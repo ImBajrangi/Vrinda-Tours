@@ -506,7 +506,7 @@
     <script>
         const MAPS_API_KEY = "AIzaSyBujG7_yMBLFYP2fXsFtbLcJWyL64sUfnA";
         const GEMINI_API_KEY = "AIzaSyBB7W-dCdNUWvMlaYeviMNFsoXK5sdZOMw";
-        const GEMINI_MODEL = "gemini-2.5-flash-preview-05-20";
+        const GEMINI_MODEL = "gemini-1.5-flash-latest";
 
         lucide.createIcons();
         let map, activeInfoWindow, directionsService, directionsRenderer, activeMarker = null;
@@ -842,11 +842,17 @@
         }
 
         function openSpotlight(location) {
-            document.getElementById('spotlight-title').textContent = location.name;
-            document.getElementById('spotlight-image').style.backgroundImage = `url(${location.image})`;
-            document.getElementById('spotlight-content').innerHTML = `<p>${location.description}</p>`;
-            document.getElementById('spotlight-history-btn').onclick = (e) => getSpotlightInfo(location.name, 'Historical Significance', e.currentTarget);
-            document.getElementById('spotlight-tips-btn').onclick = (e) => getSpotlightInfo(location.name, 'Local Tips', e.currentTarget);
+            const titleEl = document.getElementById('spotlight-title');
+            const imageEl = document.getElementById('spotlight-image');
+            const contentEl = document.getElementById('spotlight-content');
+            const historyBtn = document.getElementById('spotlight-history-btn');
+            const tipsBtn = document.getElementById('spotlight-tips-btn');
+
+            if (titleEl) titleEl.textContent = location.name;
+            if (imageEl) imageEl.style.backgroundImage = `url(${location.image})`;
+            if (contentEl) contentEl.innerHTML = `<p class="text-gray-700 leading-relaxed">${location.description}</p>`;
+            if (historyBtn) historyBtn.onclick = (e) => getSpotlightInfo(location.name, 'Historical Significance', e.currentTarget);
+            if (tipsBtn) tipsBtn.onclick = (e) => getSpotlightInfo(location.name, 'Local Tips', e.currentTarget);
             showModal('spotlight');
         }
 

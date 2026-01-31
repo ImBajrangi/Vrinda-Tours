@@ -3,18 +3,20 @@
 
 <head>
     <!-- Modern Rounded Vrindopnishad Favicon -->
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" href="https://vrindopnishad.in/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://vrindopnishad.in/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://vrindopnishad.in/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://vrindopnishad.in/apple-touch-icon.png">
+    <link rel="manifest" href="https://vrindopnishad.in/site.webmanifest">
+    <link rel="mask-icon" href="https://vrindopnishad.in/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="icon" type="image/svg+xml" href="https://vrindopnishad.in/favicon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brij 84 Kos Yatra - Interactive Map</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/auth.js" defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -455,9 +457,14 @@
                     Brij 84 Kos Yatra</h1>
                 <p class="text-sm font-medium text-gray-500">A Sacred Digital Pilgrimage</p>
             </div>
-            <button id="panel-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-all">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+            <div class="flex items-center gap-3">
+                <button id="user-auth-btn" class="p-2 rounded-full hover:bg-gray-100 transition-all">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </button>
+                <button id="panel-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
         </div>
 
         <div class="flex-grow overflow-y-auto custom-scrollbar -mr-4 sm:-mr-8 pr-4 sm:pr-8 mt-6">
@@ -629,7 +636,7 @@
     <script>
         const MAPS_API_KEY = "AIzaSyBujG7_yMBLFYP2fXsFtbLcJWyL64sUfnA";
         const GEMINI_API_KEY = "AIzaSyBB7W-dCdNUWvMlaYeviMNFsoXK5sdZOMw";
-        const GEMINI_MODEL = "gemini-2.5-flash-preview-05-20";
+        const GEMINI_MODEL = "gemini-1.5-flash-latest";
 
         lucide.createIcons();
         let map, activeInfoWindow, directionsService, directionsRenderer, activeMarker = null;
@@ -1015,11 +1022,17 @@
         }
 
         function openSpotlight(location) {
-            document.getElementById('spotlight-title').textContent = location.name;
-            document.getElementById('spotlight-image').style.backgroundImage = `url(${location.image})`;
-            document.getElementById('spotlight-content').innerHTML = `<p class="text-gray-700 leading-relaxed">${location.description}</p>`;
-            document.getElementById('spotlight-history-btn').onclick = (e) => getSpotlightInfo(location.name, 'Historical Significance', e.currentTarget);
-            document.getElementById('spotlight-tips-btn').onclick = (e) => getSpotlightInfo(location.name, 'Local Tips', e.currentTarget);
+            const titleEl = document.getElementById('spotlight-title');
+            const imageEl = document.getElementById('spotlight-image');
+            const contentEl = document.getElementById('spotlight-content');
+            const historyBtn = document.getElementById('spotlight-history-btn');
+            const tipsBtn = document.getElementById('spotlight-tips-btn');
+
+            if (titleEl) titleEl.textContent = location.name;
+            if (imageEl) imageEl.style.backgroundImage = `url(${location.image})`;
+            if (contentEl) contentEl.innerHTML = `<p class="text-gray-700 leading-relaxed">${location.description}</p>`;
+            if (historyBtn) historyBtn.onclick = (e) => getSpotlightInfo(location.name, 'Historical Significance', e.currentTarget);
+            if (tipsBtn) tipsBtn.onclick = (e) => getSpotlightInfo(location.name, 'Local Tips', e.currentTarget);
             showModal('spotlight');
         }
 
@@ -1338,6 +1351,18 @@
         } else {
             loadMapsScript();
         }
+
+
+        // Initialize Unified Auth UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const userBtn = document.getElementById('user-auth-btn');
+            if (userBtn && window.AuthService) {
+                AuthService.updateProfileUI('user-auth-btn');
+                AuthService.onAuthStateChange(() => {
+                    AuthService.updateProfileUI('user-auth-btn');
+                });
+            }
+        });
 
     </script>
 </body>
