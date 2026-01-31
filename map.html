@@ -16,22 +16,26 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         :root {
-            --accent: #FF6B35;
-            --accent-glow: rgba(255, 107, 53, 0.4);
-            --bg-dark: #0F0F0F;
-            --bg-card: #1A1A1A;
-            --bg-glass: rgba(26, 26, 26, 0.85);
+            --accent: #34D399;
+            --accent-orange: #FF6B35;
+            --accent-blue: #3B82F6;
+            --accent-gold: #FBBF24;
+            --bg-dark: #000000;
+            --bg-card: #111111;
+            --bg-glass: rgba(17, 17, 17, 0.92);
             --text-primary: #FFFFFF;
-            --text-secondary: #A0A0A0;
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --text-secondary: #9CA3AF;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
         }
 
         * {
@@ -41,7 +45,8 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        html, body {
+        html,
+        body {
             height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-dark);
@@ -62,11 +67,10 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 1rem 1.25rem;
+            padding: 1rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            background: linear-gradient(to bottom, rgba(15, 15, 15, 0.9), transparent);
         }
 
         .search-bar {
@@ -75,17 +79,18 @@
             align-items: center;
             gap: 0.75rem;
             background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
-            padding: 0.875rem 1rem;
-            transition: all 0.3s var(--transition-smooth);
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            transition: all 0.4s var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
         }
 
         .search-bar:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2), 0 4px 24px rgba(0, 0, 0, 0.3);
         }
 
         .search-bar input {
@@ -94,7 +99,7 @@
             border: none;
             outline: none;
             color: var(--text-primary);
-            font-size: 0.9375rem;
+            font-size: 1rem;
             font-weight: 500;
         }
 
@@ -103,23 +108,28 @@
         }
 
         .icon-btn {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--bg-glass);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             border: 1px solid var(--border-subtle);
-            border-radius: 14px;
+            border-radius: 16px;
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.3s var(--transition-smooth);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
         }
 
         .icon-btn:hover {
-            background: var(--bg-card);
             transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
         }
 
         /* --- Category Pills --- */
@@ -129,7 +139,7 @@
             left: 0;
             right: 0;
             z-index: 1000;
-            padding: 0 1.25rem;
+            padding: 0 1rem;
             display: flex;
             gap: 0.5rem;
             overflow-x: auto;
@@ -143,50 +153,93 @@
 
         .pill {
             flex-shrink: 0;
-            padding: 0.625rem 1rem;
+            padding: 0.75rem 1.25rem;
             background: var(--bg-glass);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             border: 1px solid var(--border-subtle);
             border-radius: 100px;
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             font-weight: 600;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.3s var(--transition-smooth);
             white-space: nowrap;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .pill.active, .pill:hover {
-            background: var(--accent);
+        .pill.active {
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            border-color: var(--text-primary);
+        }
+
+        .pill:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
-            border-color: var(--accent);
         }
 
-        /* --- Location Card (Bottom Sheet) --- */
+        /* --- Brij Points Badge --- */
+        .points-badge {
+            position: absolute;
+            top: 5.5rem;
+            right: 1rem;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #10B981, #059669);
+            padding: 0.625rem 1rem;
+            border-radius: 100px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+
+        .points-badge .coin {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.625rem;
+            color: #92400E;
+            font-weight: 900;
+        }
+
+        /* --- Location Card (Floating Bottom Sheet) --- */
         .location-card {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 1.5rem;
+            left: 1rem;
+            right: 1rem;
             z-index: 1000;
             background: var(--bg-card);
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
+            border-radius: 24px;
             padding: 1.5rem;
-            transform: translateY(100%);
-            transition: transform 0.4s var(--transition-smooth);
+            transform: translateY(calc(100% + 2rem));
+            transition: transform 0.5s var(--transition-smooth);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-subtle);
         }
 
         .location-card.visible {
             transform: translateY(0);
-        }
-
-        .card-handle {
-            width: 40px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            margin: 0 auto 1.25rem;
         }
 
         .card-header {
@@ -197,36 +250,69 @@
         }
 
         .card-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
+            width: 88px;
+            height: 88px;
+            border-radius: 20px;
             background-size: cover;
             background-position: center;
             flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
-        .card-info h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
+        .card-info {
+            flex: 1;
+            min-width: 0;
         }
 
         .card-info .category {
             display: inline-flex;
             align-items: center;
             gap: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.6875rem;
+            font-weight: 700;
             color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-info h2 {
+            font-size: 1.375rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.375rem;
         }
 
         .card-info p {
             font-size: 0.875rem;
             color: var(--text-secondary);
             line-height: 1.5;
-            margin-top: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
         }
 
         .card-actions {
@@ -239,21 +325,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: var(--accent);
+            gap: 0.625rem;
+            padding: 1rem 1.5rem;
+            background: var(--text-primary);
             border: none;
             border-radius: 14px;
             font-size: 0.9375rem;
-            font-weight: 600;
-            color: var(--text-primary);
+            font-weight: 700;
+            color: var(--bg-dark);
             cursor: pointer;
             transition: all 0.3s var(--transition-smooth);
         }
 
         .btn-primary:hover {
-            filter: brightness(1.1);
             transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
         }
 
         .btn-secondary {
@@ -274,21 +364,85 @@
             background: rgba(255, 255, 255, 0.12);
         }
 
+        /* --- Reward Toast --- */
+        .reward-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            z-index: 2000;
+            background: linear-gradient(135deg, #10B981, #059669);
+            padding: 2rem 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s var(--transition-smooth);
+            box-shadow: 0 25px 60px rgba(16, 185, 129, 0.4);
+        }
+
+        .reward-toast.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .reward-toast .coin-lg {
+            width: 64px;
+            height: 64px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #92400E;
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .reward-toast h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .reward-toast p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
         /* --- Search Results Overlay --- */
         .search-results {
             position: absolute;
             top: 5rem;
-            left: 1.25rem;
-            right: 1.25rem;
-            z-index: 1001;
+            left: 1rem;
+            right: 1rem;
+            z-index: 1002;
             background: var(--bg-card);
-            border-radius: 16px;
-            max-height: 300px;
+            border-radius: 20px;
+            max-height: 320px;
             overflow-y: auto;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-10px);
+            transform: translateY(-12px);
             transition: all 0.3s var(--transition-smooth);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-subtle);
         }
 
         .search-results.visible {
@@ -301,7 +455,7 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            padding: 1rem;
+            padding: 1rem 1.25rem;
             cursor: pointer;
             border-bottom: 1px solid var(--border-subtle);
             transition: background 0.2s ease;
@@ -316,13 +470,13 @@
         }
 
         .search-result-item .icon {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 107, 53, 0.15);
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.1));
+            border-radius: 12px;
             color: var(--accent);
         }
 
@@ -342,81 +496,116 @@
         }
 
         .custom-marker {
-            width: 36px;
-            height: 36px;
-            border-radius: 50% 50% 50% 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
             background: var(--accent);
             border: 3px solid white;
-            transform: rotate(-45deg);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
 
         .custom-marker.active {
-            transform: rotate(-45deg) scale(1.2);
-            background: #fff;
-            border-color: var(--accent);
+            width: 20px;
+            height: 20px;
+            border-width: 4px;
+            box-shadow: 0 0 0 8px rgba(52, 211, 153, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
-        .custom-marker.temple { background: #c0392b; }
-        .custom-marker.holy-site { background: #27ae60; }
-        .custom-marker.town { background: #2980b9; }
-
-        .leaflet-popup-content-wrapper {
-            background: var(--bg-card);
-            border-radius: 12px;
-            color: var(--text-primary);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        .custom-marker.temple {
+            background: #EF4444;
         }
 
-        .leaflet-popup-tip {
-            background: var(--bg-card);
+        .custom-marker.holy-site {
+            background: #10B981;
+        }
+
+        .custom-marker.town {
+            background: #3B82F6;
         }
 
         .leaflet-control-zoom {
             display: none;
         }
 
-        /* --- Animations --- */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        /* --- Map Overlay Gradient --- */
+        .map-gradient-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 160px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+            pointer-events: none;
+            z-index: 500;
         }
 
-        .loading-pulse {
-            animation: pulse 1.5s infinite;
+        .map-gradient-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            pointer-events: none;
+            z-index: 500;
         }
     </style>
 </head>
 
 <body>
     <div id="map"></div>
+    <div class="map-gradient-top"></div>
+    <div class="map-gradient-bottom"></div>
 
     <!-- Header -->
     <header class="header">
         <div class="search-bar">
-            <i data-lucide="search" style="width: 20px; height: 20px; color: var(--text-secondary);"></i>
-            <input type="text" id="search-input" placeholder="Search sacred sites...">
+            <i data-lucide="search" style="width: 22px; height: 22px; color: var(--text-secondary);"></i>
+            <input type="text" id="search-input" placeholder="Where to?">
         </div>
         <button class="icon-btn" id="user-btn">
-            <i data-lucide="user" style="width: 22px; height: 22px;"></i>
+            <i data-lucide="user" style="width: 24px; height: 24px;"></i>
         </button>
     </header>
 
     <!-- Category Pills -->
     <div class="category-pills">
-        <button class="pill active" data-filter="all">All</button>
-        <button class="pill" data-filter="Temple">Temples</button>
-        <button class="pill" data-filter="Holy Site">Holy Sites</button>
-        <button class="pill" data-filter="Town">Towns</button>
+        <button class="pill active" data-filter="all">
+            <span>✨</span> All Sites
+        </button>
+        <button class="pill" data-filter="Temple">
+            <span>🛕</span> Temples
+        </button>
+        <button class="pill" data-filter="Holy Site">
+            <span>🙏</span> Holy Sites
+        </button>
+        <button class="pill" data-filter="Town">
+            <span>🏘️</span> Towns
+        </button>
+    </div>
+
+    <!-- Brij Points Badge -->
+    <div class="points-badge">
+        <div class="coin">₿</div>
+        <span id="points-count">0</span> BrijPoints
     </div>
 
     <!-- Search Results -->
     <div class="search-results" id="search-results"></div>
 
+    <!-- Reward Toast -->
+    <div class="reward-toast" id="reward-toast">
+        <div class="coin-lg">₿</div>
+        <h3>+<span id="reward-amount">10</span> BrijPoints!</h3>
+        <p>Keep exploring sacred sites</p>
+    </div>
+
     <!-- Location Card -->
     <div class="location-card" id="location-card">
-        <div class="card-handle"></div>
+        <button class="card-close" id="close-card-btn">
+            <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+        </button>
         <div class="card-header">
             <div class="card-image" id="card-image"></div>
             <div class="card-info">
@@ -430,11 +619,11 @@
         </div>
         <div class="card-actions">
             <button class="btn-primary" id="get-directions-btn">
-                <i data-lucide="navigation" style="width: 18px; height: 18px;"></i>
+                <i data-lucide="navigation" style="width: 20px; height: 20px;"></i>
                 Get Directions
             </button>
-            <button class="btn-secondary" id="close-card-btn">
-                <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+            <button class="btn-secondary" id="share-btn">
+                <i data-lucide="share-2" style="width: 20px; height: 20px;"></i>
             </button>
         </div>
     </div>
@@ -448,16 +637,33 @@
 
         // --- Data ---
         const locations = [
-            { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival.", category: "Town" },
-            { name: "Shri Radharani Temple", lat: 27.650261, lng: 77.373287, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A hilltop temple dedicated to Radha, offering stunning views of the region.", category: "Temple" },
-            { name: "Pili Pokhar (Priya Kund)", lat: 27.653932, lng: 77.37667, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A sacred pond with golden-hued water, associated with Radha's pastimes.", category: "Holy Site" },
-            { name: "Gahvar Van", lat: 27.642648, lng: 77.367327, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A dense forest where Radha and Krishna would meet in secret.", category: "Holy Site" },
-            { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The village of Lalita Sakhi, Radha's closest companion.", category: "Town" },
-            { name: "Shri Lalita Sakhi Mandir", lat: 27.661866, lng: 77.363891, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A temple dedicated to Lalita, the leader of the Ashta Sakhis.", category: "Temple" },
-            { name: "Prem Sarovar", lat: 27.66576, lng: 77.379896, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The Lake of Love, where Radha and Krishna first met.", category: "Holy Site" },
-            { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A village with scenic hills and temples.", category: "Town" },
-            { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "Home to the legendary Ashwathama.", category: "Town" },
+            { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival celebrated with great fervor.", category: "Town", points: 15 },
+            { name: "Shri Radharani Temple", lat: 27.650261, lng: 77.373287, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A hilltop temple dedicated to Radha, offering stunning panoramic views of the sacred region.", category: "Temple", points: 20 },
+            { name: "Pili Pokhar (Priya Kund)", lat: 27.653932, lng: 77.37667, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A sacred pond with golden-hued water, deeply associated with Radha's divine pastimes.", category: "Holy Site", points: 25 },
+            { name: "Gahvar Van", lat: 27.642648, lng: 77.367327, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A dense forest where Radha and Krishna would meet in secret for their divine plays.", category: "Holy Site", points: 30 },
+            { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The village of Lalita Sakhi, Radha's closest and most beloved companion.", category: "Town", points: 15 },
+            { name: "Shri Lalita Sakhi Mandir", lat: 27.661866, lng: 77.363891, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A temple dedicated to Lalita, the leader of the Ashta Sakhis (eight companions).", category: "Temple", points: 20 },
+            { name: "Prem Sarovar", lat: 27.66576, lng: 77.379896, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The Lake of Love, the sacred site where Radha and Krishna first met.", category: "Holy Site", points: 35 },
+            { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
+            { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
         ];
+
+        let totalPoints = 0;
+        const pointsCountEl = document.getElementById('points-count');
+        const rewardToast = document.getElementById('reward-toast');
+        const rewardAmountEl = document.getElementById('reward-amount');
+
+        function addPoints(amount) {
+            totalPoints += amount;
+            pointsCountEl.textContent = totalPoints;
+            pointsCountEl.style.transform = 'scale(1.3)';
+            setTimeout(() => pointsCountEl.style.transform = 'scale(1)', 200);
+
+            // Show reward toast
+            rewardAmountEl.textContent = amount;
+            rewardToast.classList.add('visible');
+            setTimeout(() => rewardToast.classList.remove('visible'), 2000);
+        }
 
         // --- Map Initialization ---
         const map = L.map('map', {
@@ -475,21 +681,15 @@
         // --- Markers ---
         const markers = [];
         let activeMarker = null;
+        const visitedLocations = new Set();
 
         function createMarkerIcon(category, isActive = false) {
-            const colors = {
-                'Temple': '#c0392b',
-                'Holy Site': '#27ae60',
-                'Town': '#2980b9'
-            };
-            const color = isActive ? '#FFFFFF' : (colors[category] || '#FF6B35');
-            const borderColor = isActive ? '#FF6B35' : '#FFFFFF';
-
+            const categoryClass = category.toLowerCase().replace(' ', '-');
             return L.divIcon({
                 className: 'marker-wrapper',
-                html: `<div class="custom-marker ${isActive ? 'active' : ''}" style="background: ${color}; border-color: ${borderColor};"></div>`,
-                iconSize: [36, 36],
-                iconAnchor: [18, 36]
+                html: `<div class="custom-marker ${categoryClass} ${isActive ? 'active' : ''}"></div>`,
+                iconSize: [isActive ? 20 : 14, isActive ? 20 : 14],
+                iconAnchor: [isActive ? 10 : 7, isActive ? 10 : 7]
             });
         }
 
@@ -511,6 +711,7 @@
         const cardCategoryText = document.getElementById('card-category-text');
         const closeCardBtn = document.getElementById('close-card-btn');
         const getDirectionsBtn = document.getElementById('get-directions-btn');
+        const shareBtn = document.getElementById('share-btn');
 
         function showLocationCard(loc, marker) {
             // Reset previous marker
@@ -534,6 +735,12 @@
             // Center map on location
             map.flyTo([loc.lat, loc.lng], 15, { duration: 0.5 });
 
+            // Award points if first visit
+            if (!visitedLocations.has(loc.name)) {
+                visitedLocations.add(loc.name);
+                setTimeout(() => addPoints(loc.points), 800);
+            }
+
             lucide.createIcons();
         }
 
@@ -551,6 +758,21 @@
             if (activeMarker) {
                 const loc = activeMarker.locationData;
                 window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank');
+            }
+        });
+
+        shareBtn.addEventListener('click', async () => {
+            if (activeMarker && navigator.share) {
+                const loc = activeMarker.locationData;
+                try {
+                    await navigator.share({
+                        title: loc.name,
+                        text: loc.description,
+                        url: `https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`
+                    });
+                } catch (err) {
+                    console.log('Share cancelled');
+                }
             }
         });
 
@@ -580,7 +802,7 @@
                         <div class="icon"><i data-lucide="map-pin"></i></div>
                         <div class="text">
                             <h4>${loc.name}</h4>
-                            <span>${loc.category}</span>
+                            <span>${loc.category} • +${loc.points} points</span>
                         </div>
                     `;
                     item.addEventListener('click', () => {
@@ -631,7 +853,6 @@
 
         // Close card when clicking on map
         map.on('click', (e) => {
-            // Only close if not clicking a marker
             if (!e.originalEvent.target.closest('.custom-marker')) {
                 hideLocationCard();
             }
