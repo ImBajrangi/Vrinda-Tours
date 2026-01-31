@@ -1438,7 +1438,7 @@
                     url = baseUrl + 'flag-2.png';
                     break;
                 case 'Information':
-                    url = baseUrl + 'flag-3.png';
+                    url = baseUrl + 'flag.png';
                     break;
                 default:
                     url = baseUrl + 'marker-ink/icons8-marker-96.png';
@@ -1447,16 +1447,30 @@
         }
 
         function createMarkerIcon(category, isActive = false, isPlaying = false) {
+            const baseUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/';
             const hasAnim = category === 'Temple' || category === 'Holy Site';
+
+            // If active, it's the "Destination" -> Use flag-3.png
+            if (isActive) {
+                return L.divIcon({
+                    className: 'marker-wrapper',
+                    html: `<div class="image-marker active destination">
+                        <img src="${baseUrl}flag-3.png" class="static" alt="Destination">
+                    </div>`,
+                    iconSize: [44, 44],
+                    iconAnchor: [22, 44]
+                });
+            }
+
             const iconUrl = getCategoryMarker(category, isPlaying);
-            const baseStaticUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/marker-ink/icons8-marker-96.png';
+            const baseStaticUrl = baseUrl + 'marker-ink/icons8-marker-96.png';
 
             // Use specific icon for static POIs (Dining/Info), and ink marker for animated ones
             const staticUrl = hasAnim ? baseStaticUrl : iconUrl;
 
             return L.divIcon({
                 className: 'marker-wrapper',
-                html: `<div class="image-marker ${isActive ? 'active' : ''} ${isPlaying ? 'playing' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
+                html: `<div class="image-marker ${isPlaying ? 'playing' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
                     <img src="${staticUrl}" class="static" alt="${category}">
                     ${hasAnim ? `<img src="${iconUrl}" class="animated" alt="${category}">` : ''}
                 </div>`,
