@@ -190,18 +190,27 @@
         }
 
         .pill-icon {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 50%;
-            font-size: 0.75rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 8px;
+        }
+
+        .pill-icon svg {
+            width: 16px;
+            height: 16px;
+            color: var(--accent-blue);
         }
 
         .pill.active .pill-icon {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .pill.active .pill-icon svg {
+            color: var(--text-primary);
         }
 
         /* --- BrijPoints Badge --- */
@@ -568,7 +577,14 @@
 
         .custom-marker .marker-icon {
             transform: rotate(45deg);
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-marker .marker-icon svg {
+            width: 16px;
+            height: 16px;
         }
 
         .custom-marker.temple {
@@ -608,26 +624,26 @@
     <!-- Category Pills -->
     <div class="category-pills">
         <button class="pill active" data-filter="all">
-            <span class="pill-icon">✨</span>
+            <span class="pill-icon"><i data-lucide="compass"></i></span>
             All Sites
         </button>
         <button class="pill" data-filter="Temple">
-            <span class="pill-icon">🛕</span>
+            <span class="pill-icon"><i data-lucide="landmark"></i></span>
             Temples
         </button>
         <button class="pill" data-filter="Holy Site">
-            <span class="pill-icon">🙏</span>
+            <span class="pill-icon"><i data-lucide="sparkles"></i></span>
             Holy Sites
         </button>
         <button class="pill" data-filter="Town">
-            <span class="pill-icon">🏘️</span>
+            <span class="pill-icon"><i data-lucide="home"></i></span>
             Towns
         </button>
     </div>
 
     <!-- BrijPoints Badge -->
     <div class="points-badge">
-        <div class="coin">₿</div>
+        <div class="coin"><i data-lucide="trophy" style="width: 14px; height: 14px;"></i></div>
         <span><span id="points-count">0</span> Points</span>
     </div>
 
@@ -636,7 +652,7 @@
 
     <!-- Reward Toast -->
     <div class="reward-toast" id="reward-toast">
-        <div class="coin-lg">₿</div>
+        <div class="coin-lg"><i data-lucide="award" style="width: 32px; height: 32px;"></i></div>
         <h3>+<span id="reward-amount">10</span> Points!</h3>
         <p>Keep exploring sacred sites</p>
     </div>
@@ -741,10 +757,10 @@
 
         function getCategoryIcon(category) {
             switch (category) {
-                case 'Temple': return '🛕';
-                case 'Holy Site': return '🙏';
-                case 'Town': return '🏘️';
-                default: return '📍';
+                case 'Temple': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><path d="M6 11V6a6 6 0 0 1 12 0v5"/><path d="M12 2v20"/></svg>';
+                case 'Holy Site': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>';
+                case 'Town': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+                default: return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
             }
         }
 
