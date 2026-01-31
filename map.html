@@ -465,13 +465,43 @@
             }
 
             60% {
-                transform: scale(1.1) translateY(-5px);
+                transform: scale(1.1) translateY(-6px);
                 opacity: 1;
             }
 
             100% {
-                transform: scale(1) translateY(0);
-                opacity: 1;
+                transform: scale(0.9) translateY(0);
+                opacity: 0.85;
+            }
+        }
+
+        @keyframes marker-active-breath {
+
+            0%,
+            100% {
+                transform: scale(1.4) translateY(-8px);
+                filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
+            }
+
+            50% {
+                transform: scale(1.45) translateY(-10px);
+                filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.4));
+            }
+        }
+
+        @keyframes marker-hover-wiggle {
+
+            0%,
+            100% {
+                transform: scale(1.4) translateY(-8px) rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.4) translateY(-8px) rotate(-5deg);
+            }
+
+            75% {
+                transform: scale(1.4) translateY(-8px) rotate(5deg);
             }
         }
 
@@ -498,17 +528,18 @@
             mix-blend-mode: multiply;
         }
 
-        /* Interactive states (Hover/Active) */
-        .image-marker:hover,
-        .image-marker.active {
+        /* Hover interaction */
+        .image-marker:hover {
             opacity: 1;
-            transform: scale(1.4) translateY(-8px);
-            filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
             z-index: 1000 !important;
+            animation: marker-hover-wiggle 0.4s ease-in-out infinite;
         }
 
+        /* Active/Selected state */
         .image-marker.active {
-            filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.35));
+            opacity: 1;
+            z-index: 1001 !important;
+            animation: marker-active-breath 2s ease-in-out infinite;
         }
 
 
