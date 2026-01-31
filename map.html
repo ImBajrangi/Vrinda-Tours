@@ -580,6 +580,46 @@
             stroke-dasharray: none;
         }
 
+        /* --- Custom Zoom Controls --- */
+        .zoom-controls {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .zoom-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            font-size: 20px;
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .zoom-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
         /* ========================================
            RESPONSIVE MEDIA QUERIES
         ======================================== */
@@ -997,6 +1037,12 @@
         <i data-lucide="crosshair" style="width: 24px; height: 24px;"></i>
     </button>
 
+    <!-- Custom Zoom Controls -->
+    <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-in" title="Zoom in">+</button>
+        <button class="zoom-btn" id="zoom-out" title="Zoom out">−</button>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -1022,13 +1068,28 @@
             center: [27.65, 77.38],
             zoom: 13,
             zoomControl: false,
-            attributionControl: false
+            attributionControl: false,
+            // Smooth animation settings
+            zoomAnimation: true,
+            zoomAnimationThreshold: 4,
+            fadeAnimation: true,
+            markerZoomAnimation: true,
+            inertia: true,
+            inertiaDeceleration: 3000,
+            inertiaMaxSpeed: 1500,
+            easeLinearity: 0.2,
+            worldCopyJump: false,
+            maxBoundsViscosity: 1.0
         });
 
         // Modern Stadia Maps tiles (Uber-like style)
         L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
             maxZoom: 20,
-            attribution: '&copy; Stadia Maps'
+            minZoom: 10,
+            attribution: '&copy; Stadia Maps',
+            updateWhenIdle: false,
+            updateWhenZooming: false,
+            keepBuffer: 2
         }).addTo(map);
 
         // --- Markers ---
@@ -1099,7 +1160,10 @@
             locationCard.classList.add('visible');
 
             // Center map on location
-            map.flyTo([loc.lat, loc.lng], 15, { duration: 0.5 });
+            map.flyTo([loc.lat, loc.lng], 15, {
+                duration: 0.8,
+                easeLinearity: 0.25
+            });
 
             lucide.createIcons();
         }
@@ -1285,7 +1349,10 @@
                     }).addTo(map);
 
                     // Center map on user location
-                    map.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 1 });
+                    map.flyTo([userLocation.lat, userLocation.lng], 14, {
+                        duration: 1.2,
+                        easeLinearity: 0.25
+                    });
 
                     locationFab.classList.remove('loading');
 
@@ -1348,10 +1415,32 @@
                 [userLocation.lat, userLocation.lng],
                 [destination.lat, destination.lng]
             );
-            map.fitBounds(bounds, { padding: [50, 50] });
+            map.fitBounds(bounds, {
+                padding: [50, 50],
+                duration: 0.8,
+                easeLinearity: 0.25
+            });
         }
 
         locationFab.addEventListener('click', getCurrentLocation);
+
+        // --- Custom Zoom Controls ---
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+
+        zoomInBtn.addEventListener('click', () => {
+            map.setZoom(map.getZoom() + 1, {
+                animate: true,
+                duration: 0.3
+            });
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            map.setZoom(map.getZoom() - 1, {
+                animate: true,
+                duration: 0.3
+            });
+        });
 
 
         // Update Get Directions button to draw route
