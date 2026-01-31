@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Modern Rounded Vrindopnishad Favicon -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brij 84 Kos Yatra - Interactive Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --brand-orange: #FF6B35;
+            --brand-blue: #004E89;
+            --brand-light: #FAFAFA;
+            --brand-dark: #1A1A1A;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow: hidden;
+            background-color: var(--brand-light);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            transition: filter 0.3s ease;
+        }
+
+        .gm-style-iw-c {
+            border-radius: 16px !important;
+            padding: 0 !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(20px);
+        }
+
+        .gm-style-iw-d {
+            overflow: hidden !important;
+        }
+
+        .gm-style-iw-t::after {
+            display: none;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--brand-orange), var(--brand-blue));
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+        }
+
+        .glass-dark {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Side Panel */
+        .side-panel {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+            backdrop-filter: blur(40px);
+            box-shadow: -10px 0 60px rgba(0, 0, 0, 0.12);
+            z-index: 2000;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--brand-orange), #FF8C61);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--brand-dark);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+            background: linear-gradient(135deg, #ffffff, #f5f5f5);
+        }
+
+        .filter-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1.5px solid rgba(0, 0, 0, 0.1);
+            color: #666;
+            font-weight: 500;
+            background: white;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--brand-blue), #005FA3);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(0, 78, 137, 0.3);
+        }
+
+        /* Toggle Switch */
+        .yatra-mode-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 14px;
+            padding: 4px;
+            position: relative;
+        }
+
+        .yatra-mode-toggle button {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 10px;
+            z-index: 1;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .yatra-mode-toggle .active {
+            color: white;
+        }
+
+        #yatra-mode-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: linear-gradient(135deg, var(--brand-blue), #005FA3);
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0, 78, 137, 0.3);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dropdown */
+        #style-dropdown-btn {
+            background: white;
+            color: var(--brand-dark);
+            border: 1.5px solid rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+        }
+
+        #style-dropdown-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        #style-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            width: 180px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: top;
+            z-index: 10;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        #style-dropdown-list button {
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        #style-dropdown-list button:hover {
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.1), transparent);
+        }
+
+        #style-dropdown-list button.active {
+            font-weight: 700;
+            color: var(--brand-orange);
+            background: rgba(255, 107, 53, 0.08);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        /* AI Content Styling */
+        .ai-content h3 {
+            font-weight: 700;
+            color: var(--brand-blue);
+            border-bottom: 3px solid var(--brand-orange);
+            padding-bottom: 0.75rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .ai-content h4 {
+            font-weight: 600;
+            color: var(--brand-dark);
+            margin-top: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .ai-content strong {
+            color: var(--brand-blue);
+            font-weight: 600;
+        }
+
+        .ai-content ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .ai-content li {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .ai-content li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--brand-orange);
+            font-weight: bold;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Location Card Hover */
+        .location-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px;
+        }
+
+        .location-card:hover {
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.05), transparent);
+            transform: translateX(4px);
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            background: white;
+            border: 1.5px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 12px 16px 12px 44px;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--brand-orange);
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
+        }
+
+        /* Icon Buttons */
+        .icon-btn {
+            background: white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Nearby Buttons */
+        .nearby-container {
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border: 1.5px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .nearby-btn {
+            font-weight: 500;
+            font-size: 0.8125rem;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+        }
+
+        .nearby-btn:hover {
+            background: linear-gradient(90deg, rgba(255, 107, 53, 0.08), transparent);
+        }
+
+        .nearby-btn.active {
+            background: linear-gradient(135deg, var(--brand-orange), #FF8C61);
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="relative">
+
+    <div id="map"></div>
+
+    <!-- Top Controls Container -->
+    <div class="absolute top-6 left-6 right-6 sm:right-auto flex flex-col sm:flex-row sm:items-start gap-3 z-[1000]">
+        <!-- Map Style Dropdown -->
+        <div id="map-style-selector" class="relative">
+            <button id="style-dropdown-btn">
+                <span id="current-style-name">Google Original</span>
+                <i data-lucide="chevron-down" class="w-4 h-4 ml-2"></i>
+            </button>
+            <div id="style-dropdown-list" class="hidden scale-95 opacity-0">
+                <button data-style="roadmap" class="active w-full text-left p-3">Google Original</button>
+                <button data-style="classic_style" class="w-full text-left p-3">Classic</button>
+                <button data-style="satellite" class="w-full text-left p-3">Satellite</button>
+                <button data-style="serene_style" class="w-full text-left p-3">Serene</button>
+                <button data-style="mystic_style" class="w-full text-left p-3">Mystic</button>
+            </div>
+        </div>
+
+        <!-- Search and Nearby Controls -->
+        <div id="search-nearby-container" class="flex flex-col space-y-3 w-full sm:max-w-sm">
+            <div class="search-container">
+                <i data-lucide="search"
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10"></i>
+                <input type="text" id="search-input" placeholder="Search sacred sites..." class="search-input w-full">
+                <div id="search-suggestions"
+                    class="absolute top-full mt-2 w-full bg-white rounded-xl shadow-2xl overflow-hidden z-10 hidden border border-gray-100">
+                </div>
+            </div>
+            <div class="nearby-container flex items-center justify-between space-x-2">
+                <span class="px-2 text-xs font-semibold text-gray-500">Partners:</span>
+                <button data-type="Restaurant" class="nearby-btn flex-1 flex items-center justify-center py-2 px-2">
+                    <i data-lucide="utensils" class="w-4 h-4 mr-1.5"></i>Food
+                </button>
+                <button data-type="Hotel" class="nearby-btn flex-1 flex items-center justify-center py-2 px-2">
+                    <i data-lucide="bed-double" class="w-4 h-4 mr-1.5"></i>Hotels
+                </button>
+                <button id="clear-nearby-btn" class="hidden p-2 rounded-lg text-red-500 hover:bg-red-50" title="Clear">
+                    <i data-lucide="x-circle" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="side-panel"
+        class="side-panel absolute top-0 right-0 bottom-0 w-full max-w-md flex flex-col p-6 sm:p-8 transition-transform duration-500 ease-out translate-x-full">
+        <div class="flex-shrink-0 pb-6 border-b border-gray-200 flex justify-between items-start">
+            <div>
+                <h1
+                    class="text-3xl sm:text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                    Brij 84 Kos Yatra</h1>
+                <p class="text-sm font-medium text-gray-500">A Sacred Digital Pilgrimage</p>
+            </div>
+            <button id="panel-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-all">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto custom-scrollbar -mr-4 sm:-mr-8 pr-4 sm:pr-8 mt-6">
+            <div class="space-y-6">
+                <div class="yatra-mode-toggle">
+                    <div id="yatra-mode-slider"></div>
+                    <button id="yatra-mode-explore" class="active">Explore</button>
+                    <button id="yatra-mode-pilgrimage">Pilgrimage</button>
+                </div>
+
+                <div id="filters-container">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Filter by Category</h2>
+                    <div id="filters" class="flex flex-wrap gap-2">
+                        <button data-filter="all"
+                            class="filter-btn active px-5 py-2.5 text-sm rounded-full">All</button>
+                        <button data-filter="Temple"
+                            class="filter-btn px-5 py-2.5 text-sm rounded-full">Temples</button>
+                        <button data-filter="Holy Site" class="filter-btn px-5 py-2.5 text-sm rounded-full">Holy
+                            Sites</button>
+                        <button data-filter="Town" class="filter-btn px-5 py-2.5 text-sm rounded-full">Towns</button>
+                    </div>
+                </div>
+
+                <div id="pilgrimage-controls-container">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Parikrama Route</h2>
+                    <button id="toggle-route-btn"
+                        class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                        Show Full Route
+                    </button>
+                </div>
+
+                <div>
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">AI Assistant</h2>
+                    <div class="space-y-3">
+                        <button id="live-intel-btn"
+                            class="btn-primary w-full py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                            <i data-lucide="zap" class="w-4 h-4 mr-2"></i> Live Yatra Intel
+                        </button>
+                        <button id="generate-plan-btn"
+                            class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                            <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> Generate Yatra Plan
+                        </button>
+                        <button id="open-chat-btn"
+                            class="btn-secondary w-full py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                            <i data-lucide="message-circle" class="w-4 h-4 mr-2"></i> Chat with AI Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="route-info"
+                class="hidden mt-6 p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                <h3 class="font-bold text-center mb-4 text-lg">Route Details</h3>
+                <div class="flex justify-around text-center">
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium mb-1">Distance</p>
+                        <p id="total-distance" class="font-bold text-xl"></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-medium mb-1">Driving Time</p>
+                        <p id="total-duration" class="font-bold text-xl"></p>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-6 border-gray-200">
+            <div id="locations-panel-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- Panel Open Button -->
+    <button id="panel-open-btn" class="icon-btn absolute top-6 right-6 z-[1000]">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+    </button>
+
+    <button id="sound-toggle" class="icon-btn absolute bottom-6 left-6 z-30">
+        <i data-lucide="volume-2" class="w-5 h-5"></i>
+    </button>
+    <audio id="ambient-sound"
+        src="https://storage.googleapis.com/gemini-prod-us-east1-assets/codelabs/ambient-music.mp3" loop></audio>
+
+    <!-- Modals -->
+    <div id="spotlight-modal-overlay"
+        class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 opacity-0 modal-overlay">
+        <div id="spotlight-modal"
+            class="bg-white w-full max-w-4xl flex flex-col md:flex-row h-auto max-h-[90vh] transform scale-95 opacity-0 modal">
+            <div id="spotlight-image" class="w-full h-64 md:w-1/2 md:h-full bg-cover bg-center flex-shrink-0"></div>
+            <div class="w-full md:w-1/2 flex flex-col min-h-0">
+                <header class="flex items-center justify-between p-6 border-b flex-shrink-0">
+                    <h3 id="spotlight-title" class="text-2xl font-bold text-gray-900 tracking-tight"></h3>
+                    <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors"
+                        data-modal="spotlight">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </header>
+                <div id="spotlight-content" class="flex-grow p-6 overflow-y-auto custom-scrollbar ai-content"></div>
+                <footer class="p-6 border-t bg-gray-50 flex-shrink-0 space-y-3">
+                    <button id="spotlight-history-btn"
+                        class="w-full btn-secondary py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                        <i data-lucide="scroll-text" class="w-4 h-4 mr-2"></i> Historical Significance
+                    </button>
+                    <button id="spotlight-tips-btn"
+                        class="w-full btn-secondary py-3 px-4 rounded-xl flex items-center justify-center text-sm font-semibold">
+                        <i data-lucide="lightbulb" class="w-4 h-4 mr-2"></i> Local Tips
+                    </button>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <div id="itinerary-modal-overlay"
+        class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 opacity-0 modal-overlay">
+        <div id="itinerary-modal"
+            class="bg-white w-full max-w-2xl flex flex-col h-auto max-h-[90vh] transform scale-95 opacity-0 modal">
+            <header class="flex items-center justify-between p-6 border-b">
+                <h3 class="text-2xl font-bold flex items-center tracking-tight">
+                    <i data-lucide="sparkles" class="w-6 h-6 mr-3 text-yellow-500"></i>Your Yatra Plan
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors"
+                    data-modal="itinerary">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </header>
+            <div id="itinerary-modal-content" class="flex-grow p-6 overflow-y-auto custom-scrollbar ai-content"></div>
+        </div>
+    </div>
+
+    <div id="chat-modal-overlay"
+        class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 opacity-0 modal-overlay">
+        <div id="chat-modal"
+            class="bg-white w-full max-w-lg flex flex-col h-[85vh] sm:h-[80vh] transform scale-95 opacity-0 modal">
+            <header class="flex items-center justify-between p-6 border-b">
+                <h3 class="text-2xl font-bold flex items-center tracking-tight">
+                    <i data-lucide="bot" class="w-6 h-6 mr-3 text-blue-500"></i>AI Tour Guide
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors" data-modal="chat">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </header>
+            <div id="chat-history" class="flex-grow p-4 space-y-4 overflow-y-auto bg-gray-50 custom-scrollbar"></div>
+            <footer class="p-4 border-t bg-white">
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="chat-input" placeholder="Ask about the Yatra..."
+                        class="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none text-base font-medium">
+                    <button id="chat-send-btn" class="btn-primary p-3 rounded-xl flex-shrink-0">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <div id="liveintel-modal-overlay"
+        class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 opacity-0 modal-overlay">
+        <div id="liveintel-modal"
+            class="bg-white w-full max-w-xl flex flex-col h-auto max-h-[90vh] transform scale-95 opacity-0 modal">
+            <header class="flex items-center justify-between p-6 border-b">
+                <h3 class="text-2xl font-bold flex items-center tracking-tight">
+                    <i data-lucide="zap" class="w-6 h-6 mr-3 text-green-500"></i>Yatra Daily Briefing
+                </h3>
+                <button class="close-modal-btn text-gray-400 hover:text-gray-700 transition-colors"
+                    data-modal="liveintel">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </header>
+            <div id="liveintel-modal-content" class="flex-grow p-6 overflow-y-auto custom-scrollbar ai-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const MAPS_API_KEY = "AIzaSyBujG7_yMBLFYP2fXsFtbLcJWyL64sUfnA";
+        const GEMINI_API_KEY = "AIzaSyBB7W-dCdNUWvMlaYeviMNFsoXK5sdZOMw";
+        const GEMINI_MODEL = "gemini-2.5-flash-preview-05-20";
+
+        lucide.createIcons();
+        let map, activeInfoWindow, directionsService, directionsRenderer, activeMarker = null;
+        let markers = [];
+        let venueMarkers = [];
+        let chatHistory = [];
+        let isYatraMode = false;
+        let aiCache = {};
+
+        const locations = [
+            { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://placehold.co/800x800/E76F51/333333?text=Barsana", description: "A sacred destination in the Brij region.", category: "Town", minZoom: 13 },
+            { name: "Shri Radharani Temple Barsana", lat: 27.650261, lng: 77.373287, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A prominent temple dedicated to Radha.", category: "Temple", minZoom: 14 },
+            { name: "Shri Kaushal Bihari Ji Mandir", lat: 27.647493, lng: 77.369287, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A beautiful temple in Barsana.", category: "Temple", minZoom: 15 },
+            { name: "Shri Radharani Dham", lat: 27.649266, lng: 77.379455, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A spiritual complex in Barsana.", category: "Holy Site", minZoom: 15 },
+            { name: "Pili Pokhar(Priya kund)", lat: 27.653932, lng: 77.37667, image: "https://placehold.co/800x800/E76F51/333333?text=Pili", description: "A sacred pond in Barsana.", category: "Holy Site", minZoom: 14 },
+            { name: "Barsana Bus Stand", lat: 27.649238, lng: 77.378968, image: "https://placehold.co/800x800/E76F51/333333?text=Barsana", description: "Main bus terminal for Barsana.", category: "Town", minZoom: 16 },
+            { name: "Shri Surdar Gokuldas Baba", lat: 27.654651, lng: 77.37645, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A site associated with a revered saint.", category: "Holy Site", minZoom: 16 },
+            { name: "Priya Kunj Ashram or Vinod Baba Ashram", lat: 27.653665, lng: 77.375887, image: "https://placehold.co/800x800/E76F51/333333?text=Priya", description: "A well-known ashram in Barsana.", category: "Holy Site", minZoom: 15 },
+            { name: "Vrish Bhanu Nandini Kunj or Vrish Bhanu kund", lat: 27.653944, lng: 77.375293, image: "https://placehold.co/800x800/E76F51/333333?text=Vrish", description: "A sacred pond (kund) in Barsana.", category: "Holy Site", minZoom: 15 },
+            { name: "Ladili Lalan Kunj", lat: 27.643905, lng: 77.378034, image: "https://placehold.co/800x800/E76F51/333333?text=Ladili", description: "A place of spiritual significance.", category: "Holy Site", minZoom: 15 },
+            { name: "Parikrama Marg Starting Point", lat: 27.646687, lng: 77.37441, image: "https://placehold.co/800x800/E76F51/333333?text=Parikrama", description: "The starting point for the circumambulation path.", category: "Holy Site", minZoom: 16 },
+            { name: "Revti Raman Baba", lat: 27.646687, lng: 77.37441, image: "https://placehold.co/800x800/E76F51/333333?text=Revti", description: "A site related to a spiritual figure.", category: "Holy Site", minZoom: 16 },
+            { name: "Shri Lilamohan Das Ji Ashram", lat: 27.648039, lng: 77.381716, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "An ashram for devotees.", category: "Holy Site", minZoom: 15 },
+            { name: "Gahvar Van Barsana/ Gahvar kund", lat: 27.642648, lng: 77.367327, image: "https://placehold.co/800x800/E76F51/333333?text=Gahvar", description: "A dense forest and sacred pond.", category: "Holy Site", minZoom: 14 },
+            { name: "Shri Radha Ras Mandir", lat: 27.642747, lng: 77.36772, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple dedicated to Radha's divine pastimes.", category: "Temple", minZoom: 15 },
+            { name: "Mor Kuteer Barsana", lat: 27.643781, lng: 77.367815, image: "https://placehold.co/800x800/E76F51/333333?text=Mor", description: "A place where Krishna danced as a peacock.", category: "Holy Site", minZoom: 15 },
+            { name: "Ajnokh", lat: 27.670492, lng: 77.416803, image: "https://placehold.co/800x800/E76F51/333333?text=Ajnokh", description: "A nearby village of spiritual importance.", category: "Town", minZoom: 14 },
+            { name: "Indulekha Sakhi Mandir", lat: 27.670553, lng: 77.417338, image: "https://placehold.co/800x800/E76F51/333333?text=Indulekha", description: "A temple for one of Radha's companions.", category: "Temple", minZoom: 15 },
+            { name: "Chiksauli", lat: 27.642268, lng: 77.369805, image: "https://placehold.co/800x800/E76F51/333333?text=Chiksauli", description: "A village associated with Radha's pastimes.", category: "Town", minZoom: 15 },
+            { name: "Chitra Sakhi Mandir", lat: 27.643836, lng: 77.372156, image: "https://placehold.co/800x800/E76F51/333333?text=Chitra", description: "Temple dedicated to another of Radha's companions.", category: "Temple", minZoom: 15 },
+            { name: "Ashta Sakhi Leela Mandir", lat: 27.642858, lng: 77.367498, image: "https://placehold.co/800x800/E76F51/333333?text=Ashta", description: "A temple depicting the pastimes of the eight main sakhis.", category: "Temple", minZoom: 15 },
+            { name: "Shri Radha Rani Shringar Sthali Barsana", lat: 27.642372, lng: 77.367662, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "The place where Radha Rani would adorn herself.", category: "Holy Site", minZoom: 15 },
+            { name: "Bihari Ji Temple/Bihari Ji Kund", lat: 27.640983, lng: 77.368877, image: "https://placehold.co/800x800/E76F51/333333?text=Bihari", description: "A temple and associated sacred pond.", category: "Temple", minZoom: 15 },
+            { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://placehold.co/800x800/E76F51/333333?text=Uchagram", description: "A village related to Lalita Sakhi.", category: "Town", minZoom: 13 },
+            { name: "Deh Kund", lat: 27.66272, lng: 77.362203, image: "https://placehold.co/800x800/E76F51/333333?text=Deh", description: "A sacred pond in Uchagram.", category: "Holy Site", minZoom: 15 },
+            { name: "Shri Dauji Temple", lat: 27.660954, lng: 77.365348, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple dedicated to Balarama.", category: "Temple", minZoom: 14 },
+            { name: "Shri Lalita Sakhi Mandir", lat: 27.661866, lng: 77.363891, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A major temple for Radha's closest companion, Lalita.", category: "Temple", minZoom: 14 },
+            { name: "Shri Deh Bihari Ji Temple", lat: 27.661963, lng: 77.36227, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple in the Uchagram area.", category: "Temple", minZoom: 15 },
+            { name: "Shri Mata Ka Mandir", lat: 27.662079, lng: 77.367604, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A local temple dedicated to the Goddess.", category: "Temple", minZoom: 16 },
+            { name: "Gheesa Dada Mandir", lat: 27.662406, lng: 77.363987, image: "https://placehold.co/800x800/E76F51/333333?text=Gheesa", description: "A local temple with its own history.", category: "Temple", minZoom: 16 },
+            { name: "Sunhara", lat: 27.650328, lng: 77.334545, image: "https://placehold.co/800x800/E76F51/333333?text=Sunhara", description: "A nearby village.", category: "Town", minZoom: 14 },
+            { name: "Mridula Sudeva Sakhi Temple", lat: 27.651467, lng: 77.336547, image: "https://placehold.co/800x800/E76F51/333333?text=Mridula", description: "A temple for one of the sakhis.", category: "Temple", minZoom: 15 },
+            { name: "Dhola Baba Ashram", lat: 27.651261, lng: 77.336684, image: "https://placehold.co/800x800/E76F51/333333?text=Dhola", description: "An ashram in the region.", category: "Holy Site", minZoom: 16 },
+            { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://placehold.co/800x800/E76F51/333333?text=Rankoli", description: "A village known for its hills and temples.", category: "Town", minZoom: 13 },
+            { name: "Rang Devi Sakhi Temple", lat: 27.616129, lng: 77.339449, image: "https://placehold.co/800x800/E76F51/333333?text=Rang", description: "A temple for one of the sakhis.", category: "Temple", minZoom: 15 },
+            { name: "Rankoli Hills", lat: 27.622759, lng: 77.331417, image: "https://placehold.co/800x800/E76F51/333333?text=Rankoli", description: "Scenic and sacred hills in the area.", category: "Holy Site", minZoom: 14 },
+            { name: "Radha Ras Bihari Ashram", lat: 27.625194, lng: 77.334678, image: "https://placehold.co/800x800/E76F51/333333?text=Radha", description: "An ashram in Rankoli.", category: "Holy Site", minZoom: 15 },
+            { name: "Kadam Khandi", lat: 27.633808, lng: 77.325992, image: "https://placehold.co/800x800/E76F51/333333?text=Kadam", description: "A place known for its Kadamba trees.", category: "Holy Site", minZoom: 15 },
+            { name: "Mridula Kadam Khandi", lat: 27.63095, lng: 77.323259, image: "https://placehold.co/800x800/E76F51/333333?text=Mridula", description: "A sacred grove area.", category: "Holy Site", minZoom: 15 },
+            { name: "Shri Naga Baba Mandir Kadam khandi", lat: 27.629626, lng: 77.32328, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A local temple.", category: "Temple", minZoom: 16 },
+            { name: "Kadambkhandi Mandir Marokhari", lat: 27.633694, lng: 77.325907, image: "https://placehold.co/800x800/E76F51/333333?text=Kadambkhandi", description: "A temple in the Kadambkhandi area.", category: "Temple", minZoom: 16 },
+            { name: "Dabhala", lat: 27.638964, lng: 77.344855, image: "https://placehold.co/800x800/E76F51/333333?text=Dabhala", description: "A nearby village.", category: "Town", minZoom: 15 },
+            { name: "Tungavidya Sakhi Mandir", lat: 27.629883, lng: 77.358724, image: "https://placehold.co/800x800/E76F51/333333?text=Tungavidya", description: "A temple for one of the sakhis.", category: "Temple", minZoom: 15 },
+            { name: "Mukhiya Vihar Colony", lat: 27.634979, lng: 77.364145, image: "https://placehold.co/800x800/E76F51/333333?text=Mukhiya", description: "A residential area.", category: "Town", minZoom: 16 },
+            { name: "Shyam Lila", lat: 27.629883, lng: 77.352103, image: "https://placehold.co/800x800/E76F51/333333?text=Shyam", description: "A place of Krishna's pastimes.", category: "Holy Site", minZoom: 15 },
+            { name: "Shri Mata Ji Gaushala", lat: 27.637398, lng: 77.364311, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A cow shelter.", category: "Holy Site", minZoom: 16 },
+            { name: "Ratna Kunda", lat: 27.630674, lng: 77.347827, image: "https://placehold.co/800x800/E76F51/333333?text=Ratna", description: "A sacred pond.", category: "Holy Site", minZoom: 15 },
+            { name: "Shri Shri Radha Madan Gopal Mandir", lat: 27.636001, lng: 77.362087, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A beautiful temple.", category: "Temple", minZoom: 15 },
+            { name: "Shri Radha Gau Gopal Temple", lat: 27.638812, lng: 77.361353, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple dedicated to Radha and the cows.", category: "Temple", minZoom: 15 },
+            { name: "Syamlaxmi Gau Hospital", lat: 27.639276, lng: 77.355143, image: "https://placehold.co/800x800/E76F51/333333?text=Syamlaxmi", description: "A hospital for cows.", category: "Holy Site", minZoom: 16 },
+            { name: "Moni Baba", lat: 27.641879, lng: 77.343825, image: "https://placehold.co/800x800/E76F51/333333?text=Moni", description: "A site related to a silent sage.", category: "Holy Site", minZoom: 16 },
+            { name: "Radha Naam", lat: 27.63952, lng: 77.34194, image: "https://placehold.co/800x800/E76F51/333333?text=Radha", description: "A place for chanting Radha's name.", category: "Holy Site", minZoom: 16 },
+            { name: "Radha Baba Sunhara Barsana", lat: 27.640476, lng: 77.345817, image: "https://placehold.co/800x800/E76F51/333333?text=Radha", description: "A site associated with a devotee.", category: "Holy Site", minZoom: 16 },
+            { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://placehold.co/800x800/E76F51/333333?text=Pisawa", description: "A village with historical significance.", category: "Town", minZoom: 13 },
+            { name: "Ashwathama Ki Jhadi, Pisawa", lat: 27.673058, lng: 77.432223, image: "https://placehold.co/800x800/E76F51/333333?text=Ashwathama", description: "A place linked to Ashwathama.", category: "Holy Site", minZoom: 15 },
+            { name: "Ashwathama Khel Maidan", lat: 27.674322, lng: 77.430878, image: "https://placehold.co/800x800/E76F51/333333?text=Ashwathama", description: "A ground associated with Ashwathama.", category: "Holy Site", minZoom: 16 },
+            { name: "Hanuman Ji Mandir", lat: 27.676947, lng: 77.438123, image: "https://placehold.co/800x800/E76F51/333333?text=Hanuman", description: "A temple dedicated to Hanuman.", category: "Temple", minZoom: 15 },
+            { name: "Ashvsthama Mandir", lat: 27.669117, lng: 77.434526, image: "https://placehold.co/800x800/E76F51/333333?text=Ashvsthama", description: "A temple for Ashwathama.", category: "Temple", minZoom: 15 },
+            { name: "Ashvthama Ji Mandir", lat: 27.667235, lng: 77.433504, image: "https://placehold.co/800x800/E76F51/333333?text=Ashvthama", description: "Another temple for Ashwathama.", category: "Temple", minZoom: 15 },
+            { name: "Duogar Baba Mandir", lat: 27.66832, lng: 77.434603, image: "https://placehold.co/800x800/E76F51/333333?text=Duogar", description: "A local temple.", category: "Temple", minZoom: 16 },
+            { name: "Lodhauli", lat: 27.684908, lng: 77.421548, image: "https://placehold.co/800x800/E76F51/333333?text=Lodhauli", description: "A nearby village.", category: "Town", minZoom: 15 },
+            { name: "Gajipur", lat: 27.666203, lng: 77.380996, image: "https://placehold.co/800x800/E76F51/333333?text=Gajipur", description: "A village near Prem Sarovar.", category: "Town", minZoom: 14 },
+            { name: "Sudama kutir", lat: 27.665108, lng: 77.380959, image: "https://placehold.co/800x800/E76F51/333333?text=Sudama", description: "A place associated with Krishna's friend Sudama.", category: "Holy Site", minZoom: 15 },
+            { name: "Shri Thakur Radha Govind Ji Mandir", lat: 27.663922, lng: 77.381031, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple for Radha and Govind.", category: "Temple", minZoom: 15 },
+            { name: "Shri Prem Sarovar Kund", lat: 27.66576, lng: 77.379896, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "The lake of love.", category: "Holy Site", minZoom: 14 },
+            { name: "Shri Prem Bihari Ji Mandir", lat: 27.665426, lng: 77.380645, image: "https://placehold.co/800x800/E76F51/333333?text=Shri", description: "A temple near Prem Sarovar.", category: "Temple", minZoom: 15 },
+        ];
+
+        const partnerVenues = [
+            { name: "Radhika Sweets & Restaurant", lat: 27.4930, lng: 77.6750, type: "Restaurant", description: "Authentic Brij cuisine. Partnership discount available." },
+            { name: "Bansal Foods", lat: 27.4915, lng: 77.6790, type: "Restaurant", description: "Quick bites and thalis." },
+            { name: "Hotel Brijwasi Royal", lat: 27.5010, lng: 77.6788, type: "Hotel", description: "Comfortable stay near Janmabhoomi. 15% off for yatris." },
+            { name: "Gopal's Eatery", lat: 27.5820, lng: 77.6965, type: "Restaurant", description: "Pure vegetarian food near Banke Bihari Temple." },
+            { name: "Shri Radha Brij Vasundhara", lat: 27.4985, lng: 77.4590, type: "Hotel", description: "Resort & Spa near Govardhan Hill." },
+            { name: "Yamuna View Hotel", lat: 27.5795, lng: 77.7010, type: "Hotel", description: "Rooms overlooking the Yamuna river in Vrindavan." },
+            { name: "Wingston Hotel, Barsana", lat: 27.6501, lng: 77.3899, type: "Hotel", description: "Modern amenities with a traditional touch." },
+            { name: "Barsana Bhojanalay", lat: 27.6533, lng: 77.3865, type: "Restaurant", description: "Local thalis and sweets." },
+            { name: "Govardhan Restaurant", lat: 27.4950, lng: 77.4622, type: "Restaurant", description: "Serving pilgrims at the heart of Govardhan." }
+        ];
+
+        const classicMapStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#f0e9e1" }] }, { "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#665949" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#f0e9e1" }] }, { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#c9c1b6" }] }, { "featureType": "administrative.land_parcel", "elementType": "labels.text.fill", "stylers": [{ "color": "#ae9e90" }] }, { "featureType": "landscape.natural", "elementType": "geometry", "stylers": [{ "color": "#e3dbd0" }] }, { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#d5d0c7" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#92887c" }] }, { "featureType": "poi.park", "elementType": "geometry.fill", "stylers": [{ "color": "#ccd6a8" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#f5f1e6" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#f8c967" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#e9bc62" }] }, { "featureType": "road.highway.controlled_access", "elementType": "geometry", "stylers": [{ "color": "#e98d58" }] }, { "featureType": "road.highway.controlled_access", "elementType": "geometry.stroke", "stylers": [{ "color": "#db8555" }] }, { "featureType": "road.local", "elementType": "labels.text.fill", "stylers": [{ "color": "#806b63" }] }, { "featureType": "transit.line", "elementType": "geometry", "stylers": [{ "color": "#dcd2be" }] }, { "featureType": "transit.station", "elementType": "geometry", "stylers": [{ "color": "#d5d0c7" }] }, { "featureType": "water", "elementType": "geometry.fill", "stylers": [{ "color": "#a1c4c8" }] }];
+        const sereneMapStyle = [{ "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "saturation": 36 }, { "color": "#333333" }, { "lightness": 40 }] }, { "featureType": "all", "elementType": "labels.text.stroke", "stylers": [{ "visibility": "on" }, { "color": "#ffffff" }, { "lightness": 16 }] }, { "featureType": "all", "elementType": "labels.icon", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative", "elementType": "geometry.fill", "stylers": [{ "color": "#fefefe" }, { "lightness": 20 }] }, { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#fefefe" }, { "lightness": 17 }, { "weight": 1.2 }] }, { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 20 }] }, { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#f5f5f5" }, { "lightness": 21 }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#dedede" }, { "lightness": 21 }] }, { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#ffffff" }, { "lightness": 17 }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#ffffff" }, { "lightness": 29 }, { "weight": 0.2 }] }, { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 18 }] }, { "featureType": "road.local", "elementType": "geometry", "stylers": [{ "color": "#ffffff" }, { "lightness": 16 }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#f2f2f2" }, { "lightness": 19 }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#e9e9e9" }, { "lightness": 17 }] }];
+        const mysticMapStyle = [{ "featureType": "all", "elementType": "labels.text.fill", "stylers": [{ "color": "#ffffff" }] }, { "featureType": "all", "elementType": "labels.text.stroke", "stylers": [{ "color": "#000000" }, { "lightness": 13 }] }, { "featureType": "administrative", "elementType": "geometry.fill", "stylers": [{ "color": "#000000" }] }, { "featureType": "administrative", "elementType": "geometry.stroke", "stylers": [{ "color": "#144b53" }, { "lightness": 14 }, { "weight": 1.4 }] }, { "featureType": "landscape", "elementType": "all", "stylers": [{ "color": "#08304b" }] }, { "featureType": "poi", "elementType": "geometry", "stylers": [{ "color": "#0c4152" }, { "lightness": 5 }] }, { "featureType": "road.highway", "elementType": "geometry.fill", "stylers": [{ "color": "#000000" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#0b434f" }, { "lightness": 25 }] }, { "featureType": "road.arterial", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }, { "featureType": "road.arterial", "elementType": "geometry.stroke", "stylers": [{ "color": "#0b3d51" }, { "lightness": 16 }] }, { "featureType": "road.local", "elementType": "geometry", "stylers": [{ "color": "#000000" }] }, { "featureType": "transit", "elementType": "all", "stylers": [{ "color": "#146474" }] }, { "featureType": "water", "elementType": "all", "stylers": [{ "color": "#021019" }] }];
+
+        function updateMarkersVisibility() {
+            const zoomLevel = map.getZoom();
+            markers.forEach(marker => {
+                const location = locations[marker.originalIndex];
+                marker.setVisible(zoomLevel >= (location.minZoom || 13));
+            });
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 27.64, lng: 77.37 },
+                zoom: 13,
+                disableDefaultUI: true,
+                mapTypeControl: false,
+                gestureHandling: 'greedy'
+            });
+
+            map.mapTypes.set('classic_style', new google.maps.StyledMapType(classicMapStyle, { name: 'Classic' }));
+            map.mapTypes.set('serene_style', new google.maps.StyledMapType(sereneMapStyle, { name: 'Serene' }));
+            map.mapTypes.set('mystic_style', new google.maps.StyledMapType(mysticMapStyle, { name: 'Mystic' }));
+            map.setMapTypeId('roadmap');
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({ suppressMarkers: true, polylineOptions: { strokeColor: '#FF6B35', strokeOpacity: 0.9, strokeWeight: 6 } });
+            directionsRenderer.setMap(map);
+
+            createMarkers();
+            populateSidePanel();
+
+            map.addListener('zoom_changed', updateMarkersVisibility);
+        }
+
+        function createMarkerIcon(color, scale = 42) {
+            const svg = `
+                <svg width="${scale}" height="${scale}" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 0C9.37 0 4 5.37 4 12C4 21 16 32 16 32C16 32 28 21 28 12C28 5.37 22.63 0 16 0Z" fill="${color}" stroke="white" stroke-width="2" style="filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.3));"></path>
+                    <circle cx="16" cy="12" r="4" fill="white"></circle>
+                </svg>`;
+            return {
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+                scaledSize: new google.maps.Size(scale, scale),
+                anchor: new google.maps.Point(scale / 2, scale),
+            };
+        }
+
+        function createVenueMarkerIcon(type) {
+            const color = type === 'Restaurant' ? '#FF6B35' : '#004E89';
+            const scale = 30;
+            const svg = `
+                 <svg width="${scale}" height="${scale}" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 0C9.37 0 4 5.37 4 12C4 21 16 32 16 32C16 32 28 21 28 12C28 5.37 22.63 0 16 0Z" fill="${color}" stroke="white" stroke-width="1.5" style="filter: drop-shadow(0px 3px 6px rgba(0,0,0,0.25));"></path>
+                </svg>`;
+            return {
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+                scaledSize: new google.maps.Size(scale, scale),
+                anchor: new google.maps.Point(scale / 2, scale),
+            };
+        }
+
+        function createMarkers() {
+            locations.forEach((location, index) => {
+                const color = { 'Temple': '#c0392b', 'Holy Site': '#27ae60', 'Town': '#2980b9' }[location.category] || '#8e44ad';
+                const marker = new google.maps.Marker({
+                    position: { lat: location.lat, lng: location.lng },
+                    map: map,
+                    title: location.name,
+                    icon: createMarkerIcon(color, 42),
+                    category: location.category,
+                    originalIndex: index,
+                    zIndex: 10
+                });
+
+                marker.addListener('click', () => {
+                    if (activeInfoWindow) activeInfoWindow.close();
+                    clearVenueMarkers();
+                    document.getElementById('side-panel').classList.add('translate-x-full');
+                    document.getElementById('panel-open-btn').classList.remove('hidden');
+
+                    openSpotlight(location);
+                    map.panTo(marker.getPosition());
+
+                    if (activeMarker && activeMarker !== marker) {
+                        activeMarker.setIcon(createMarkerIcon(activeMarker.get('color'), 42));
+                        activeMarker.setZIndex(10);
+                    }
+                    marker.setIcon(createMarkerIcon(color, 54));
+                    marker.setZIndex(100);
+                    activeMarker = marker;
+                    activeMarker.set('color', color);
+                });
+                markers.push(marker);
+            });
+            updateMarkersVisibility();
+        }
+
+        function findNearby(type) {
+            if (!map) {
+                console.warn("Map not initialized yet. Skipping partner search.");
+                return;
+            }
+
+            markers.forEach(marker => marker.setVisible(false));
+            clearVenueMarkers(false);
+
+            const matchedVenues = partnerVenues.filter(venue => venue.type === type);
+
+            if (matchedVenues.length === 0) {
+                clearVenueMarkers(true);
+                return;
+            }
+
+            const bounds = new google.maps.LatLngBounds();
+
+            matchedVenues.forEach(venue => {
+                const venuePosition = new google.maps.LatLng(venue.lat, venue.lng);
+
+                const venueMarker = new google.maps.Marker({
+                    position: venuePosition,
+                    map: map,
+                    title: venue.name,
+                    icon: createVenueMarkerIcon(type),
+                    zIndex: 5,
+                    animation: google.maps.Animation.DROP
+                });
+
+                const infoWindowContent = `<div class="p-4"><h4 class="font-bold text-base mb-2">${venue.name}</h4><p class="text-sm text-gray-600">${venue.description}</p></div>`;
+                const infoWindow = new google.maps.InfoWindow({ content: infoWindowContent });
+
+                venueMarker.addListener('click', () => {
+                    if (activeInfoWindow) activeInfoWindow.close();
+                    infoWindow.open(map, venueMarker);
+                    activeInfoWindow = infoWindow;
+                });
+
+                venueMarkers.push(venueMarker);
+                bounds.extend(venuePosition);
+            });
+
+            map.fitBounds(bounds);
+            document.getElementById('clear-nearby-btn').classList.remove('hidden');
+            document.querySelectorAll('.nearby-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.nearby-btn[data-type="${type}"]`).classList.add('active');
+        }
+
+        function clearVenueMarkers(restoreMarkers = true) {
+            venueMarkers.forEach(marker => marker.setMap(null));
+            venueMarkers = [];
+            document.getElementById('clear-nearby-btn').classList.add('hidden');
+            document.querySelectorAll('.nearby-btn').forEach(b => b.classList.remove('active'));
+
+            if (restoreMarkers) {
+                const activeFilter = document.querySelector('#filters .filter-btn.active')?.dataset.filter || 'all';
+                filterMarkers(activeFilter);
+            }
+        }
+
+        function calculateAndDisplayRoute() {
+            if (locations.length < 2) return;
+            const waypoints = locations.slice(1, -1).map(loc => ({ location: new google.maps.LatLng(loc.lat, loc.lng), stopover: true }));
+            const request = { origin: new google.maps.LatLng(locations[0].lat, locations[0].lng), destination: new google.maps.LatLng(locations[locations.length - 1].lat, locations[locations.length - 1].lng), waypoints: waypoints, optimizeWaypoints: true, travelMode: google.maps.TravelMode.DRIVING };
+            directionsService.route(request, (result, status) => {
+                if (status == 'OK') {
+                    directionsRenderer.setDirections(result);
+                    const route = result.routes[0];
+                    let totalDistance = 0, totalDuration = 0;
+                    route.legs.forEach(leg => { totalDistance += leg.distance.value; totalDuration += leg.duration.value; });
+                    document.getElementById('total-distance').textContent = `${(totalDistance / 1000).toFixed(1)} km`;
+                    document.getElementById('total-duration').textContent = `${Math.floor(totalDuration / 3600)}h ${Math.floor((totalDuration % 3600) / 60)}m`;
+                    document.getElementById('route-info').classList.remove('hidden');
+                } else console.error('Directions request failed due to ' + status);
+            });
+        }
+        function clearRoute() {
+            directionsRenderer.setDirections({ routes: [] });
+            document.getElementById('route-info').classList.add('hidden');
+        }
+
+        function populateSidePanel() {
+            const panelList = document.getElementById('locations-panel-list');
+            panelList.innerHTML = '';
+
+            const activeFilterElement = document.querySelector('#filters .filter-btn.active');
+            const activeFilter = activeFilterElement ? activeFilterElement.dataset.filter : 'all';
+
+            const source = isYatraMode ? locations : locations.filter(l => {
+                return activeFilter === 'all' || l.category === activeFilter;
+            });
+
+            source.forEach((location, index) => {
+                const item = document.createElement('div');
+                item.className = 'location-card p-4 cursor-pointer flex items-center border border-transparent';
+                item.innerHTML = `<span class="font-bold mr-4 text-lg text-gray-400 w-8">${isYatraMode ? (index + 1).toString().padStart(2, '0') : '•'}</span><div><p class="font-semibold text-gray-900">${location.name}</p><p class="text-xs text-gray-500 font-medium mt-0.5">${location.category}</p></div>`;
+                item.addEventListener('click', () => {
+                    const originalLocIndex = locations.indexOf(location);
+                    const markerToTrigger = markers.find(m => m.originalIndex === originalLocIndex);
+                    if (markerToTrigger) {
+                        map.setZoom(location.minZoom || 15);
+                        google.maps.event.trigger(markerToTrigger, 'click');
+                    }
+                });
+                panelList.appendChild(item);
+            });
+        }
+
+        function filterMarkers(category) {
+            const zoomLevel = map.getZoom();
+            markers.forEach(marker => {
+                const location = locations[marker.originalIndex];
+                const categoryMatch = category === 'all' || marker.category === category;
+                marker.setVisible(categoryMatch && zoomLevel >= (location.minZoom || 13));
+            });
+        }
+
+        async function streamGemini(prompt, systemInstruction, useGrounding, onChunk, onComplete) {
+            const apiKey = typeof __GEMINI_API_KEY__ !== 'undefined' ? __GEMINI_API_KEY__ : GEMINI_API_KEY;
+            const payload = { contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemInstruction }] } };
+            if (useGrounding) payload.tools = [{ "google_search": {} }];
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?key=${apiKey}&alt=sse`;
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const jsonStr = line.substring(6);
+                            try {
+                                const json = JSON.parse(jsonStr);
+                                const text = json.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                                if (text) onChunk(text);
+                            } catch (e) { /* Ignore parsing errors */ }
+                        }
+                    }
+                }
+            } catch (error) {
+                onChunk("An error occurred. Please try again.");
+            } finally {
+                if (onComplete) onComplete();
+            }
+        }
+
+        function createSkeletonLoader(title) {
+            return `<div class="animate-pulse p-4"><div class="h-8 bg-gray-200 rounded-xl w-3/4 mb-6"></div><div class="space-y-4"><div class="h-4 bg-gray-200 rounded-lg"></div><div class="h-4 bg-gray-200 rounded-lg w-5/6"></div><div class="h-4 bg-gray-200 rounded-lg w-4/5"></div></div><div class="text-center mt-12 text-gray-500 font-medium">${title}</div></div>`;
+        }
+
+        async function getSpotlightInfo(locationName, infoType, btn) {
+            const originalBtnHTML = btn.innerHTML;
+            const cacheKey = `${locationName}-${infoType}`;
+
+            if (aiCache[cacheKey]) {
+                document.getElementById('spotlight-content').innerHTML = aiCache[cacheKey];
+                return;
+            }
+
+            btn.innerHTML = '<i class="animate-spin" data-lucide="loader-2"></i>';
+            lucide.createIcons();
+            btn.disabled = true;
+
+            const modalContent = document.getElementById('spotlight-content');
+            modalContent.innerHTML = createSkeletonLoader(`Researching ${infoType}...`);
+            const prompt = `Provide the "${infoType}" for "${locationName}" in Brij. Format as clean, readable HTML using only p, strong, ul, and li tags. Use headings like "<h4>📜 Historical Significance</h4>" or "<h4>💡 Local Tips</h4>".`;
+            const systemInstruction = infoType === 'Historical Significance' ? "You are a historian specializing in the Brij region." : "You are a local guide for the Brij region, providing practical tips.";
+
+            let fullText = "";
+            let firstChunk = true;
+            await streamGemini(prompt, systemInstruction, false, (chunk) => {
+                if (firstChunk) {
+                    modalContent.innerHTML = '';
+                    firstChunk = false;
+                }
+                fullText += chunk;
+                modalContent.innerHTML = fullText;
+            }, () => {
+                aiCache[cacheKey] = fullText;
+                btn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+                btn.disabled = false;
+            });
+        }
+
+        function openSpotlight(location) {
+            document.getElementById('spotlight-title').textContent = location.name;
+            document.getElementById('spotlight-image').style.backgroundImage = `url(${location.image})`;
+            document.getElementById('spotlight-content').innerHTML = `<p class="text-gray-700 leading-relaxed">${location.description}</p>`;
+            document.getElementById('spotlight-history-btn').onclick = (e) => getSpotlightInfo(location.name, 'Historical Significance', e.currentTarget);
+            document.getElementById('spotlight-tips-btn').onclick = (e) => getSpotlightInfo(location.name, 'Local Tips', e.currentTarget);
+            showModal('spotlight');
+        }
+
+        async function generateYatraPlan(btn) {
+            const originalBtnHTML = btn.innerHTML;
+            const cacheKey = 'yatraPlan';
+
+            const modalContent = document.getElementById('itinerary-modal-content');
+            showModal('itinerary');
+
+            if (aiCache[cacheKey]) {
+                modalContent.innerHTML = aiCache[cacheKey];
+                return;
+            }
+
+            btn.innerHTML = '<i class="animate-spin" data-lucide="loader-2"></i> Generating...';
+            lucide.createIcons(); btn.disabled = true;
+            modalContent.innerHTML = createSkeletonLoader("Crafting your itinerary...");
+
+            const locationNames = locations.map(l => l.name).join(', ');
+            const prompt = `Create a 3-day itinerary for the Brij 84 Kos Yatra, visiting these locations: ${locationNames}. Format as clean, readable HTML using only h3, h4, p, strong, ul, and li tags. Use headings like "<h3>Day 1: ...</h3>". Inside each day, use headings like "<h4>✨ Spiritual Significance</h4>" and "<h4>💡 Practical Tip</h4>".`;
+            const systemInstruction = "You are an expert spiritual tour guide for the Brij 84 Kos Yatra in India.";
+
+            let fullText = "";
+            let firstChunk = true;
+            await streamGemini(prompt, systemInstruction, false, (chunk) => {
+                if (firstChunk) {
+                    modalContent.innerHTML = '';
+                    firstChunk = false;
+                }
+                fullText += chunk;
+                modalContent.innerHTML = fullText;
+            }, () => {
+                aiCache[cacheKey] = fullText;
+                btn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+                btn.disabled = false;
+            });
+        }
+        async function getLiveIntel(btn) {
+            const originalBtnHTML = btn.innerHTML;
+            const cacheKey = 'liveIntel';
+            const cacheTTL = 3600000;
+
+            const modalContent = document.getElementById('liveintel-modal-content');
+            showModal('liveintel');
+
+            if (aiCache[cacheKey] && (Date.now() - aiCache[cacheKey].timestamp < cacheTTL)) {
+                modalContent.innerHTML = aiCache[cacheKey].content;
+                return;
+            }
+
+            btn.innerHTML = '<i class="animate-spin" data-lucide="loader-2"></i> Fetching...';
+            lucide.createIcons(); btn.disabled = true;
+            modalContent.innerHTML = createSkeletonLoader("Gathering real-time intel...");
+
+            const prompt = `Provide a "Daily Briefing" for a pilgrim visiting the Brij region (Mathura, India) today. Include three sections: 1. Current weather in Mathura. 2. Any notable local events or festivals in the Brij region happening today. 3. A "Pro Tip for Pilgrims" relevant to the current season. Format as clean, readable HTML using only h3, h4, p, and strong. Use headings like "<h3>☀️ Current Weather</h3>" and "<h3>💡 Pro Tip for Pilgrims</h3>".`;
+            const systemInstruction = "You are a helpful travel assistant providing real-time information.";
+
+            let fullText = "";
+            let firstChunk = true;
+            await streamGemini(prompt, systemInstruction, true, (chunk) => {
+                if (firstChunk) {
+                    modalContent.innerHTML = '';
+                    firstChunk = false;
+                }
+                fullText += chunk;
+                modalContent.innerHTML = fullText;
+            }, () => {
+                aiCache[cacheKey] = { content: fullText, timestamp: Date.now() };
+                btn.innerHTML = originalBtnHTML;
+                lucide.createIcons();
+                btn.disabled = false;
+            });
+        }
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            const userQuery = input.value.trim();
+            if (!userQuery) return;
+            appendChatMessage(userQuery, 'user');
+            input.value = ''; sendBtn.disabled = true;
+
+            const botMessageDiv = appendChatMessage("", 'bot');
+            const locationContext = locations.map(l => `${l.name} (${l.category})`).join('; ');
+            const systemInstruction = `You are a friendly and knowledgeable tour guide for the Brij 84 Kos Yatra. Your knowledge base includes these locations: ${locationContext}. Answer user questions concisely and helpfully about the pilgrimage. Format responses using only simple HTML tags like <p>, <strong>, <ul> and <li>.`;
+
+            let firstChunk = true;
+            await streamGemini(userQuery, systemInstruction, false, (chunk) => {
+                if (firstChunk) { botMessageDiv.innerHTML = ''; firstChunk = false; }
+                botMessageDiv.innerHTML += chunk.replace(/\n/g, '<br>');
+                document.getElementById('chat-history').scrollTop = document.getElementById('chat-history').scrollHeight;
+            }, () => {
+                sendBtn.disabled = false;
+            });
+        }
+        function appendChatMessage(text, role) {
+            const historyDiv = document.getElementById('chat-history');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${role === 'user' ? 'bg-gradient-to-br from-blue-600 to-blue-500 text-white self-end ml-auto shadow-lg' : 'bg-white text-gray-800 self-start shadow-md border border-gray-100'}`;
+            messageDiv.innerHTML = text;
+            historyDiv.appendChild(messageDiv);
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+            return messageDiv;
+        }
+
+        function showModal(modalType) {
+            const overlay = document.getElementById(`${modalType}-modal-overlay`);
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+                overlay.querySelector('.modal').classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+        function hideModal(modalType) {
+            const overlay = document.getElementById(`${modalType}-modal-overlay`);
+            overlay.classList.add('opacity-0');
+            overlay.querySelector('.modal').classList.add('scale-95', 'opacity-0');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidePanel = document.getElementById('side-panel');
+            const panelToggle = document.getElementById('panel-toggle');
+            const panelOpenBtn = document.getElementById('panel-open-btn');
+
+            panelToggle.addEventListener('click', () => {
+                sidePanel.classList.add('translate-x-full');
+                panelOpenBtn.classList.remove('hidden');
+            });
+            panelOpenBtn.addEventListener('click', () => {
+                sidePanel.classList.remove('translate-x-full');
+                panelOpenBtn.classList.add('hidden');
+            });
+
+            document.getElementById('filters').addEventListener('click', (e) => {
+                const clickedFilterBtn = e.target.closest('.filter-btn');
+
+                if (clickedFilterBtn) {
+                    const filter = clickedFilterBtn.dataset.filter;
+                    clearVenueMarkers(false);
+                    filterMarkers(filter);
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    clickedFilterBtn.classList.add('active');
+                    populateSidePanel();
+                }
+            });
+
+            const slider = document.getElementById('yatra-mode-slider');
+            const exploreBtn = document.getElementById('yatra-mode-explore');
+            const pilgrimageBtn = document.getElementById('yatra-mode-pilgrimage');
+            const filtersContainer = document.getElementById('filters-container');
+            const pilgrimageControls = document.getElementById('pilgrimage-controls-container');
+
+            exploreBtn.addEventListener('click', () => {
+                isYatraMode = false;
+                slider.style.transform = 'translateX(0%)';
+                exploreBtn.classList.add('active');
+                pilgrimageBtn.classList.remove('active');
+                filtersContainer.style.display = 'block';
+                pilgrimageControls.style.display = 'none';
+                clearRoute();
+                populateSidePanel();
+                filterMarkers(document.querySelector('.filter-btn.active').dataset.filter);
+            });
+
+            pilgrimageBtn.addEventListener('click', () => {
+                isYatraMode = true;
+                slider.style.transform = 'translateX(100%)';
+                pilgrimageBtn.classList.add('active');
+                exploreBtn.classList.remove('active');
+                filtersContainer.style.display = 'none';
+                pilgrimageControls.style.display = 'block';
+                if (document.getElementById('toggle-route-btn').textContent.includes('Hide')) calculateAndDisplayRoute();
+                populateSidePanel();
+                markers.forEach(m => m.setVisible(true));
+            });
+
+            pilgrimageControls.style.display = 'none';
+            document.getElementById('toggle-route-btn').addEventListener('click', (e) => {
+                const btn = e.currentTarget;
+                const isRouteVisible = btn.textContent.includes('Hide');
+                if (!isRouteVisible) {
+                    calculateAndDisplayRoute();
+                    btn.textContent = 'Hide Full Route';
+                    btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+                } else {
+                    clearRoute();
+                    btn.textContent = 'Show Full Route';
+                    btn.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+                }
+            });
+
+            const styleDropdownBtn = document.getElementById('style-dropdown-btn');
+            const styleDropdownList = document.getElementById('style-dropdown-list');
+
+            styleDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isHidden = styleDropdownList.classList.contains('hidden');
+                if (isHidden) {
+                    styleDropdownList.classList.remove('hidden');
+                    setTimeout(() => styleDropdownList.classList.remove('opacity-0', 'scale-95'), 10);
+                } else {
+                    styleDropdownList.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => styleDropdownList.classList.add('hidden'), 300);
+                }
+            });
+
+            styleDropdownList.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const styleId = e.target.dataset.style;
+                    document.getElementById('current-style-name').textContent = e.target.textContent;
+                    map.setMapTypeId(styleId);
+                    document.querySelectorAll('#style-dropdown-list button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                }
+            });
+
+            const searchInput = document.getElementById('search-input');
+            const searchSuggestions = document.getElementById('search-suggestions');
+
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
+                searchSuggestions.innerHTML = '';
+                if (query.length < 2) {
+                    searchSuggestions.classList.add('hidden');
+                    return;
+                }
+                const matchedLocations = locations.filter(loc => loc.name.toLowerCase().includes(query));
+                if (matchedLocations.length > 0) {
+                    matchedLocations.forEach(loc => {
+                        const item = document.createElement('div');
+                        item.className = 'p-4 hover:bg-gray-50 cursor-pointer text-sm font-medium transition-colors';
+                        item.textContent = loc.name;
+                        item.onclick = () => {
+                            const markerToClick = markers.find(m => m.title === loc.name);
+                            if (markerToClick) {
+                                map.setZoom(loc.minZoom || 15);
+                                google.maps.event.trigger(markerToClick, 'click');
+                            }
+                            searchInput.value = loc.name;
+                            searchSuggestions.classList.add('hidden');
+                        };
+                        searchSuggestions.appendChild(item);
+                    });
+                    searchSuggestions.classList.remove('hidden');
+                } else {
+                    searchSuggestions.classList.add('hidden');
+                }
+            });
+
+            document.querySelectorAll('.nearby-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => findNearby(e.currentTarget.dataset.type));
+            });
+            document.getElementById('clear-nearby-btn').addEventListener('click', () => clearVenueMarkers(true));
+
+            document.getElementById('live-intel-btn').addEventListener('click', (e) => getLiveIntel(e.currentTarget));
+            document.getElementById('generate-plan-btn').addEventListener('click', (e) => generateYatraPlan(e.currentTarget));
+            document.getElementById('open-chat-btn').addEventListener('click', () => {
+                showModal('chat');
+                if (chatHistory.length === 0) appendChatMessage("Hello! I am your AI guide. How can I help you plan your sacred journey through Brij?", "bot");
+            });
+            document.getElementById('chat-send-btn').addEventListener('click', sendChatMessage);
+            document.getElementById('chat-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendChatMessage(); });
+            document.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', () => hideModal(btn.dataset.modal)));
+            document.querySelectorAll('.modal-overlay').forEach(overlay => overlay.addEventListener('click', (e) => { if (e.target === overlay) hideModal(overlay.id.split('-')[0]); }));
+
+            const soundToggle = document.getElementById('sound-toggle');
+            const ambientSound = document.getElementById('ambient-sound');
+            let isSoundPlaying = false;
+            soundToggle.addEventListener('click', () => {
+                if (isSoundPlaying) {
+                    ambientSound.pause();
+                    soundToggle.innerHTML = '<i data-lucide="volume-x"></i>';
+                } else {
+                    if (ambientSound.readyState > 0) {
+                        ambientSound.play().catch(e => { console.error("Audio playback failed:", e); });
+                    }
+                    soundToggle.innerHTML = '<i data-lucide="volume-2"></i>';
+                }
+                isSoundPlaying = !isSoundPlaying;
+                lucide.createIcons();
+            });
+
+            ambientSound.load();
+
+            window.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target)) {
+                    searchSuggestions.classList.add('hidden');
+                }
+                if (!document.getElementById('map-style-selector').contains(e.target)) {
+                    if (!styleDropdownList.classList.contains('hidden')) {
+                        styleDropdownList.classList.add('opacity-0', 'scale-95');
+                        setTimeout(() => styleDropdownList.classList.add('hidden'), 300);
+                    }
+                }
+            });
+        });
+
+        function loadMapsScript() {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&callback=initMap&libraries=places&v=weekly`;
+            script.async = true;
+            script.defer = true;
+            script.onerror = function () {
+                console.error('Failed to load Google Maps script');
+                document.getElementById('map').innerHTML = '<div class="flex items-center justify-center h-full"><p class="text-gray-500">Failed to load map. Please refresh the page.</p></div>';
+            };
+            document.head.appendChild(script);
+        }
+
+        window.initMap = initMap;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadMapsScript);
+        } else {
+            loadMapsScript();
+        }
+
+    </script>
+</body>
+
+</html>
