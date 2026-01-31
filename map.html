@@ -1362,15 +1362,30 @@
             maxBoundsViscosity: 1.0
         });
 
-        // Premium Stadia Maps tiles (Alidade Smooth aesthetic)
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=335373e5-9b50-49aa-b7df-094224d82fb4', {
+        // --- Tile Providers ---
+
+        // OPTION A: Free CartoDB Voyager (Best for Demo/Dev - No Tokens Used)
+        const demoTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 20,
-            minZoom: 10,
-            attribution: '&copy; Stadia Maps',
+            minZoom: 2,
+            attribution: '&copy; CartoDB',
             updateWhenIdle: false,
             updateWhenZooming: false,
             keepBuffer: 2
-        }).addTo(map);
+        });
+
+        // OPTION B: Premium Stadia Maps (Best for Production - Uses Tokens)
+        // const prodTiles = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png?api_key=335373e5-9b50-49aa-b7df-094224d82fb4', {
+        //     maxZoom: 20,
+        //     minZoom: 10,
+        //     attribution: '&copy; Stadia Maps',
+        //     updateWhenIdle: false,
+        //     updateWhenZooming: false,
+        //     keepBuffer: 2
+        // });
+
+        // Add Demo tiles to map by default
+        demoTiles.addTo(map);
 
         // --- Markers & Clustering ---
         const markers = [];
