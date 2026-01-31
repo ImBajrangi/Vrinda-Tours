@@ -487,12 +487,12 @@
 
         @keyframes marker-active-pop {
             0% {
-                transform: scale(0.9) translateY(0);
+                transform: scale(1) translateY(0);
             }
 
             50% {
-                transform: scale(1.5) translateY(-12px);
-                filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.4));
+                transform: scale(1.6) translateY(-14px);
+                filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.45));
             }
 
             100% {
@@ -541,15 +541,14 @@
             pointer-events: none;
         }
 
-        /* Show animated GIF on hover or when playing */
-        .image-marker:hover img.animated,
-        .image-marker.playing img.animated {
+        /* Selective image toggle for animated markers */
+        .image-marker.has-animation:hover img.animated,
+        .image-marker.has-animation.playing img.animated {
             opacity: 1;
         }
 
-        /* Hide static PNG when animated is shown */
-        .image-marker:hover img.static,
-        .image-marker.playing img.static {
+        .image-marker.has-animation:hover img.static,
+        .image-marker.has-animation.playing img.static {
             opacity: 0;
         }
 
@@ -1413,12 +1412,13 @@
         function createMarkerIcon(category, isActive = false, isPlaying = false) {
             const animatedUrl = getCategoryMarker(category, isPlaying);
             const staticUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/video/marker-ink/icons8-marker-96.png';
+            const hasAnim = category === 'Temple' || category === 'Holy Site';
 
             return L.divIcon({
                 className: 'marker-wrapper',
-                html: `<div class="image-marker ${isActive ? 'active' : ''} ${isPlaying ? 'playing' : ''}">
+                html: `<div class="image-marker ${isActive ? 'active' : ''} ${isPlaying ? 'playing' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
                     <img src="${staticUrl}" class="static" alt="${category}">
-                    <img src="${animatedUrl}" class="animated" alt="${category}">
+                    ${hasAnim ? `<img src="${animatedUrl}" class="animated" alt="${category}">` : ''}
                 </div>`,
                 iconSize: [40, 40],
                 iconAnchor: [20, 40]
