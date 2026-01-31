@@ -850,15 +850,19 @@
                 font-size: 22px;
             }
 
-            /* On desktop, keep buttons on right even when card visible (more space) */
+            /* On desktop, move buttons to left side when card visible (card is on right) */
             .fab.card-visible {
-                right: 2rem;
-                left: auto;
+                right: auto;
+                left: 2rem;
+                bottom: 2rem;
             }
 
             .zoom-controls.card-visible {
-                right: 1.5rem;
-                left: auto;
+                right: auto;
+                left: 2rem;
+                /* Keep middle position */
+                top: 50%;
+                transform: translateY(-50%);
             }
         }
 
