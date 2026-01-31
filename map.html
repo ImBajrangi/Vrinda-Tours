@@ -473,8 +473,9 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* Advanced white background removal via SVG filter */
+            /* Advanced white background removal via SVG filter + Blend fallback */
             filter: url(#remove-bg);
+            mix-blend-mode: multiply;
         }
 
         .image-marker.active {
@@ -1113,7 +1114,7 @@
     </div>
 
     <!-- SVG Filter for Marker Background Removal -->
-    <svg style="visibility: hidden; position: absolute;" width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" xmlns="http://www.w3.org/2000/svg">
         <filter id="remove-bg" color-interpolation-filters="sRGB">
             <feColorMatrix type="matrix" values="1 0 0 0 0
                                                  0 1 0 0 0
