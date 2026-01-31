@@ -211,35 +211,6 @@
             color: white;
         }
 
-        /* --- Points Badge --- */
-        .points-badge {
-            position: absolute;
-            top: 5.75rem;
-            right: 0.75rem;
-            z-index: 1001;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            background: var(--bg-card);
-            padding: 0.375rem 0.625rem;
-            border-radius: 8px;
-            font-size: 0.6875rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .points-badge .coin {
-            width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, var(--accent-primary), #FDBA74);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
 
         /* --- Location Card --- */
         .location-card {
@@ -417,68 +388,6 @@
             color: var(--accent-primary);
         }
 
-        /* --- Reward Toast --- */
-        .reward-toast {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            z-index: 2000;
-            background: var(--bg-card);
-            padding: 2rem 2.5rem;
-            border-radius: var(--radius-lg);
-            text-align: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.4s var(--transition-smooth);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .reward-toast.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .reward-toast .coin-lg {
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, #FDE047, #F59E0B);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.75rem;
-            font-weight: 900;
-            color: #92400E;
-            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
-            animation: bounce 0.5s ease;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.15);
-            }
-        }
-
-        .reward-toast h3 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .reward-toast p {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
 
         /* --- Search Results Overlay --- */
         .search-results {
@@ -634,21 +543,8 @@
         </button>
     </div>
 
-    <!-- BrijPoints Badge -->
-    <div class="points-badge">
-        <div class="coin"><i data-lucide="trophy" style="width: 14px; height: 14px;"></i></div>
-        <span><span id="points-count">0</span> Points</span>
-    </div>
-
     <!-- Search Results -->
     <div class="search-results" id="search-results"></div>
-
-    <!-- Reward Toast -->
-    <div class="reward-toast" id="reward-toast">
-        <div class="coin-lg"><i data-lucide="award" style="width: 32px; height: 32px;"></i></div>
-        <h3>+<span id="reward-amount">10</span> Points!</h3>
-        <p>Keep exploring sacred sites</p>
-    </div>
 
     <!-- Location Card -->
     <div class="location-card" id="location-card">
@@ -668,10 +564,6 @@
             </div>
         </div>
         <div class="card-stats">
-            <div class="stat">
-                <div class="stat-value" id="stat-points">+20</div>
-                <div class="stat-label">Points</div>
-            </div>
             <div class="stat">
                 <div class="stat-value">4.8</div>
                 <div class="stat-label">Rating</div>
@@ -712,23 +604,6 @@
             { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
         ];
 
-        let totalPoints = 0;
-        const pointsCountEl = document.getElementById('points-count');
-        const rewardToast = document.getElementById('reward-toast');
-        const rewardAmountEl = document.getElementById('reward-amount');
-
-        function addPoints(amount) {
-            totalPoints += amount;
-            pointsCountEl.textContent = totalPoints;
-            pointsCountEl.style.transform = 'scale(1.3)';
-            setTimeout(() => pointsCountEl.style.transform = 'scale(1)', 200);
-
-            // Show reward toast
-            rewardAmountEl.textContent = amount;
-            rewardToast.classList.add('visible');
-            setTimeout(() => rewardToast.classList.remove('visible'), 2000);
-        }
-
         // --- Map Initialization ---
         const map = L.map('map', {
             center: [27.65, 77.38],
@@ -746,7 +621,6 @@
         // --- Markers ---
         const markers = [];
         let activeMarker = null;
-        const visitedLocations = new Set();
 
         function getCategoryIcon(category) {
             switch (category) {
@@ -785,7 +659,6 @@
         const cardTitle = document.getElementById('card-title');
         const cardDescription = document.getElementById('card-description');
         const cardCategoryText = document.getElementById('card-category-text');
-        const statPoints = document.getElementById('stat-points');
         const closeCardBtn = document.getElementById('close-card-btn');
         const getDirectionsBtn = document.getElementById('get-directions-btn');
         const shareBtn = document.getElementById('share-btn');
@@ -805,19 +678,12 @@
             cardTitle.textContent = loc.name;
             cardDescription.textContent = loc.description;
             cardCategoryText.textContent = loc.category;
-            statPoints.textContent = `+${loc.points}`;
 
             // Show card with animation
             locationCard.classList.add('visible');
 
             // Center map on location
             map.flyTo([loc.lat, loc.lng], 15, { duration: 0.5 });
-
-            // Award points if first visit
-            if (!visitedLocations.has(loc.name)) {
-                visitedLocations.add(loc.name);
-                setTimeout(() => addPoints(loc.points), 800);
-            }
 
             lucide.createIcons();
         }
