@@ -475,17 +475,19 @@
             }
         }
 
-        @keyframes marker-active-breath {
-
-            0%,
-            100% {
-                transform: scale(1.4) translateY(-8px);
-                filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
+        @keyframes marker-active-pop {
+            0% {
+                transform: scale(0.9) translateY(0);
             }
 
             50% {
-                transform: scale(1.45) translateY(-10px);
-                filter: drop-shadow(0 16px 28px rgba(0, 0, 0, 0.4));
+                transform: scale(1.5) translateY(-12px);
+                filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.4));
+            }
+
+            100% {
+                transform: scale(1.4) translateY(-8px);
+                filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
             }
         }
 
@@ -493,17 +495,18 @@
 
             0%,
             100% {
-                transform: scale(1.4) translateY(-8px) rotate(0deg);
+                transform: scale(1) translateY(0) rotate(0deg);
             }
 
             25% {
-                transform: scale(1.4) translateY(-8px) rotate(-5deg);
+                transform: scale(1.1) translateY(-2px) rotate(-8deg);
             }
 
             75% {
-                transform: scale(1.4) translateY(-8px) rotate(5deg);
+                transform: scale(1.1) translateY(-2px) rotate(8deg);
             }
         }
+
 
         .image-marker {
             width: 40px;
@@ -528,18 +531,24 @@
             mix-blend-mode: multiply;
         }
 
-        /* Hover interaction */
-        .image-marker:hover {
+        /* Hover interaction - Plays once */
+        .image-marker:hover:not(.active) {
             opacity: 1;
             z-index: 1000 !important;
-            animation: marker-hover-wiggle 0.4s ease-in-out infinite;
+            animation: marker-hover-wiggle 0.5s ease-in-out;
+            transform: scale(1.1) translateY(-2px);
         }
 
-        /* Active/Selected state */
+        /* Active/Selected state - Pops once on activation */
         .image-marker.active {
             opacity: 1;
             z-index: 1001 !important;
-            animation: marker-active-breath 2s ease-in-out infinite;
+            transform: scale(1.4) translateY(-8px);
+            filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .image-marker.active.playing {
+            animation: marker-active-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
 
@@ -1288,25 +1297,30 @@
         const markers = [];
         let activeMarker = null;
 
-        function getCategoryMarker(category) {
+        function getCategoryMarker(category, bustCache = false) {
             const baseUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/video/';
+            let url = '';
             switch (category) {
                 case 'Temple':
-                    return baseUrl + 'marker-ios-17-outlined/icons8-marker-100.gif';
+                    url = baseUrl + 'marker-ios-17-outlined/icons8-marker-100.gif';
+                    break;
                 case 'Holy Site':
-                    return baseUrl + 'place-marker-ios-17-filled/icons8-place-marker-100.gif';
+                    url = baseUrl + 'place-marker-ios-17-filled/icons8-place-marker-100.gif';
+                    break;
                 case 'Town':
-                    return baseUrl + 'marker-ink/icons8-marker-96.png';
+                    url = baseUrl + 'marker-ink/icons8-marker-96.png';
+                    break;
                 default:
-                    return baseUrl + 'marker-ink/icons8-marker-96.png';
+                    url = baseUrl + 'marker-ink/icons8-marker-96.png';
             }
+            return bustCache ? `${url}?t=${Date.now()}` : url;
         }
 
-        function createMarkerIcon(category, isActive = false) {
-            const markerUrl = getCategoryMarker(category);
+        function createMarkerIcon(category, isActive = false, isPlaying = false) {
+            const markerUrl = getCategoryMarker(category, isPlaying);
             return L.divIcon({
                 className: 'marker-wrapper',
-                html: `<div class="image-marker ${isActive ? 'active' : ''}">
+                html: `<div class="image-marker ${isActive ? 'active' : ''} ${isPlaying ? 'playing' : ''}">
                     <img src="${markerUrl}" alt="${category}" style="width: 100%; height: 100%;">
                 </div>`,
                 iconSize: [40, 40],
@@ -1337,12 +1351,19 @@
         function showLocationCard(loc, marker) {
             // Reset previous marker
             if (activeMarker) {
-                activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false));
+                activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false, false));
             }
 
-            // Highlight new marker
-            marker.setIcon(createMarkerIcon(loc.category, true));
+            // Highlight new marker and trigger animation
+            marker.setIcon(createMarkerIcon(loc.category, true, true));
             activeMarker = marker;
+
+            // Remove 'playing' class after animation ends (600ms)
+            setTimeout(() => {
+                if (activeMarker === marker) {
+                    marker.setIcon(createMarkerIcon(loc.category, true, false));
+                }
+            }, 600);
 
             // Update card content
             cardImage.style.backgroundImage = `url(${loc.image})`;
@@ -1377,7 +1398,7 @@
             document.querySelector('.zoom-controls').classList.remove('card-visible');
 
             if (activeMarker) {
-                activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false));
+                activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false, false));
                 activeMarker = null;
             }
         }
