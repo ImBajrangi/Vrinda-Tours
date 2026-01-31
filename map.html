@@ -28,25 +28,25 @@
 
     <style>
         :root {
-            --bg-app: #F5F7FA;
+            --bg-app: #F5F5F5;
             --bg-card: #FFFFFF;
-            --gradient-start: #F8FAFC;
-            --gradient-end: #F1F5F9;
-            --accent-primary: #F97316;
-            --accent-primary-dark: #EA580C;
-            --accent-blue: #3B82F6;
-            --accent-green: #22C55E;
-            --text-primary: #1E293B;
-            --text-secondary: #64748B;
-            --text-muted: #94A3B8;
-            --border-subtle: rgba(0, 0, 0, 0.06);
+            --gradient-start: #FFFFFF;
+            --gradient-end: #F5F5F5;
+            --accent-primary: #000000;
+            --accent-primary-dark: #1A1A1A;
+            --accent-success: #22C55E;
+            --text-primary: #000000;
+            --text-secondary: #545454;
+            --text-muted: #9E9E9E;
+            --border-subtle: #EEEEEE;
+            --divider: #F5F5F5;
             --transition-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
         }
 
         * {
@@ -193,7 +193,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(249, 115, 22, 0.1);
+            background: #F5F5F5;
             border-radius: 5px;
         }
 
@@ -503,6 +503,81 @@
 
         .leaflet-control-zoom {
             display: none;
+        }
+
+        /* --- Floating Action Button (Current Location) --- */
+        .fab {
+            position: absolute;
+            bottom: 10rem;
+            right: 1rem;
+            z-index: 1001;
+            width: 52px;
+            height: 52px;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .fab:active {
+            transform: scale(0.95);
+        }
+
+        .fab.loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- User Location Marker --- */
+        .user-location-marker {
+            width: 20px;
+            height: 20px;
+            background: #3B82F6;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 rgba(59, 130, 246, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+
+        /* --- Route Line Styling --- */
+        .leaflet-interactive.route-line {
+            stroke: var(--accent-primary);
+            stroke-width: 4;
+            stroke-dasharray: none;
         }
 
         /* ========================================
@@ -894,12 +969,16 @@
         </div>
         <div class="card-stats">
             <div class="stat">
-                <div class="stat-value">4.8</div>
-                <div class="stat-label">Rating</div>
+                <div class="stat-value" id="stat-distance">--</div>
+                <div class="stat-label">Distance</div>
             </div>
             <div class="stat">
-                <div class="stat-value">Free</div>
-                <div class="stat-label">Entry</div>
+                <div class="stat-value" id="stat-eta">--</div>
+                <div class="stat-label">ETA</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">4.8</div>
+                <div class="stat-label">Rating</div>
             </div>
         </div>
         <div class="card-actions">
@@ -912,6 +991,11 @@
             </button>
         </div>
     </div>
+
+    <!-- Floating Action Button (Current Location) -->
+    <button class="fab" id="location-fab" title="Center on my location">
+        <i data-lucide="crosshair" style="width: 24px; height: 24px;"></i>
+    </button>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -1008,6 +1092,9 @@
             cardDescription.textContent = loc.description;
             cardCategoryText.textContent = loc.category;
 
+            // Update distance and ETA
+            updateDistanceAndETA(loc);
+
             // Show card with animation
             locationCard.classList.add('visible');
 
@@ -1026,13 +1113,6 @@
         }
 
         closeCardBtn.addEventListener('click', hideLocationCard);
-
-        getDirectionsBtn.addEventListener('click', () => {
-            if (activeMarker) {
-                const loc = activeMarker.locationData;
-                window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank');
-            }
-        });
 
         shareBtn.addEventListener('click', async () => {
             if (activeMarker && navigator.share) {
@@ -1130,6 +1210,169 @@
                 hideLocationCard();
             }
         });
+
+        // --- Current Location Functionality ---
+        let userLocation = null;
+        let userMarker = null;
+        let routeLine = null;
+        const locationFab = document.getElementById('location-fab');
+        const statDistance = document.getElementById('stat-distance');
+        const statEta = document.getElementById('stat-eta');
+
+        // Haversine formula to calculate distance
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Format distance
+        function formatDistance(km) {
+            if (km < 1) {
+                return `${Math.round(km * 1000)}m`;
+            }
+            return `${km.toFixed(1)}km`;
+        }
+
+        // Calculate ETA (assuming 40 km/h average speed)
+        function calculateETA(km) {
+            const hours = km / 40;
+            const minutes = Math.round(hours * 60);
+            if (minutes < 60) {
+                return `${minutes}min`;
+            }
+            const hrs = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hrs}h ${mins}m`;
+        }
+
+        // Get current location
+        function getCurrentLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+
+            locationFab.classList.add('loading');
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    // Remove old user marker
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    // Add user location marker
+                    const userIcon = L.divIcon({
+                        className: 'user-location-marker',
+                        html: '',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+
+                    userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                        icon: userIcon
+                    }).addTo(map);
+
+                    // Center map on user location
+                    map.flyTo([userLocation.lat, userLocation.lng], 14, { duration: 1 });
+
+                    locationFab.classList.remove('loading');
+
+                    // Update distance if card is visible
+                    if (activeMarker && locationCard.classList.contains('visible')) {
+                        updateDistanceAndETA(activeMarker.locationData);
+                    }
+                },
+                (error) => {
+                    locationFab.classList.remove('loading');
+                    alert('Unable to get your location. Please enable location services.');
+                    console.error('Geolocation error:', error);
+                }
+            );
+        }
+
+        // Update distance and ETA in card
+        function updateDistanceAndETA(location) {
+            if (!userLocation) {
+                statDistance.textContent = '--';
+                statEta.textContent = '--';
+                return;
+            }
+
+            const distance = calculateDistance(
+                userLocation.lat,
+                userLocation.lng,
+                location.lat,
+                location.lng
+            );
+
+            statDistance.textContent = formatDistance(distance);
+            statEta.textContent = calculateETA(distance);
+        }
+
+        // Draw route line
+        function drawRoute(destination) {
+            // Remove old route
+            if (routeLine) {
+                map.removeLayer(routeLine);
+            }
+
+            if (!userLocation) {
+                return;
+            }
+
+            // Create simple straight line (for demo - real routing would use routing API)
+            routeLine = L.polyline(
+                [[userLocation.lat, userLocation.lng], [destination.lat, destination.lng]],
+                {
+                    color: '#000000',
+                    weight: 4,
+                    opacity: 0.7,
+                    className: 'route-line'
+                }
+            ).addTo(map);
+
+            // Fit map to show both points
+            const bounds = L.latLngBounds(
+                [userLocation.lat, userLocation.lng],
+                [destination.lat, destination.lng]
+            );
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        locationFab.addEventListener('click', getCurrentLocation);
+
+
+        // Update Get Directions button to draw route
+        getDirectionsBtn.addEventListener('click', () => {
+            if (activeMarker) {
+                const loc = activeMarker.locationData;
+                if (userLocation) {
+                    drawRoute(loc);
+                } else {
+                    // Open Google Maps if no user location
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank');
+                }
+            }
+        });
+
+        // Try to get location on load
+        setTimeout(() => {
+            if (navigator.geolocation) {
+                getCurrentLocation();
+            }
+        }, 1000);
     </script>
 </body>
 
