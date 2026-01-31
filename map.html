@@ -1363,11 +1363,11 @@
             maxBoundsViscosity: 1.0
         });
 
-        // Modern Stadia Maps tiles (Uber-like style)
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+        // Modern CartoDB Voyager tiles (High-end aesthetic, no 401 errors)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
             maxZoom: 20,
-            minZoom: 10,
-            attribution: '&copy; Stadia Maps',
+            minZoom: 2,
+            attribution: '&copy; CartoDB',
             updateWhenIdle: false,
             updateWhenZooming: false,
             keepBuffer: 2
