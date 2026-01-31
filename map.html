@@ -508,11 +508,11 @@
         /* --- Floating Action Button (Current Location) --- */
         .fab {
             position: absolute;
-            bottom: 10rem;
+            bottom: 1.5rem;
             right: 1rem;
             z-index: 1001;
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             background: var(--accent-primary);
             border: none;
             border-radius: 50%;
@@ -583,9 +583,8 @@
         /* --- Custom Zoom Controls --- */
         .zoom-controls {
             position: absolute;
-            top: 50%;
+            bottom: 6.5rem;
             right: 1rem;
-            transform: translateY(-50%);
             z-index: 1001;
             display: flex;
             flex-direction: column;
@@ -593,8 +592,8 @@
         }
 
         .zoom-btn {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: var(--radius-sm);
@@ -605,7 +604,7 @@
             align-items: center;
             justify-content: center;
             box-shadow: var(--shadow-sm);
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             user-select: none;
         }
@@ -680,6 +679,24 @@
 
             .card-info p {
                 font-size: 0.75rem;
+            }
+
+            .fab {
+                width: 52px;
+                height: 52px;
+                bottom: 1.75rem;
+                right: 1.25rem;
+            }
+
+            .zoom-controls {
+                bottom: 7.5rem;
+                right: 1.25rem;
+            }
+
+            .zoom-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
             }
         }
 
@@ -800,6 +817,26 @@
             .custom-marker .marker-icon svg {
                 width: 14px;
                 height: 14px;
+            }
+
+            .fab {
+                width: 56px;
+                height: 56px;
+                bottom: 2rem;
+                right: 2rem;
+            }
+
+            .zoom-controls {
+                top: 50%;
+                transform: translateY(-50%);
+                bottom: auto;
+                right: 1.5rem;
+            }
+
+            .zoom-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
             }
         }
 
