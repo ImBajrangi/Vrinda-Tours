@@ -473,8 +473,8 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            /* Effectively removes white background from GIFs */
-            mix-blend-mode: multiply;
+            /* Advanced white background removal via SVG filter */
+            filter: url(#remove-bg);
         }
 
         .image-marker.active {
@@ -1111,6 +1111,16 @@
         <i data-lucide="alert-circle" class="toast-icon"></i>
         <span class="toast-message" id="toast-message"></span>
     </div>
+
+    <!-- SVG Filter for Marker Background Removal -->
+    <svg style="visibility: hidden; position: absolute;" width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+        <filter id="remove-bg" color-interpolation-filters="sRGB">
+            <feColorMatrix type="matrix" values="1 0 0 0 0
+                                                 0 1 0 0 0
+                                                 0 0 1 0 0
+                                                 -1 -1 -1 3 0" />
+        </filter>
+    </svg>
 
     <!-- Location Card -->
     <div class="location-card" id="location-card">
