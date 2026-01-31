@@ -16,6 +16,8 @@
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -553,6 +555,52 @@
 
         .image-marker.active.playing {
             animation: marker-active-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* --- Marker Clustering Styles --- */
+        .marker-cluster {
+            background-clip: padding-box;
+            border-radius: 20px;
+        }
+
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
+            text-align: center;
+            border-radius: 15px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .marker-cluster span {
+            line-height: 30px;
+        }
+
+        /* Monochrome Cluster Theme */
+        .marker-cluster-small,
+        .marker-cluster-medium,
+        .marker-cluster-large {
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .marker-cluster-small div,
+        .marker-cluster-medium div,
+        .marker-cluster-large div {
+            background-color: #000000;
+            color: #FFFFFF;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .marker-cluster:hover div {
+            transform: scale(1.1);
+            background-color: #1A1A1A;
         }
 
 
@@ -1250,6 +1298,8 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
         // Initialize Lucide icons
@@ -1297,9 +1347,23 @@
             keepBuffer: 2
         }).addTo(map);
 
-        // --- Markers ---
+        // --- Markers & Clustering ---
         const markers = [];
         let activeMarker = null;
+
+        // Initialize Marker Cluster Group with custom settings
+        const markerCluster = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            spiderfyOnMaxZoom: true,
+            removeOutsideVisibleBounds: true,
+            animate: true,
+            disableClusteringAtZoom: 18,
+            maxClusterRadius: 60,
+            // Smoothly animate cluster expansion
+            animateAddingMarkers: true
+        });
+        map.addLayer(markerCluster);
 
         function getCategoryMarker(category, bustCache = false) {
             const baseUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/video/';
@@ -1339,7 +1403,10 @@
             // Start with playing=true for the bounce-in effect
             const marker = L.marker([loc.lat, loc.lng], {
                 icon: createMarkerIcon(loc.category, false, true)
-            }).addTo(map);
+            });
+
+            // Add to Cluster Group instead of direct Map
+            markerCluster.addLayer(marker);
 
             // Turn off animation state after initial entrance
             setTimeout(() => {
@@ -1467,7 +1534,10 @@
                     item.addEventListener('click', () => {
                         const marker = markers.find(m => m.locationData.name === loc.name);
                         if (marker) {
-                            showLocationCard(loc, marker);
+                            // Ensure marker is visible if it's currently clustered
+                            markerCluster.zoomToShowLayer(marker, () => {
+                                showLocationCard(loc, marker);
+                            });
                             searchInput.value = loc.name;
                             searchResults.classList.remove('visible');
                         }
@@ -1497,17 +1567,19 @@
                 pill.classList.add('active');
 
                 const filter = pill.dataset.filter;
+
+                // Clear and re-add to cluster group based on filter
+                markerCluster.clearLayers();
+
                 markers.forEach(marker => {
                     const loc = marker.locationData;
                     if (filter === 'all' || loc.category === filter) {
-                        marker.addTo(map);
+                        markerCluster.addLayer(marker);
                         // Trigger one-time entrance animation
                         marker.setIcon(createMarkerIcon(loc.category, false, true));
                         setTimeout(() => {
                             marker.setIcon(createMarkerIcon(loc.category, false, false));
                         }, 2500);
-                    } else {
-                        map.removeLayer(marker);
                     }
                 });
 
