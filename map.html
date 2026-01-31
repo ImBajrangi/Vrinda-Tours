@@ -458,48 +458,28 @@
             background: var(--bg-app);
         }
 
-        .custom-marker {
-            width: 28px;
-            height: 28px;
-            background: var(--bg-card);
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
+        .image-marker {
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
-            border: 2px solid var(--accent-primary);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+            cursor: pointer;
         }
 
-        .custom-marker.active {
-            transform: rotate(-45deg) scale(1.2);
-            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+        .image-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
-        .custom-marker .marker-icon {
-            transform: rotate(45deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .image-marker.active {
+            transform: scale(1.4) translateY(-8px);
+            filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.3));
         }
 
-        .custom-marker .marker-icon svg {
-            width: 12px;
-            height: 12px;
-        }
-
-        .custom-marker.temple {
-            border-color: #EF4444;
-        }
-
-        .custom-marker.holy-site {
-            border-color: #22C55E;
-        }
-
-        .custom-marker.town {
-            border-color: #8B5CF6;
-        }
 
         .leaflet-control-zoom {
             display: none;
@@ -887,15 +867,9 @@
                 height: 46px;
             }
 
-            .custom-marker {
-                width: 32px;
-                height: 32px;
-                border-width: 2.5px;
-            }
-
-            .custom-marker .marker-icon svg {
-                width: 14px;
-                height: 14px;
+            .image-marker {
+                width: 44px;
+                height: 44px;
             }
 
             .fab {
@@ -1066,14 +1040,9 @@
                 height: 38px;
             }
 
-            .custom-marker {
-                width: 24px;
-                height: 24px;
-            }
-
-            .custom-marker .marker-icon svg {
-                width: 10px;
-                height: 10px;
+            .image-marker {
+                width: 32px;
+                height: 32px;
             }
         }
 
@@ -1247,24 +1216,29 @@
         const markers = [];
         let activeMarker = null;
 
-        function getCategoryIcon(category) {
+        function getCategoryMarker(category) {
+            const baseUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/video/';
             switch (category) {
-                case 'Temple': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><path d="M6 11V6a6 6 0 0 1 12 0v5"/><path d="M12 2v20"/></svg>';
-                case 'Holy Site': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>';
-                case 'Town': return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-                default: return '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>';
+                case 'Temple':
+                    return baseUrl + 'marker-ios-17-outlined/icons8-marker-100.gif';
+                case 'Holy Site':
+                    return baseUrl + 'place-marker-ios-17-filled/icons8-place-marker-100.gif';
+                case 'Town':
+                    return baseUrl + 'marker-ink/icons8-marker-96.png';
+                default:
+                    return baseUrl + 'marker-ink/icons8-marker-96.png';
             }
         }
 
         function createMarkerIcon(category, isActive = false) {
-            const categoryClass = category.toLowerCase().replace(' ', '-');
+            const markerUrl = getCategoryMarker(category);
             return L.divIcon({
                 className: 'marker-wrapper',
-                html: `<div class="custom-marker ${categoryClass} ${isActive ? 'active' : ''}">
-                    <span class="marker-icon">${getCategoryIcon(category)}</span>
+                html: `<div class="image-marker ${isActive ? 'active' : ''}">
+                    <img src="${markerUrl}" alt="${category}" style="width: 100%; height: 100%;">
                 </div>`,
-                iconSize: [36, 36],
-                iconAnchor: [18, 36]
+                iconSize: [40, 40],
+                iconAnchor: [20, 40]
             });
         }
 
@@ -1430,7 +1404,7 @@
 
         // Close card when clicking on map
         map.on('click', (e) => {
-            if (!e.originalEvent.target.closest('.custom-marker')) {
+            if (!e.originalEvent.target.closest('.image-marker')) {
                 hideLocationCard();
             }
         });
