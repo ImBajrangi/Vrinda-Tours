@@ -548,6 +548,12 @@
             }
         }
 
+        /* Shift buttons when card is visible */
+        .fab.card-visible {
+            right: auto;
+            left: 1rem;
+        }
+
         /* --- User Location Marker --- */
         .user-location-marker {
             width: 20px;
@@ -617,6 +623,11 @@
 
         .zoom-btn:active {
             transform: scale(0.95);
+        }
+
+        .zoom-controls.card-visible {
+            right: auto;
+            left: 1rem;
         }
 
         /* ========================================
@@ -837,6 +848,17 @@
                 width: 48px;
                 height: 48px;
                 font-size: 22px;
+            }
+
+            /* On desktop, keep buttons on right even when card visible (more space) */
+            .fab.card-visible {
+                right: 2rem;
+                left: auto;
+            }
+
+            .zoom-controls.card-visible {
+                right: 1.5rem;
+                left: auto;
             }
         }
 
@@ -1196,6 +1218,10 @@
             // Show card with animation
             locationCard.classList.add('visible');
 
+            // Shift buttons to avoid overlapping card
+            locationFab.classList.add('card-visible');
+            document.querySelector('.zoom-controls').classList.add('card-visible');
+
             // Center map on location
             map.flyTo([loc.lat, loc.lng], 15, {
                 duration: 0.8,
@@ -1207,6 +1233,11 @@
 
         function hideLocationCard() {
             locationCard.classList.remove('visible');
+
+            // Move buttons back to original position
+            locationFab.classList.remove('card-visible');
+            document.querySelector('.zoom-controls').classList.remove('card-visible');
+
             if (activeMarker) {
                 activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false));
                 activeMarker = null;
