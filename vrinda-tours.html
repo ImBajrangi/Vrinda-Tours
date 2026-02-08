@@ -28,6 +28,10 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Unified Auth Dependencies -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="../../js/auth.js"></script>
+
     <style>
         :root {
             --bg-app: #F5F5F5;
@@ -682,27 +686,59 @@
 
         /* --- User Location Marker --- */
         .user-location-marker {
-            width: 32px;
-            height: 32px;
-            background-image: url('https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/map-pin.png');
+            width: 40px;
+            height: 40px;
+            background-image: url('../../Vrindopnishad Web/class/marker/map-pin.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-            animation: user-pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            /* Multi-stage animation: Pulse + Floating */
+            animation: user-marker-pulse 2s ease-in-out infinite;
+            z-index: 2000 !important;
         }
 
-        @keyframes user-pulse {
-
-            0%,
-            100% {
+        @keyframes user-marker-pulse {
+            0% {
                 transform: scale(1);
-                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4));
             }
 
             50% {
-                transform: scale(1.1);
-                filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.5));
+                transform: scale(1.15) translateY(-4px);
+                filter: drop-shadow(0 12px 20px rgba(59, 130, 246, 0.8));
+            }
+
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 4px 8px rgba(59, 130, 246, 0.4));
+            }
+        }
+
+        /* Pulsing Aura under the pin */
+        .user-location-marker::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 8px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            z-index: -1;
+            animation: aura-expand 2s ease-out infinite;
+        }
+
+        @keyframes aura-expand {
+            0% {
+                transform: translateX(-50%) scale(0.8);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: translateX(-50%) scale(2.5);
+                opacity: 0;
             }
         }
 
@@ -1344,6 +1380,14 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
+        // Initialize Unified Auth
+        if (window.AuthService) {
+            AuthService.updateProfileUI('user-btn');
+            AuthService.onAuthStateChange(() => {
+                AuthService.updateProfileUI('user-btn');
+            });
+        }
+
         // --- Data ---
         const locations = [
             { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival celebrated with great fervor.", category: "Town", points: 15 },
@@ -1422,23 +1466,23 @@
         map.addLayer(markerCluster);
 
         function getCategoryMarker(category, bustCache = false) {
-            const baseUrl = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/';
+            const baseUrl = '../../Vrindopnishad Web/class/marker/';
             let url = '';
             switch (category) {
                 case 'Temple':
-                    url = baseUrl + 'marker-ios-17-outlined/icons8-marker-100.gif';
+                    url = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/marker-ios-17-outlined/icons8-marker-100.gif';
                     break;
                 case 'Holy Site':
-                    url = baseUrl + 'place-marker-ios-17-filled/icons8-place-marker-100.gif';
+                    url = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/place-marker-ios-17-filled/icons8-place-marker-100.gif';
                     break;
                 case 'Town':
                     url = baseUrl + 'marker-ink/icons8-marker-96.png';
                     break;
                 case 'Dining':
-                    url = baseUrl + 'flag-2.png';
+                    url = baseUrl + 'pin-3.png';
                     break;
                 case 'Information':
-                    url = baseUrl + 'flag.png';
+                    url = baseUrl + 'pin-2.png';
                     break;
                 default:
                     url = baseUrl + 'marker-ink/icons8-marker-96.png';
@@ -1766,8 +1810,8 @@
                     const userIcon = L.divIcon({
                         className: 'user-location-marker',
                         html: '',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32]
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 40]
                     });
 
                     userMarker = L.marker([userLocation.lat, userLocation.lng], {
