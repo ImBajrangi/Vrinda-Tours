@@ -12,7 +12,40 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brij 84 Kos Yatra - Sacred Map</title>
+    <title>Brij Yatra - Sacred Pilgrimage by Vrindopnishad</title>
+    <meta name="description"
+        content="Experience the sacred Brij 84 Kos Yatra with our interactive map and guide. Discover temples, kunds, and holy sites across the divine land of Brij.">
+    <link rel="canonical" href="https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html",
+          "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html",
+          "name": "Brij Yatra - Sacred Pilgrimage",
+          "description": "Interactive map and guide for the Brij 84 Kos Yatra.",
+          "isPartOf": { "@id": "https://vrindopnishad.in/#website" }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://vrindopnishad.in/#organization",
+          "name": "Vrindopnishad",
+          "url": "https://vrindopnishad.in/",
+          "logo": "https://vrindopnishad.in/Vrindopnishad%20Web/class/logo/v-logo.png"
+        },
+        {
+          "@type": "Place",
+          "name": "Brij 84 Kos Yatra",
+          "description": "The sacred pilgrimage circuit encompassing the divine sites of Krishna's pastimes.",
+          "parentOrganization": { "@id": "https://vrindopnishad.in/#organization" }
+        }
+      ]
+    }
+    </script>
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -470,6 +503,11 @@
         .search-result-item .text span {
             font-size: 0.75rem;
             color: var(--text-secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            line-clamp: 1;
+            overflow: hidden;
         }
 
         /* --- Custom Leaflet Styles --- */
