@@ -67,9 +67,17 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Unified Auth Dependencies -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script src="../../js/auth.js"></script>
+    <!-- Firebase Import Map for ES Modules -->
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+          "firebase/analytics": "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js"
+        }
+      }
+    </script>
+    <script type="module" src="../../js/auth.js"></script>
 
     <style>
         :root {
