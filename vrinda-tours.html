@@ -23,18 +23,67 @@
       "@context": "https://schema.org",
       "@graph": [
         {
+          "@type": "WebSite",
+          "@id": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html#website",
+          "name": "Vrinda Tours",
+          "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html",
+          "publisher": { "@id": "https://vrindopnishad.in/#organization" },
+          "description": "Experience the sacred Brij 84 Kos Yatra with our interactive map and guide."
+        },
+        {
           "@type": "WebPage",
           "@id": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html#webpage",
           "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html",
           "name": "Brij Yatra - Sacred Pilgrimage",
           "description": "Interactive map and guide for the Brij 84 Kos Yatra.",
-          "isPartOf": { "@id": "https://vrindopnishad.in/#website" }
+          "isPartOf": { "@id": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html#website" }
         },
         {
-          "@type": "WebSite",
-          "@id": "https://vrindopnishad.in/#website",
-          "url": "https://vrindopnishad.in/",
-          "name": "Vrindopnishad"
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://vrindopnishad.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Projects",
+              "item": "https://vrindopnishad.in/#projects"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Vrinda Tours",
+              "item": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html"
+            }
+          ]
+        },
+        {
+          "@type": "SiteNavigationElement",
+          "name": "Vrinda Tours Navigation",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Interactive Yatra Map",
+              "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html#map"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Holy Sites",
+              "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/vrinda-tours.html#places"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Contact",
+              "url": "https://vrindopnishad.in/Vrindopnishad%20Web/about%20code/main/about.html#contact"
+            }
+          ]
         },
         {
           "@type": "Organization",
@@ -348,6 +397,7 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -892,6 +942,7 @@
             font-weight: 500;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
