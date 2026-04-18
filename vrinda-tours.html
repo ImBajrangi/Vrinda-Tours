@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta charset="UTF-8">
@@ -121,7 +120,8 @@
         "imports": {
           "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
           "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-          "firebase/analytics": "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js"
+          "firebase/analytics": "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js",
+          "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
         }
       }
     </script>
@@ -1354,6 +1354,587 @@
                 overflow-y: auto;
             }
         }
+
+        /* ========================================
+           DRIVERS MANAGEMENT STYLES
+        ======================================== */
+
+        /* Overlay backdrop */
+        .drivers-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s var(--transition-smooth);
+        }
+
+        .drivers-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Drivers Panel */
+        .drivers-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2001;
+            background: var(--bg-card);
+            border-radius: 20px 20px 0 0;
+            max-height: 85vh;
+            transform: translateY(100%);
+            transition: transform 0.4s var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .drivers-panel.visible {
+            transform: translateY(0);
+        }
+
+        .drivers-panel-handle {
+            width: 36px;
+            height: 4px;
+            background: #D1D5DB;
+            border-radius: 100px;
+            margin: 10px auto 0;
+            flex-shrink: 0;
+        }
+
+        .drivers-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .drivers-panel-header h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .drivers-panel-header h3 .driver-count {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            background: var(--accent-primary);
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 100px;
+        }
+
+        .drivers-panel-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #F3F4F6;
+            border: none;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .drivers-panel-close:hover {
+            background: #E5E7EB;
+            color: var(--text-primary);
+        }
+
+        .drivers-panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1.25rem 1.25rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Add Driver Button */
+        .add-driver-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .add-driver-btn:hover {
+            background: var(--accent-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-driver-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Driver Card */
+        .driver-card {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            padding: 0.875rem;
+            background: #FAFAFA;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.625rem;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .driver-card:hover {
+            background: #F5F5F5;
+            border-color: #DDD;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .driver-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #E5E7EB;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #9CA3AF;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .driver-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .driver-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .driver-details h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.125rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .driver-details .driver-phone {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .driver-details .driver-email {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            margin-top: 0.125rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .driver-actions {
+            display: flex;
+            gap: 0.375rem;
+            flex-shrink: 0;
+        }
+
+        .driver-action-btn {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .driver-action-btn:hover {
+            border-color: #000;
+            color: #000;
+        }
+
+        .driver-action-btn.call-btn:hover {
+            background: #ECFDF5;
+            border-color: #059669;
+            color: #059669;
+        }
+
+        .driver-action-btn.delete-btn:hover {
+            background: #FEF2F2;
+            border-color: #EF4444;
+            color: #EF4444;
+        }
+
+        .drivers-empty {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .drivers-empty svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 0.75rem;
+            opacity: 0.4;
+        }
+
+        .drivers-empty p {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .drivers-empty span {
+            font-size: 0.75rem;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        /* Add Driver Modal */
+        .add-driver-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s var(--transition-smooth);
+        }
+
+        .add-driver-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .add-driver-modal-bg {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .add-driver-form-container {
+            position: relative;
+            z-index: 1;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.35s var(--transition-smooth);
+        }
+
+        .add-driver-modal.visible .add-driver-form-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.25rem 0;
+        }
+
+        .modal-header h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #F3F4F6;
+            border: none;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: #E5E7EB;
+        }
+
+        .add-driver-form {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Photo Upload Area */
+        .photo-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #F3F4F6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 3px dashed #D1D5DB;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .photo-preview:hover {
+            border-color: var(--accent-primary);
+            background: #F9FAFB;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-preview .photo-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--text-muted);
+        }
+
+        .photo-preview .photo-placeholder span {
+            font-size: 0.625rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .photo-upload input[type="file"] {
+            display: none;
+        }
+
+        /* Form Fields */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-group label .optional {
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .form-group input {
+            padding: 0.75rem 0.875rem;
+            background: #F9FAFB;
+            border: 1.5px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group .input-error {
+            border-color: #EF4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .form-group .error-text {
+            font-size: 0.6875rem;
+            color: #EF4444;
+            display: none;
+        }
+
+        .form-group .error-text.visible {
+            display: block;
+        }
+
+        .form-submit-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem;
+            background: var(--accent-primary);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.25rem;
+        }
+
+        .form-submit-btn:hover {
+            background: var(--accent-primary-dark);
+        }
+
+        .form-submit-btn:active {
+            transform: scale(0.98);
+        }
+
+        .form-submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Delete Confirmation */
+        .delete-confirm {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+
+        .delete-confirm.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .delete-confirm span {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .delete-confirm button {
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .delete-confirm .confirm-yes {
+            background: #EF4444;
+            color: #fff;
+        }
+
+        .delete-confirm .confirm-yes:hover {
+            background: #DC2626;
+        }
+
+        .delete-confirm .confirm-no {
+            background: #F3F4F6;
+            color: var(--text-secondary);
+        }
+
+        .delete-confirm .confirm-no:hover {
+            background: #E5E7EB;
+        }
+
+        /* Responsive for drivers panel */
+        @media (min-width: 640px) {
+            .drivers-panel {
+                max-width: 480px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100%);
+                border-radius: 20px 20px 0 0;
+            }
+
+            .drivers-panel.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .drivers-panel {
+                bottom: auto;
+                top: 50%;
+                left: 50%;
+                right: auto;
+                transform: translate(-50%, -50%) scale(0.95);
+                border-radius: var(--radius-lg);
+                max-height: 75vh;
+                max-width: 500px;
+                width: 90vw;
+            }
+
+            .drivers-panel.visible {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -1398,6 +1979,10 @@
         <button class="pill" data-filter="Information">
             <span class="pill-icon"><i data-lucide="info"></i></span>
             Info
+        </button>
+        <button class="pill" id="drivers-pill">
+            <span class="pill-icon"><i data-lucide="car"></i></span>
+            Drivers
         </button>
     </div>
 
@@ -1473,6 +2058,73 @@
         <button class="zoom-btn" id="zoom-out" title="Zoom out">−</button>
     </div>
 
+    <!-- Drivers Overlay -->
+    <div class="drivers-overlay" id="drivers-overlay"></div>
+
+    <!-- Drivers Panel -->
+    <div class="drivers-panel" id="drivers-panel">
+        <div class="drivers-panel-handle"></div>
+        <div class="drivers-panel-header">
+            <h3>
+                <i data-lucide="car" style="width:20px;height:20px;"></i>
+                Our Drivers
+                <span class="driver-count" id="driver-count">0</span>
+            </h3>
+            <button class="drivers-panel-close" id="close-drivers-panel">
+                <i data-lucide="x" style="width:16px;height:16px;"></i>
+            </button>
+        </div>
+        <div class="drivers-panel-body" id="drivers-panel-body">
+            <button class="add-driver-btn" id="open-add-driver">
+                <i data-lucide="user-plus" style="width:18px;height:18px;"></i>
+                Add New Driver
+            </button>
+            <div id="drivers-list"></div>
+        </div>
+    </div>
+
+    <!-- Add Driver Modal -->
+    <div class="add-driver-modal" id="add-driver-modal">
+        <div class="add-driver-modal-bg" id="add-driver-modal-bg"></div>
+        <div class="add-driver-form-container">
+            <div class="modal-header">
+                <h3>Add Driver</h3>
+                <button class="modal-close" id="close-add-driver-modal">
+                    <i data-lucide="x" style="width:16px;height:16px;"></i>
+                </button>
+            </div>
+            <form class="add-driver-form" id="add-driver-form">
+                <div class="photo-upload">
+                    <div class="photo-preview" id="photo-preview">
+                        <div class="photo-placeholder">
+                            <i data-lucide="camera" style="width:24px;height:24px;"></i>
+                            <span>Photo</span>
+                        </div>
+                    </div>
+                    <input type="file" id="driver-photo-input" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="driver-name" placeholder="Enter driver's full name" required>
+                    <span class="error-text" id="name-error">Name is required</span>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="driver-phone" placeholder="+91 XXXXX XXXXX" required>
+                    <span class="error-text" id="phone-error">Valid phone number is required</span>
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="optional">(optional)</span></label>
+                    <input type="email" id="driver-email" placeholder="driver@example.com">
+                </div>
+                <button type="submit" class="form-submit-btn" id="form-submit-btn">
+                    <i data-lucide="user-check" style="width:18px;height:18px;"></i>
+                    Save Driver
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- MarkerCluster JS -->
@@ -1482,32 +2134,61 @@
         // Initialize Lucide icons
         lucide.createIcons();
 
-        // Initialize Unified Auth
-        if (window.AuthService) {
-            AuthService.updateProfileUI('user-btn');
-            AuthService.onAuthStateChange(() => {
-                AuthService.updateProfileUI('user-btn');
-            });
-        }
+        // Initialize Unified Auth — poll for module load since auth.js is type="module" (deferred)
+        (function initAuth() {
+            var userBtn = document.getElementById('user-btn');
+            var maxRetries = 20; // 10 seconds max
+            var retryCount = 0;
+
+            // Immediate fallback: if AuthService never loads, clicking the user button
+            // should still redirect to login
+            if (userBtn && !userBtn.dataset.authFallback) {
+                userBtn.dataset.authFallback = 'true';
+                userBtn.addEventListener('click', function fallbackHandler(e) {
+                    // If AuthService has set its own listener, skip fallback
+                    if (userBtn.dataset.authListenerSet === 'true') return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Redirect to login — use relative path from /Projects/Vrinda-Tours/
+                    var redirect = window.location.pathname + window.location.search;
+                    window.location.href = '../../login.html?redirect=' + encodeURIComponent(redirect);
+                });
+            }
+
+            function tryInit() {
+                if (window.AuthService) {
+                    AuthService.updateProfileUI('user-btn');
+                    AuthService.onAuthStateChange(function() {
+                        AuthService.updateProfileUI('user-btn');
+                    });
+                    return; // Success
+                }
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    setTimeout(tryInit, 500);
+                }
+            }
+            tryInit();
+        })();
 
         // --- Data ---
         const locations = [
-            { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival celebrated with great fervor.", category: "Town", points: 15 },
-            { name: "Shri Radharani Temple", lat: 27.650261, lng: 77.373287, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A hilltop temple dedicated to Radha, offering stunning panoramic views of the sacred region.", category: "Temple", points: 20 },
-            { name: "Pili Pokhar (Priya Kund)", lat: 27.653932, lng: 77.37667, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A sacred pond with golden-hued water, deeply associated with Radha's divine pastimes.", category: "Holy Site", points: 25 },
-            { name: "Gahvar Van", lat: 27.642648, lng: 77.367327, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A dense forest where Radha and Krishna would meet in secret for their divine plays.", category: "Holy Site", points: 30 },
-            { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The village of Lalita Sakhi, Radha's closest and most beloved companion.", category: "Town", points: 15 },
-            { name: "Shri Lalita Sakhi Mandir", lat: 27.661866, lng: 77.363891, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A temple dedicated to Lalita, the leader of the Ashta Sakhis (eight companions).", category: "Temple", points: 20 },
-            { name: "Prem Sarovar", lat: 27.66576, lng: 77.379896, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "The Lake of Love, the sacred site where Radha and Krishna first met.", category: "Holy Site", points: 35 },
-            { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
-            { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1609766857326-22d0a72fb3c2?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
+            { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1548013146-72479768bbaa?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival celebrated with great fervor.", category: "Town", points: 15 },
+            { name: "Shri Radharani Temple", lat: 27.650261, lng: 77.373287, image: "https://images.unsplash.com/photo-1544955378-b16260907e5c?w=400", description: "A hilltop temple dedicated to Radha, offering stunning panoramic views of the sacred region.", category: "Temple", points: 20 },
+            { name: "Pili Pokhar (Priya Kund)", lat: 27.653932, lng: 77.37667, image: "https://images.unsplash.com/photo-1588145229559-69324b104332?w=400", description: "A sacred pond with golden-hued water, deeply associated with Radha's divine pastimes.", category: "Holy Site", points: 25 },
+            { name: "Gahvar Van", lat: 27.642648, lng: 77.367327, image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=400", description: "A dense forest where Radha and Krishna would meet in secret for their divine plays.", category: "Holy Site", points: 30 },
+            { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://images.unsplash.com/photo-1596422846543-75c6fc188f67?w=400", description: "The village of Lalita Sakhi, Radha's closest and most beloved companion.", category: "Town", points: 15 },
+            { name: "Shri Lalita Sakhi Mandir", lat: 27.661866, lng: 77.363891, image: "https://images.unsplash.com/photo-1627850604051-bd1f705a2656?w=400", description: "A temple dedicated to Lalita, the leader of the Ashta Sakhis (eight companions).", category: "Temple", points: 20 },
+            { name: "Prem Sarovar", lat: 27.66576, lng: 77.379896, image: "https://images.unsplash.com/photo-1600100397991-3f698dc53216?w=400", description: "The Lake of Love, the sacred site where Radha and Krishna first met.", category: "Holy Site", points: 35 },
+            { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1590050752117-23ed9568779b?w=400", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
+            { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1590766940511-78210419665d?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
             { name: "Brijwasin Dining", lat: 27.6485, lng: 77.3750, image: "https://images.unsplash.com/photo-1517248135467-4c7ed9d8c47c?w=400", description: "Traditional Vedic dining experience offering pure vegetarian delicacies from the heart of Brij.", category: "Dining", points: 10 },
             { name: "Tourist Info Center", lat: 27.6440, lng: 77.3700, image: "https://images.unsplash.com/photo-1549412658-904aa6600473?w=400", description: "Official information center for pilgrims and tourists visiting Barsana.", category: "Information", points: 5 }
         ];
 
         // --- Map Initialization ---
         const map = L.map('map', {
-            center: [27.65, 77.38],
+            center: [27.64, 77.38],
             zoom: 13,
             zoomControl: false,
             attributionControl: false,
@@ -2034,6 +2715,344 @@
                 getCurrentLocation();
             }
         }, 1000);
+
+        // ========================================
+        // DRIVERS MANAGEMENT SYSTEM
+        // =====================================        // ========================================
+        // DRIVERS MANAGEMENT SYSTEM - UNBREAKABLE VERSION
+        // ========================================
+        (function DriversModule() {
+            const STORAGE_KEY = 'vrinda_tours_drivers';
+            const DRIVERS_PATH = 'drivers';
+            const AS = window.AuthService;
+
+            // Cache DOM
+            const driversPill = document.getElementById('drivers-pill');
+            const driversOverlay = document.getElementById('drivers-overlay');
+            const driversPanel = document.getElementById('drivers-panel');
+            const closePanelBtn = document.getElementById('close-drivers-panel');
+            const driversList = document.getElementById('drivers-list');
+            const driverCount = document.getElementById('driver-count');
+            const openAddBtn = document.getElementById('open-add-driver');
+            const addModal = document.getElementById('add-driver-modal');
+            const addModalBg = document.getElementById('add-driver-modal-bg');
+            const closeModalBtn = document.getElementById('close-add-driver-modal');
+            const addForm = document.getElementById('add-driver-form');
+            const photoPreview = document.getElementById('photo-preview');
+            const photoInput = document.getElementById('driver-photo-input');
+            const nameInput = document.getElementById('driver-name');
+            const phoneInput = document.getElementById('driver-phone');
+            const emailInput = document.getElementById('driver-email');
+            const nameError = document.getElementById('name-error');
+            const phoneError = document.getElementById('phone-error');
+
+            let currentPhotoBase64 = '';
+            let isAdmin = false;
+            let firebaseSyncing = false;
+            let useFirebase = true; // Will auto-switch if DB fails
+
+            // --- Admin Check ---
+            var isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+            async function checkAdminStatus() {
+                if (isLocalhost) {
+                    isAdmin = true;
+                    updateAdminUI();
+                    return;
+                }
+
+                if (!AS) { updateAdminUI(); return; }
+                try {
+                    var user = await AS.getUser();
+                    if (user) {
+                        var adminRef = AS.dbRef('users/' + user.uid + '/isAdmin');
+                        var snapshot = await AS.dbGet(adminRef);
+                        isAdmin = snapshot.exists() && snapshot.val() === true;
+                    } else {
+                        isAdmin = false;
+                    }
+                } catch (err) {
+                    isAdmin = false;
+                }
+                updateAdminUI();
+            }
+
+            function updateAdminUI() {
+                if (openAddBtn) openAddBtn.style.display = isAdmin ? 'flex' : 'none';
+                renderDrivers(getDriversCache());
+            }
+
+            // --- Storage (Local Cache) ---
+            function getDriversCache() {
+                try {
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function setDriversCache(drivers) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(drivers));
+                renderDrivers(drivers);
+            }
+
+            // --- Firebase Sync & Fallback ---
+            function initFirebaseSync() {
+                if (!AS || !AS.db || firebaseSyncing) return;
+                firebaseSyncing = true;
+
+                try {
+                    var driversRef = AS.dbRef(DRIVERS_PATH);
+                    AS.dbOnValue(driversRef, function (snapshot) {
+                        var data = snapshot.val();
+                        var drivers = [];
+                        if (data) {
+                            Object.keys(data).forEach(function (key) {
+                                drivers.push(Object.assign({ id: key }, data[key]));
+                            });
+                        }
+                        drivers.sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+                        setDriversCache(drivers);
+                        useFirebase = true;
+                    }, function (err) {
+                        console.warn('Firebase Access Denied. Falling back to Local Storage.');
+                        useFirebase = false;
+                    });
+                } catch (err) {
+                    useFirebase = false;
+                    renderDrivers(getDriversCache());
+                }
+            }
+
+            // --- Panel Toggle ---
+            function openPanel() {
+                checkAdminStatus();
+                renderDrivers(getDriversCache());
+                driversOverlay.classList.add('visible');
+                driversPanel.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            function closePanel() {
+                driversOverlay.classList.remove('visible');
+                driversPanel.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+
+            if (driversPill) driversPill.addEventListener('click', function (e) {
+                e.stopPropagation();
+                openPanel();
+            });
+            if (closePanelBtn) closePanelBtn.addEventListener('click', closePanel);
+            if (driversOverlay) driversOverlay.addEventListener('click', closePanel);
+
+            // --- Modal Toggle ---
+            function openModal() {
+                if (!isAdmin) {
+                    if (window.showToast) window.showToast('Admin access required', 'error');
+                    return;
+                }
+                addModal.classList.add('visible');
+                resetForm();
+            }
+
+            function closeModal() {
+                addModal.classList.remove('visible');
+                resetForm();
+            }
+
+            if (openAddBtn) openAddBtn.addEventListener('click', openModal);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+            if (addModalBg) addModalBg.addEventListener('click', closeModal);
+
+            // --- Photo Upload ---
+            if (photoPreview) photoPreview.addEventListener('click', function () { photoInput.click(); });
+
+            if (photoInput) photoInput.addEventListener('change', function (e) {
+                var file = e.target.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function (ev) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var MAX = 140; // Smaller for even faster loading
+                        var w = img.width, h = img.height;
+                        if (w > h) { h = h * MAX / w; w = MAX; }
+                        else { w = w * MAX / h; h = MAX; }
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        currentPhotoBase64 = canvas.toDataURL('image/jpeg', 0.55);
+                        photoPreview.innerHTML = '<img src="' + currentPhotoBase64 + '" alt="Driver photo">';
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // --- Form Validation & Submit ---
+            function resetForm() {
+                if (addForm) addForm.reset();
+                currentPhotoBase64 = '';
+                if (photoPreview) photoPreview.innerHTML = '<div class="photo-placeholder"><i data-lucide="camera" style="width:24px;height:24px;"></i><span>Photo</span></div>';
+                if (nameError) nameError.classList.remove('visible');
+                if (phoneError) phoneError.classList.remove('visible');
+                if (nameInput) nameInput.classList.remove('input-error');
+                if (phoneInput) phoneInput.classList.remove('input-error');
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            if (addForm) addForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                if (!isAdmin) return;
+
+                var valid = true;
+                var name = nameInput.value.trim();
+                var phone = phoneInput.value.trim();
+
+                if (!name) { nameInput.classList.add('input-error'); nameError.classList.add('visible'); valid = false; }
+                if (!phone || phone.length < 10) { phoneInput.classList.add('input-error'); phoneError.classList.add('visible'); valid = false; }
+
+                if (!valid) return;
+
+                var submitBtn = document.getElementById('form-submit-btn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                var driverData = {
+                    name: name,
+                    phone: phone,
+                    email: emailInput.value.trim() || '',
+                    photo: currentPhotoBase64,
+                    createdAt: new Date().toISOString()
+                };
+
+                // Helper to save locally immediately for seamless feel
+                function saveLocally() {
+                    var localDrivers = getDriversCache();
+                    var newDriver = Object.assign({ id: 'local_' + Date.now() }, driverData);
+                    localDrivers.unshift(newDriver);
+                    setDriversCache(localDrivers);
+                    closeModal();
+                    if (window.showToast) window.showToast(name + ' added (locally)', 'success');
+                }
+
+                if (useFirebase && AS && AS.db) {
+                    AS.dbPush(AS.dbRef(DRIVERS_PATH), driverData).then(function () {
+                        closeModal();
+                        if (window.showToast) window.showToast(name + ' added successfully', 'success');
+                    }).catch(function (err) {
+                        console.warn('Firebase Write failed. Using local storage.');
+                        useFirebase = false;
+                        saveLocally();
+                    }).finally(function () {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i data-lucide="user-check" style="width:18px;height:18px;"></i> Save Driver';
+                        if (window.lucide) window.lucide.createIcons();
+                    });
+                } else {
+                    saveLocally();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i data-lucide="user-check" style="width:18px;height:18px;"></i> Save Driver';
+                    if (window.lucide) window.lucide.createIcons();
+                }
+            });
+
+            // --- Render Drivers List ---
+            function renderDrivers(drivers) {
+                if (driverCount) driverCount.textContent = drivers.length;
+                if (!driversList) return;
+
+                if (drivers.length === 0) {
+                    driversList.innerHTML = '<div class="drivers-empty">' +
+                        '<i data-lucide="users" style="width:48px;height:48px;"></i>' +
+                        '<p>No drivers yet</p>' +
+                        '<span>' + (isAdmin ? 'Add your first driver to get started' : 'Currently no drivers available') + '</span>' +
+                        '</div>';
+                    if (window.lucide) window.lucide.createIcons();
+                    return;
+                }
+
+                driversList.innerHTML = drivers.map(function (d) {
+                    var initials = d.name.split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+                    var avatar = d.photo
+                        ? '<img src="' + d.photo + '" alt="' + d.name + '">'
+                        : initials;
+                    var emailLine = d.email
+                        ? '<div class="driver-email">' + d.email + '</div>'
+                        : '';
+                    var deleteBtn = isAdmin
+                        ? '<button class="driver-action-btn delete-btn" title="Remove" onclick="DriversModule.confirmDelete(\'' + d.id + '\')">' +
+                        '<i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>'
+                        : '';
+
+                    return '<div class="driver-card" data-id="' + d.id + '">' +
+                        '<div class="driver-avatar" style="background:' + (d.photo ? 'none' : '#F3F4F6') + '">' + avatar + '</div>' +
+                        '<div class="driver-details">' +
+                        '<h4>' + d.name + '</h4>' +
+                        '<div class="driver-phone"><i data-lucide="phone" style="width:12px;height:12px;"></i> ' + d.phone + '</div>' +
+                        emailLine +
+                        '</div>' +
+                        '<div class="driver-actions">' +
+                        '<button class="driver-action-btn call-btn" title="Call" onclick="window.open(\'tel:' + d.phone + '\')"><i data-lucide="phone" style="width:16px;height:16px;"></i></button>' +
+                        deleteBtn +
+                        '</div>' +
+                        '<div class="delete-confirm" id="del-' + d.id + '">' +
+                        '<span>Remove?</span>' +
+                        '<button class="confirm-yes" onclick="DriversModule.deleteDriver(\'' + d.id + '\')">Yes</button>' +
+                        '<button class="confirm-no" onclick="document.getElementById(\'del-' + d.id + '\').classList.remove(\'visible\')">No</button>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            // --- Delete ---
+            function confirmDelete(id) {
+                if (!isAdmin) return;
+                var el = document.getElementById('del-' + id);
+                if (el) el.classList.add('visible');
+            }
+
+            function deleteDriver(id) {
+                if (!isAdmin) return;
+
+                function removeLocally() {
+                    var localDrivers = getDriversCache().filter(function (d) { return d.id !== id; });
+                    setDriversCache(localDrivers);
+                    if (window.showToast) window.showToast('Driver removed', 'success');
+                }
+
+                if (useFirebase && AS && AS.db && !id.startsWith('local_')) {
+                    AS.dbRemove(AS.dbRef(DRIVERS_PATH + '/' + id)).then(function () {
+                        if (window.showToast) window.showToast('Driver removed from cloud', 'success');
+                    }).catch(function () {
+                        removeLocally();
+                    });
+                } else {
+                    removeLocally();
+                }
+            }
+
+            // Expose to global
+            window.DriversModule = { confirmDelete: confirmDelete, deleteDriver: deleteDriver };
+
+            // Initialize
+            renderDrivers(getDriversCache());
+            function initWhenReady() {
+                if (window.AuthService && window.AuthService.db) {
+                    checkAdminStatus();
+                    initFirebaseSync();
+                    window.AuthService.onAuthStateChange(function () { checkAdminStatus(); });
+                } else {
+                    setTimeout(initWhenReady, 500);
+                }
+            }
+            setTimeout(initWhenReady, 300);
+        })();
     </script>
 </body>
 
