@@ -3254,19 +3254,21 @@
                 } catch(e) {}
             }
 
-            // Long-press (mobile) / double-click (desktop) on Drivers pill for manual login
+            // Press-and-hold on Drivers pill to open admin login (both mobile & desktop)
             let longPressTimer = null;
             if (driversPill) {
+                // Mobile: touchstart/touchend
                 driversPill.addEventListener('touchstart', function (e) {
-                    longPressTimer = setTimeout(function () { openAdminLogin(); }, 800);
+                    longPressTimer = setTimeout(function () { openAdminLogin(); }, 1200);
                 });
                 driversPill.addEventListener('touchend', function () { clearTimeout(longPressTimer); });
                 driversPill.addEventListener('touchmove', function () { clearTimeout(longPressTimer); });
-                driversPill.addEventListener('dblclick', function (e) {
-                    e.stopPropagation();
-                    openPanel();
-                    if (!isAdmin) openAdminLogin();
+                // Desktop: mousedown/mouseup
+                driversPill.addEventListener('mousedown', function (e) {
+                    longPressTimer = setTimeout(function () { openAdminLogin(); }, 1200);
                 });
+                driversPill.addEventListener('mouseup', function () { clearTimeout(longPressTimer); });
+                driversPill.addEventListener('mouseleave', function () { clearTimeout(longPressTimer); });
             }
 
             function openAdminLogin() {
