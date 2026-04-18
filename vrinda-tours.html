@@ -3287,7 +3287,7 @@
                     showToast('Admin access granted ✓', 'success');
                     // Persist admin role to Firebase for current user
                     try {
-                        AS.onAuthStateChange(function(user) {
+                        AS.onAuthStateChange(function(event, user) {
                             if (user) AS.dbSet(AS.dbRef(user.uid), 'admin');
                         });
                     } catch(e) {}
@@ -3755,7 +3755,7 @@
             function initWhenReady() {
                 if (window.AuthService && window.AuthService.db) {
                     initFirebaseSync();
-                    AS.onAuthStateChange(function(user) { checkFirebaseAdmin(user); });
+                    AS.onAuthStateChange(function(event, user) { checkFirebaseAdmin(user); });
                 } else {
                     setTimeout(initWhenReady, 500);
                 }
