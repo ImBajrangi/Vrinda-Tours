@@ -2339,10 +2339,16 @@
                 max-height: 75vh;
                 max-width: 500px;
                 width: 90vw;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
             }
 
             .drivers-panel.visible {
                 transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
             }
         }
     </style>
@@ -3553,9 +3559,7 @@
 
             if (driversPill) driversPill.addEventListener('click', function (e) {
                 e.stopPropagation();
-                e.preventDefault();
-                // Single click: just show hint. Panel opens on double-click/long-press.
-                showToast('Double-click to open Drivers panel', 'success');
+                openPanel();
             });
             if (closePanelBtn) closePanelBtn.addEventListener('click', closePanel);
             if (driversOverlay) driversOverlay.addEventListener('click', closePanel);
