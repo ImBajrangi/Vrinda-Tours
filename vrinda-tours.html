@@ -3256,7 +3256,11 @@
                 });
                 driversPill.addEventListener('touchend', function () { clearTimeout(longPressTimer); });
                 driversPill.addEventListener('touchmove', function () { clearTimeout(longPressTimer); });
-                driversPill.addEventListener('dblclick', function (e) { e.stopPropagation(); openAdminLogin(); });
+                driversPill.addEventListener('dblclick', function (e) {
+                    e.stopPropagation();
+                    openPanel();
+                    if (!isAdmin) openAdminLogin();
+                });
             }
 
             function openAdminLogin() {
@@ -3549,7 +3553,9 @@
 
             if (driversPill) driversPill.addEventListener('click', function (e) {
                 e.stopPropagation();
-                openPanel();
+                e.preventDefault();
+                // Single click: just show hint. Panel opens on double-click/long-press.
+                showToast('Double-click to open Drivers panel', 'success');
             });
             if (closePanelBtn) closePanelBtn.addEventListener('click', closePanel);
             if (driversOverlay) driversOverlay.addEventListener('click', closePanel);
