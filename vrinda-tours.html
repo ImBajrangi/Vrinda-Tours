@@ -3248,8 +3248,8 @@
                             sessionStorage.setItem('vt_admin', 'true');
                             updateAdminUI();
                         }
-                    }).catch(function() {});
-                } catch(e) {}
+                    }).catch(function(err) { console.error('Firestore Admin Check Error:', err); });
+                } catch(e) { console.error('Firestore Check Exception:', e); }
             }
 
             // Press-and-hold on Drivers pill to open admin login (both mobile & desktop)
@@ -3288,9 +3288,13 @@
                     // Persist admin role to Firestore
                     try {
                         AS.onAuthStateChange(function(event, user) {
-                            if (user) AS.fsSet(AS.fsDoc('admins', user.uid), { role: 'admin', email: user.email || '' }, { merge: true });
+                            if (user) {
+                                AS.fsSet(AS.fsDoc('admins', user.uid), { role: 'admin', email: user.email || '' }, { merge: true })
+                                  .then(() => console.log('Admin role persisted to Firestore'))
+                                  .catch(err => console.error('Admin persistence failed:', err));
+                            }
                         });
-                    } catch(e) {}
+                    } catch(e) { console.error('Admin persistence exception:', e); }
                 } else {
                     adminError.textContent = 'Invalid credentials';
                     setTimeout(function () { adminError.textContent = ''; }, 3000);
@@ -3328,6 +3332,7 @@
                         updateDriverMapMarkers(drivers);
                     });
                 } catch (err) {
+                    console.error('Firestore Sync Error:', err);
                     useFirebase = false;
                     renderDrivers(getDriversCache());
                 }
@@ -3476,7 +3481,8 @@
                     AS.fsUpdate(AS.fsDoc(DRIVERS_PATH, driverId), { currentRide: rideData }).then(function () {
                         showRideStatusBanner('waiting', 'Waiting for ' + driver.name + ' to accept...');
                         listenForRideStatus(driverId, driver);
-                    }).catch(function () {
+                    }).catch(function (err) {
+                        console.error('Ride Request Firestore Error:', err);
                         showToast('Could not send request. Try again.', 'error');
                     });
                 } else {
@@ -3633,7 +3639,10 @@
                 if (useFirebase && AS && AS.firestore) {
                     AS.fsAdd(AS.fsCollection(DRIVERS_PATH), driverData).then(function () {
                         closeModal(); showToast(name + ' added successfully', 'success');
-                    }).catch(function () { useFirebase = false; saveLocally(); })
+                    }).catch(function (err) { 
+                        console.error('Add Driver Firestore Error:', err);
+                        useFirebase = false; saveLocally(); 
+                    })
                         .finally(function () {
                             submitBtn.disabled = false;
                             submitBtn.innerHTML = '<i data-lucide="user-check" style="width:18px;height:18px;"></i> Save Driver';
