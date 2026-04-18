@@ -3236,19 +3236,18 @@
                 renderDrivers(getDriversCache());
             }
 
-            // Auto-detect admin from Firebase Auth user role
+            // Auto-detect admin from Firestore 'admins' collection
             function checkFirebaseAdmin(user) {
-                if (!AS || !user || !user.uid) return;
+                if (!AS || !AS.firestore || !user || !user.uid) return;
                 try {
-                    // Check flat structure: {uid}: "admin" at root
-                    var roleRef = AS.dbRef(user.uid);
-                    AS.dbOnValue(roleRef, function(snap) {
-                        if (snap.exists() && snap.val() === 'admin') {
+                    var adminDoc = AS.fsDoc('admins', user.uid);
+                    AS.fsGet(adminDoc).then(function(snap) {
+                        if (snap.exists() && snap.data().role === 'admin') {
                             isAdmin = true;
                             sessionStorage.setItem('vt_admin', 'true');
                             updateAdminUI();
                         }
-                    }, function() {});
+                    }).catch(function() {});
                 } catch(e) {}
             }
 
@@ -3285,10 +3284,10 @@
                     adminModal.classList.remove('visible');
                     updateAdminUI();
                     showToast('Admin access granted ✓', 'success');
-                    // Persist admin role to Firebase for current user
+                    // Persist admin role to Firestore
                     try {
                         AS.onAuthStateChange(function(event, user) {
-                            if (user) AS.dbSet(AS.dbRef(user.uid), 'admin');
+                            if (user) AS.fsSet(AS.fsDoc('admins', user.uid), { role: 'admin', email: user.email || '' }, { merge: true });
                         });
                     } catch(e) {}
                 } else {
@@ -3313,26 +3312,19 @@
             //  FIREBASE SYNC + LIVE DRIVER MARKERS
             // ========================================
             function initFirebaseSync() {
-                if (!AS || !AS.db || firebaseSyncing) return;
+                if (!AS || !AS.firestore || firebaseSyncing) return;
                 firebaseSyncing = true;
                 try {
-                    var driversRef = AS.dbRef(DRIVERS_PATH);
-                    AS.dbOnValue(driversRef, function (snapshot) {
-                        var data = snapshot.val();
+                    var driversCol = AS.fsCollection(DRIVERS_PATH);
+                    AS.fsOnSnapshot(driversCol, function (snapshot) {
                         var drivers = [];
-                        if (data) {
-                            Object.keys(data).forEach(function (key) {
-                                drivers.push(Object.assign({ id: key }, data[key]));
-                            });
-                        }
+                        snapshot.forEach(function (doc) {
+                            drivers.push(Object.assign({ id: doc.id }, doc.data()));
+                        });
                         drivers.sort(function (a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
                         setDriversCache(drivers);
                         useFirebase = true;
-                        // Update map markers for online drivers
                         updateDriverMapMarkers(drivers);
-                    }, function (err) {
-                        console.warn('Firebase Access Denied. Falling back to Local Storage.');
-                        useFirebase = false;
                     });
                 } catch (err) {
                     useFirebase = false;
@@ -3479,8 +3471,8 @@
                 activeRideDriverId = driverId;
 
                 // Push ride request to Firebase
-                if (useFirebase && AS && AS.db) {
-                    AS.dbSet(AS.dbRef(DRIVERS_PATH + '/' + driverId + '/currentRide'), rideData).then(function () {
+                if (useFirebase && AS && AS.firestore) {
+                    AS.fsUpdate(AS.fsDoc(DRIVERS_PATH, driverId), { currentRide: rideData }).then(function () {
                         showRideStatusBanner('waiting', 'Waiting for ' + driver.name + ' to accept...');
                         listenForRideStatus(driverId, driver);
                     }).catch(function () {
@@ -3494,10 +3486,10 @@
             }
 
             function listenForRideStatus(driverId, driver) {
-                if (!AS || !AS.db) return;
-                var rideRef = AS.dbRef(DRIVERS_PATH + '/' + driverId + '/currentRide/status');
-                rideStatusListener = AS.dbOnValue(rideRef, function (snap) {
-                    var status = snap.val();
+                if (!AS || !AS.firestore) return;
+                var rideRef = AS.fsDoc(DRIVERS_PATH, driverId);
+                rideStatusListener = AS.fsOnSnapshot(rideRef, function (snap) {
+                    var data = snap.data(); var status = data && data.currentRide ? data.currentRide.status : null;
                     if (status === 'accepted') {
                         showRideStatusBanner('accepted', driver.name + ' accepted your ride! 🎉');
                         var dest = activeMarker ? activeMarker.locationData : null;
@@ -3538,8 +3530,8 @@
             }
 
             if (cancelRideBtn) cancelRideBtn.addEventListener('click', function () {
-                if (activeRideDriverId && useFirebase && AS && AS.db) {
-                    AS.dbRemove(AS.dbRef(DRIVERS_PATH + '/' + activeRideDriverId + '/currentRide'));
+                if (activeRideDriverId && useFirebase && AS && AS.firestore) {
+                    AS.fsUpdate(AS.fsDoc(DRIVERS_PATH, activeRideDriverId), { currentRide: null });
                 }
                 hideRideStatusBanner();
                 showToast('Ride cancelled', 'error');
@@ -3637,8 +3629,8 @@
                     closeModal(); showToast(name + ' added (locally)', 'success');
                 }
 
-                if (useFirebase && AS && AS.db) {
-                    AS.dbPush(AS.dbRef(DRIVERS_PATH), driverData).then(function () {
+                if (useFirebase && AS && AS.firestore) {
+                    AS.fsAdd(AS.fsCollection(DRIVERS_PATH), driverData).then(function () {
                         closeModal(); showToast(name + ' added successfully', 'success');
                     }).catch(function () { useFirebase = false; saveLocally(); })
                         .finally(function () {
@@ -3711,8 +3703,8 @@
                 // Remove map marker
                 if (driverMapMarkers[id]) { map.removeLayer(driverMapMarkers[id]); delete driverMapMarkers[id]; }
 
-                if (useFirebase && AS && AS.db && !id.startsWith('local_')) {
-                    AS.dbRemove(AS.dbRef(DRIVERS_PATH + '/' + id)).then(function () {
+                if (useFirebase && AS && AS.firestore && !id.startsWith('local_')) {
+                    AS.fsDelete(AS.fsDoc(DRIVERS_PATH, id)).then(function () {
                         showToast('Driver removed from cloud', 'success');
                     }).catch(function () { removeLocally(); });
                 } else { removeLocally(); }
@@ -3753,7 +3745,7 @@
             renderDrivers(getDriversCache());
 
             function initWhenReady() {
-                if (window.AuthService && window.AuthService.db) {
+                if (window.AuthService && window.AuthService.firestore) {
                     initFirebaseSync();
                     AS.onAuthStateChange(function(event, user) { checkFirebaseAdmin(user); });
                 } else {
