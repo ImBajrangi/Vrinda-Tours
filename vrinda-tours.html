@@ -3187,7 +3187,7 @@
             const DRIVERS_PATH = 'drivers';
             const ADMIN_USER = 'admin';
             const ADMIN_PASS = 'vrinda2026';
-            const AS = window.AuthService;
+            let AS = window.AuthService;
 
             // Cache DOM
             const driversPill = document.getElementById('drivers-pill');
@@ -3747,6 +3747,7 @@
 
             function initWhenReady() {
                 if (window.AuthService && window.AuthService.firestore) {
+                    AS = window.AuthService;
                     initFirebaseSync();
                     AS.onAuthStateChange(function(event, user) { checkFirebaseAdmin(user); });
                 } else {
