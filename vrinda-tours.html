@@ -3287,6 +3287,12 @@
                     adminModal.classList.remove('visible');
                     updateAdminUI();
                     showToast('Admin access granted ✓', 'success');
+                    // Persist admin role to Firebase for current user
+                    try {
+                        AS.getUser().then(function(user) {
+                            if (user) AS.dbSet(AS.dbRef('users/' + user.uid + '/role'), 'admin');
+                        }).catch(function() {});
+                    } catch(e) {}
                 } else {
                     adminError.textContent = 'Invalid credentials';
                     setTimeout(function () { adminError.textContent = ''; }, 3000);
