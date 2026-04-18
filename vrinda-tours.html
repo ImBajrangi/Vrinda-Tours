@@ -2922,7 +2922,7 @@
         });
 
         // --- Category Filters ---
-        const pills = document.querySelectorAll('.pill');
+        const pills = document.querySelectorAll('.pill:not(#drivers-pill)');
 
         pills.forEach(pill => {
             pill.addEventListener('click', () => {
@@ -3223,14 +3223,32 @@
             let rideStatusListener = null;
 
             // ========================================
-            //  ADMIN AUTH (HARDCODED)
+            //  ADMIN AUTH (Firebase role + hardcoded fallback)
             // ========================================
             function updateAdminUI() {
                 if (openAddBtn) openAddBtn.style.display = isAdmin ? 'flex' : 'none';
                 renderDrivers(getDriversCache());
             }
 
-            // Long-press on Drivers pill to trigger admin login
+            // Auto-detect admin from Firebase Auth user role
+            function checkFirebaseAdmin() {
+                if (!AS) return;
+                try {
+                    AS.getUser().then(function(user) {
+                        if (!user) return;
+                        var roleRef = AS.dbRef('users/' + user.uid + '/role');
+                        AS.dbGet(roleRef).then(function(snap) {
+                            if (snap.exists() && snap.val() === 'admin') {
+                                isAdmin = true;
+                                sessionStorage.setItem('vt_admin', 'true');
+                                updateAdminUI();
+                            }
+                        }).catch(function() {});
+                    }).catch(function() {});
+                } catch(e) {}
+            }
+
+            // Long-press (mobile) / double-click (desktop) on Drivers pill for manual login
             let longPressTimer = null;
             if (driversPill) {
                 driversPill.addEventListener('touchstart', function (e) {
@@ -3238,7 +3256,6 @@
                 });
                 driversPill.addEventListener('touchend', function () { clearTimeout(longPressTimer); });
                 driversPill.addEventListener('touchmove', function () { clearTimeout(longPressTimer); });
-                // Desktop: double-click
                 driversPill.addEventListener('dblclick', function (e) { e.stopPropagation(); openAdminLogin(); });
             }
 
@@ -3722,6 +3739,8 @@
             function initWhenReady() {
                 if (window.AuthService && window.AuthService.db) {
                     initFirebaseSync();
+                    checkFirebaseAdmin();
+                    AS.onAuthStateChange(function() { checkFirebaseAdmin(); });
                 } else {
                     setTimeout(initWhenReady, 500);
                 }
