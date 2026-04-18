@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vrinda Tours — Driver</title>
+    <meta name="description" content="Vrinda Tours Driver Companion App — Go online, share your location, and receive ride requests.">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/json,{}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+        }
+    }
+    </script>
+    <style>
+        :root {
+            --bg: #000; --bg-card: #111; --bg-surface: #1a1a1a;
+            --accent: #22C55E; --accent-dim: rgba(34,197,94,0.15);
+            --danger: #EF4444; --warning: #F59E0B;
+            --text: #fff; --text-dim: #888; --text-muted: #555;
+            --radius: 16px; --transition: cubic-bezier(0.22,1,0.36,1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+        /* ---- Login Screen ---- */
+        .login-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; padding:2rem; gap:2rem; }
+        .login-screen.hidden { display:none; }
+        .login-logo { font-size:1.5rem; font-weight:800; letter-spacing:0.1em; }
+        .login-logo span { color:var(--accent); }
+        .login-sub { color:var(--text-dim); font-size:0.8rem; letter-spacing:0.05em; text-transform:uppercase; }
+        .login-form { width:100%; max-width:360px; display:flex; flex-direction:column; gap:1rem; }
+        .login-input { width:100%; padding:1rem; background:var(--bg-surface); border:1.5px solid #333; border-radius:12px; color:var(--text); font-size:1rem; font-family:inherit; outline:none; transition:border-color 0.2s; }
+        .login-input:focus { border-color:var(--accent); }
+        .login-input::placeholder { color:var(--text-muted); }
+        .login-btn { padding:1rem; background:var(--accent); border:none; border-radius:12px; color:#000; font-size:1rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .login-btn:active { transform:scale(0.97); }
+        .login-btn:disabled { opacity:0.4; cursor:not-allowed; }
+        .login-error { color:var(--danger); font-size:0.8rem; text-align:center; min-height:1.2rem; }
+
+        /* ---- Main Dashboard ---- */
+        .dashboard { display:none; flex-direction:column; height:100vh; }
+        .dashboard.active { display:flex; }
+
+        .dash-header { padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; }
+        .dash-name { font-size:1.125rem; font-weight:700; }
+        .dash-name span { color:var(--text-dim); font-weight:400; font-size:0.8rem; display:block; margin-top:2px; }
+        .dash-logout { padding:0.5rem 1rem; background:var(--bg-surface); border:1px solid #333; border-radius:8px; color:var(--text-dim); font-size:0.75rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+        .dash-logout:hover { border-color:var(--danger); color:var(--danger); }
+
+        /* ---- Status Card ---- */
+        .status-card { margin:0 1.5rem; background:var(--bg-card); border:1px solid #222; border-radius:var(--radius); padding:1.5rem; text-align:center; }
+        .status-indicator { width:80px; height:80px; border-radius:50%; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; font-size:2rem; transition:all 0.5s var(--transition); }
+        .status-indicator.offline { background:var(--bg-surface); border:2px solid #333; }
+        .status-indicator.online { background:var(--accent-dim); border:2px solid var(--accent); animation:pulse-green 2s infinite; }
+        .status-indicator.busy { background:rgba(245,158,11,0.15); border:2px solid var(--warning); }
+        @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 16px rgba(34,197,94,0)} }
+
+        .status-label { font-size:1.25rem; font-weight:700; margin-bottom:0.25rem; }
+        .status-sub { font-size:0.8rem; color:var(--text-dim); }
+
+        /* ---- Toggle Switch ---- */
+        .toggle-section { display:flex; align-items:center; justify-content:center; gap:1rem; padding:1.5rem; }
+        .toggle-label { font-size:0.875rem; font-weight:600; color:var(--text-dim); }
+        .toggle-switch { width:64px; height:34px; background:#333; border-radius:17px; position:relative; cursor:pointer; transition:background 0.3s; }
+        .toggle-switch.on { background:var(--accent); }
+        .toggle-switch::after { content:''; position:absolute; top:3px; left:3px; width:28px; height:28px; border-radius:50%; background:#fff; transition:transform 0.3s var(--transition); box-shadow:0 2px 6px rgba(0,0,0,0.3); }
+        .toggle-switch.on::after { transform:translateX(30px); }
+
+        /* ---- Stats Row ---- */
+        .stats-row { display:flex; gap:0.75rem; padding:0 1.5rem; margin-bottom:1rem; }
+        .stat-card { flex:1; background:var(--bg-card); border:1px solid #222; border-radius:12px; padding:1rem; text-align:center; }
+        .stat-card .val { font-size:1.5rem; font-weight:800; }
+        .stat-card .lbl { font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:0.25rem; }
+
+        /* ---- GPS Info ---- */
+        .gps-info { margin:0 1.5rem; padding:0.75rem 1rem; background:var(--bg-surface); border-radius:10px; display:flex; align-items:center; gap:0.75rem; font-size:0.75rem; color:var(--text-dim); }
+        .gps-dot { width:8px; height:8px; border-radius:50%; background:#333; flex-shrink:0; }
+        .gps-dot.active { background:var(--accent); animation:blink 1.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        /* ---- Ride Request Popup ---- */
+        .ride-request-overlay { position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.7); backdrop-filter:blur(12px); display:none; align-items:flex-end; justify-content:center; padding:1rem; }
+        .ride-request-overlay.visible { display:flex; }
+        .ride-request-card { width:100%; max-width:420px; background:var(--bg-card); border:1px solid #222; border-radius:20px 20px 12px 12px; padding:1.5rem; animation:slide-up 0.4s var(--transition); }
+        @keyframes slide-up { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+        .ride-req-title { font-size:1rem; font-weight:700; margin-bottom:0.25rem; }
+        .ride-req-sub { font-size:0.8rem; color:var(--text-dim); margin-bottom:1rem; }
+        .ride-req-detail { display:flex; align-items:center; gap:0.75rem; padding:0.75rem; background:var(--bg-surface); border-radius:10px; margin-bottom:0.75rem; }
+        .ride-req-detail .dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+        .ride-req-detail .dot.pickup { background:var(--accent); }
+        .ride-req-detail .dot.dest { background:var(--danger); }
+        .ride-req-detail .info { flex:1; }
+        .ride-req-detail .info strong { font-size:0.85rem; display:block; }
+        .ride-req-detail .info span { font-size:0.7rem; color:var(--text-dim); }
+        .ride-req-actions { display:flex; gap:0.75rem; margin-top:1rem; }
+        .ride-req-actions button { flex:1; padding:1rem; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+        .ride-req-actions .accept-btn { background:var(--accent); color:#000; }
+        .ride-req-actions .reject-btn { background:var(--bg-surface); color:var(--text-dim); border:1px solid #333; }
+        .ride-req-actions button:active { transform:scale(0.97); }
+        .ride-req-timer { text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:0.75rem; }
+    </style>
+</head>
+<body>
+
+<!-- ======== LOGIN SCREEN ======== -->
+<div class="login-screen" id="login-screen">
+    <div class="login-logo">VRINDA<span>TOURS</span></div>
+    <div class="login-sub">Driver Companion</div>
+    <form class="login-form" id="login-form">
+        <input class="login-input" type="tel" id="login-phone" placeholder="+91 XXXXX XXXXX" required>
+        <button class="login-btn" type="submit" id="login-btn">Go Online</button>
+        <div class="login-error" id="login-error"></div>
+    </form>
+</div>
+
+<!-- ======== DASHBOARD ======== -->
+<div class="dashboard" id="dashboard">
+    <div class="dash-header">
+        <div class="dash-name" id="dash-name">Driver <span>Loading...</span></div>
+        <button class="dash-logout" id="dash-logout">Logout</button>
+    </div>
+
+    <div class="status-card">
+        <div class="status-indicator offline" id="status-indicator">🚗</div>
+        <div class="status-label" id="status-label">Offline</div>
+        <div class="status-sub" id="status-sub">Toggle to start receiving rides</div>
+    </div>
+
+    <div class="toggle-section">
+        <span class="toggle-label">Go Online</span>
+        <div class="toggle-switch" id="toggle-switch"></div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card"><div class="val" id="stat-rides">0</div><div class="lbl">Rides Today</div></div>
+        <div class="stat-card"><div class="val" id="stat-hours">0h</div><div class="lbl">Online</div></div>
+        <div class="stat-card"><div class="val" id="stat-rating">5.0</div><div class="lbl">Rating</div></div>
+    </div>
+
+    <div class="gps-info" id="gps-info">
+        <div class="gps-dot" id="gps-dot"></div>
+        <span id="gps-text">GPS inactive</span>
+    </div>
+</div>
+
+<!-- ======== RIDE REQUEST POPUP ======== -->
+<div class="ride-request-overlay" id="ride-request-overlay">
+    <div class="ride-request-card">
+        <div class="ride-req-title">🔔 New Ride Request</div>
+        <div class="ride-req-sub" id="ride-req-user">A pilgrim needs a ride</div>
+        <div class="ride-req-detail">
+            <div class="dot pickup"></div>
+            <div class="info"><strong id="ride-pickup">Pickup Location</strong><span>Pilgrim's current location</span></div>
+        </div>
+        <div class="ride-req-detail">
+            <div class="dot dest"></div>
+            <div class="info"><strong id="ride-dest">Destination</strong><span id="ride-dest-desc">Holy site</span></div>
+        </div>
+        <div class="ride-req-actions">
+            <button class="reject-btn" id="reject-ride-btn">Decline</button>
+            <button class="accept-btn" id="accept-ride-btn">Accept Ride</button>
+        </div>
+        <div class="ride-req-timer" id="ride-timer">Auto-declines in <strong>30s</strong></div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, get, onValue, remove, update } from "firebase/database";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCxBytUXjMdhBQfSjjuaIGfcXZe8N0WkH0",
+    authDomain: "login-me-vrinda.firebaseapp.com",
+    databaseURL: "https://login-me-vrinda-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "login-me-vrinda",
+    storageBucket: "login-me-vrinda.firebasestorage.app",
+    messagingSenderId: "1019370299171",
+    appId: "1:1019370299171:web:1a6df319b2fbfd6fcd3696"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ---- State ----
+let driverId = null;
+let driverData = null;
+let isOnline = false;
+let gpsWatchId = null;
+let lastLat = 0, lastLng = 0;
+let onlineStartTime = null;
+let rideRequestTimeout = null;
+let currentRideKey = null;
+
+// ---- DOM ----
+const loginScreen = document.getElementById('login-screen');
+const loginForm = document.getElementById('login-form');
+const loginPhone = document.getElementById('login-phone');
+const loginError = document.getElementById('login-error');
+const dashboard = document.getElementById('dashboard');
+const dashName = document.getElementById('dash-name');
+const dashLogout = document.getElementById('dash-logout');
+const statusIndicator = document.getElementById('status-indicator');
+const statusLabel = document.getElementById('status-label');
+const statusSub = document.getElementById('status-sub');
+const toggleSwitch = document.getElementById('toggle-switch');
+const gpsDot = document.getElementById('gps-dot');
+const gpsText = document.getElementById('gps-text');
+const rideOverlay = document.getElementById('ride-request-overlay');
+const ridePickup = document.getElementById('ride-pickup');
+const rideDest = document.getElementById('ride-dest');
+const rideDestDesc = document.getElementById('ride-dest-desc');
+const rideTimer = document.getElementById('ride-timer');
+const acceptBtn = document.getElementById('accept-ride-btn');
+const rejectBtn = document.getElementById('reject-ride-btn');
+
+// ---- Check saved session ----
+const savedDriverId = sessionStorage.getItem('vt_driver_id');
+if (savedDriverId) {
+    loadDriver(savedDriverId);
+}
+
+// ---- Login ----
+loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const phone = loginPhone.value.trim().replace(/\s/g, '');
+    if (phone.length < 10) { loginError.textContent = 'Enter a valid phone number'; return; }
+    loginError.textContent = 'Searching...';
+    document.getElementById('login-btn').disabled = true;
+
+    try {
+        const driversSnap = await get(ref(db, 'drivers'));
+        if (!driversSnap.exists()) { loginError.textContent = 'No drivers registered. Contact admin.'; document.getElementById('login-btn').disabled = false; return; }
+
+        const drivers = driversSnap.val();
+        let foundId = null;
+        Object.keys(drivers).forEach(key => {
+            const d = drivers[key];
+            const dPhone = (d.phone || '').replace(/\s/g, '');
+            if (dPhone === phone || dPhone.endsWith(phone.slice(-10)) || phone.endsWith(dPhone.slice(-10))) {
+                foundId = key;
+            }
+        });
+
+        if (!foundId) { loginError.textContent = 'Phone not found. Ask admin to add you.'; document.getElementById('login-btn').disabled = false; return; }
+
+        sessionStorage.setItem('vt_driver_id', foundId);
+        loadDriver(foundId);
+    } catch (err) {
+        loginError.textContent = 'Connection error. Try again.';
+        console.error(err);
+    }
+    document.getElementById('login-btn').disabled = false;
+});
+
+async function loadDriver(id) {
+    driverId = id;
+    try {
+        const snap = await get(ref(db, `drivers/${id}`));
+        if (!snap.exists()) { sessionStorage.removeItem('vt_driver_id'); return; }
+        driverData = snap.val();
+        driverData.id = id;
+
+        dashName.innerHTML = `${driverData.name} <span>${driverData.phone}</span>`;
+        loginScreen.classList.add('hidden');
+        dashboard.classList.add('active');
+
+        // Listen for ride requests
+        listenForRides();
+    } catch (err) {
+        console.error('Load driver error:', err);
+    }
+}
+
+// ---- Toggle Online/Offline ----
+toggleSwitch.addEventListener('click', () => {
+    isOnline = !isOnline;
+    toggleSwitch.classList.toggle('on', isOnline);
+
+    if (isOnline) {
+        statusIndicator.className = 'status-indicator online';
+        statusLabel.textContent = 'Online';
+        statusSub.textContent = 'Receiving ride requests';
+        onlineStartTime = Date.now();
+        startGPS();
+        set(ref(db, `drivers/${driverId}/status`), 'available');
+    } else {
+        statusIndicator.className = 'status-indicator offline';
+        statusLabel.textContent = 'Offline';
+        statusSub.textContent = 'Toggle to start receiving rides';
+        stopGPS();
+        set(ref(db, `drivers/${driverId}/status`), 'offline');
+        remove(ref(db, `drivers/${driverId}/location`));
+    }
+});
+
+// ---- GPS Tracking ----
+function startGPS() {
+    if (!navigator.geolocation) { gpsText.textContent = 'GPS not supported'; return; }
+    gpsDot.classList.add('active');
+    gpsText.textContent = 'Acquiring GPS...';
+
+    gpsWatchId = navigator.geolocation.watchPosition(
+        (pos) => {
+            lastLat = pos.coords.latitude;
+            lastLng = pos.coords.longitude;
+            gpsText.textContent = `📍 ${lastLat.toFixed(5)}, ${lastLng.toFixed(5)}`;
+
+            // Push to Firebase
+            set(ref(db, `drivers/${driverId}/location`), {
+                lat: lastLat, lng: lastLng,
+                timestamp: Date.now(),
+                heading: pos.coords.heading || 0
+            });
+
+            // Update online timer
+            if (onlineStartTime) {
+                const hrs = ((Date.now() - onlineStartTime) / 3600000).toFixed(1);
+                document.getElementById('stat-hours').textContent = hrs + 'h';
+            }
+        },
+        (err) => { gpsText.textContent = 'GPS error: ' + err.message; },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+    );
+}
+
+function stopGPS() {
+    if (gpsWatchId !== null) { navigator.geolocation.clearWatch(gpsWatchId); gpsWatchId = null; }
+    gpsDot.classList.remove('active');
+    gpsText.textContent = 'GPS inactive';
+}
+
+// ---- Listen for Ride Requests ----
+function listenForRides() {
+    onValue(ref(db, `drivers/${driverId}/currentRide`), (snap) => {
+        if (!snap.exists()) { rideOverlay.classList.remove('visible'); return; }
+        const ride = snap.val();
+        if (ride.status === 'requested') {
+            showRideRequest(ride, snap.key);
+        } else if (ride.status === 'accepted') {
+            // We accepted it — show busy status
+            statusIndicator.className = 'status-indicator busy';
+            statusLabel.textContent = 'En Route';
+            statusSub.textContent = `Heading to: ${ride.destName}`;
+        } else if (ride.status === 'completed') {
+            // Ride done — back to available
+            statusIndicator.className = 'status-indicator online';
+            statusLabel.textContent = 'Online';
+            statusSub.textContent = 'Receiving ride requests';
+            remove(ref(db, `drivers/${driverId}/currentRide`));
+            const rides = parseInt(document.getElementById('stat-rides').textContent) + 1;
+            document.getElementById('stat-rides').textContent = rides;
+        }
+    });
+}
+
+function showRideRequest(ride) {
+    ridePickup.textContent = ride.pickupName || 'Pilgrim Location';
+    rideDest.textContent = ride.destName || 'Destination';
+    rideDestDesc.textContent = ride.destDesc || '';
+    rideOverlay.classList.add('visible');
+
+    // Auto-decline timer
+    let countdown = 30;
+    if (rideRequestTimeout) clearInterval(rideRequestTimeout);
+    rideRequestTimeout = setInterval(() => {
+        countdown--;
+        rideTimer.innerHTML = `Auto-declines in <strong>${countdown}s</strong>`;
+        if (countdown <= 0) {
+            clearInterval(rideRequestTimeout);
+            declineRide();
+        }
+    }, 1000);
+}
+
+// ---- Accept / Reject ----
+acceptBtn.addEventListener('click', () => {
+    clearInterval(rideRequestTimeout);
+    rideOverlay.classList.remove('visible');
+    update(ref(db, `drivers/${driverId}/currentRide`), { status: 'accepted' });
+    set(ref(db, `drivers/${driverId}/status`), 'busy');
+});
+
+rejectBtn.addEventListener('click', declineRide);
+
+function declineRide() {
+    clearInterval(rideRequestTimeout);
+    rideOverlay.classList.remove('visible');
+    remove(ref(db, `drivers/${driverId}/currentRide`));
+}
+
+// ---- Logout ----
+dashLogout.addEventListener('click', () => {
+    if (isOnline) {
+        set(ref(db, `drivers/${driverId}/status`), 'offline');
+        remove(ref(db, `drivers/${driverId}/location`));
+        stopGPS();
+    }
+    sessionStorage.removeItem('vt_driver_id');
+    driverId = null; driverData = null; isOnline = false;
+    dashboard.classList.remove('active');
+    loginScreen.classList.remove('hidden');
+    loginError.textContent = '';
+});
+</script>
+</body>
+</html>
