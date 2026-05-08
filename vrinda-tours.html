@@ -2352,6 +2352,146 @@
                 pointer-events: auto;
             }
         }
+
+        /* ========================================
+           HOTEL & RESTAURANT BOOKING
+        ======================================== */
+        .booking-overlay {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+            opacity: 0; visibility: hidden; transition: all 0.35s var(--transition-smooth);
+        }
+        .booking-overlay.visible { opacity: 1; visibility: visible; }
+
+        .booking-sheet {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 2001;
+            background: var(--bg-card); border-radius: 20px 20px 0 0;
+            max-height: 80vh; transform: translateY(100%);
+            transition: transform 0.4s var(--transition-smooth);
+            display: flex; flex-direction: column;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+        }
+        .booking-sheet.visible { transform: translateY(0); }
+        .booking-sheet-handle { width: 36px; height: 4px; background: #D1D5DB; border-radius: 100px; margin: 10px auto 0; }
+        .booking-sheet-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem 1.25rem 0.75rem;
+        }
+        .booking-sheet-header h3 { font-size: 1.125rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+        .booking-sheet-close {
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            background: #F3F4F6; border: none; border-radius: 50%;
+            color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+        }
+        .booking-sheet-close:hover { background: #E5E7EB; }
+        .booking-sheet-body { flex: 1; overflow-y: auto; padding: 0 1.25rem 1.25rem; -webkit-overflow-scrolling: touch; }
+
+        .booking-venue-info {
+            display: flex; gap: 0.875rem; padding: 1rem;
+            background: #F8FAFC; border-radius: var(--radius-md);
+            margin-bottom: 1rem; border: 1px solid var(--border-subtle);
+        }
+        .booking-venue-img {
+            width: 64px; height: 64px; border-radius: var(--radius-sm);
+            background-size: cover; background-position: center; flex-shrink: 0;
+        }
+        .booking-venue-details { flex: 1; min-width: 0; }
+        .booking-venue-details h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .booking-venue-details .venue-meta {
+            font-size: 0.75rem; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 0.375rem; flex-wrap: wrap;
+        }
+        .venue-meta .rating-badge {
+            display: inline-flex; align-items: center; gap: 0.2rem;
+            background: #FEF3C7; color: #92400E; padding: 2px 6px;
+            border-radius: 4px; font-weight: 700; font-size: 0.6875rem;
+        }
+        .venue-meta .price-badge {
+            display: inline-flex; padding: 2px 6px;
+            background: #ECFDF5; color: #065F46; border-radius: 4px;
+            font-weight: 600; font-size: 0.6875rem;
+        }
+
+        .booking-form { display: flex; flex-direction: column; gap: 0.875rem; }
+        .booking-field { display: flex; flex-direction: column; gap: 0.375rem; }
+        .booking-field label {
+            font-size: 0.6875rem; font-weight: 700; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .booking-field input, .booking-field select {
+            padding: 0.75rem 0.875rem; background: #F9FAFB;
+            border: 1.5px solid var(--border-subtle); border-radius: var(--radius-sm);
+            font-size: 0.875rem; font-family: inherit; color: var(--text-primary);
+            outline: none; transition: all 0.2s ease;
+        }
+        .booking-field input:focus, .booking-field select:focus {
+            border-color: var(--accent-primary); background: #fff;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+        }
+        .booking-field-row { display: flex; gap: 0.75rem; }
+        .booking-field-row .booking-field { flex: 1; }
+
+        .guest-counter {
+            display: flex; align-items: center; gap: 1rem; padding: 0.5rem 0;
+        }
+        .guest-counter button {
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            background: #F3F4F6; border: 1.5px solid var(--border-subtle);
+            border-radius: 50%; font-size: 1.25rem; font-weight: 700;
+            color: var(--text-primary); cursor: pointer; transition: all 0.2s; user-select: none;
+        }
+        .guest-counter button:hover { background: #E5E7EB; border-color: var(--accent-primary); }
+        .guest-counter button:active { transform: scale(0.95); }
+        .guest-counter .guest-count { font-size: 1.25rem; font-weight: 800; min-width: 2rem; text-align: center; }
+
+        .room-types { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .room-type-card {
+            flex: 1; min-width: 85px; padding: 0.75rem; background: #F9FAFB;
+            border: 1.5px solid var(--border-subtle); border-radius: var(--radius-sm);
+            text-align: center; cursor: pointer; transition: all 0.2s ease;
+        }
+        .room-type-card:hover { border-color: #000; }
+        .room-type-card.selected { background: #000; color: #fff; border-color: #000; }
+        .room-type-card .room-name { font-size: 0.8125rem; font-weight: 700; }
+        .room-type-card .room-price { font-size: 0.6875rem; color: var(--text-muted); margin-top: 0.125rem; }
+        .room-type-card.selected .room-price { color: rgba(255,255,255,0.7); }
+
+        .booking-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .btn-whatsapp {
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            padding: 0.875rem; background: #25D366; border: none; border-radius: var(--radius-sm);
+            font-size: 0.875rem; font-weight: 700; color: #fff; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-whatsapp:hover { background: #1DA851; }
+        .btn-whatsapp:active { transform: scale(0.98); }
+        .btn-call-booking {
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            background: #F3F4F6; border: 1.5px solid var(--border-subtle);
+            border-radius: var(--radius-sm); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;
+        }
+        .btn-call-booking:hover { background: #ECFDF5; border-color: #059669; color: #059669; }
+
+        .btn-book-hotel { background: #7C3AED !important; }
+        .btn-book-hotel:hover { background: #6D28D9 !important; }
+        .btn-book-restaurant { background: #EA580C !important; }
+        .btn-book-restaurant:hover { background: #C2410C !important; }
+
+        @media (min-width: 640px) {
+            .booking-sheet { max-width: 480px; left: 50%; transform: translateX(-50%) translateY(100%); }
+            .booking-sheet.visible { transform: translateX(-50%) translateY(0); }
+        }
+        @media (min-width: 1024px) {
+            .booking-sheet {
+                bottom: auto; top: 50%; left: 50%; right: auto;
+                transform: translate(-50%, -50%) scale(0.95);
+                border-radius: var(--radius-lg); max-height: 75vh; max-width: 480px; width: 90vw;
+                opacity: 0; visibility: hidden; pointer-events: none;
+            }
+            .booking-sheet.visible {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1; visibility: visible; pointer-events: auto;
+            }
+        }
     </style>
 </head>
 
@@ -2396,6 +2536,14 @@
         <button class="pill" data-filter="Information">
             <span class="pill-icon"><i data-lucide="info"></i></span>
             Info
+        </button>
+        <button class="pill" data-filter="Hotel">
+            <span class="pill-icon"><i data-lucide="bed-double"></i></span>
+            Hotels
+        </button>
+        <button class="pill" data-filter="Restaurant">
+            <span class="pill-icon"><i data-lucide="chef-hat"></i></span>
+            Restaurants
         </button>
         <button class="pill" id="drivers-pill">
             <span class="pill-icon"><i data-lucide="car"></i></span>
@@ -2453,7 +2601,15 @@
                 <div class="stat-label">Rating</div>
             </div>
         </div>
-        <div class="card-actions">
+        <div class="card-actions" id="card-actions">
+            <button class="btn-primary btn-book-hotel" id="book-hotel-btn" style="display:none;">
+                <i data-lucide="bed-double" style="width: 18px; height: 18px;"></i>
+                Book Room
+            </button>
+            <button class="btn-primary btn-book-restaurant" id="book-restaurant-btn" style="display:none;">
+                <i data-lucide="utensils-crossed" style="width: 18px; height: 18px;"></i>
+                Reserve Table
+            </button>
             <button class="btn-primary" id="book-ride-btn" style="background:#22C55E;">
                 <i data-lucide="car" style="width: 18px; height: 18px;"></i>
                 Book a Ride
@@ -2556,8 +2712,134 @@
                 <i data-lucide="x" style="width:16px;height:16px;"></i>
             </button>
         </div>
-        <div class="ride-sheet-body" id="ride-sheet-body">
-            <!-- Driver cards rendered dynamically -->
+        <div class="ride-sheet-body" id="ride-sheet-body"></div>
+    </div>
+
+    <!-- Hotel Booking Sheet -->
+    <div class="booking-overlay" id="hotel-booking-overlay"></div>
+    <div class="booking-sheet" id="hotel-booking-sheet">
+        <div class="booking-sheet-handle"></div>
+        <div class="booking-sheet-header">
+            <h3>🏨 Book a Room</h3>
+            <button class="booking-sheet-close" id="close-hotel-booking">
+                <i data-lucide="x" style="width:16px;height:16px;"></i>
+            </button>
+        </div>
+        <div class="booking-sheet-body">
+            <div class="booking-venue-info" id="hotel-venue-info">
+                <div class="booking-venue-img" id="hotel-venue-img"></div>
+                <div class="booking-venue-details">
+                    <h4 id="hotel-venue-name">Hotel Name</h4>
+                    <div class="venue-meta">
+                        <span class="rating-badge" id="hotel-venue-rating">⭐ 4.5</span>
+                        <span class="price-badge" id="hotel-venue-price">₹800 - ₹3000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="booking-form" id="hotel-booking-form">
+                <div class="booking-field-row">
+                    <div class="booking-field">
+                        <label>Check-in</label>
+                        <input type="date" id="hotel-checkin">
+                    </div>
+                    <div class="booking-field">
+                        <label>Check-out</label>
+                        <input type="date" id="hotel-checkout">
+                    </div>
+                </div>
+                <div class="booking-field">
+                    <label>Guests</label>
+                    <div class="guest-counter">
+                        <button type="button" id="hotel-guest-minus">−</button>
+                        <span class="guest-count" id="hotel-guest-count">2</span>
+                        <button type="button" id="hotel-guest-plus">+</button>
+                    </div>
+                </div>
+                <div class="booking-field">
+                    <label>Room Type</label>
+                    <div class="room-types" id="hotel-room-types">
+                        <div class="room-type-card selected" data-room="Standard">
+                            <div class="room-name">Standard</div>
+                            <div class="room-price">₹800/night</div>
+                        </div>
+                        <div class="room-type-card" data-room="Deluxe">
+                            <div class="room-name">Deluxe</div>
+                            <div class="room-price">₹1500/night</div>
+                        </div>
+                        <div class="room-type-card" data-room="Suite">
+                            <div class="room-name">Suite</div>
+                            <div class="room-price">₹3000/night</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="booking-actions">
+                    <button class="btn-whatsapp" id="hotel-book-whatsapp">
+                        <i data-lucide="message-circle" style="width:18px;height:18px;"></i>
+                        Book via WhatsApp
+                    </button>
+                    <button class="btn-call-booking" id="hotel-book-call" title="Call Hotel">
+                        <i data-lucide="phone" style="width:20px;height:20px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restaurant Booking Sheet -->
+    <div class="booking-overlay" id="restaurant-booking-overlay"></div>
+    <div class="booking-sheet" id="restaurant-booking-sheet">
+        <div class="booking-sheet-handle"></div>
+        <div class="booking-sheet-header">
+            <h3>🍽️ Reserve a Table</h3>
+            <button class="booking-sheet-close" id="close-restaurant-booking">
+                <i data-lucide="x" style="width:16px;height:16px;"></i>
+            </button>
+        </div>
+        <div class="booking-sheet-body">
+            <div class="booking-venue-info" id="restaurant-venue-info">
+                <div class="booking-venue-img" id="restaurant-venue-img"></div>
+                <div class="booking-venue-details">
+                    <h4 id="restaurant-venue-name">Restaurant Name</h4>
+                    <div class="venue-meta">
+                        <span class="rating-badge" id="restaurant-venue-rating">⭐ 4.2</span>
+                        <span class="price-badge" id="restaurant-venue-price">₹100 - ₹500</span>
+                        <span id="restaurant-venue-cuisine" style="font-size:0.6875rem;color:var(--text-muted);">Sattvic</span>
+                    </div>
+                </div>
+            </div>
+            <div class="booking-form" id="restaurant-booking-form">
+                <div class="booking-field-row">
+                    <div class="booking-field">
+                        <label>Date</label>
+                        <input type="date" id="restaurant-date">
+                    </div>
+                    <div class="booking-field">
+                        <label>Time</label>
+                        <input type="time" id="restaurant-time" value="12:00">
+                    </div>
+                </div>
+                <div class="booking-field">
+                    <label>Guests</label>
+                    <div class="guest-counter">
+                        <button type="button" id="restaurant-guest-minus">−</button>
+                        <span class="guest-count" id="restaurant-guest-count">2</span>
+                        <button type="button" id="restaurant-guest-plus">+</button>
+                    </div>
+                </div>
+                <div class="booking-field">
+                    <label>Special Requests <span style="font-weight:400;color:var(--text-muted);text-transform:none;letter-spacing:0;">(optional)</span></label>
+                    <input type="text" id="restaurant-special" placeholder="Dietary needs, celebration, etc.">
+                </div>
+                <div class="booking-actions">
+                    <button class="btn-whatsapp" id="restaurant-book-whatsapp">
+                        <i data-lucide="message-circle" style="width:18px;height:18px;"></i>
+                        Reserve via WhatsApp
+                    </button>
+                    <button class="btn-call-booking" id="restaurant-book-call" title="Call Restaurant">
+                        <i data-lucide="phone" style="width:20px;height:20px;"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2646,7 +2928,17 @@
             { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1590050752117-23ed9568779b?w=400", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
             { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1590766940511-78210419665d?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
             { name: "Brijwasin Dining", lat: 27.6485, lng: 77.3750, image: "https://images.unsplash.com/photo-1517248135467-4c7ed9d8c47c?w=400", description: "Traditional Vedic dining experience offering pure vegetarian delicacies from the heart of Brij.", category: "Dining", points: 10 },
-            { name: "Tourist Info Center", lat: 27.6440, lng: 77.3700, image: "https://images.unsplash.com/photo-1549412658-904aa6600473?w=400", description: "Official information center for pilgrims and tourists visiting Barsana.", category: "Information", points: 5 }
+            { name: "Tourist Info Center", lat: 27.6440, lng: 77.3700, image: "https://images.unsplash.com/photo-1549412658-904aa6600473?w=400", description: "Official information center for pilgrims and tourists visiting Barsana.", category: "Information", points: 5 },
+            // --- Hotels ---
+            { name: "Radha Krishna Dham", lat: 27.6490, lng: 77.3760, image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400", description: "Serene temple guesthouse with garden courtyard, minutes from Barsana Mandir. Pure sattvic meals included.", category: "Hotel", points: 10, phone: "+919876543210", rating: 4.6, priceRange: "₹800 - ₹2500", roomTypes: ["Standard","Deluxe"], cuisine: "" },
+            { name: "Brij Vasundhara Resort", lat: 27.6430, lng: 77.3820, image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=400", description: "Modern pilgrim resort with AC rooms, rooftop dining, and Govardhan Hill views.", category: "Hotel", points: 10, phone: "+919876543211", rating: 4.3, priceRange: "₹1200 - ₹4000", roomTypes: ["Standard","Deluxe","Suite"], cuisine: "" },
+            { name: "Pilgrims Inn", lat: 27.6470, lng: 77.3740, image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400", description: "Budget-friendly stay in main market area with hot meals and 24/7 reception.", category: "Hotel", points: 5, phone: "+919876543212", rating: 4.0, priceRange: "₹500 - ₹1200", roomTypes: ["Standard","Deluxe"], cuisine: "" },
+            { name: "Vrinda Heritage Stay", lat: 27.6620, lng: 77.3780, image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400", description: "Heritage haveli near Prem Sarovar with traditional Brij decor and courtyard.", category: "Hotel", points: 15, phone: "+919876543213", rating: 4.8, priceRange: "₹2000 - ₹5000", roomTypes: ["Deluxe","Suite"], cuisine: "" },
+            // --- Restaurants ---
+            { name: "Govinda's Kitchen", lat: 27.6480, lng: 77.3755, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400", description: "Pure sattvic thali with fresh seasonal sabzi, dal, and hand-made rotis. Peaceful temple-side ambiance.", category: "Restaurant", points: 10, phone: "+919876543220", rating: 4.7, priceRange: "₹100 - ₹300", cuisine: "Sattvic Thali" },
+            { name: "Radha Rasoi", lat: 27.6460, lng: 77.3730, image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400", description: "Iconic street food — crispy kachori, hot jalebi, lassi, and Mathura peda. A must-visit!", category: "Restaurant", points: 10, phone: "+919876543221", rating: 4.5, priceRange: "₹50 - ₹200", cuisine: "Street Food" },
+            { name: "Brij Bhoj", lat: 27.6640, lng: 77.3790, image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", description: "Full Brij meal experience near Prem Sarovar — 56 bhog thali with traditional sweets.", category: "Restaurant", points: 15, phone: "+919876543222", rating: 4.4, priceRange: "₹200 - ₹500", cuisine: "Brij Cuisine" },
+            { name: "Nand Bhavan Dining", lat: 27.6440, lng: 77.3800, image: "https://images.unsplash.com/photo-1567337710282-00832b415979?w=400", description: "Family-style North Indian restaurant with spacious seating and festive decor.", category: "Restaurant", points: 10, phone: "+919876543223", rating: 4.2, priceRange: "₹150 - ₹400", cuisine: "North Indian" }
         ];
 
         // --- Map Initialization ---
@@ -2725,9 +3017,13 @@
                     url = baseUrl + 'marker-ink/icons8-marker-96.png';
                     break;
                 case 'Dining':
+                case 'Restaurant':
                     url = baseUrl + 'pin-3.png';
                     break;
                 case 'Information':
+                    url = baseUrl + 'pin-2.png';
+                    break;
+                case 'Hotel':
                     url = baseUrl + 'pin-2.png';
                     break;
                 default:
@@ -2801,16 +3097,14 @@
         function showLocationCard(loc, marker) {
             // Reset previous marker
             if (activeMarker) {
-                // Return previous to static state (no playing class)
                 activeMarker.setIcon(createMarkerIcon(activeMarker.locationData.category, false, false));
             }
 
             // Highlight new marker and trigger "one-time" animation
-            // The third parameter 'true' triggers the GIF restart and the CSS pop animation
             marker.setIcon(createMarkerIcon(loc.category, true, true));
             activeMarker = marker;
 
-            // Remove 'playing' class after animation ends (2.5s for a full GIF cycle)
+            // Remove 'playing' class after animation ends
             setTimeout(() => {
                 if (activeMarker === marker) {
                     marker.setIcon(createMarkerIcon(loc.category, true, false));
@@ -2825,6 +3119,25 @@
 
             // Update distance and ETA
             updateDistanceAndETA(loc);
+
+            // --- Dynamic action buttons based on category ---
+            const bookHotelBtn = document.getElementById('book-hotel-btn');
+            const bookRestaurantBtn = document.getElementById('book-restaurant-btn');
+            const bookRideBtnEl = document.getElementById('book-ride-btn');
+
+            const cat = loc.category;
+            bookHotelBtn.style.display = (cat === 'Hotel') ? 'flex' : 'none';
+            bookRestaurantBtn.style.display = (cat === 'Restaurant' || cat === 'Dining') ? 'flex' : 'none';
+            // Shrink ride button when hotel/restaurant button is visible
+            if (cat === 'Hotel' || cat === 'Restaurant' || cat === 'Dining') {
+                bookRideBtnEl.style.flex = '0.6';
+            } else {
+                bookRideBtnEl.style.flex = '';
+            }
+
+            // Update stat rating from location data if available
+            const ratingEl = locationCard.querySelector('.stat:nth-child(3) .stat-value');
+            if (ratingEl) ratingEl.textContent = loc.rating || '4.8';
 
             // Show card with animation
             locationCard.classList.add('visible');
@@ -3764,6 +4077,247 @@
                 }
             }
             setTimeout(initWhenReady, 300);
+        })();
+
+        // ========================================
+        // HOTEL & RESTAURANT BOOKING MODULE
+        // ========================================
+        (function BookingModule() {
+            // --- Cached DOM ---
+            var hotelOverlay = document.getElementById('hotel-booking-overlay');
+            var hotelSheet = document.getElementById('hotel-booking-sheet');
+            var closeHotelBtn = document.getElementById('close-hotel-booking');
+            var hotelVenueImg = document.getElementById('hotel-venue-img');
+            var hotelVenueName = document.getElementById('hotel-venue-name');
+            var hotelVenueRating = document.getElementById('hotel-venue-rating');
+            var hotelVenuePrice = document.getElementById('hotel-venue-price');
+            var hotelCheckin = document.getElementById('hotel-checkin');
+            var hotelCheckout = document.getElementById('hotel-checkout');
+            var hotelGuestCount = document.getElementById('hotel-guest-count');
+            var hotelGuestMinus = document.getElementById('hotel-guest-minus');
+            var hotelGuestPlus = document.getElementById('hotel-guest-plus');
+            var hotelRoomTypes = document.getElementById('hotel-room-types');
+            var hotelBookWA = document.getElementById('hotel-book-whatsapp');
+            var hotelBookCall = document.getElementById('hotel-book-call');
+
+            var restOverlay = document.getElementById('restaurant-booking-overlay');
+            var restSheet = document.getElementById('restaurant-booking-sheet');
+            var closeRestBtn = document.getElementById('close-restaurant-booking');
+            var restVenueImg = document.getElementById('restaurant-venue-img');
+            var restVenueName = document.getElementById('restaurant-venue-name');
+            var restVenueRating = document.getElementById('restaurant-venue-rating');
+            var restVenuePrice = document.getElementById('restaurant-venue-price');
+            var restVenueCuisine = document.getElementById('restaurant-venue-cuisine');
+            var restDate = document.getElementById('restaurant-date');
+            var restTime = document.getElementById('restaurant-time');
+            var restGuestCount = document.getElementById('restaurant-guest-count');
+            var restGuestMinus = document.getElementById('restaurant-guest-minus');
+            var restGuestPlus = document.getElementById('restaurant-guest-plus');
+            var restSpecial = document.getElementById('restaurant-special');
+            var restBookWA = document.getElementById('restaurant-book-whatsapp');
+            var restBookCall = document.getElementById('restaurant-book-call');
+
+            var currentBookingLoc = null;
+            var hotelGuests = 2;
+            var restGuests = 2;
+            var selectedRoomType = 'Standard';
+
+            // --- Default dates ---
+            function setDefaultDates() {
+                var today = new Date();
+                var tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                var fmt = function(d) { return d.toISOString().split('T')[0]; };
+                if (hotelCheckin) { hotelCheckin.value = fmt(today); hotelCheckin.min = fmt(today); }
+                if (hotelCheckout) { hotelCheckout.value = fmt(tomorrow); hotelCheckout.min = fmt(tomorrow); }
+                if (restDate) { restDate.value = fmt(today); restDate.min = fmt(today); }
+            }
+
+            // --- Utility: clean phone for WhatsApp ---
+            function cleanPhone(phone) {
+                var p = (phone || '').replace(/[^0-9]/g, '');
+                if (p.startsWith('0')) p = '91' + p.slice(1);
+                if (!p.startsWith('91') && p.length === 10) p = '91' + p;
+                return p;
+            }
+
+            // ========================================
+            //  HOTEL BOOKING
+            // ========================================
+            function openHotelBooking() {
+                if (!activeMarker) return;
+                var loc = activeMarker.locationData;
+                if (loc.category !== 'Hotel') return;
+                currentBookingLoc = loc;
+                setDefaultDates();
+                hotelGuests = 2;
+                hotelGuestCount.textContent = '2';
+                selectedRoomType = 'Standard';
+
+                // Populate venue info
+                hotelVenueImg.style.backgroundImage = 'url(' + loc.image + ')';
+                hotelVenueName.textContent = loc.name;
+                hotelVenueRating.textContent = '⭐ ' + (loc.rating || '4.5');
+                hotelVenuePrice.textContent = loc.priceRange || '₹800 - ₹3000';
+
+                // Update room types if location has custom ones
+                if (loc.roomTypes && loc.roomTypes.length > 0) {
+                    var priceMap = { 'Standard': '₹800', 'Deluxe': '₹1500', 'Suite': '₹3000' };
+                    hotelRoomTypes.innerHTML = loc.roomTypes.map(function(rt, i) {
+                        return '<div class="room-type-card' + (i === 0 ? ' selected' : '') + '" data-room="' + rt + '">' +
+                            '<div class="room-name">' + rt + '</div>' +
+                            '<div class="room-price">' + (priceMap[rt] || '₹1000') + '/night</div></div>';
+                    }).join('');
+                    selectedRoomType = loc.roomTypes[0];
+                }
+
+                // Show sheet
+                hotelOverlay.classList.add('visible');
+                hotelSheet.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            function closeHotelBooking() {
+                hotelOverlay.classList.remove('visible');
+                hotelSheet.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+
+            if (closeHotelBtn) closeHotelBtn.addEventListener('click', closeHotelBooking);
+            if (hotelOverlay) hotelOverlay.addEventListener('click', closeHotelBooking);
+
+            // Guest counter
+            if (hotelGuestMinus) hotelGuestMinus.addEventListener('click', function() {
+                if (hotelGuests > 1) { hotelGuests--; hotelGuestCount.textContent = hotelGuests; }
+            });
+            if (hotelGuestPlus) hotelGuestPlus.addEventListener('click', function() {
+                if (hotelGuests < 10) { hotelGuests++; hotelGuestCount.textContent = hotelGuests; }
+            });
+
+            // Room type selection
+            if (hotelRoomTypes) hotelRoomTypes.addEventListener('click', function(e) {
+                var card = e.target.closest('.room-type-card');
+                if (!card) return;
+                hotelRoomTypes.querySelectorAll('.room-type-card').forEach(function(c) { c.classList.remove('selected'); });
+                card.classList.add('selected');
+                selectedRoomType = card.dataset.room;
+            });
+
+            // WhatsApp booking
+            if (hotelBookWA) hotelBookWA.addEventListener('click', function() {
+                if (!currentBookingLoc) return;
+                var loc = currentBookingLoc;
+                var phone = cleanPhone(loc.phone);
+                var checkin = hotelCheckin ? hotelCheckin.value : '';
+                var checkout = hotelCheckout ? hotelCheckout.value : '';
+
+                var msg = '🙏 *Vrinda Tours — Room Booking Request*\n\n';
+                msg += '🏨 *Hotel*: ' + loc.name + '\n';
+                msg += '📅 *Check-in*: ' + checkin + '\n';
+                msg += '📅 *Check-out*: ' + checkout + '\n';
+                msg += '👥 *Guests*: ' + hotelGuests + '\n';
+                msg += '🛏️ *Room Type*: ' + selectedRoomType + '\n';
+                msg += '\nPlease confirm availability and rate. 🙏';
+
+                window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+                closeHotelBooking();
+                if (window.showToast) showToast('Opening WhatsApp for ' + loc.name, 'success');
+            });
+
+            // Call button
+            if (hotelBookCall) hotelBookCall.addEventListener('click', function() {
+                if (currentBookingLoc && currentBookingLoc.phone) {
+                    window.open('tel:' + currentBookingLoc.phone);
+                }
+            });
+
+            // ========================================
+            //  RESTAURANT BOOKING
+            // ========================================
+            function openRestaurantBooking() {
+                if (!activeMarker) return;
+                var loc = activeMarker.locationData;
+                if (loc.category !== 'Restaurant' && loc.category !== 'Dining') return;
+                currentBookingLoc = loc;
+                setDefaultDates();
+                restGuests = 2;
+                restGuestCount.textContent = '2';
+                if (restSpecial) restSpecial.value = '';
+
+                // Populate venue info
+                restVenueImg.style.backgroundImage = 'url(' + loc.image + ')';
+                restVenueName.textContent = loc.name;
+                restVenueRating.textContent = '⭐ ' + (loc.rating || '4.2');
+                restVenuePrice.textContent = loc.priceRange || '₹100 - ₹500';
+                restVenueCuisine.textContent = loc.cuisine || 'Vegetarian';
+
+                // Show sheet
+                restOverlay.classList.add('visible');
+                restSheet.classList.add('visible');
+                document.body.style.overflow = 'hidden';
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            function closeRestaurantBooking() {
+                restOverlay.classList.remove('visible');
+                restSheet.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+
+            if (closeRestBtn) closeRestBtn.addEventListener('click', closeRestaurantBooking);
+            if (restOverlay) restOverlay.addEventListener('click', closeRestaurantBooking);
+
+            // Guest counter
+            if (restGuestMinus) restGuestMinus.addEventListener('click', function() {
+                if (restGuests > 1) { restGuests--; restGuestCount.textContent = restGuests; }
+            });
+            if (restGuestPlus) restGuestPlus.addEventListener('click', function() {
+                if (restGuests < 20) { restGuests++; restGuestCount.textContent = restGuests; }
+            });
+
+            // WhatsApp booking
+            if (restBookWA) restBookWA.addEventListener('click', function() {
+                if (!currentBookingLoc) return;
+                var loc = currentBookingLoc;
+                var phone = cleanPhone(loc.phone);
+                var date = restDate ? restDate.value : '';
+                var time = restTime ? restTime.value : '';
+                var special = restSpecial ? restSpecial.value.trim() : '';
+
+                var msg = '🙏 *Vrinda Tours — Table Reservation*\n\n';
+                msg += '🍽️ *Restaurant*: ' + loc.name + '\n';
+                msg += '📅 *Date*: ' + date + '\n';
+                msg += '🕐 *Time*: ' + time + '\n';
+                msg += '👥 *Guests*: ' + restGuests + '\n';
+                if (special) msg += '📝 *Special Request*: ' + special + '\n';
+                msg += '\nPlease confirm the reservation. 🙏';
+
+                window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+                closeRestaurantBooking();
+                if (window.showToast) showToast('Opening WhatsApp for ' + loc.name, 'success');
+            });
+
+            // Call button
+            if (restBookCall) restBookCall.addEventListener('click', function() {
+                if (currentBookingLoc && currentBookingLoc.phone) {
+                    window.open('tel:' + currentBookingLoc.phone);
+                }
+            });
+
+            // ========================================
+            //  CARD BUTTON WIRING
+            // ========================================
+            var bookHotelBtn = document.getElementById('book-hotel-btn');
+            var bookRestaurantBtn = document.getElementById('book-restaurant-btn');
+            if (bookHotelBtn) bookHotelBtn.addEventListener('click', openHotelBooking);
+            if (bookRestaurantBtn) bookRestaurantBtn.addEventListener('click', openRestaurantBooking);
+
+            // Expose for potential external use
+            window.BookingModule = {
+                openHotelBooking: openHotelBooking,
+                openRestaurantBooking: openRestaurantBooking
+            };
         })();
     </script>
 </body>
