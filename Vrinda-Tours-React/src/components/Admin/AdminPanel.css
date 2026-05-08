@@ -1,0 +1,261 @@
+/* Admin Panel CSS - Consistently Centered */
+.adm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(12px) saturate(160%);
+    animation: adm-fadeIn 0.3s ease-out;
+}
+
+.adm-card-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 440px;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 32px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4);
+    z-index: 10000;
+}
+
+.adm-panel-centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 520px;
+    height: 80vh;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10000;
+}
+
+.adm-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.adm-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.adm-btn-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.adm-btn-close:hover {
+    color: #ef4444;
+    background: #fee2e2;
+    transform: rotate(90deg);
+}
+
+.adm-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.adm-form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.adm-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.adm-input-wrapper svg {
+    position: absolute;
+    left: 1rem;
+    color: #64748b;
+}
+
+.adm-input-wrapper input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 2.75rem;
+    background: #f8fafc;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 14px;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+
+.adm-input-wrapper input:focus {
+    outline: none;
+    border-color: #212128;
+    background: white;
+}
+
+.adm-btn-primary {
+    width: 100%;
+    padding: 1rem;
+    background: #212128;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.adm-btn-submit {
+    width: 100%;
+    padding: 1.125rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+}
+
+.adm-photo-circle {
+    width: 96px;
+    height: 96px;
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    margin: 0 auto 1.5rem;
+}
+
+.adm-photo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.adm-driver-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.adm-driver-item:hover {
+    /* transform: translateY(-2px); */
+    box-shadow: 0 8px 4px rgba(0, 0, 0, 0.06);
+    border-color: #e2e8f0;
+}
+
+.adm-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    flex-shrink: 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.adm-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.adm-info {
+    flex: 1;
+}
+
+.adm-info h4 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.adm-info span {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    display: block;
+    margin-top: 2px;
+}
+
+.adm-btn-delete {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #fff;
+    color: #ef4444;
+    border: 1px solid #fee2e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+    /* Pushes to the far right */
+}
+
+.adm-btn-delete:hover {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+    transform: scale(1.1);
+}
+
+@keyframes adm-fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
