@@ -28,8 +28,12 @@ export default function Header({ onSelectLocation, onOpenDriverPortal }) {
   return (
     <header className="header">
       <div className="header-content">
+        <div className="header-brand-logo" title="Vrindopnishad">
+          <img src="/official-logo.svg" alt="Vrindopnishad Logo" className="site-brand-logo" />
+        </div>
         <div className="search-bar">
           <Search size={20} color="#9E9E9E" />
+
           <input
             ref={inputRef}
             type="text"

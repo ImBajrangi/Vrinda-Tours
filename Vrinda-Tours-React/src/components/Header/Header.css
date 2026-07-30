@@ -13,6 +13,33 @@
     gap: 0.5rem;
 }
 
+.header-brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 6px;
+    transition: transform 0.2s ease;
+}
+
+.header-brand-logo:hover {
+    transform: scale(1.08);
+}
+
+.site-brand-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
 .search-bar {
     flex: 1;
     display: flex;
