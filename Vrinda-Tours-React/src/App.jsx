@@ -13,10 +13,11 @@ import { useFirebaseLocations } from './hooks/useFirebaseLocations';
 import RideSheet from './components/BookingSheets/RideSheet';
 import RideStatusBanner from './components/UI/RideStatusBanner';
 import DriversPanel from './components/Admin/DriversPanel';
-import AdminPanel from './components/Admin/AdminPanel'; // This is for login
+import AdminPanel from './components/Admin/AdminPanel';
+import DriverPortalModal from './components/Driver/DriverPortalModal';
 import Toast from './components/UI/Toast';
 import './components/UI/UI.css';
-import { doc, updateDoc, collection, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteField } from 'firebase/firestore';
 import { firestore } from './config/firebase';
 import { locations as initialData } from './data/locations';
 
@@ -29,10 +30,35 @@ export default function App() {
   const [activeRide, setActiveRide] = useState(null); // { driver, status }
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
+  const [driverPortalVisible, setDriverPortalVisible] = useState(false);
   const [toast, setToast] = useState(null);
+
   const { position, loading, requestLocation } = useGeolocation();
   const { drivers, firebaseReady } = useFirebaseDrivers();
   const { locations, loading: locationsLoading } = useFirebaseLocations();
+
+  // Listen to passenger active ride status updates in real-time
+  useEffect(() => {
+    if (!activeRide?.driver?.id) return;
+
+    const driverRef = doc(firestore, 'drivers', activeRide.driver.id);
+    const unsub = onSnapshot(driverRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.currentRide) {
+          setActiveRide(prev => prev ? { ...prev, status: data.currentRide.status } : null);
+        } else {
+          // Ride completed or cancelled by driver
+          if (activeRide.status === 'arrived' || activeRide.status === 'accepted') {
+            setToast({ message: 'Ride completed! Thank you for choosing Vrinda Tours.', type: 'success' });
+          }
+          setActiveRide(null);
+        }
+      }
+    });
+
+    return () => unsub();
+  }, [activeRide?.driver?.id]);
 
   const handleFilterChange = useCallback((key) => {
     if (key === '__drivers__') {
@@ -65,18 +91,19 @@ export default function App() {
       const rideData = {
         pickupLat: position?.lat || 27.646,
         pickupLng: position?.lng || 77.377,
-        pickupName: position ? 'Your Location' : 'Barsana Center',
-        destName: activeLocation.name,
-        destLat: activeLocation.lat,
-        destLng: activeLocation.lng,
+        pickupName: position ? 'Your Current GPS Location' : 'Barsana Center',
+        destName: activeLocation?.name || 'Pilgrim Destination',
+        destLat: activeLocation?.lat || 27.646,
+        destLng: activeLocation?.lng || 77.377,
         status: 'requested',
         timestamp: Date.now()
       };
 
       await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
       setActiveRide({ driver, status: 'requested' });
-      setToast({ message: `Request sent to ${driver.name}`, type: 'success' });
+      setToast({ message: `Ride request sent to ${driver.name}`, type: 'success' });
     } catch (err) {
+      console.error('Ride request error:', err);
       setToast({ message: 'Ride request failed', type: 'error' });
     }
   }, [position, activeLocation]);
@@ -84,10 +111,12 @@ export default function App() {
   const handleCancelRide = useCallback(async () => {
     if (activeRide?.driver) {
       try {
-        await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: null });
+        await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
         setActiveRide(null);
         setToast({ message: 'Ride cancelled', type: 'success' });
-      } catch {}
+      } catch (err) {
+        console.error('Cancel ride error:', err);
+      }
     }
   }, [activeRide]);
 
@@ -139,12 +168,16 @@ export default function App() {
         onSelectLocation={handleSelectLocation}
       />
 
-      <Header onSelectLocation={handleSelectLocation} />
+      <Header 
+        onSelectLocation={handleSelectLocation} 
+        onOpenDriverPortal={() => setDriverPortalVisible(true)}
+      />
 
       <CategoryPills 
         activeFilter={activeFilter} 
         onFilterChange={handleFilterChange} 
         onAdminOpen={() => setAdminVisible(true)} 
+        onDriverPortalOpen={() => setDriverPortalVisible(true)}
       />
 
       <LocationCard
@@ -178,7 +211,7 @@ export default function App() {
       {activeRide && (
         <RideStatusBanner 
           status={activeRide.status} 
-          driverName={activeRide.driver.name} 
+          driver={activeRide.driver} 
           onCancel={handleCancelRide} 
         />
       )}
@@ -188,6 +221,10 @@ export default function App() {
           drivers={drivers} 
           onClose={() => setDriversVisible(false)} 
           onOpenAdmin={() => setAdminVisible(true)}
+          onOpenDriverPortal={() => {
+            setDriversVisible(false);
+            setDriverPortalVisible(true);
+          }}
         />
       )}
 
@@ -196,6 +233,13 @@ export default function App() {
           drivers={drivers} 
           userPosition={position}
           onClose={() => setAdminVisible(false)} 
+        />
+      )}
+
+      {driverPortalVisible && (
+        <DriverPortalModal 
+          drivers={drivers}
+          onClose={() => setDriverPortalVisible(false)} 
         />
       )}
 

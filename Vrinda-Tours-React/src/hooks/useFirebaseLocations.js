@@ -27,11 +27,18 @@ export function useFirebaseLocations() {
           return;
         }
 
-        const list = [];
-        snap.forEach((doc) => list.push({ id: doc.id, ...doc.data() }));
+        const map = new Map();
+        snap.forEach((doc) => {
+          const data = doc.data();
+          if (data.name && !map.has(data.name)) {
+            map.set(data.name, { id: doc.id, ...data });
+          }
+        });
+        const list = Array.from(map.values());
         setLocations(list);
         setLoading(false);
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); } catch {}
+
       }, (err) => {
         console.error('Firestore Locations Error:', err);
         setLoading(false);

@@ -283,6 +283,8 @@
     transform: translateZ(0);
 }
 
+
+
 .image-marker img.animated {
     opacity: 0;
     pointer-events: none;
@@ -316,96 +318,37 @@
     animation: marker-active-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-.user-marker-container {
-    position: relative;
+/* --- User Location Marker GIF with SVG remove-bg filter --- */
+.user-marker-wrapper {
+    background: none;
+    border: none;
+}
+
+.image-marker.user-location-marker {
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    cursor: pointer;
 }
 
-.user-pulse-ring {
-    position: absolute;
+.image-marker.user-location-marker img {
     width: 100%;
     height: 100%;
-    background: rgba(0, 48, 124, 0.4);
-    border-radius: 50%;
-    animation: user-pulse 2s infinite;
+    object-fit: contain;
+    filter: url(#remove-bg);
+    mix-blend-mode: multiply;
+    transition: transform 0.2s ease;
 }
 
-.user-center-dot {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 2;
+.image-marker.user-location-marker:hover img {
+    transform: scale(1.15) translateY(-2px);
 }
 
-.user-core {
-    width: 10px;
-    height: 10px;
-    background: #14294d;
-    border-radius: 50%;
-}
 
-@keyframes user-pulse {
-    0% {
-        transform: scale(0.5);
-        opacity: 1;
-    }
 
-    100% {
-        transform: scale(2.5);
-        opacity: 0;
-    }
-}
-
-@keyframes user-marker-pulse {
-    0% {
-        transform: scale(1);
-        filter: drop-shadow(0 4px 8px rgba(34, 76, 143, 0.4));
-    }
-
-    50% {
-        transform: scale(1.15) translateY(-4px);
-        filter: drop-shadow(0 12px 20px rgba(28, 64, 122, 0.8));
-    }
-
-    100% {
-        transform: scale(1);
-        filter: drop-shadow(0 4px 8px rgba(23, 49, 93, 0.4));
-    }
-}
-
-.user-location-marker::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 8px;
-    background: rgba(59, 130, 246, 0.3);
-    border-radius: 50%;
-    z-index: -1;
-    animation: aura-expand 2s ease-out infinite;
-}
-
-@keyframes aura-expand {
-    0% {
-        transform: translateX(-50%) scale(0.8);
-        opacity: 0.8;
-    }
-
-    100% {
-        transform: translateX(-50%) scale(2.5);
-        opacity: 0;
-    }
-}
 
 .marker-cluster {
     background-clip: padding-box;
@@ -458,75 +401,179 @@
 }
 
 .driver-map-marker {
-    position: relative;
     width: 42px;
     height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.3s ease;
 }
 
-.car-icon {
-    width: 34px;
-    height: 34px;
+.driver-map-marker:hover {
+    transform: scale(1.15);
+    z-index: 1000 !important;
+}
+
+.driver-map-marker .car-icon {
+    width: 36px;
+    height: 36px;
     background: #000;
-    color: #fff;
-    border-radius: 12px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    border: 2.5px solid #fff;
-    z-index: 2;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-size: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid #fff;
+    transition: all 0.2s ease;
 }
 
-.car-icon.busy {
-    background: #475569;
+.driver-map-marker .car-icon.available {
+    border-color: #22C55E;
 }
 
-.car-icon svg {
-    width: 18px;
-    height: 18px;
+.driver-map-marker .car-icon.busy {
+    border-color: #F59E0B;
 }
 
-.status-pulse {
+.driver-map-marker .status-pulse {
     position: absolute;
-    width: 48px;
-    height: 48px;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    z-index: 1;
+    border: 2px solid #fff;
     pointer-events: none;
 }
 
-.status-pulse.available {
-    background: rgba(34, 197, 94, 0.4);
-    animation: driver-pulse-green 2s infinite;
+.driver-map-marker .status-pulse.available {
+    background: #22C55E;
+    animation: driver-pulse 2s infinite;
 }
 
-.status-pulse.busy {
-    background: rgba(234, 179, 8, 0.4);
-    animation: driver-pulse-yellow 2s infinite;
+.driver-map-marker .status-pulse.busy {
+    background: #F59E0B;
 }
 
-.driver-name-tag {
+@keyframes driver-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+.driver-map-marker .driver-name-tag {
     position: absolute;
-    bottom: -18px;
+    bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 9px;
-    font-weight: 700;
+    background: #000;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.625rem;
+    font-weight: 600;
     white-space: nowrap;
-    pointer-events: none;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 3;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    margin-bottom: 4px;
 }
 
 .driver-map-marker:hover .driver-name-tag {
     opacity: 1;
+}
+
+
+/* --- Leaflet Driver Popup Styling --- */
+.leaflet-driver-popup .leaflet-popup-content-wrapper {
+    background: #0f172a;
+    color: #fff;
+    border-radius: 16px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.leaflet-driver-popup .leaflet-popup-content {
+    margin: 12px 14px;
+}
+
+.leaflet-driver-popup .leaflet-popup-tip {
+    background: #0f172a;
+}
+
+.driver-popup-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dpc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dpc-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #22c55e;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #22c55e;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.dpc-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dpc-name {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #fff;
+    display: block;
+}
+
+.dpc-sub {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+.dpc-status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.dpc-status.available { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+.dpc-status.busy { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+.dpc-actions {
+    margin-top: 2px;
+}
+
+.dpc-btn-call {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 6px;
+    background: #22c55e;
+    color: #000 !important;
+    font-weight: 800;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    text-decoration: none;
 }

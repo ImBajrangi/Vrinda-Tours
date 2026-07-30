@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
-import { Search, User } from 'lucide-react';
+import { Search, User, Car } from 'lucide-react';
 import { locations } from '../../data/locations';
 import './Header.css';
 
-export default function Header({ onSelectLocation }) {
+export default function Header({ onSelectLocation, onOpenDriverPortal }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const inputRef = useRef(null);
@@ -39,6 +39,15 @@ export default function Header({ onSelectLocation }) {
             onBlur={() => setTimeout(() => setResults([]), 200)}
           />
         </div>
+        <button 
+          className="icon-btn" 
+          id="driver-btn" 
+          onClick={onOpenDriverPortal}
+          title="Driver Companion Portal"
+          style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)' }}
+        >
+          <Car size={20} />
+        </button>
         <button className="icon-btn" id="user-btn">
           <User size={22} />
         </button>
@@ -60,3 +69,4 @@ export default function Header({ onSelectLocation }) {
     </header>
   );
 }
+

@@ -3,7 +3,7 @@ import * as LucideIcons from 'lucide-react';
 import { CATEGORIES } from '../../data/locations';
 import './CategoryPills.css';
 
-export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpen }) {
+export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpen, onDriverPortalOpen }) {
   const timerRef = useRef(null);
 
   const handleTouchStart = (key) => {
@@ -50,3 +50,4 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
     </div>
   );
 }
+

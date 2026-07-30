@@ -1,10 +1,9 @@
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet.markercluster';
 import './MapView.css';
 
 const MARKER_BASE = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/';
-const LOCAL_BASE = '../../Vrindopnishad Web/class/marker/';
 
 function getCategoryIcon(category) {
   switch (category) {
@@ -59,14 +58,29 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
   const mapInstanceRef = useRef(null);
   const clusterRef = useRef(null);
   const markersRef = useRef([]);
-  const driverMarkersRef = useRef({}); // { driverId: L.marker }
+  const driverMarkersRef = useRef({}); // { driverId: { marker, status, lat, lng } }
   const userMarkerRef = useRef(null);
   const activeMarkerRef = useRef(null);
+  const onSelectLocationRef = useRef(onSelectLocation);
+
+  useEffect(() => {
+    onSelectLocationRef.current = onSelectLocation;
+  }, [onSelectLocation]);
 
   const filteredLocations = useMemo(() => {
-    if (activeFilter === 'all' || activeFilter === '__drivers__') return locations;
-    return locations.filter((l) => l.category === activeFilter);
+    const raw = (activeFilter === 'all' || activeFilter === '__drivers__')
+      ? locations
+      : locations.filter((l) => l.category === activeFilter);
+
+    const uniqueMap = new Map();
+    raw.forEach((loc) => {
+      if (loc.name && !uniqueMap.has(loc.name)) {
+        uniqueMap.set(loc.name, loc);
+      }
+    });
+    return Array.from(uniqueMap.values());
   }, [locations, activeFilter]);
+
 
   // Initialize map once
   useEffect(() => {
@@ -96,19 +110,12 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       animate: true,
       disableClusteringAtZoom: 18,
       maxClusterRadius: 60,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        let sizeClass = 'small';
-        if (count >= 10) sizeClass = 'medium';
-        if (count >= 20) sizeClass = 'large';
-        return L.divIcon({
-          html: `<div><span>${count}</span></div>`,
-          className: `marker-cluster marker-cluster-${sizeClass}`,
-          iconSize: [40, 40],
-        });
-      },
+      animateAddingMarkers: true
     });
+
+
     map.addLayer(cluster);
+
 
     mapInstanceRef.current = map;
     clusterRef.current = cluster;
@@ -116,7 +123,7 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     return () => { map.remove(); mapInstanceRef.current = null; };
   }, []);
 
-  // Update markers when filter changes
+  // Update location markers ONLY when filteredLocations changes
   useEffect(() => {
     const cluster = clusterRef.current;
     if (!cluster) return;
@@ -125,23 +132,20 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     markersRef.current = [];
 
     filteredLocations.forEach((loc) => {
-      // Start with playing=true for the bounce-in effect
       const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false, true) });
       marker._locData = loc;
-      marker.on('click', () => onSelectLocation(loc));
+      marker.on('click', () => onSelectLocationRef.current?.(loc));
       cluster.addLayer(marker);
       markersRef.current.push(marker);
 
-      // Turn off animation state after initial entrance
       setTimeout(() => {
         marker.setIcon(createIcon(loc.category, false, false));
       }, 2500);
     });
-  }, [filteredLocations, onSelectLocation]);
+  }, [filteredLocations]);
 
-  // Highlight active marker
+  // Highlight active location marker
   useEffect(() => {
-    // Reset previous
     if (activeMarkerRef.current) {
       const prev = activeMarkerRef.current;
       prev.setIcon(createIcon(prev._locData.category, false));
@@ -150,12 +154,10 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     if (activeLocation) {
       const marker = markersRef.current.find((m) => m._locData.name === activeLocation.name);
       if (marker) {
-        // Highlight and trigger one-time animation
         marker.setIcon(createIcon(activeLocation.category, true, true));
         activeMarkerRef.current = marker;
         mapInstanceRef.current?.flyTo([activeLocation.lat, activeLocation.lng], 15, { duration: 0.8 });
 
-        // Remove playing class after animation ends
         setTimeout(() => {
           if (activeMarkerRef.current === marker) {
             marker.setIcon(createIcon(activeLocation.category, true, false));
@@ -167,7 +169,7 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     }
   }, [activeLocation]);
 
-  // Update user location marker
+  // Update user location marker using user-marker-crop.gif with remove-bg SVG filter
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !userPosition) return;
@@ -175,37 +177,39 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     if (userMarkerRef.current) map.removeLayer(userMarkerRef.current);
 
     const icon = L.divIcon({
-      className: 'user-marker-container',
+      className: 'user-marker-wrapper',
       html: `
-        <div class="user-pulse-ring"></div>
-        <div class="user-center-dot">
-          <div class="user-core"></div>
+        <div class="image-marker user-location-marker">
+          <img src="/user-marker-crop.gif" alt="Your Location" />
         </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 20]
+      iconSize: [44, 44],
+      iconAnchor: [22, 44]
     });
 
     const marker = L.marker([userPosition.lat, userPosition.lng], { 
       icon,
-      zIndexOffset: 1000 
+      zIndexOffset: 2000 
     }).addTo(map);
     
     userMarkerRef.current = marker;
   }, [userPosition]);
 
-  // Update live driver markers
+
+
+
+  // Update live driver markers safely without flickering
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    const currentMarkers = driverMarkersRef.current;
+    const currentMap = driverMarkersRef.current;
     
-    // Remove markers for drivers no longer in list or offline
-    Object.keys(currentMarkers).forEach((id) => {
+    // Remove markers for offline/removed drivers
+    Object.keys(currentMap).forEach((id) => {
       if (!drivers.find(d => d.id === id)) {
-        map.removeLayer(currentMarkers[id]);
-        delete currentMarkers[id];
+        map.removeLayer(currentMap[id].marker);
+        delete currentMap[id];
       }
     });
 
@@ -214,30 +218,69 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       const loc = d.location;
 
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
-        const icon = L.divIcon({
-          className: 'driver-marker-wrapper',
-          html: `<div class="driver-map-marker">
-                   <div class="car-icon ${status}">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-                   </div>
-                   <div class="status-pulse ${status}"></div>
-                   <div class="driver-name-tag">${d.name}</div>
-                 </div>`,
-          iconSize: [42, 42],
-          iconAnchor: [21, 21]
-        });
+        const vehicleEmoji = d.vehicleType === 'Taxi' ? '🚗' : (d.vehicleType === 'Bike' ? '🛵' : '🛺');
+        
+        const existing = currentMap[d.id];
 
-        if (currentMarkers[d.id]) {
-          currentMarkers[d.id].setLatLng([loc.lat, loc.lng]);
-          currentMarkers[d.id].setIcon(icon);
-        } else {
+        // Check if marker needs icon re-render
+        if (!existing || existing.status !== status || existing.vehicleType !== d.vehicleType || existing.name !== d.name) {
+          if (existing) map.removeLayer(existing.marker);
+
+          const icon = L.divIcon({
+            className: 'driver-marker-wrapper',
+            html: `<div class="driver-map-marker">
+                     <div class="car-icon ${status}">
+                       <span style="font-size:16px;">${vehicleEmoji}</span>
+                     </div>
+                     <div class="status-pulse ${status}"></div>
+                     <div class="driver-name-tag">${d.name}</div>
+                   </div>`,
+            iconSize: [42, 42],
+            iconAnchor: [21, 21],
+            popupAnchor: [0, -22]
+          });
+
+          const popupContent = `
+            <div class="driver-popup-card">
+              <div class="dpc-header">
+                <div class="dpc-avatar">
+                  ${d.photo ? `<img src="${d.photo}" alt="${d.name}" />` : d.name[0].toUpperCase()}
+                </div>
+                <div>
+                  <strong class="dpc-name">${d.name}</strong>
+                  <span class="dpc-sub">${d.vehicleType || 'E-Rickshaw'} • ${d.vehicleNo || 'UP-85'}</span>
+                </div>
+              </div>
+              <div class="dpc-status ${status}">${status === 'available' ? 'Available for Ride' : 'On a Ride'}</div>
+              <div class="dpc-actions">
+                <a href="tel:${d.phone}" class="dpc-btn-call">📞 Call Driver</a>
+              </div>
+            </div>
+          `;
+
           const marker = L.marker([loc.lat, loc.lng], { icon, zIndexOffset: 500 });
+          marker.bindPopup(popupContent, { className: 'leaflet-driver-popup', maxWidth: 240 });
           marker.addTo(map);
-          currentMarkers[d.id] = marker;
+
+          currentMap[d.id] = {
+            marker,
+            status,
+            lat: loc.lat,
+            lng: loc.lng,
+            name: d.name,
+            vehicleType: d.vehicleType
+          };
+        } else {
+          // Smoothly animate position update if coords changed
+          if (existing.lat !== loc.lat || existing.lng !== loc.lng) {
+            existing.marker.setLatLng([loc.lat, loc.lng]);
+            existing.lat = loc.lat;
+            existing.lng = loc.lng;
+          }
         }
-      } else if (currentMarkers[d.id]) {
-        map.removeLayer(currentMarkers[d.id]);
-        delete currentMarkers[d.id];
+      } else if (currentMap[d.id]) {
+        map.removeLayer(currentMap[d.id].marker);
+        delete currentMap[d.id];
       }
     });
   }, [drivers]);

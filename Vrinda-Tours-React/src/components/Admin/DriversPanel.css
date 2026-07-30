@@ -107,115 +107,123 @@
 .di-avatar {
     width: 48px;
     height: 48px;
-    background: #f1f5f9;
+    background: #1e293b;
+    color: #38bdf8;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    flex-shrink: 0;
 }
 
-.di-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.di-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
 
-.status-dot {
+.di-emoji-badge {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    border: 2px solid #fff;
+    bottom: -4px;
+    right: -4px;
+    font-size: 0.72rem;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 1px 3px;
 }
 
-.status-dot.available { background: #22c55e; }
-.status-dot.busy { background: #eab308; }
-.status-dot.offline { background: #94a3b8; }
-
-.di-info { flex: 1; }
-.di-info h4 { font-size: 0.9375rem; font-weight: 700; margin-bottom: 2px; }
-.di-info p { font-size: 0.75rem; color: #64748b; }
-
-.di-actions { display: flex; gap: 0.5rem; }
-
-.btn-call, .btn-delete {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    border: none;
+.di-sub-info {
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 2px;
 }
 
-.btn-call { background: #f0fdf4; color: #22c55e; }
-.btn-delete { background: #fef2f2; color: #ef4444; }
+.di-rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #f59e0b;
+    font-weight: 700;
+}
 
-/* Add Modal */
-.add-modal-overlay {
-    position: fixed;
+.di-status-wrapper {
+    margin-top: 4px;
+}
+
+.di-status-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.di-status-badge.available { background: #dcfce7; color: #15803d; }
+.di-status-badge.busy { background: #fef3c7; color: #b45309; }
+.di-status-badge.offline { background: #f1f5f9; color: #64748b; }
+
+/* Confirm Delete Modal */
+.confirm-delete-overlay {
+    position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 2002;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 3000;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 1.25rem;
 }
 
-.add-driver-card {
+.confirm-delete-card {
     background: #fff;
-    width: 100%;
-    max-width: 400px;
     border-radius: 20px;
     padding: 1.5rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-}
-
-.photo-upload-zone {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.photo-preview {
-    width: 80px;
-    height: 80px;
-    background: #f1f5f9;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.5rem;
-    overflow: hidden;
-}
-
-.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
-
-.form-group { margin-bottom: 1rem; }
-.form-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 0.5rem; text-transform: uppercase; }
-.form-group input { width: 100%; padding: 0.875rem; border: 1.5px solid #f1f5f9; border-radius: 12px; font-family: inherit; }
-
-.submit-driver-btn {
+    text-align: center;
     width: 100%;
-    padding: 1rem;
-    background: #22c55e;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
+    max-width: 320px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.confirm-delete-card h4 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+    color: #0f172a;
+}
+
+.confirm-delete-card p {
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+}
+
+.confirm-delete-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-cancel, .btn-confirm-del {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: 10px;
     font-weight: 700;
-    margin-top: 1rem;
+    font-size: 0.85rem;
+    border: none;
     cursor: pointer;
+}
+
+.btn-cancel {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.btn-confirm-del {
+    background: #ef4444;
+    color: #fff;
 }
 
 @media (min-width: 768px) {
@@ -230,3 +238,4 @@
     }
     .drivers-panel.visible { transform: translateY(0); }
 }
+
