@@ -1,0 +1,2956 @@
+{
+  "nodes": [
+    {
+      "id": "vrinda_tours_react_package",
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_name",
+      "label": "name",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L2",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_private",
+      "label": "private",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_version",
+      "label": "version",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L4",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_type",
+      "label": "type",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_scripts",
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_scripts_dev",
+      "label": "dev",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_scripts_build",
+      "label": "build",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_scripts_preview",
+      "label": "preview",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L9",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies",
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_firebase",
+      "label": "firebase",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L12",
+      "_origin": "ast"
+    },
+    {
+      "id": "firebase",
+      "label": "firebase",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L12",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_leaflet",
+      "label": "leaflet",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "leaflet",
+      "label": "leaflet",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_leaflet_markercluster",
+      "label": "leaflet.markercluster",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "leaflet_markercluster",
+      "label": "leaflet.markercluster",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_lucide_react",
+      "label": "lucide-react",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "lucide_react",
+      "label": "lucide-react",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_react",
+      "label": "react",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "react",
+      "label": "react",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_react_dom",
+      "label": "react-dom",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L17",
+      "_origin": "ast"
+    },
+    {
+      "id": "react_dom",
+      "label": "react-dom",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L17",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_dependencies_react_leaflet",
+      "label": "react-leaflet",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "react_leaflet",
+      "label": "react-leaflet",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_devdependencies",
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_devdependencies_types_leaflet",
+      "label": "@types/leaflet",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "types_leaflet",
+      "label": "@types/leaflet",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_devdependencies_vitejs_plugin_react",
+      "label": "@vitejs/plugin-react",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L22",
+      "_origin": "ast"
+    },
+    {
+      "id": "vitejs_plugin_react",
+      "label": "@vitejs/plugin-react",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L22",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_package_devdependencies_vite",
+      "label": "vite",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "vite",
+      "label": "vite",
+      "file_type": "concept",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L23",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_app",
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_app_app",
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L24",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_admin_adminpanel",
+      "label": "AdminPanel.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_admin_adminpanel_adminpanel",
+      "label": "AdminPanel()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_admin_driverspanel",
+      "label": "DriversPanel.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_admin_driverspanel_driverspanel",
+      "label": "DriversPanel()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "label": "HotelBooking.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_hotelbooking_hotelbooking",
+      "label": "HotelBooking()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "label": "RestaurantBooking.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking_restaurantbooking",
+      "label": "RestaurantBooking()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "label": "RideSheet.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "label": "RideSheet()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "label": "CategoryPills.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_categorypills_categorypills_categorypills",
+      "label": "CategoryPills()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "label": "DriverPortalModal.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_driver_driverportalmodal_driverportalmodal",
+      "label": "DriverPortalModal()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_header_header",
+      "label": "Header.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_header_header_header",
+      "label": "Header()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "label": "LocationCard.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "label": "LocationCard()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_map_mapview",
+      "label": "MapView.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_map_mapview_getcategoryicon",
+      "label": "getCategoryIcon()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_map_mapview_createicon",
+      "label": "createIcon()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L27",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_map_mapview_mapview",
+      "label": "MapView()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L56",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_ui_ridestatusbanner",
+      "label": "RideStatusBanner.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/UI/RideStatusBanner.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_ui_ridestatusbanner_ridestatusbanner",
+      "label": "RideStatusBanner()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/UI/RideStatusBanner.jsx",
+      "source_location": "L4",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_ui_toast",
+      "label": "Toast.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_components_ui_toast_toast",
+      "label": "Toast()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_config_firebase",
+      "label": "firebase.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_config_firebase_firebaseconfig",
+      "label": "firebaseConfig",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_config_firebase_app",
+      "label": "app",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_config_firebase_firestore",
+      "label": "firestore",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_data_locations",
+      "label": "locations.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/data/locations.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_data_locations_locations",
+      "label": "locations",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/data/locations.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_data_locations_categories",
+      "label": "CATEGORIES",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/data/locations.js",
+      "source_location": "L36",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "label": "useFirebaseDrivers.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebasedrivers_getcached",
+      "label": "getCached()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebasedrivers_usefirebasedrivers",
+      "label": "useFirebaseDrivers()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L12",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "label": "useFirebaseLocations.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebaselocations_getcached",
+      "label": "getCached()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usefirebaselocations_usefirebaselocations",
+      "label": "useFirebaseLocations()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usegeolocation",
+      "label": "useGeolocation.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useGeolocation.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_hooks_usegeolocation_usegeolocation",
+      "label": "useGeolocation()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/hooks/useGeolocation.js",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_main",
+      "label": "main.jsx",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_distance",
+      "label": "distance.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "label": "calculateDistance()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L2",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "label": "formatDistance()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "label": "calculateETA()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L19",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp",
+      "label": "whatsapp.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp_cleanphone",
+      "label": "cleanPhone()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "label": "openWhatsApp()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp_generatehotelmessage",
+      "label": "generateHotelMessage()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp_generaterestaurantmessage",
+      "label": "generateRestaurantMessage()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L17",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_src_utils_whatsapp_generateridemessage",
+      "label": "generateRideMessage()",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L24",
+      "_origin": "ast"
+    },
+    {
+      "id": "vrinda_tours_react_vite_config",
+      "label": "vite.config.js",
+      "file_type": "code",
+      "source_file": "Vrinda-Tours-React/vite.config.js",
+      "source_location": "L1",
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_private",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_version",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_type",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_scripts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_scripts",
+      "target": "vrinda_tours_react_package_scripts_dev",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_scripts",
+      "target": "vrinda_tours_react_package_scripts_build",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_scripts",
+      "target": "vrinda_tours_react_package_scripts_preview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_dependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_firebase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_firebase",
+      "target": "firebase",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_leaflet",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_leaflet",
+      "target": "leaflet",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_leaflet_markercluster",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_leaflet_markercluster",
+      "target": "leaflet_markercluster",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_lucide_react",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_lucide_react",
+      "target": "lucide_react",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_react",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_react",
+      "target": "react",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_react_dom",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_react_dom",
+      "target": "react_dom",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L17",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies",
+      "target": "vrinda_tours_react_package_dependencies_react_leaflet",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_dependencies_react_leaflet",
+      "target": "react_leaflet",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package",
+      "target": "vrinda_tours_react_package_devdependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies",
+      "target": "vrinda_tours_react_package_devdependencies_types_leaflet",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies_types_leaflet",
+      "target": "types_leaflet",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies",
+      "target": "vrinda_tours_react_package_devdependencies_vitejs_plugin_react",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies_vitejs_plugin_react",
+      "target": "vitejs_plugin_react",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L22",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies",
+      "target": "vrinda_tours_react_package_devdependencies_vite",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_package_devdependencies_vite",
+      "target": "vite",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/package.json",
+      "source_location": "L23",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_data_locations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_data_locations_locations",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usegeolocation",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usegeolocation_usegeolocation",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_map_mapview",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_header_header",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers_usefirebasedrivers",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations_usefirebaselocations",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_ui_ridestatusbanner",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_admin_driverspanel",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_admin_adminpanel",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_ui_toast",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_ui_ui",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_data_locations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_data_locations_locations",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_app_app",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "vrinda_tours_react_src_components_admin_adminpanel",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_adminpanel",
+      "target": "vrinda_tours_react_src_components_admin_adminpanel_adminpanel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/AdminPanel.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "vrinda_tours_react_src_components_admin_driverspanel",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_admin_driverspanel",
+      "target": "vrinda_tours_react_src_components_admin_driverspanel_driverspanel",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Admin/DriversPanel.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generatehotelmessage",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "vrinda_tours_react_src_components_bookingsheets_bookingsheets",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking",
+      "target": "vrinda_tours_react_src_components_bookingsheets_hotelbooking_hotelbooking",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generaterestaurantmessage",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "vrinda_tours_react_src_components_bookingsheets_bookingsheets",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking",
+      "target": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking_restaurantbooking",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_components_bookingsheets_bookingsheets",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet",
+      "target": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "vrinda_tours_react_src_data_locations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "vrinda_tours_react_src_data_locations_categories",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_categorypills_categorypills",
+      "target": "vrinda_tours_react_src_components_categorypills_categorypills_categorypills",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/CategoryPills/CategoryPills.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_utils_distance",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal",
+      "target": "vrinda_tours_react_src_components_driver_driverportalmodal_driverportalmodal",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "vrinda_tours_react_src_data_locations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "vrinda_tours_react_src_data_locations_locations",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "vrinda_tours_react_src_components_header_header",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_header_header",
+      "target": "vrinda_tours_react_src_components_header_header_header",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Header/Header.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "ref_leaflet",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "ref_leaflet_markercluster",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "vrinda_tours_react_src_components_map_mapview",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "vrinda_tours_react_src_components_map_mapview_getcategoryicon",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "vrinda_tours_react_src_components_map_mapview_createicon",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview",
+      "target": "vrinda_tours_react_src_components_map_mapview_mapview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview_createicon",
+      "target": "vrinda_tours_react_src_components_map_mapview_getcategoryicon",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_map_mapview_mapview",
+      "target": "vrinda_tours_react_src_components_map_mapview_createicon",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/Map/MapView.jsx",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_ridestatusbanner",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/RideStatusBanner.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_ridestatusbanner",
+      "target": "vrinda_tours_react_src_components_ui_ui",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/RideStatusBanner.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_ridestatusbanner",
+      "target": "vrinda_tours_react_src_components_ui_ridestatusbanner_ridestatusbanner",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/RideStatusBanner.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_toast",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_toast",
+      "target": "ref_lucide_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_toast",
+      "target": "vrinda_tours_react_src_components_ui_ui",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_ui_toast",
+      "target": "vrinda_tours_react_src_components_ui_toast_toast",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/components/UI/Toast.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "ref_firebase_app",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "ref_firebase_analytics",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "vrinda_tours_react_src_config_firebase_firebaseconfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "vrinda_tours_react_src_config_firebase_app",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_config_firebase",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/config/firebase.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_data_locations",
+      "target": "vrinda_tours_react_src_data_locations_locations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/data/locations.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_data_locations",
+      "target": "vrinda_tours_react_src_data_locations_categories",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/data/locations.js",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers_getcached",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers_usefirebasedrivers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebasedrivers_usefirebasedrivers",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers_getcached",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseDrivers.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "ref_firebase_firestore",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_config_firebase",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_config_firebase_firestore",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_data_locations",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_data_locations_locations",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations_getcached",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations_usefirebaselocations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usefirebaselocations_usefirebaselocations",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations_getcached",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useFirebaseLocations.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usegeolocation",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useGeolocation.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_hooks_usegeolocation",
+      "target": "vrinda_tours_react_src_hooks_usegeolocation_usegeolocation",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/hooks/useGeolocation.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_main",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_main",
+      "target": "ref_react_dom_client",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_main",
+      "target": "vrinda_tours_react_src_app",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_main",
+      "target": "vrinda_tours_react_src_app",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_distance",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_distance",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_distance",
+      "target": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/distance.js",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_cleanphone",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generatehotelmessage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generaterestaurantmessage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generateridemessage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "target": "vrinda_tours_react_src_utils_whatsapp_cleanphone",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/utils/whatsapp.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_vite_config",
+      "target": "ref_vite",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/vite.config.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_vite_config",
+      "target": "ref_vitejs_plugin_react",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/vite.config.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_map_mapview_mapview",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_header_header_header",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_categorypills_categorypills_categorypills",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_hotelbooking_hotelbooking",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking_restaurantbooking",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_ui_ridestatusbanner_ridestatusbanner",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_admin_driverspanel_driverspanel",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_admin_adminpanel_adminpanel",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_driver_driverportalmodal_driverportalmodal",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app",
+      "target": "vrinda_tours_react_src_components_ui_toast_toast",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_main",
+      "target": "vrinda_tours_react_src_app_app",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "Vrinda-Tours-React/src/main.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app_app",
+      "target": "vrinda_tours_react_src_hooks_usegeolocation_usegeolocation",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebasedrivers_usefirebasedrivers",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_app_app",
+      "target": "vrinda_tours_react_src_hooks_usefirebaselocations_usefirebaselocations",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/App.jsx",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking_hotelbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generatehotelmessage",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_hotelbooking_hotelbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/HotelBooking.jsx",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking_restaurantbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_generaterestaurantmessage",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_restaurantbooking_restaurantbooking",
+      "target": "vrinda_tours_react_src_utils_whatsapp_openwhatsapp",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RestaurantBooking.jsx",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_bookingsheets_ridesheet_ridesheet",
+      "target": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/BookingSheets/RideSheet.jsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_driver_driverportalmodal_driverportalmodal",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/Driver/DriverPortalModal.jsx",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_calculatedistance",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_formatdistance",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "vrinda_tours_react_src_components_locationcard_locationcard_locationcard",
+      "target": "vrinda_tours_react_src_utils_distance_calculateeta",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "Vrinda-Tours-React/src/components/LocationCard/LocationCard.jsx",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
