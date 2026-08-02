@@ -293,28 +293,60 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
   return (
     <>
       <div className="dp-modal-overlay" onClick={onClose} />
+
       <div className="dp-modal-container">
         <div className="dp-modal-header">
           <div className="dp-brand">
-            <Car className="dp-brand-icon" size={22} />
+            <div className="dp-brand-logo-wrapper">
+              <img src="/official-logo.svg" alt="Vrindopnishad" className="dp-brand-img" />
+            </div>
             <div>
-              <h2>Vrinda Tours Driver Companion</h2>
-              <span className="dp-brand-sub">Pilgrim Fleet Partner Portal</span>
+              <h2>Vrindopnishad Partner Companion</h2>
+              <span className="dp-brand-sub">Pilgrim Fleet Driver Portal</span>
             </div>
           </div>
           <button className="dp-close-btn" onClick={onClose}><X size={18} /></button>
         </div>
 
         {!driverId ? (
-          /* LOGIN SCREEN */
+          /* LOGIN SCREEN WITH QUICK DEMO SELECTOR */
           <div className="dp-login-body">
             <div className="dp-login-hero">
               <div className="dp-hero-badge">
-                <Shield size={16} /> Verified Partner Network
+                <Shield size={14} /> Verified Fleet Network
               </div>
               <h3>Driver Sign In</h3>
-              <p>Enter your registered mobile number to access your driver dashboard, go online, and receive pilgrim rides.</p>
+              <p>Sign in with your registered mobile number or select your driver profile below to start receiving pilgrim rides.</p>
             </div>
+
+            {/* Quick Demo Driver Selector Cards */}
+            {drivers.length > 0 && (
+              <div className="dp-quick-selector">
+                <span className="dp-qs-title">QUICK DEMO DRIVER LOGIN</span>
+                <div className="dp-qs-grid">
+                  {drivers.map((d) => (
+                    <div 
+                      key={d.id} 
+                      className="dp-qs-card"
+                      onClick={() => {
+                        sessionStorage.setItem('vt_driver_id', d.id);
+                        setDriverId(d.id);
+                        setDriverData(d);
+                      }}
+                    >
+                      <div className="dp-qs-avatar">
+                        {d.photo ? <img src={d.photo} alt={d.name} /> : (d.name || 'D')[0].toUpperCase()}
+                      </div>
+                      <div className="dp-qs-info">
+                        <strong>{d.name}</strong>
+                        <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
+                      </div>
+                      <button className="dp-qs-btn">Select</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleLoginSubmit} className="dp-login-form">
               <div className="dp-form-group">
@@ -342,11 +374,12 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
               </button>
 
               <div className="dp-login-hint">
-                <span>Not registered as a driver yet?</span> Ask the fleet manager or admin to add your phone and vehicle.
+                <span>Not registered as a driver yet?</span> Ask the fleet manager in Admin Panel to add your vehicle.
               </div>
             </form>
           </div>
         ) : (
+
           /* DRIVER DASHBOARD */
           <div className="dp-dash-body">
             {/* Driver Profile Bar */}

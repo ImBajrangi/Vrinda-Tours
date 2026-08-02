@@ -1,6 +1,6 @@
 .header {
     position: absolute;
-    top: 0;
+    top: 34px;
     left: 0;
     right: 0;
     z-index: 1000;

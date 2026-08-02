@@ -21,6 +21,8 @@ import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteFiel
 import { firestore } from './config/firebase';
 import { locations as initialData } from './data/locations';
 
+import AnnouncementBanner from './components/UI/AnnouncementBanner';
+
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [activeLocation, setActiveLocation] = useState(null);
@@ -159,6 +161,8 @@ export default function App() {
 
   return (
     <>
+      <AnnouncementBanner />
+
       <MapView
         locations={locations}
         drivers={drivers}

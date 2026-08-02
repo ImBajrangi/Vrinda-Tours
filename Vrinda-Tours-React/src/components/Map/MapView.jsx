@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet.markercluster';
 import './MapView.css';
 
-const MARKER_BASE = 'https://imbajrangi.github.io/Company/Vrindopnishad%20Web/class/marker/';
+const MARKER_BASE = '/marker/';
 
 function getCategoryIcon(category) {
   switch (category) {
