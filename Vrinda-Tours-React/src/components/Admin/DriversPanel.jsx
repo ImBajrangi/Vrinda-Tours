@@ -10,7 +10,7 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
   const [deletingId, setDeletingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+  const { isDragging, isClosing, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
 
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return drivers;
@@ -46,9 +46,9 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
 
   return (
     <>
-      <div className="drivers-overlay visible" onClick={triggerClose} />
+      <div className={`drivers-overlay visible ${isClosing ? 'closing' : ''}`} onClick={triggerClose} />
       <div 
-        className={`drivers-panel visible ${isDragging ? 'dragging' : ''}`}
+        className={`drivers-panel visible ${isDragging ? 'dragging' : ''} ${isClosing ? 'closing' : ''}`}
         style={sheetStyle}
       >
         <div className="drivers-panel-handle-wrapper" {...handleProps} title="Drag down to close">
@@ -56,20 +56,22 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
         </div>
 
         <div className="drivers-panel-header">
-          <div className="dp-title">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Shield size={20} color="#18181b" />
-              <h3 style={{ margin: 0 }}>Fleet Partners</h3>
+          <div className="dp-header-left">
+            <div className="dp-header-icon-box">
+              <Shield size={18} color="#09090b" />
             </div>
-            <span className="dp-count">{drivers.length} verified drivers</span>
+            <div className="dp-header-text">
+              <h3>Local Drivers</h3>
+              <span className="dp-count">{drivers.length} Verified Drivers</span>
+            </div>
           </div>
           <div className="dp-actions">
             {!isAdmin && (
               <button className="btn-admin-login" onClick={onOpenAdmin} title="Admin Login">
-                <LogIn size={15} /> Admin
+                <LogIn size={14} /> Admin
               </button>
             )}
-            <button className="drivers-panel-close" onClick={triggerClose} title="Close"><X size={18} /></button>
+            <button className="drivers-panel-close" onClick={triggerClose} title="Close"><X size={17} /></button>
           </div>
         </div>
 
@@ -102,24 +104,30 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
               </div>
             ) : (
               filtered.map((d) => {
-                const initials = d.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                 const emoji = getVehicleEmoji(d.vehicleType);
                 const status = d.status || 'offline';
                 return (
                   <div key={d.id} className="driver-item">
                     <div className="di-avatar">
-                      {d.photo ? <img src={d.photo} alt={d.name} /> : initials}
+                      <img 
+                        src={d.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.name}&backgroundColor=f1f5f9`} 
+                        alt={d.name} 
+                      />
                       <span className="di-emoji-badge">{emoji}</span>
                     </div>
                     <div className="di-info">
-                      <h4>{d.name}</h4>
-                      <div className="di-sub-info">
-                        <span>{d.vehicleType || 'E-Rickshaw'} • {d.phone}</span>
+                      <div className="di-name-row">
+                        <div className="di-name-left">
+                          <h4>{d.name}</h4>
+                        </div>
                         <span className="di-rating"><Star size={11} fill="#f59e0b" color="#f59e0b" /> {d.rating || '4.9'}</span>
                       </div>
-                      <div className="di-status-wrapper">
-                        <span className={`di-status-badge ${status}`}>
-                          {status === 'available' ? 'Available now' : (status === 'busy' ? 'On a ride' : 'Offline')}
+                      <div className="di-sub-info">
+                        <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
+                        <span className="di-sub-dot">•</span>
+                        <span className={`di-status-dot-label ${status}`}>
+                          <span className={`di-dot-indicator ${status}`} />
+                          {status === 'available' ? 'Available' : (status === 'busy' ? 'Busy' : 'Offline')}
                         </span>
                       </div>
                     </div>

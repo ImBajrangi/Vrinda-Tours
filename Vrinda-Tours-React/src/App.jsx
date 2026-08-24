@@ -14,7 +14,8 @@ import RideSheet from './components/BookingSheets/RideSheet';
 import RideStatusBanner from './components/UI/RideStatusBanner';
 import DriversPanel from './components/Admin/DriversPanel';
 import AdminPanel from './components/Admin/AdminPanel';
-import DriverPortalModal from './components/Driver/DriverPortalModal';
+import PartnerHubModal from './components/PartnerHub/PartnerHubModal';
+import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
 import Toast from './components/UI/Toast';
 import './components/UI/UI.css';
 import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteField } from 'firebase/firestore';
@@ -33,6 +34,8 @@ export default function App() {
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
   const [driverPortalVisible, setDriverPortalVisible] = useState(false);
+  const [partnerLandingVisible, setPartnerLandingVisible] = useState(true);
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const [toast, setToast] = useState(null);
 
   const { position, loading, requestLocation } = useGeolocation();
@@ -115,7 +118,7 @@ export default function App() {
       try {
         await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
         setActiveRide(null);
-        setToast({ message: 'Ride cancelled', type: 'success' });
+        setToast({ message: 'Ride Cancelled', type: 'error' });
       } catch (err) {
         console.error('Cancel ride error:', err);
       }
@@ -172,22 +175,22 @@ export default function App() {
         onSelectLocation={handleSelectLocation}
       />
 
-      <Header 
-        onSelectLocation={handleSelectLocation} 
+      <Header
+        onSelectLocation={handleSelectLocation}
         onOpenDriverPortal={() => setDriverPortalVisible(true)}
         onOpenDrivers={() => setDriversVisible(true)}
-        activeFilter={activeFilter} 
-        onFilterChange={handleFilterChange} 
+        activeFilter={activeFilter}
+        onFilterChange={handleFilterChange}
         onAdminOpen={() => setAdminVisible(true)}
+        onSearchFocusChange={setIsSearchActive}
       />
 
       <LocationCard
-        location={!activeRide && !rideRequest ? activeLocation : null}
+        location={!isSearchActive && !activeRide && !rideRequest ? activeLocation : null}
         userPosition={position}
+        drivers={drivers}
+        onRequestRide={handleRequestRide}
         onClose={() => setActiveLocation(null)}
-        onBookHotel={handleBookHotel}
-        onBookRestaurant={handleBookRestaurant}
-        onBookRide={handleBookRide}
         onDirections={handleDirections}
       />
 
@@ -200,27 +203,27 @@ export default function App() {
       )}
 
       {rideRequest && (
-        <RideSheet 
-          destination={rideRequest.destination} 
-          drivers={drivers} 
+        <RideSheet
+          destination={rideRequest.destination}
+          drivers={drivers}
           userPosition={position}
           onSelectDriver={handleRequestRide}
-          onClose={() => setRideRequest(null)} 
+          onClose={() => setRideRequest(null)}
         />
       )}
 
       {activeRide && (
-        <RideStatusBanner 
-          status={activeRide.status} 
-          driver={activeRide.driver} 
-          onCancel={handleCancelRide} 
+        <RideStatusBanner
+          status={activeRide.status}
+          driver={activeRide.driver}
+          onCancel={handleCancelRide}
         />
       )}
 
       {driversVisible && (
-        <DriversPanel 
-          drivers={drivers} 
-          onClose={() => setDriversVisible(false)} 
+        <DriversPanel
+          drivers={drivers}
+          onClose={() => setDriversVisible(false)}
           onOpenAdmin={() => setAdminVisible(true)}
           onOpenDriverPortal={() => {
             setDriversVisible(false);
@@ -230,17 +233,31 @@ export default function App() {
       )}
 
       {adminVisible && (
-        <AdminPanel 
-          drivers={drivers} 
+        <AdminPanel
+          drivers={drivers}
           userPosition={position}
-          onClose={() => setAdminVisible(false)} 
+          onClose={() => setAdminVisible(false)}
         />
       )}
 
       {driverPortalVisible && (
-        <DriverPortalModal 
+        <PartnerHubModal
           drivers={drivers}
-          onClose={() => setDriverPortalVisible(false)} 
+          onClose={() => setDriverPortalVisible(false)}
+          onOpenLanding={() => {
+            setDriverPortalVisible(false);
+            setPartnerLandingVisible(true);
+          }}
+        />
+      )}
+
+      {partnerLandingVisible && (
+        <PartnerLandingPage
+          onClose={() => setPartnerLandingVisible(false)}
+          onOpenPartnerHub={(role) => {
+            setPartnerLandingVisible(false);
+            setDriverPortalVisible(true);
+          }}
         />
       )}
 
@@ -252,9 +269,9 @@ export default function App() {
           <button className="zoom-btn zoom-out" onClick={() => window.__vtMap?.zoomOut()} title="Zoom Out">−</button>
         </div>
 
-        <button 
-          className={`fab ${loading ? 'loading' : ''}`} 
-          onClick={handleLocate} 
+        <button
+          className={`fab ${loading ? 'loading' : ''}`}
+          onClick={handleLocate}
           title="Center GPS on my location"
         >
           <Navigation size={18} fill="currentColor" />

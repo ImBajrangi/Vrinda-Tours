@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Search, User, Car, X, ArrowLeft, Landmark, Sparkles, BedDouble, 
-  UtensilsCrossed, Home, Info, ArrowUpRight, TrendingUp 
+  UtensilsCrossed, Home, Info, ArrowUpRight, TrendingUp, Briefcase 
 } from 'lucide-react';
 import { locations } from '../../data/locations';
 import CategoryPills from '../CategoryPills/CategoryPills';
@@ -13,13 +13,20 @@ export default function Header({
   onOpenDrivers,
   activeFilter,
   onFilterChange,
-  onAdminOpen
+  onAdminOpen,
+  onSearchFocusChange
 }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (onSearchFocusChange) {
+      onSearchFocusChange(isFocused);
+    }
+  }, [isFocused, onSearchFocusChange]);
 
   // Filtered search results or popular recommendations
   const searchResults = useMemo(() => {
@@ -112,14 +119,23 @@ export default function Header({
   const isDropdownOpen = isFocused;
 
   return (
-    <header className={`header-card ${isDropdownOpen ? 'search-active' : ''}`}>
-      <div className="header-top-row">
-        {/* Brand Logo - Visible in resting mode */}
-        {!isFocused && (
-          <div className="header-brand-logo" title="Vrindopnishad">
-            <img src="/official-logo.svg" alt="Vrindopnishad Logo" className="site-brand-logo" />
-          </div>
-        )}
+    <>
+      {isFocused && (
+        <div 
+          className="search-backdrop-scrim" 
+          onClick={handleCancel} 
+          aria-hidden="true" 
+        />
+      )}
+
+      <header className={`header-card ${isDropdownOpen ? 'search-active' : ''}`}>
+        <div className="header-top-row">
+          {/* Brand Logo - Visible in resting mode */}
+          {!isFocused && (
+            <div className="header-brand-logo" title="Vrindopnishad">
+              <img src="/official-logo.svg" alt="Vrindopnishad Logo" className="site-brand-logo" />
+            </div>
+          )}
 
         {/* Search Input Bar */}
         <div 
@@ -181,29 +197,28 @@ export default function Header({
           ) : null}
         </div>
 
-        {/* Quick Action Buttons - Visible in resting mode */}
         {!isFocused && (
           <>
             <button 
               className="icon-btn header-action-btn" 
-              id="driver-btn" 
-              onClick={onOpenDriverPortal}
-              title="Driver Companion Portal"
-              aria-label="Driver Portal"
+              id="rides-btn" 
+              onClick={onOpenDrivers}
+              title="Find Local Drivers & Rides"
+              aria-label="Find Rides"
             >
               <Car size={16} />
-              <span className="btn-text">Driver</span>
+              <span className="btn-text">Rides</span>
             </button>
 
             <button 
               className="icon-btn header-action-btn" 
-              id="user-btn"
-              onClick={onOpenDrivers}
-              title="Fleet Partners & Admin"
-              aria-label="Fleet Partners"
+              id="partner-btn" 
+              onClick={onOpenDriverPortal}
+              title="Brij Staff & Partner Hub (Drivers, Dining, Stays, Admin)"
+              aria-label="Partner Hub"
             >
-              <User size={16} />
-              <span className="btn-text">Fleet</span>
+              <Briefcase size={15} />
+              <span className="btn-text">Partner</span>
             </button>
           </>
         )}
@@ -293,5 +308,6 @@ export default function Header({
         </div>
       )}
     </header>
+  </>
   );
 }

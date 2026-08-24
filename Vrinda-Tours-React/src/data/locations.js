@@ -11,8 +11,8 @@ export const locations = [
   // --- Towns ---
   { name: "Barsana", lat: 27.646118, lng: 77.377712, image: "https://images.unsplash.com/photo-1548013146-72479768bbaa?w=400", description: "The birthplace of Radha Rani, known for the famous Lathmar Holi festival celebrated with great fervor.", category: "Town", points: 15 },
   { name: "Uchagram", lat: 27.66334, lng: 77.364839, image: "https://images.unsplash.com/photo-1596422846543-75c6fc188f67?w=400", description: "The village of Lalita Sakhi, Radha's closest and most beloved companion.", category: "Town", points: 15 },
-  { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1590050752117-23ed9568779b?w=400", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
-  { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1590766940511-78210419665d?w=400", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
+  { name: "Rankoli", lat: 27.624933, lng: 77.334663, image: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&auto=format&fit=crop&q=80", description: "A village with scenic hills and ancient temples steeped in history.", category: "Town", points: 15 },
+  { name: "Pisawa", lat: 27.672451, lng: 77.441938, image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?w=600&auto=format&fit=crop&q=80", description: "Home to the legendary Ashwathama, who is said to still roam these lands.", category: "Town", points: 20 },
 
   // --- Dining ---
   { name: "Brijwasin Dining", lat: 27.6485, lng: 77.3750, image: "https://images.unsplash.com/photo-1517248135467-4c7ed9d8c47c?w=400", description: "Traditional Vedic dining experience offering pure vegetarian delicacies from the heart of Brij.", category: "Dining", points: 10, phone: "+919876543230", rating: 4.3, priceRange: "₹80 - ₹250", cuisine: "Vedic" },

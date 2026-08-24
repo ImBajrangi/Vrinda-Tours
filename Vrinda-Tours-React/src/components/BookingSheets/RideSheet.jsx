@@ -105,7 +105,10 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
                     >
                       {/* Left: Avatar */}
                       <div className="rd-avatar-mini">
-                        {d.photo ? <img src={d.photo} alt={d.name} /> : initials}
+                        <img 
+                          src={d.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.name}&backgroundColor=f1f5f9`} 
+                          alt={d.name} 
+                        />
                         <span className="rd-vehicle-badge-mini">{emoji}</span>
                       </div>
 
@@ -113,6 +116,7 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
                       <div className="rd-row-details">
                         <div className="rd-row-name-line">
                           <span className="rd-row-name">{d.name}</span>
+                          <span className="rd-verified-badge">✓ Verified</span>
                         </div>
                         <div className="rd-row-subtext">
                           <span>{d.vehicleType || 'E-Rickshaw'}</span>

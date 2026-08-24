@@ -2,19 +2,19 @@
    Modern Minimalist UI Components (Collision-Free Architecture & Glass Tokens)
    ========================================================================== */
 
-/* Toast Notification (Floating Pill below Unified Header Card) */
+/* Toast Notification (Grounded & Dynamic Island-Grade Clearance) */
 .toast {
   position: fixed;
-  top: calc(120px + env(safe-area-inset-top, 0px));
+  top: calc(146px + env(safe-area-inset-top, 0px));
   left: 50%;
-  transform: translateX(-50%) translateY(-14px) scale(0.96);
+  transform: translateX(-50%) translateY(-10px) scale(0.96);
   z-index: 9999;
-  background: rgba(18, 18, 20, 0.94);
+  background: rgba(9, 9, 11, 0.94);
   color: #ffffff;
-  padding: 0.45rem 1rem 0.45rem 0.55rem;
+  padding: 0.5rem 1.1rem 0.5rem 0.65rem;
   border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22), 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   max-width: 90vw;
   width: max-content;
   display: flex;
@@ -22,11 +22,11 @@
   gap: 0.6rem;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   user-select: none;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
 .toast.visible {
@@ -36,7 +36,7 @@
 }
 
 .toast:hover {
-  background: #18191c;
+  background: #18181b;
 }
 
 .toast:active {
@@ -51,13 +51,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.15);
   color: #ffffff;
 }
 
 .toast.error .toast-icon-badge {
-  background: rgba(239, 68, 68, 0.25);
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
 }
 
 .toast.success .toast-icon-badge {
@@ -67,7 +67,7 @@
 
 .toast-message {
   color: #ffffff;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -93,7 +93,7 @@
   will-change: bottom, opacity, transform;
 }
 
-.map-controls-cluster > * {
+.map-controls-cluster>* {
   pointer-events: auto;
 }
 
@@ -120,6 +120,8 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   user-select: none;
+  isolation: isolate;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 .zoom-btn {
@@ -135,8 +137,23 @@
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1;
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
+  user-select: none;
+}
+
+.zoom-btn.zoom-in {
+  border-top-left-radius: 999px;
+  border-top-right-radius: 999px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.zoom-btn.zoom-out {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 999px;
+  border-bottom-right-radius: 999px;
 }
 
 .zoom-btn:hover {
@@ -146,7 +163,6 @@
 
 .zoom-btn:active {
   background: #e4e4e7;
-  transform: scale(0.92);
 }
 
 .zoom-divider {
@@ -154,6 +170,7 @@
   width: 24px;
   margin: 0 auto;
   background: rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
 }
 
 /* Floating Action Button (Center GPS Target) */
@@ -168,21 +185,20 @@
   color: #09090b;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  user-select: none;
 }
 
 .fab:hover {
-  background: #09090b;
-  color: #ffffff;
-  border-color: #09090b;
-  transform: scale(1.06);
+  background: #f4f4f5;
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .fab:active {
-  transform: scale(0.94);
+  background: #e4e4e7;
 }
 
 .fab.loading {
@@ -190,8 +206,13 @@
 }
 
 @keyframes fabSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (min-width: 768px) {
@@ -234,6 +255,7 @@
 }
 
 @media (min-width: 768px) {
+
   .ride-status-banner,
   .ride-status-card {
     bottom: 2rem;
@@ -256,6 +278,7 @@
     opacity: 0;
     transform: translateY(36px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -267,6 +290,7 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   to {
     opacity: 0;
     transform: translateY(30px) scale(0.96);
@@ -296,8 +320,15 @@
 }
 
 @keyframes rscPulse {
-  from { transform: scale(0.92); opacity: 0.8; }
-  to { transform: scale(1.08); opacity: 1; }
+  from {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+
+  to {
+    transform: scale(1.08);
+    opacity: 1;
+  }
 }
 
 .rsc-text {
@@ -374,6 +405,7 @@
   .zoom-controls {
     right: 2rem;
   }
+
   .fab {
     right: 2rem;
   }

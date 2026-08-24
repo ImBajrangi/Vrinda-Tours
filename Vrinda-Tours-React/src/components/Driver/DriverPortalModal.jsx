@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   X, Phone, Navigation, Power, Shield, MapPin, 
-  LogOut, ChevronRight, Zap, CheckCircle2, Clock, Search
+  LogOut, ChevronRight, Zap, CheckCircle2, Clock, Search, Star
 } from 'lucide-react';
 import { collection, getDocs, doc, updateDoc, deleteField, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
@@ -17,7 +17,7 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [driverSearch, setDriverSearch] = useState('');
 
-  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+  const { isDragging, isClosing, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
 
   const [isOnline, setIsOnline] = useState(false);
   const [currentRide, setCurrentRide] = useState(null);
@@ -312,10 +312,10 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
 
   return (
     <>
-      <div className="dp-modal-overlay" onClick={triggerClose} />
+      <div className={`dp-modal-overlay ${isClosing ? 'closing' : ''}`} onClick={triggerClose} />
 
       <div 
-        className={`dp-modal-container ${isDragging ? 'dragging' : ''}`}
+        className={`dp-modal-container ${isDragging ? 'dragging' : ''} ${isClosing ? 'closing' : ''}`}
         style={sheetStyle}
       >
         <div className="dp-modal-handle-wrapper" {...handleProps} title="Drag down to dismiss">
@@ -329,7 +329,7 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
             </div>
             <div>
               <h2>Driver Companion</h2>
-              <span className="dp-brand-sub">Pilgrim Fleet</span>
+              <span className="dp-brand-sub">Driver Partner</span>
             </div>
           </div>
           <button className="dp-close-btn" onClick={triggerClose} title="Close"><X size={18} /></button>
@@ -370,25 +370,35 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
                   {filteredDrivers.length === 0 ? (
                     <div className="dp-no-drivers">No driver found matching "{driverSearch}"</div>
                   ) : (
-                    filteredDrivers.map((d) => (
-                      <div 
-                        key={d.id} 
-                        className="dp-driver-card-compact"
-                        onClick={() => handleSelectDriverDirect(d)}
-                        title={`Sign in as ${d.name}`}
-                      >
-                        <div className="dp-driver-avatar">
-                          {d.photo ? <img src={d.photo} alt={d.name} /> : (d.name || 'D')[0].toUpperCase()}
+                    filteredDrivers.map((d) => {
+                      const emoji = (d.vehicleType || '').toLowerCase().includes('taxi') ? '🚗' : (d.vehicleType || '').toLowerCase().includes('bike') ? '🛵' : '🛺';
+                      return (
+                        <div 
+                          key={d.id} 
+                          className="dp-driver-card-compact"
+                          onClick={() => handleSelectDriverDirect(d)}
+                          title={`Sign in as ${d.name}`}
+                        >
+                          <div className="dp-driver-avatar">
+                            <img 
+                              src={d.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.name}&backgroundColor=f1f5f9`} 
+                              alt={d.name} 
+                            />
+                            <span className="dp-driver-vehicle-badge">{emoji}</span>
+                          </div>
+                          <div className="dp-driver-meta">
+                            <div className="dp-driver-name-line">
+                              <strong className="dp-driver-title">{d.name}</strong>
+                              <span className="dp-driver-verified-pill">✓ Verified</span>
+                            </div>
+                            <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
+                          </div>
+                          <div className="dp-driver-arrow">
+                            <ChevronRight size={18} />
+                          </div>
                         </div>
-                        <div className="dp-driver-meta">
-                          <strong>{d.name}</strong>
-                          <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
-                        </div>
-                        <div className="dp-driver-arrow">
-                          <ChevronRight size={16} />
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -429,19 +439,19 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
             {/* Driver Profile Bar */}
             <div className="dp-profile-card">
               <div className="dp-avatar">
-                {driverData?.photo ? (
-                  <img src={driverData.photo} alt={driverData.name} />
-                ) : (
-                  (driverData?.name || 'D')[0].toUpperCase()
-                )}
+                <img 
+                  src={driverData?.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${driverData?.name}&backgroundColor=f1f5f9`} 
+                  alt={driverData?.name || 'Driver'} 
+                />
                 <span className={`dp-status-dot ${isOnline ? (currentRide ? 'busy' : 'online') : 'offline'}`} />
               </div>
               <div className="dp-profile-info">
-                <h4>{driverData?.name || 'Driver'}</h4>
-                <div className="dp-profile-tags">
-                  <span className="dp-tag-vehicle">🛺 {vehicleType}</span>
-                  <span className="dp-tag-vehicle">{vehicleNo}</span>
+                <div className="dp-profile-name-row">
+                  <h4>{driverData?.name || 'Driver'}</h4>
                   <span className="dp-tag-rating">★ {rating}</span>
+                </div>
+                <div className="dp-profile-sub">
+                  <span>🛺 {vehicleType || 'E-Rickshaw'} • {vehicleNo || 'UP-85 VT 2026'}</span>
                 </div>
               </div>
               <button className="dp-logout-btn" onClick={handleLogout} title="Sign Out">
@@ -453,32 +463,40 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
             <div className={`dp-status-box ${isOnline ? (currentRide ? 'busy' : 'online') : 'offline'}`}>
               <div className="dp-status-hero">
                 <div className="dp-status-beacon">
-                  {isOnline ? <Zap size={28} /> : <Power size={28} />}
+                  {isOnline ? <Zap size={22} /> : <Power size={22} />}
                 </div>
-                <h3>{isOnline ? (currentRide ? 'ON TRIP' : 'ONLINE') : 'OFFLINE'}</h3>
+                <div className="dp-status-text">
+                  <h3>{isOnline ? (currentRide ? 'ON TRIP' : 'ONLINE') : 'OFFLINE'}</h3>
+                  <span className="dp-status-sub">
+                    {isOnline ? 'Available for rides' : 'Ready to accept trips'}
+                  </span>
+                </div>
               </div>
 
               <button 
                 className={`dp-power-toggle ${isOnline ? 'active' : ''}`} 
                 onClick={toggleOnline}
               >
-                {isOnline ? 'GO OFFLINE' : 'GO ONLINE'}
+                {isOnline ? 'Go Offline' : 'Go Online'}
               </button>
             </div>
 
             {/* 3 Metrics */}
             <div className="dp-stats-grid">
               <div className="dp-stat-card">
-                <div className="dp-stat-val">{ridesCompletedToday}</div>
-                <div className="dp-stat-lbl">Rides</div>
+                <span className="dp-stat-val">{ridesCompletedToday}</span>
+                <span className="dp-stat-lbl">Rides</span>
               </div>
               <div className="dp-stat-card">
-                <div className="dp-stat-val">{onlineHoursText}</div>
-                <div className="dp-stat-lbl">Online</div>
+                <span className="dp-stat-val">{onlineHoursText}</span>
+                <span className="dp-stat-lbl">Online</span>
               </div>
               <div className="dp-stat-card">
-                <div className="dp-stat-val">★ {rating}</div>
-                <div className="dp-stat-lbl">Rating</div>
+                <div className="dp-stat-val dp-stat-rating">
+                  <Star size={14} fill="#f59e0b" color="#f59e0b" />
+                  <span>{rating}</span>
+                </div>
+                <span className="dp-stat-lbl">Rating</span>
               </div>
             </div>
 

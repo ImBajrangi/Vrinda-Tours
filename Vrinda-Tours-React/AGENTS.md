@@ -26,6 +26,7 @@
 
 ## Work Like
 be creative and expert professional designer please
-## Always do
 
+## Always do
+Do not use unusual hover translateY like animations please
 you are expert UI UX designer and frontend developer

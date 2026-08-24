@@ -34,12 +34,11 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
     const delta = Math.max(0, currentYRef.current - startYRef.current);
     if (delta > threshold) {
       setIsClosing(true);
-      setDragY(450);
       setTimeout(() => {
-        setDragY(0);
         setIsClosing(false);
+        setDragY(0);
         onClose?.();
-      }, 220);
+      }, 280);
     } else {
       setDragY(0);
     }
@@ -82,17 +81,18 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
   }, [startDrag, moveDrag, endDrag]);
 
   const triggerClose = useCallback(() => {
+    if (isClosing) return;
     setIsClosing(true);
     setTimeout(() => {
       setIsClosing(false);
       onClose?.();
-    }, 220);
-  }, [onClose]);
+    }, 280);
+  }, [isClosing, onClose]);
 
   const sheetStyle = {
-    '--drag-y': dragY > 0 ? `${dragY}px` : (isClosing ? '450px' : '0px'),
-    transition: isDragging ? 'none' : (isClosing ? 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s' : undefined),
-    opacity: dragY > 0 ? Math.max(0.15, 1 - dragY / 320) : (isClosing ? 0 : undefined),
+    '--drag-y': dragY > 0 ? `${dragY}px` : '0px',
+    transition: isDragging ? 'none' : undefined,
+    opacity: dragY > 0 ? Math.max(0.15, 1 - dragY / 320) : undefined,
     WebkitUserSelect: isDragging ? 'none' : undefined,
     userSelect: isDragging ? 'none' : undefined
   };
