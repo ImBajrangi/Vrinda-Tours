@@ -1,20 +1,20 @@
 /* ==========================================================================
-   Uber-Inspired UI Components (Monochrome Luxury & Collision-Free Architecture)
+   Modern Minimalist UI Components (Collision-Free Architecture & Glass Tokens)
    ========================================================================== */
 
 /* Toast Notification (Floating Pill below Unified Header Card) */
 .toast {
   position: fixed;
-  top: calc(126px + env(safe-area-inset-top, 0px));
+  top: calc(120px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%) translateY(-14px) scale(0.96);
   z-index: 9999;
-  background: #111214;
+  background: rgba(18, 18, 20, 0.94);
   color: #ffffff;
   padding: 0.45rem 1rem 0.45rem 0.55rem;
   border-radius: 999px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   max-width: 90vw;
   width: max-content;
   display: flex;
@@ -25,8 +25,8 @@
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   user-select: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .toast.visible {
@@ -51,12 +51,12 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.14);
   color: #ffffff;
 }
 
 .toast.error .toast-icon-badge {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.25);
   color: #ef4444;
 }
 
@@ -76,56 +76,63 @@
 }
 
 /* ==========================================================================
-   Map Floating Controls (Cornered when space is available + Smart Glide)
+   Map Floating Controls (Cornered + Smart Glide)
    ========================================================================== */
 
 .map-controls-cluster {
   position: absolute;
   bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
   right: 1rem;
-  z-index: 1001;
+  z-index: 900;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
   pointer-events: none;
-  transition: bottom 0.38s cubic-bezier(0.16, 1, 0.3, 1), right 0.38s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: bottom, right;
+  transition: bottom 0.38s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: bottom, opacity, transform;
 }
 
 .map-controls-cluster > * {
   pointer-events: auto;
 }
 
-/* When bottom card or live ride card is active, glide controls gracefully above it */
+.map-controls-cluster.hidden {
+  opacity: 0;
+  pointer-events: none !important;
+  transform: scale(0.92);
+}
+
 .map-controls-cluster.card-visible {
-  bottom: calc(18rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(18.5rem + env(safe-area-inset-bottom, 0.5rem));
 }
 
 /* Integrated Zoom Capsule */
 .zoom-controls {
   display: flex;
   flex-direction: column;
-  background: var(--color-canvas);
-  border: 1px solid var(--color-border-subtle);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  width: 44px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  width: 42px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   user-select: none;
 }
 
 .zoom-btn {
-  width: 44px;
-  height: 40px;
+  width: 42px;
+  height: 38px;
   background: transparent;
   border: none;
-  color: var(--color-ink);
+  color: #09090b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: 1;
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
@@ -133,32 +140,34 @@
 }
 
 .zoom-btn:hover {
-  background: var(--color-canvas-soft);
-  color: var(--color-ink);
+  background: #f4f4f5;
+  color: #09090b;
 }
 
 .zoom-btn:active {
-  background: var(--color-surface-pressed);
+  background: #e4e4e7;
   transform: scale(0.92);
 }
 
 .zoom-divider {
   height: 1px;
-  width: 26px;
+  width: 24px;
   margin: 0 auto;
-  background: var(--color-border-subtle);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 /* Floating Action Button (Center GPS Target) */
 .fab {
-  width: 44px;
-  height: 44px;
-  background: var(--color-canvas);
-  border: 1px solid var(--color-border-subtle);
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  color: var(--color-ink);
+  color: #09090b;
   cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
@@ -166,9 +175,9 @@
 }
 
 .fab:hover {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  border-color: var(--color-primary);
+  background: #09090b;
+  color: #ffffff;
+  border-color: #09090b;
   transform: scale(1.06);
 }
 
@@ -181,13 +190,8 @@
 }
 
 @keyframes fabSpin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (min-width: 768px) {
@@ -203,7 +207,7 @@
 }
 
 /* ==========================================================================
-   Uber Live Activity Ride Status Card (Flush Mobile Dock & Luxury Desktop Floating)
+   Live Activity Ride Status Card (Flush Mobile Dock & Luxury Floating)
    ========================================================================== */
 
 .ride-status-banner,
@@ -252,7 +256,6 @@
     opacity: 0;
     transform: translateY(36px) scale(0.96);
   }
-
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -264,7 +267,6 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-
   to {
     opacity: 0;
     transform: translateY(30px) scale(0.96);
@@ -294,15 +296,8 @@
 }
 
 @keyframes rscPulse {
-  from {
-    transform: scale(0.92);
-    opacity: 0.8;
-  }
-
-  to {
-    transform: scale(1.08);
-    opacity: 1;
-  }
+  from { transform: scale(0.92); opacity: 0.8; }
+  to { transform: scale(1.08); opacity: 1; }
 }
 
 .rsc-text {
@@ -379,7 +374,6 @@
   .zoom-controls {
     right: 2rem;
   }
-
   .fab {
     right: 2rem;
   }

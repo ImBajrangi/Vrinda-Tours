@@ -1,27 +1,41 @@
 /* ==========================================================================
-   Uber-Inspired Unified Explorer Header Card (Adaptive Luxury Capsule)
+   Modern Frosted Glass Floating Explorer Header (Unified Search Surface)
    ========================================================================== */
 
 .header-card {
   position: absolute;
-  top: calc(34px + 0.5rem + env(safe-area-inset-top, 0px));
-  left: 0.65rem;
-  right: 0.65rem;
+  top: calc(30px + 0.65rem + env(safe-area-inset-top, 0px));
+  left: 0.75rem;
+  right: 0.75rem;
   width: auto;
   max-width: 480px;
   margin: 0 auto;
   z-index: 1000;
   background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 20px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
   padding: 0.5rem 0.65rem 0.45rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   animation: headerCardFadeDown 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: border-radius 0.24s cubic-bezier(0.16, 1, 0.3, 1), 
+              background 0.2s ease, 
+              box-shadow 0.24s ease, 
+              padding 0.24s ease;
+}
+
+/* When Search is Active: Header transforms into a single unified search panel */
+.header-card.search-active {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 0.45rem 0.55rem 0.55rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  border-color: rgba(0, 0, 0, 0.12);
+  gap: 0;
 }
 
 @keyframes headerCardFadeDown {
@@ -49,21 +63,20 @@
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  background: var(--color-canvas-soft);
+  background: #f4f4f5;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none;
-  border: 1px solid transparent;
   flex-shrink: 0;
   overflow: hidden;
   padding: 5px;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
   cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
 }
 
 .header-brand-logo:hover {
-  background: var(--color-surface-pressed);
+  background: #e4e4e7;
   transform: scale(1.04);
 }
 
@@ -73,29 +86,31 @@
   object-fit: contain;
 }
 
-/* Search Bar Pill */
+/* Search Bar Pill (Resting vs Active) */
 .search-bar {
   flex: 1;
   min-width: 0;
-  height: 36px;
+  height: 38px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--color-canvas-soft);
+  background: #f4f4f5;
   border-radius: 999px;
-  padding: 0 0.85rem;
-  box-shadow: none;
-  border: 1px solid transparent;
+  padding: 0 0.75rem 0 0.85rem;
+  border: 1.5px solid transparent;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.search-bar:focus-within {
-  background: #ffffff;
-  border-color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+/* In active search mode: seamlessly blend into the top of the header card */
+.header-card.search-active .search-bar {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0 0.35rem;
+  height: 42px;
 }
 
-.search-bar svg {
+.search-icon {
   color: #71717a;
   flex-shrink: 0;
 }
@@ -106,9 +121,9 @@
   background: transparent;
   border: none;
   outline: none;
-  color: var(--color-ink);
-  font-size: 0.82rem;
-  font-weight: 500;
+  color: #09090b;
+  font-size: 0.88rem;
+  font-weight: 600;
   font-family: inherit;
   text-overflow: ellipsis;
 }
@@ -118,27 +133,78 @@
   font-weight: 400;
 }
 
+/* In-Capsule Leading Back Button */
+.search-leading-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: transparent;
+  border: none;
+  color: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.search-leading-btn:hover {
+  background: #f4f4f5;
+}
+
+.search-leading-btn:active {
+  transform: scale(0.92);
+}
+
+/* In-Capsule Trailing Clear/Close Button */
+.search-trailing-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #f4f4f5;
+  border: none;
+  color: #52525b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.search-trailing-btn:hover {
+  background: #e4e4e7;
+  color: #09090b;
+  transform: scale(1.08);
+}
+
+.search-trailing-btn:active {
+  transform: scale(0.92);
+}
+
 /* Action Icon Buttons */
 .icon-btn {
-  height: 36px;
-  min-width: 36px;
+  height: 38px;
+  min-width: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0 0.65rem;
-  background: var(--color-canvas-soft);
+  padding: 0 0.75rem;
+  background: #f4f4f5;
   border-radius: 999px;
-  color: var(--color-ink);
+  color: #09090b;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: none;
-  border: 1px solid transparent;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .icon-btn:hover {
-  background: var(--color-surface-pressed);
+  background: #e4e4e7;
 }
 
 .icon-btn:active {
@@ -156,94 +222,195 @@
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Search Dropdown Results */
-.search-results {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  left: 0;
-  right: 0;
+/* Integrated Search Results Panel (Inside Header Card) */
+.search-results-panel {
   width: 100%;
-  z-index: 1002;
-  background: var(--color-canvas);
-  border-radius: 18px;
-  max-height: 300px;
+  max-height: 380px;
   overflow-y: auto;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--color-border-subtle);
-  animation: searchSlideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 0.4rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.55rem 0.25rem 0.25rem;
+  margin-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  animation: searchPanelFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes searchSlideDown {
+@keyframes searchPanelFadeIn {
   from {
     opacity: 0;
-    transform: translateY(-6px) scale(0.98);
+    transform: translateY(-4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+.search-results-header {
+  padding: 0.25rem 0.55rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  margin-bottom: 0.3rem;
+}
+
+.sr-header-trending {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #52525b;
+  font-weight: 700;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
 .search-result-item {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.65rem 0.85rem;
+  gap: 0.75rem;
+  padding: 0.6rem 0.65rem;
   cursor: pointer;
+  border-radius: 14px;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.search-result-item:hover,
+.search-result-item.selected,
+.search-result-item:focus-visible {
+  background: #f4f4f5;
+}
+
+.sr-icon-avatar {
+  width: 38px;
+  height: 38px;
   border-radius: 12px;
-  transition: background 0.15s ease;
-}
-
-.search-result-item:hover {
-  background: var(--color-canvas-soft);
-}
-
-.sr-icon {
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-canvas-soft);
-  border-radius: 999px;
-  color: var(--color-ink);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.sr-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sr-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.sr-name-row h4 {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #09090b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.sr-rating {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #d97706;
   flex-shrink: 0;
 }
 
-.sr-text h4 {
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: var(--color-ink);
-  margin-bottom: 2px;
+.sr-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.sr-text span {
-  font-size: 0.7rem;
-  color: var(--color-body);
+.sr-category-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #71717a;
+}
+
+.sr-points {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #16a34a;
+  background: #f0fdf4;
+  padding: 1px 5px;
+  border-radius: 999px;
+}
+
+.sr-arrow {
+  color: #a1a1aa;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.search-result-item:hover .sr-arrow,
+.search-result-item.selected .sr-arrow {
+  transform: translate(2px, -2px);
+  color: #09090b;
+}
+
+.search-empty-state {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: #71717a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.search-empty-state p {
+  font-size: 0.88rem;
+  color: #09090b;
+  font-weight: 600;
+  margin: 0;
+}
+
+.search-empty-state span {
+  font-size: 0.75rem;
+  color: #a1a1aa;
 }
 
 /* Medium Screens (>= 768px) */
 @media (min-width: 768px) {
   .header-card {
-    top: calc(34px + 0.85rem);
+    top: calc(30px + 0.85rem);
     left: 1.5rem;
     right: auto;
     width: 580px;
     margin: 0;
     padding: 0.6rem 0.75rem 0.5rem;
-    border-radius: 22px;
+    border-radius: 24px;
+  }
+
+  .header-card.search-active {
+    padding: 0.55rem 0.75rem 0.65rem;
+    border-radius: 24px;
   }
 }
 
-/* Large Screens (>= 1024px - Expand to Grab Available Free Space) */
+/* Large Screens (>= 1024px) */
 @media (min-width: 1024px) {
   .header-card {
     width: 760px;
     max-width: calc(100vw - 3rem);
     padding: 0.65rem 0.85rem 0.55rem;
-    border-radius: 24px;
+    border-radius: 26px;
   }
 
   .header-brand-logo {
@@ -269,11 +436,10 @@
     display: inline;
     font-size: 0.78rem;
     font-weight: 700;
-    color: var(--color-ink);
+    color: #09090b;
   }
 }
 
-/* Extra Large Screens (>= 1280px) */
 @media (min-width: 1280px) {
   .header-card {
     width: 820px;

@@ -39,7 +39,7 @@
 }
 
 .drivers-panel.visible {
-  transform: translateY(0);
+  transform: translateY(var(--drag-y, 0px));
 }
 
 .drivers-panel.dragging,
@@ -439,6 +439,6 @@
   }
 
   .drivers-panel.visible {
-    transform: translateY(0);
+    transform: translateY(var(--drag-y, 0px));
   }
 }

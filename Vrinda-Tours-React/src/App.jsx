@@ -245,7 +245,7 @@ export default function App() {
       )}
 
       {/* Map Controls Cluster (Cornered when space is available + Smart Glide) */}
-      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest ? 'card-visible' : ''}`}>
+      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest ? 'card-visible' : ''} ${hotelBooking || restaurantBooking || driverPortalVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
         <div className="zoom-controls">
           <button className="zoom-btn zoom-in" onClick={() => window.__vtMap?.zoomIn()} title="Zoom In">+</button>
           <div className="zoom-divider" />

@@ -26,7 +26,7 @@ function getCategoryIcon(category) {
 
 function createIcon(category, isActive = false, isPlaying = false) {
   const hasAnim = category === 'Temple' || category === 'Holy Site';
-  
+
   if (isActive) {
     return L.divIcon({
       className: 'marker-wrapper',
@@ -187,11 +187,11 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       iconAnchor: [22, 44]
     });
 
-    const marker = L.marker([userPosition.lat, userPosition.lng], { 
+    const marker = L.marker([userPosition.lat, userPosition.lng], {
       icon,
-      zIndexOffset: 2000 
+      zIndexOffset: 2000
     }).addTo(map);
-    
+
     userMarkerRef.current = marker;
   }, [userPosition]);
 
@@ -204,7 +204,7 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     if (!map) return;
 
     const currentMap = driverMarkersRef.current;
-    
+
     // Remove markers for offline/removed drivers
     Object.keys(currentMap).forEach((id) => {
       if (!drivers.find(d => d.id === id)) {
@@ -219,7 +219,7 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
 
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
         const vehicleEmoji = d.vehicleType === 'Taxi' ? '🚗' : (d.vehicleType === 'Bike' ? '🛵' : '🛺');
-        
+
         const existing = currentMap[d.id];
 
         // Check if marker needs icon re-render

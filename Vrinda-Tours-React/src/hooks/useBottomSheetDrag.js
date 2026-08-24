@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 
 /**
  * High-performance drag-to-dismiss gesture hook for bottom sheets and floating dialogs.
- * Provides 60fps touch and mouse drag-down physics with strict text selection suppression.
+ * Uses CSS custom properties (--drag-y) to preserve horizontal centering and avoid inline style clobbering.
  */
 export function useBottomSheetDrag(onClose, threshold = 65) {
   const [dragY, setDragY] = useState(0);
@@ -15,7 +15,6 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
     startYRef.current = clientY;
     currentYRef.current = clientY;
     setIsDragging(true);
-    // Clear any text selection that may have occurred
     window.getSelection()?.removeAllRanges();
   }, []);
 
@@ -29,14 +28,13 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
   const endDrag = useCallback(() => {
     if (!isDragging) return;
     setIsDragging(false);
-    // Restore body selection
     document.body.style.userSelect = '';
     document.body.style.webkitUserSelect = '';
 
     const delta = Math.max(0, currentYRef.current - startYRef.current);
     if (delta > threshold) {
       setIsClosing(true);
-      setDragY(380);
+      setDragY(450);
       setTimeout(() => {
         setDragY(0);
         setIsClosing(false);
@@ -61,7 +59,6 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
 
   const handleMouseDown = useCallback((e) => {
     if (e.button !== 0) return;
-    // Prevent default browser text selection drag behavior
     e.preventDefault();
     window.getSelection()?.removeAllRanges();
     document.body.style.userSelect = 'none';
@@ -93,9 +90,9 @@ export function useBottomSheetDrag(onClose, threshold = 65) {
   }, [onClose]);
 
   const sheetStyle = {
-    transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+    '--drag-y': dragY > 0 ? `${dragY}px` : (isClosing ? '450px' : '0px'),
     transition: isDragging ? 'none' : (isClosing ? 'transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s' : undefined),
-    opacity: dragY > 0 ? Math.max(0.15, 1 - dragY / 300) : (isClosing ? 0 : undefined),
+    opacity: dragY > 0 ? Math.max(0.15, 1 - dragY / 320) : (isClosing ? 0 : undefined),
     WebkitUserSelect: isDragging ? 'none' : undefined,
     userSelect: isDragging ? 'none' : undefined
   };
