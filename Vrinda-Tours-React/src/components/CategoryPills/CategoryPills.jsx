@@ -3,7 +3,7 @@ import * as LucideIcons from 'lucide-react';
 import { CATEGORIES } from '../../data/locations';
 import './CategoryPills.css';
 
-export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpen, onDriverPortalOpen }) {
+export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpen }) {
   const timerRef = useRef(null);
 
   const handleTouchStart = (key) => {
@@ -20,7 +20,7 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
   const pills = useMemo(() => CATEGORIES, []);
 
   return (
-    <div className="category-pills">
+    <div className="category-track">
       {pills.map((cat) => {
         const Icon = LucideIcons[cat.icon] || LucideIcons.MapPin;
         return (
@@ -43,6 +43,7 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
         onMouseLeave={handleTouchEnd}
         onTouchStart={() => handleTouchStart('__drivers__')}
         onTouchEnd={handleTouchEnd}
+        title="View Live Drivers"
       >
         <span className="pill-icon"><LucideIcons.Car size={12} /></span>
         Drivers
@@ -50,4 +51,3 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
     </div>
   );
 }
-

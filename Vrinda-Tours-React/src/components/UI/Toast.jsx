@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import './UI.css';
 
 export default function Toast({ message, type = 'error', onDismiss }) {
@@ -8,17 +8,26 @@ export default function Toast({ message, type = 'error', onDismiss }) {
   useEffect(() => {
     if (message) {
       setVisible(true);
-      const t = setTimeout(() => { setVisible(false); setTimeout(onDismiss, 300); }, 3000);
+      const t = setTimeout(() => { 
+        setVisible(false); 
+        setTimeout(onDismiss, 250); 
+      }, 2800);
       return () => clearTimeout(t);
     }
   }, [message, onDismiss]);
 
   if (!message) return null;
-  const Icon = type === 'success' ? CheckCircle : AlertCircle;
+  const Icon = type === 'success' ? CheckCircle2 : AlertCircle;
 
   return (
-    <div className={`toast ${type} ${visible ? 'visible' : ''}`}>
-      <Icon size={20} className="toast-icon" />
+    <div 
+      className={`toast ${type} ${visible ? 'visible' : ''}`}
+      onClick={() => { setVisible(false); setTimeout(onDismiss, 200); }}
+      role="alert"
+    >
+      <div className="toast-icon-badge">
+        <Icon size={16} />
+      </div>
       <span className="toast-message">{message}</span>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Crosshair } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
 import MapView from './components/Map/MapView';
@@ -175,17 +175,14 @@ export default function App() {
       <Header 
         onSelectLocation={handleSelectLocation} 
         onOpenDriverPortal={() => setDriverPortalVisible(true)}
-      />
-
-      <CategoryPills 
+        onOpenDrivers={() => setDriversVisible(true)}
         activeFilter={activeFilter} 
         onFilterChange={handleFilterChange} 
-        onAdminOpen={() => setAdminVisible(true)} 
-        onDriverPortalOpen={() => setDriverPortalVisible(true)}
+        onAdminOpen={() => setAdminVisible(true)}
       />
 
       <LocationCard
-        location={activeLocation}
+        location={!activeRide && !rideRequest ? activeLocation : null}
         userPosition={position}
         onClose={() => setActiveLocation(null)}
         onBookHotel={handleBookHotel}
@@ -247,14 +244,21 @@ export default function App() {
         />
       )}
 
-      {/* FAB + Zoom Controls */}
-      <button className={`fab ${loading ? 'loading' : ''} ${activeLocation ? 'card-visible' : ''}`} onClick={handleLocate} title="Center on my location">
-        <Crosshair size={24} />
-      </button>
+      {/* Map Controls Cluster (Cornered when space is available + Smart Glide) */}
+      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest ? 'card-visible' : ''}`}>
+        <div className="zoom-controls">
+          <button className="zoom-btn zoom-in" onClick={() => window.__vtMap?.zoomIn()} title="Zoom In">+</button>
+          <div className="zoom-divider" />
+          <button className="zoom-btn zoom-out" onClick={() => window.__vtMap?.zoomOut()} title="Zoom Out">−</button>
+        </div>
 
-      <div className={`zoom-controls ${activeLocation ? 'card-visible' : ''}`}>
-        <button className="zoom-btn" onClick={() => window.__vtMap?.zoomIn()}>+</button>
-        <button className="zoom-btn" onClick={() => window.__vtMap?.zoomOut()}>−</button>
+        <button 
+          className={`fab ${loading ? 'loading' : ''}`} 
+          onClick={handleLocate} 
+          title="Center GPS on my location"
+        >
+          <Navigation size={18} fill="currentColor" />
+        </button>
       </div>
 
       {toast && (

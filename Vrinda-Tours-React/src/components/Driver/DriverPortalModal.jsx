@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
-  X, Phone, Navigation, Power, Car, Shield, Award, CheckCircle, 
-  AlertTriangle, Clock, MapPin, User, LogOut, Check, ChevronRight, Zap
+  X, Phone, Navigation, Power, Shield, MapPin, 
+  LogOut, ChevronRight, Zap, CheckCircle2, Clock, Search
 } from 'lucide-react';
-import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteField, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteField, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
-import { calculateDistance, formatDistance } from '../../utils/distance';
+import { calculateDistance } from '../../utils/distance';
+import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import './DriverPortalModal.css';
 
 export default function DriverPortalModal({ onClose, drivers = [] }) {
@@ -14,14 +15,28 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
   const [loginPhone, setLoginPhone] = useState('');
   const [loginError, setLoginError] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [driverSearch, setDriverSearch] = useState('');
+
+  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
 
   const [isOnline, setIsOnline] = useState(false);
   const [currentRide, setCurrentRide] = useState(null);
   const [gpsActive, setGpsActive] = useState(false);
-  const [gpsText, setGpsText] = useState('GPS Inactive');
+  const [gpsText, setGpsText] = useState('GPS Ready');
   const [onlineStartTime, setOnlineStartTime] = useState(null);
   const [onlineHoursText, setOnlineHoursText] = useState('0.0h');
   const [ridesCompletedToday, setRidesCompletedToday] = useState(0);
+
+  const filteredDrivers = useMemo(() => {
+    if (!driverSearch.trim()) return drivers;
+    const q = driverSearch.toLowerCase();
+    return drivers.filter(d => 
+      d.name?.toLowerCase().includes(q) || 
+      d.phone?.includes(q) || 
+      d.vehicleNo?.toLowerCase().includes(q) ||
+      d.vehicleType?.toLowerCase().includes(q)
+    );
+  }, [drivers, driverSearch]);
   
   // Timer for ride auto-decline
   const [countdown, setCountdown] = useState(30);
@@ -49,7 +64,6 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
           setCurrentRide(null);
         }
       } else {
-        // Registered driver deleted
         sessionStorage.removeItem('vt_driver_id');
         setDriverId(null);
         setDriverData(null);
@@ -109,10 +123,9 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
       distMeters = distKm * 1000;
     }
 
-    // REQUIREMENT: Only update Firestore if driver moved >= 15m OR >= 10s passed since last update
     if (!last.time || distMeters >= 15 || timeElapsedMs >= 10000) {
       lastLocationRef.current = { lat, lng, time: now };
-      setGpsText(`📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+      setGpsText(`${lat.toFixed(4)}, ${lng.toFixed(4)}`);
       
       try {
         await updateDoc(doc(firestore, 'drivers', driverId), {
@@ -132,20 +145,20 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
   // 5. GPS Watch Manager
   const startGPS = useCallback(() => {
     if (!navigator.geolocation) {
-      setGpsText('GPS not supported');
+      setGpsText('No GPS');
       return;
     }
 
     setGpsActive(true);
-    setGpsText('Acquiring location...');
+    setGpsText('Locating...');
 
     gpsWatchRef.current = navigator.geolocation.watchPosition(
       (pos) => {
         const { latitude, longitude, heading } = pos.coords;
         updateDriverLocationInFirestore(latitude, longitude, heading);
       },
-      (err) => {
-        setGpsText(`GPS Error: ${err.message}`);
+      () => {
+        setGpsText('GPS Offline');
         setGpsActive(false);
       },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
@@ -158,7 +171,7 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
       gpsWatchRef.current = null;
     }
     setGpsActive(false);
-    setGpsText('GPS Inactive');
+    setGpsText('GPS Idle');
   }, []);
 
   // 6. Handle Online / Offline Switch
@@ -189,7 +202,7 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
     setLoginError('');
     const cleanPhone = loginPhone.trim().replace(/\D/g, '');
     if (cleanPhone.length < 10) {
-      setLoginError('Please enter a valid 10-digit phone number');
+      setLoginError('Enter 10-digit number');
       return;
     }
 
@@ -211,17 +224,24 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
         setDriverId(match.id);
         setDriverData(match);
       } else {
-        setLoginError('Phone number not registered. Contact admin to register your vehicle.');
+        setLoginError('Unregistered number');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setLoginError('Connection error. Please try again.');
+      setLoginError('Connection error');
     } finally {
       setIsLoggingIn(false);
     }
   };
 
-  // 8. Ride Action Handlers
+  // 8. Direct 1-Tap Driver Select
+  const handleSelectDriverDirect = (d) => {
+    sessionStorage.setItem('vt_driver_id', d.id);
+    setDriverId(d.id);
+    setDriverData(d);
+  };
+
+  // 9. Ride Action Handlers
   const handleAcceptRide = async () => {
     if (!driverId) return;
     try {
@@ -288,99 +308,123 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
 
   const vehicleType = driverData?.vehicleType || 'E-Rickshaw';
   const vehicleNo = driverData?.vehicleNo || 'UP-85 VT 2026';
-  const rating = driverData?.rating || '4.9 ★';
+  const rating = driverData?.rating || '4.9';
 
   return (
     <>
-      <div className="dp-modal-overlay" onClick={onClose} />
+      <div className="dp-modal-overlay" onClick={triggerClose} />
 
-      <div className="dp-modal-container">
+      <div 
+        className={`dp-modal-container ${isDragging ? 'dragging' : ''}`}
+        style={sheetStyle}
+      >
+        <div className="dp-modal-handle-wrapper" {...handleProps} title="Drag down to dismiss">
+          <div className="dp-modal-handle" />
+        </div>
+
         <div className="dp-modal-header">
           <div className="dp-brand">
             <div className="dp-brand-logo-wrapper">
               <img src="/official-logo.svg" alt="Vrindopnishad" className="dp-brand-img" />
             </div>
             <div>
-              <h2>Vrindopnishad Partner Companion</h2>
-              <span className="dp-brand-sub">Pilgrim Fleet Driver Portal</span>
+              <h2>Driver Companion</h2>
+              <span className="dp-brand-sub">Pilgrim Fleet</span>
             </div>
           </div>
-          <button className="dp-close-btn" onClick={onClose}><X size={18} /></button>
+          <button className="dp-close-btn" onClick={triggerClose} title="Close"><X size={18} /></button>
         </div>
 
         {!driverId ? (
-          /* LOGIN SCREEN WITH QUICK DEMO SELECTOR */
+          /* MINIMAL HIGH-IMPACT LOGIN VIEW */
           <div className="dp-login-body">
-            <div className="dp-login-hero">
-              <div className="dp-hero-badge">
-                <Shield size={14} /> Verified Fleet Network
-              </div>
-              <h3>Driver Sign In</h3>
-              <p>Sign in with your registered mobile number or select your driver profile below to start receiving pilgrim rides.</p>
-            </div>
-
-            {/* Quick Demo Driver Selector Cards */}
+            {/* Quick 1-Tap Driver Select Cards with Smart Search Filter */}
             {drivers.length > 0 && (
-              <div className="dp-quick-selector">
-                <span className="dp-qs-title">QUICK DEMO DRIVER LOGIN</span>
-                <div className="dp-qs-grid">
-                  {drivers.map((d) => (
-                    <div 
-                      key={d.id} 
-                      className="dp-qs-card"
-                      onClick={() => {
-                        sessionStorage.setItem('vt_driver_id', d.id);
-                        setDriverId(d.id);
-                        setDriverData(d);
-                      }}
-                    >
-                      <div className="dp-qs-avatar">
-                        {d.photo ? <img src={d.photo} alt={d.name} /> : (d.name || 'D')[0].toUpperCase()}
+              <div className="dp-quick-section">
+                <div className="dp-section-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Shield size={13} />
+                    <span>ONE-TAP DRIVER SIGN IN</span>
+                  </div>
+                  <span className="dp-count-pill">{filteredDrivers.length} {filteredDrivers.length === 1 ? 'driver' : 'drivers'}</span>
+                </div>
+
+                {drivers.length > 2 && (
+                  <div className="dp-search-bar">
+                    <Search size={14} color="#71717a" />
+                    <input 
+                      type="text" 
+                      placeholder="Filter by name, vehicle, or phone..." 
+                      value={driverSearch}
+                      onChange={(e) => setDriverSearch(e.target.value)}
+                    />
+                    {driverSearch && (
+                      <button type="button" className="dp-search-clear" onClick={() => setDriverSearch('')}>
+                        <X size={12} />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="dp-driver-grid">
+                  {filteredDrivers.length === 0 ? (
+                    <div className="dp-no-drivers">No driver found matching "{driverSearch}"</div>
+                  ) : (
+                    filteredDrivers.map((d) => (
+                      <div 
+                        key={d.id} 
+                        className="dp-driver-card-compact"
+                        onClick={() => handleSelectDriverDirect(d)}
+                        title={`Sign in as ${d.name}`}
+                      >
+                        <div className="dp-driver-avatar">
+                          {d.photo ? <img src={d.photo} alt={d.name} /> : (d.name || 'D')[0].toUpperCase()}
+                        </div>
+                        <div className="dp-driver-meta">
+                          <strong>{d.name}</strong>
+                          <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
+                        </div>
+                        <div className="dp-driver-arrow">
+                          <ChevronRight size={16} />
+                        </div>
                       </div>
-                      <div className="dp-qs-info">
-                        <strong>{d.name}</strong>
-                        <span>{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
-                      </div>
-                      <button className="dp-qs-btn">Select</button>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </div>
             )}
 
+            <div className="dp-or-divider">
+              <span>or enter phone number</span>
+            </div>
+
             <form onSubmit={handleLoginSubmit} className="dp-login-form">
-              <div className="dp-form-group">
-                <label>Mobile Phone Number</label>
-                <div className="dp-input-box">
-                  <Phone size={18} color="#94a3b8" />
-                  <input
-                    type="tel"
-                    placeholder="+91 98765 43210"
-                    value={loginPhone}
-                    onChange={(e) => setLoginPhone(e.target.value)}
-                    required
-                  />
-                </div>
+              <div className="dp-input-box">
+                <Phone size={18} color="#71717a" />
+                <span className="dp-country-code">+91</span>
+                <input
+                  type="tel"
+                  placeholder="98765 43210"
+                  value={loginPhone}
+                  onChange={(e) => setLoginPhone(e.target.value)}
+                  required
+                />
               </div>
 
               {loginError && (
                 <div className="dp-login-error">
-                  <AlertTriangle size={16} /> {loginError}
+                  {loginError}
                 </div>
               )}
 
               <button type="submit" className="dp-login-submit" disabled={isLoggingIn}>
-                {isLoggingIn ? 'Verifying Credentials...' : 'Go to Dashboard'}
+                {isLoggingIn ? 'Verifying...' : 'Enter Dashboard'}
               </button>
-
-              <div className="dp-login-hint">
-                <span>Not registered as a driver yet?</span> Ask the fleet manager in Admin Panel to add your vehicle.
-              </div>
             </form>
           </div>
         ) : (
 
-          /* DRIVER DASHBOARD */
+          /* MINIMAL POWERFUL DRIVER DASHBOARD */
           <div className="dp-dash-body">
             {/* Driver Profile Bar */}
             <div className="dp-profile-card">
@@ -395,97 +439,89 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
               <div className="dp-profile-info">
                 <h4>{driverData?.name || 'Driver'}</h4>
                 <div className="dp-profile-tags">
-                  <span className="dp-tag-vehicle">🛺 {vehicleType} ({vehicleNo})</span>
-                  <span className="dp-tag-rating">{rating}</span>
+                  <span className="dp-tag-vehicle">🛺 {vehicleType}</span>
+                  <span className="dp-tag-vehicle">{vehicleNo}</span>
+                  <span className="dp-tag-rating">★ {rating}</span>
                 </div>
               </div>
-              <button className="dp-logout-btn" onClick={handleLogout} title="Logout Driver">
-                <LogOut size={16} /> Logout
+              <button className="dp-logout-btn" onClick={handleLogout} title="Sign Out">
+                <LogOut size={16} />
               </button>
             </div>
 
-            {/* Status Card & Online Toggle */}
+            {/* Status Radar & Switch */}
             <div className={`dp-status-box ${isOnline ? (currentRide ? 'busy' : 'online') : 'offline'}`}>
-              <div className="dp-status-indicator">
-                {isOnline ? (currentRide ? '🚗' : '⚡') : '💤'}
-              </div>
-              <div className="dp-status-meta">
-                <h3>{isOnline ? (currentRide ? 'On a Ride' : 'Online & Receiving Rides') : 'You are Offline'}</h3>
-                <p>{isOnline ? 'Transmitting live GPS coordinates for pilgrim bookings' : 'Toggle the switch below to start receiving ride requests'}</p>
+              <div className="dp-status-hero">
+                <div className="dp-status-beacon">
+                  {isOnline ? <Zap size={28} /> : <Power size={28} />}
+                </div>
+                <h3>{isOnline ? (currentRide ? 'ON TRIP' : 'ONLINE') : 'OFFLINE'}</h3>
               </div>
 
-              <button className={`dp-power-toggle ${isOnline ? 'active' : ''}`} onClick={toggleOnline}>
-                <Power size={22} />
-                <span>{isOnline ? 'GO OFFLINE' : 'GO ONLINE'}</span>
+              <button 
+                className={`dp-power-toggle ${isOnline ? 'active' : ''}`} 
+                onClick={toggleOnline}
+              >
+                {isOnline ? 'GO OFFLINE' : 'GO ONLINE'}
               </button>
             </div>
 
-            {/* Performance Stats */}
+            {/* 3 Metrics */}
             <div className="dp-stats-grid">
               <div className="dp-stat-card">
                 <div className="dp-stat-val">{ridesCompletedToday}</div>
-                <div className="dp-stat-lbl">Rides Today</div>
+                <div className="dp-stat-lbl">Rides</div>
               </div>
               <div className="dp-stat-card">
                 <div className="dp-stat-val">{onlineHoursText}</div>
-                <div className="dp-stat-lbl">Hours Online</div>
+                <div className="dp-stat-lbl">Online</div>
               </div>
               <div className="dp-stat-card">
-                <div className="dp-stat-val">{rating}</div>
-                <div className="dp-stat-lbl">Pilgrim Rating</div>
+                <div className="dp-stat-val">★ {rating}</div>
+                <div className="dp-stat-lbl">Rating</div>
               </div>
             </div>
 
-            {/* Live GPS Telemetry */}
+            {/* Minimal GPS Pill */}
             <div className="dp-gps-bar">
               <div className={`dp-gps-pulse ${gpsActive ? 'active' : ''}`} />
-              <div className="dp-gps-info">
-                <Navigation size={14} />
-                <span>{gpsText}</span>
-              </div>
-              <span className="dp-gps-rate">Throttled Stream (≥15m or 10s)</span>
+              <Navigation size={13} />
+              <span>{gpsText}</span>
             </div>
 
-            {/* Active Ride Lifecycle Card (If Accepted or Arrived) */}
+            {/* Active Ride Lifecycle Card */}
             {currentRide && (currentRide.status === 'accepted' || currentRide.status === 'arrived') && (
               <div className="dp-active-ride-card">
                 <div className="dp-arc-header">
                   <span className="dp-arc-badge">
-                    {currentRide.status === 'accepted' ? 'En Route to Pickup' : 'Arrived at Pickup'}
+                    {currentRide.status === 'accepted' ? 'En Route' : 'Arrived'}
                   </span>
-                  <span className="dp-arc-time"><Clock size={14} /> Active Trip</span>
+                  <span className="dp-arc-time"><Clock size={13} /> Live Trip</span>
                 </div>
 
                 <div className="dp-arc-route">
                   <div className="dp-arc-step">
-                    <div className="dp-step-icon pickup"><MapPin size={16} /></div>
-                    <div>
-                      <span className="dp-step-lbl">PICKUP LOCATION</span>
-                      <strong>{currentRide.pickupName || 'Pilgrim Location'}</strong>
-                    </div>
+                    <MapPin size={16} color="#ffffff" />
+                    <strong>{currentRide.pickupName || 'Pickup Location'}</strong>
                   </div>
-
                   <div className="dp-arc-step">
-                    <div className="dp-step-icon dest"><ChevronRight size={16} /></div>
-                    <div>
-                      <span className="dp-step-lbl">DESTINATION</span>
-                      <strong>{currentRide.destName}</strong>
-                    </div>
+                    <ChevronRight size={16} color="#a1a1aa" />
+                    <strong>{currentRide.destName}</strong>
                   </div>
                 </div>
 
                 <div className="dp-arc-actions">
                   {currentRide.status === 'accepted' ? (
                     <button className="dp-btn-arrive" onClick={handleMarkArrived}>
-                      <CheckCircle size={18} /> Mark Arrived at Pickup
+                      <CheckCircle2 size={16} /> Arrived at Pickup
                     </button>
                   ) : (
                     <button className="dp-btn-complete" onClick={handleCompleteRide}>
-                      <Zap size={18} /> Complete Ride
+                      <Zap size={16} /> Complete Trip
                     </button>
                   )}
                   <button className="dp-btn-cancel-ride" onClick={handleDeclineRide}>
-                    Decline / Cancel
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -498,33 +534,23 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
           <div className="dp-req-overlay">
             <div className="dp-req-card">
               <div className="dp-req-header">
-                <div className="dp-req-bell">🔔</div>
-                <div>
-                  <h4>New Ride Request!</h4>
-                  <span>A pilgrim needs a ride in Vrindavan/Barsana</span>
-                </div>
+                <div className="dp-req-badge">NEW RIDE</div>
+                <h4>Pilgrim Request</h4>
               </div>
 
               <div className="dp-req-locations">
                 <div className="dp-req-loc">
                   <div className="dp-dot pickup" />
-                  <div>
-                    <label>Pickup Location</label>
-                    <strong>{currentRide.pickupName || 'Pilgrim Location'}</strong>
-                  </div>
+                  <strong>{currentRide.pickupName || 'Current Location'}</strong>
                 </div>
-
                 <div className="dp-req-loc">
                   <div className="dp-dot dest" />
-                  <div>
-                    <label>Destination</label>
-                    <strong>{currentRide.destName}</strong>
-                  </div>
+                  <strong>{currentRide.destName}</strong>
                 </div>
               </div>
 
               <div className="dp-req-timer">
-                <Clock size={14} /> Auto-declining in <strong>{countdown}s</strong>
+                Declines in <strong>{countdown}s</strong>
               </div>
 
               <div className="dp-req-actions">
@@ -532,7 +558,7 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
                   Decline
                 </button>
                 <button className="dp-btn-accept" onClick={handleAcceptRide}>
-                  Accept Ride Now
+                  Accept Ride
                 </button>
               </div>
             </div>

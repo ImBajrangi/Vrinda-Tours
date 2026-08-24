@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { X, MessageCircle, Phone, Utensils, Star } from 'lucide-react';
 import { openWhatsApp, generateRestaurantMessage } from '../../utils/whatsapp';
+import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import './BookingSheets.css';
 
 export default function RestaurantBooking({ location, onClose }) {
+  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+
   const today = new Date().toISOString().split('T')[0];
   const [date, setDate] = useState(today);
   const [time, setTime] = useState('12:00');
@@ -15,20 +18,25 @@ export default function RestaurantBooking({ location, onClose }) {
   const handleBook = () => {
     const msg = generateRestaurantMessage(location, date, time, guests, special);
     openWhatsApp(location.phone, msg);
-    onClose();
+    triggerClose();
   };
 
   return (
     <>
-      <div className="booking-overlay visible" onClick={onClose} />
-      <div className="booking-sheet visible">
-        <div className="booking-sheet-handle" />
+      <div className="booking-overlay visible" onClick={triggerClose} />
+      <div 
+        className={`booking-sheet visible ${isDragging ? 'dragging' : ''}`}
+        style={sheetStyle}
+      >
+        <div className="booking-sheet-handle-wrapper" {...handleProps} title="Drag down to dismiss">
+          <div className="booking-sheet-handle" />
+        </div>
         <div className="booking-sheet-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Utensils size={20} />
             <h3>Reserve a Table</h3>
           </div>
-          <button className="booking-sheet-close" onClick={onClose}><X size={16} /></button>
+          <button className="booking-sheet-close" onClick={triggerClose} title="Close"><X size={16} /></button>
         </div>
         <div className="booking-sheet-body">
           <div className="booking-venue-info">

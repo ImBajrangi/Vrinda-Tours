@@ -75,15 +75,15 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
       <>
         <div className="adm-overlay" onClick={onClose}></div>
         <div className="adm-card-centered">
-          <button className="adm-btn-close" style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }} onClick={onClose}><X size={20} /></button>
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{ width: '60px', height: '60px', background: '#212128', borderRadius: '18px', margin: '0 auto 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#22c55e' }}>
+          <button className="adm-btn-close" style={{ position: 'absolute', top: '1.25rem', right: '1.25rem' }} onClick={onClose}><X size={18} /></button>
+          <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+            <div style={{ width: '56px', height: '56px', background: '#000000', borderRadius: '16px', margin: '0 auto 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
               <LogIn size={24} />
             </div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>Fleet Admin Access</h3>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Vrinda Tours Control Panel</span>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-ink)', margin: '0 0 0.25rem 0' }}>Fleet Admin Access</h3>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-body)' }}>Vrinda Tours Fleet Control</span>
           </div>
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
             <div className="adm-form-group">
               <label>Username</label>
               <div className="adm-input-wrapper">
@@ -99,7 +99,7 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
               </div>
             </div>
             <button type="submit" className="adm-btn-primary">Login to Fleet Manager</button>
-            {error && <p style={{ color: '#ef4444', fontSize: '0.8rem', textAlign: 'center', margin: 0 }}>{error}</p>}
+            {error && <p style={{ color: '#ef4444', fontSize: '0.8rem', textAlign: 'center', margin: 0, fontWeight: 600 }}>{error}</p>}
           </form>
         </div>
       </>
@@ -112,13 +112,13 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
       <div className="adm-panel-centered">
         <div className="adm-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <UserPlus size={20} color="#22c55e" />
-            <h3 style={{ fontWeight: 800, margin: 0 }}>Fleet Management</h3>
+            <UserPlus size={20} color="#000000" />
+            <h3 style={{ fontWeight: 800, margin: 0, fontSize: '1.15rem', color: 'var(--color-ink)' }}>Fleet Management</h3>
           </div>
-          <button className="adm-btn-close" onClick={onClose}><X size={20} /></button>
+          <button className="adm-btn-close" onClick={onClose}><X size={18} /></button>
         </div>
         <div className="adm-body">
-          <button className="adm-btn-primary" style={{ marginBottom: '1.5rem' }} onClick={() => setShowAddForm(true)}>
+          <button className="adm-btn-primary" style={{ marginBottom: '1.25rem' }} onClick={() => setShowAddForm(true)}>
             <Plus size={18} /> Register New Driver & Vehicle
           </button>
           <div className="adm-list">
@@ -143,14 +143,14 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
           <>
             <div className="adm-overlay" style={{ zIndex: 11000 }} onClick={() => setShowAddForm(false)}></div>
             <div className="adm-card-centered" style={{ zIndex: 12000, maxWidth: '440px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0 }}>Register Fleet Partner</h4>
-                <button className="adm-btn-close" onClick={() => setShowAddForm(false)}><X size={18} /></button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-ink)', margin: 0 }}>Register Fleet Partner</h4>
+                <button className="adm-btn-close" onClick={() => setShowAddForm(false)}><X size={16} /></button>
               </div>
-              <form onSubmit={handleAddDriver} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+              <form onSubmit={handleAddDriver} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div className="adm-photo-circle" onClick={() => document.getElementById('driver-photo-input').click()}>
                   <input id="driver-photo-input" type="file" accept="image/*" onChange={handlePhotoChange} hidden />
-                  {newPhoto ? <img src={newPhoto} alt="Preview" /> : <Camera size={28} color="#94a3b8" />}
+                  {newPhoto ? <img src={newPhoto} alt="Preview" /> : <Camera size={26} color="#71717a" />}
                 </div>
 
                 <div className="adm-form-group">
@@ -176,13 +176,13 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
                     <select 
                       value={newVehicleType} 
                       onChange={e => setNewVehicleType(e.target.value)}
-                      style={{ background: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none', fontWeight: 600, fontSize: '0.95rem' }}
+                      style={{ width: '100%', outline: 'none', fontWeight: 600, fontSize: '0.92rem' }}
                     >
-                      <option value="E-Rickshaw" style={{ background: '#1e293b' }}>🛺 E-Rickshaw</option>
-                      <option value="Auto" style={{ background: '#1e293b' }}>🛺 Auto</option>
-                      <option value="Taxi" style={{ background: '#1e293b' }}>🚗 Taxi / Cab</option>
-                      <option value="Bike" style={{ background: '#1e293b' }}>🛵 Bike Taxi</option>
-                      <option value="Bus" style={{ background: '#1e293b' }}>🚌 Pilgrim Bus</option>
+                      <option value="E-Rickshaw">🛺 E-Rickshaw</option>
+                      <option value="Auto">🛺 Auto</option>
+                      <option value="Taxi">🚗 Taxi / Cab</option>
+                      <option value="Bike">🛵 Bike Taxi</option>
+                      <option value="Bus">🚌 Pilgrim Bus</option>
                     </select>
                   </div>
                 </div>
@@ -204,13 +204,13 @@ export default function AdminPanel({ drivers, onClose, userPosition }) {
         {/* Custom Confirmation Modal */}
         {deletingId && (
           <div className="adm-overlay" style={{ zIndex: 13000 }} onClick={() => setDeletingId(null)}>
-            <div className="adm-card-centered" style={{ zIndex: 14000, maxWidth: '320px', textAlign: 'center' }}>
+            <div className="adm-card-centered" style={{ zIndex: 14000, maxWidth: '340px', textAlign: 'center', padding: '1.75rem' }}>
               <ShieldAlert size={36} color="#ef4444" style={{ margin: '0 auto 0.5rem' }} />
-              <h4 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 800, margin: '0 0 0.25rem 0' }}>Delete Driver?</h4>
-              <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginBottom: '1.25rem' }}>This driver will be removed from fleet records.</p>
+              <h4 style={{ color: 'var(--color-ink)', fontSize: '1.15rem', fontWeight: 800, margin: '0 0 0.35rem 0' }}>Delete Driver?</h4>
+              <p style={{ color: 'var(--color-body)', fontSize: '0.82rem', marginBottom: '1.5rem', lineHeight: 1.45 }}>This driver will be permanently removed from fleet records.</p>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
-                <button className="adm-btn-close" style={{ flex: 1, borderRadius: '10px', height: '40px', width: 'auto', background: 'rgba(255,255,255,0.1)', color: '#fff' }} onClick={() => setDeletingId(null)}>Cancel</button>
-                <button className="adm-btn-submit" style={{ flex: 1, background: '#ef4444', height: '40px', padding: 0 }} onClick={confirmDeleteDriver}>Delete</button>
+                <button className="adm-btn-close" style={{ flex: 1, borderRadius: '999px', height: '42px', width: 'auto', background: 'var(--color-canvas-soft)', color: 'var(--color-ink)', fontWeight: 700 }} onClick={() => setDeletingId(null)}>Cancel</button>
+                <button className="adm-btn-submit" style={{ flex: 1, background: '#ef4444', height: '42px', padding: 0, color: '#ffffff', fontWeight: 700 }} onClick={confirmDeleteDriver}>Delete</button>
               </div>
             </div>
           </div>

@@ -1,9 +1,17 @@
 import { useState, useRef } from 'react';
 import { Search, User, Car } from 'lucide-react';
 import { locations } from '../../data/locations';
+import CategoryPills from '../CategoryPills/CategoryPills';
 import './Header.css';
 
-export default function Header({ onSelectLocation, onOpenDriverPortal }) {
+export default function Header({ 
+  onSelectLocation, 
+  onOpenDriverPortal, 
+  onOpenDrivers,
+  activeFilter,
+  onFilterChange,
+  onAdminOpen
+}) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const inputRef = useRef(null);
@@ -26,42 +34,58 @@ export default function Header({ onSelectLocation, onOpenDriverPortal }) {
   };
 
   return (
-    <header className="header">
-      <div className="header-content">
+    <header className="header-card">
+      <div className="header-top-row">
         <div className="header-brand-logo" title="Vrindopnishad">
           <img src="/official-logo.svg" alt="Vrindopnishad Logo" className="site-brand-logo" />
         </div>
-        <div className="search-bar">
-          <Search size={20} color="#9E9E9E" />
 
+        <div className="search-bar">
+          <Search size={16} />
           <input
             ref={inputRef}
             type="text"
-            placeholder="Where do you want to go?"
+            placeholder="Search temples, holy sites, dining, pilgrim rides..."
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
             onBlur={() => setTimeout(() => setResults([]), 200)}
           />
         </div>
+
         <button 
           className="icon-btn" 
           id="driver-btn" 
           onClick={onOpenDriverPortal}
           title="Driver Companion Portal"
-          style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)' }}
         >
-          <Car size={20} />
+          <Car size={16} />
+          <span className="btn-text">Driver</span>
         </button>
-        <button className="icon-btn" id="user-btn">
-          <User size={22} />
+
+        <button 
+          className="icon-btn" 
+          id="user-btn"
+          onClick={onOpenDrivers}
+          title="Fleet Partners & Admin"
+        >
+          <User size={16} />
+          <span className="btn-text">Fleet</span>
         </button>
+      </div>
+
+      <div className="header-category-tray">
+        <CategoryPills 
+          activeFilter={activeFilter} 
+          onFilterChange={onFilterChange} 
+          onAdminOpen={onAdminOpen}
+        />
       </div>
 
       {results.length > 0 && (
         <div className="search-results visible">
           {results.map((loc) => (
             <div key={loc.name} className="search-result-item" onMouseDown={() => handleSelect(loc)}>
-              <div className="sr-icon"><Search size={16} /></div>
+              <div className="sr-icon"><Search size={15} /></div>
               <div className="sr-text">
                 <h4>{loc.name}</h4>
                 <span>{loc.category} • +{loc.points} points</span>
@@ -73,4 +97,3 @@ export default function Header({ onSelectLocation, onOpenDriverPortal }) {
     </header>
   );
 }
-

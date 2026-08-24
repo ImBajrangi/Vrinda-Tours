@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react';
 import { X, MessageCircle, Phone, BedDouble, Star } from 'lucide-react';
 import { openWhatsApp, generateHotelMessage } from '../../utils/whatsapp';
+import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import './BookingSheets.css';
 
 export default function HotelBooking({ location, onClose }) {
+  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = useMemo(() => { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().split('T')[0]; }, []);
 
@@ -20,20 +23,25 @@ export default function HotelBooking({ location, onClose }) {
   const handleBook = () => {
     const msg = generateHotelMessage(location, checkin, checkout, guests, roomType);
     openWhatsApp(location.phone, msg);
-    onClose();
+    triggerClose();
   };
 
   return (
     <>
-      <div className="booking-overlay visible" onClick={onClose} />
-      <div className="booking-sheet visible">
-        <div className="booking-sheet-handle" />
+      <div className="booking-overlay visible" onClick={triggerClose} />
+      <div 
+        className={`booking-sheet visible ${isDragging ? 'dragging' : ''}`}
+        style={sheetStyle}
+      >
+        <div className="booking-sheet-handle-wrapper" {...handleProps} title="Drag down to dismiss">
+          <div className="booking-sheet-handle" />
+        </div>
         <div className="booking-sheet-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <BedDouble size={20} />
             <h3>Book a Room</h3>
           </div>
-          <button className="booking-sheet-close" onClick={onClose}><X size={16} /></button>
+          <button className="booking-sheet-close" onClick={triggerClose} title="Close"><X size={16} /></button>
         </div>
         <div className="booking-sheet-body">
           <div className="booking-venue-info">

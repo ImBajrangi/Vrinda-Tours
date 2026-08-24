@@ -1,9 +1,12 @@
 import { useMemo } from 'react';
 import { X, Car, Phone, Star } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
+import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import './BookingSheets.css';
 
 export default function RideSheet({ destination, drivers, userPosition, onSelectDriver, onClose }) {
+  const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+
   const refLat = userPosition?.lat || destination?.lat || 27.64;
   const refLng = userPosition?.lng || destination?.lng || 77.38;
 
@@ -35,25 +38,34 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
 
   return (
     <>
-      <div className="booking-overlay visible" onClick={onClose} />
-      <div className="booking-sheet visible">
-        <div className="booking-sheet-handle" />
+      <div className="booking-overlay visible" onClick={triggerClose} />
+      <div 
+        className={`booking-sheet visible ${isDragging ? 'dragging' : ''}`}
+        style={sheetStyle}
+      >
+        <div className="booking-sheet-handle-wrapper" {...handleProps} title="Drag down to dismiss">
+          <div className="booking-sheet-handle" />
+        </div>
         <div className="booking-sheet-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Car size={22} color="#22c55e" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: '#000000', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Car size={20} />
+            </div>
             <div>
-              <h3 style={{ margin: 0 }}>Available Pilgrim Rides</h3>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Heading to: {destination?.name || 'Destination'}</span>
+              <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Available Pilgrim Rides</h3>
+              <span style={{ fontSize: '0.78rem', color: 'var(--color-body)' }}>Destination: {destination?.name || 'Pilgrim Site'}</span>
             </div>
           </div>
-          <button className="booking-sheet-close" onClick={onClose}><X size={16} /></button>
+          <button className="booking-sheet-close" onClick={triggerClose} title="Close"><X size={16} /></button>
         </div>
         <div className="booking-sheet-body">
           {availableDrivers.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#94a3b8' }}>
-              <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🛺</div>
-              <h4 style={{ color: '#fff', margin: '0 0 0.25rem 0' }}>No Drivers Currently Online</h4>
-              <span style={{ fontSize: '0.8rem' }}>Please wait a moment or ask a driver to go online using the Driver Companion Portal.</span>
+            <div style={{ textAlign: 'center', padding: '3rem 1.5rem', color: 'var(--color-body)' }}>
+              <div style={{ fontSize: '2.8rem', marginBottom: '0.75rem' }}>🛺</div>
+              <h4 style={{ color: 'var(--color-ink)', margin: '0 0 0.4rem 0', fontSize: '1.1rem', fontWeight: 800 }}>No Drivers Currently Online</h4>
+              <span style={{ fontSize: '0.82rem', lineHeight: 1.5, display: 'block', maxWidth: '320px', margin: '0 auto' }}>
+                Please wait a moment or ask a fleet partner to go online using the Driver Companion Portal.
+              </span>
             </div>
           ) : (
             <div className="drivers-list">
@@ -67,10 +79,14 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
                       <span className="rd-vehicle-badge">{emoji}</span>
                     </div>
                     <div className="rd-info">
-                      <h4>{d.name}</h4>
+                      <div className="rd-title-row">
+                        <h4>{d.name}</h4>
+                        <span className="rd-rating"><Star size={11} fill="#f59e0b" color="#f59e0b" /> {d.rating || '4.9'}</span>
+                      </div>
                       <div className="rd-meta">
-                        <span className="rd-vehicle">{d.vehicleType || 'E-Rickshaw'} • {d.vehicleNo || 'UP-85'}</span>
-                        <span className="rd-rating"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {d.rating || '4.9'}</span>
+                        <span className="rd-vehicle-tag">{d.vehicleType || 'E-Rickshaw'}</span>
+                        <span className="rd-dot">•</span>
+                        <span className="rd-plate">{d.vehicleNo || 'UP-85'}</span>
                       </div>
                       <div className="rd-eta">{d._distanceText} away • ETA {d._eta}</div>
                     </div>
@@ -78,7 +94,7 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
                       <button className="rd-call-btn" onClick={() => window.open(`tel:${d.phone}`)} title="Call Driver">
                         <Phone size={15} />
                       </button>
-                      <button className="rd-select-btn" onClick={() => onSelectDriver(d)}>Request Ride</button>
+                      <button className="rd-select-btn" onClick={() => onSelectDriver(d)}>Book</button>
                     </div>
                   </div>
                 );
@@ -90,4 +106,3 @@ export default function RideSheet({ destination, drivers, userPosition, onSelect
     </>
   );
 }
-
