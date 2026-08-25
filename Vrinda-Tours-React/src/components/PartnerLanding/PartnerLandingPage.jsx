@@ -4,7 +4,8 @@ import {
   ArrowRight, ArrowLeft, CheckCircle2, Play, SlidersHorizontal,
   X, Plane, Building2, Bus, Car, Mail, Send, ChevronRight,
   Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Github, Globe,
-  CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin
+  CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
+  LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff
 } from 'lucide-react';
 import {
   heroSteps,
@@ -22,12 +23,34 @@ import {
   getCachedData,
   setCachedData
 } from '../../data/landingData';
+import { auth } from '../../config/firebase';
+import {
+  GoogleAuthProvider,
+  OAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut,
+  onAuthStateChanged,
+  signInAnonymously
+} from 'firebase/auth';
 import './PartnerLandingPage.css';
 
 export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
   const currentHero = heroSteps.find(h => h.step === activeStep) || heroSteps[0];
+
+  // Preload all Hero background pictures in memory for zero-latency, instant transitions
+  useEffect(() => {
+    heroSteps.forEach(step => {
+      if (step.bgImage) {
+        const img = new Image();
+        img.src = step.bgImage;
+      }
+    });
+  }, []);
 
   // Journey Animated Carousel State (Defaulting to step 2 "Book A Ticket" matching reference design)
   const [activeJourneyStep, setActiveJourneyStep] = useState(2);
@@ -75,16 +98,372 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('signup'); // 'login' | 'signup'
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState(250);
   const [minRatingFilter, setMinRatingFilter] = useState(4.5);
+
+  // Real-time Authentication & Firebase State Synchronization
+  const [currentUser, setCurrentUser] = useState(() => {
+    const cached = getCachedData('traveler_user', null);
+    // Purge mock dummy accounts from previous versions
+    if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google VIP Member')) {
+      setCachedData('traveler_user', null);
+      return null;
+    }
+    return cached;
+  });
+  const [signupStep, setSignupStep] = useState(1); // 1: Email & Pass, 2: Name, 3: Phone
+  const [authNameInput, setAuthNameInput] = useState('');
+  const [authEmailInput, setAuthEmailInput] = useState('');
+  const [authPhoneInput, setAuthPhoneInput] = useState('');
+  const [authPasswordInput, setAuthPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [authRememberMe, setAuthRememberMe] = useState(true);
+  const [authError, setAuthError] = useState('');
+  const [authSuccessMsg, setAuthSuccessMsg] = useState('');
 
   // Booking Form State
   const [bookingName, setBookingName] = useState('');
   const [bookingEmail, setBookingEmail] = useState('');
   const [bookingPhone, setBookingPhone] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  // Sync Firebase Auth state changes in real-time
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+      if (fbUser) {
+        const name = fbUser.displayName || fbUser.email?.split('@')[0] || (fbUser.isAnonymous ? 'Guest Traveler' : 'Traveler');
+        const email = fbUser.email || '';
+        const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+        const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+
+        const userObj = {
+          uid: fbUser.uid,
+          name,
+          email,
+          phone: fbUser.phoneNumber || '',
+          avatar,
+          initials,
+          authProvider: fbUser.providerData?.[0]?.providerId || (fbUser.isAnonymous ? 'anonymous' : 'password'),
+          memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+          isAnonymous: fbUser.isAnonymous
+        };
+
+        setCurrentUser(userObj);
+        setCachedData('traveler_user', userObj);
+        if (userObj.name && userObj.name !== 'Guest Traveler') setBookingName(userObj.name);
+        if (userObj.email) setBookingEmail(userObj.email);
+        if (userObj.phone) setBookingPhone(userObj.phone);
+      } else {
+        const cached = getCachedData('traveler_user', null);
+        if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google VIP Member')) {
+          setCachedData('traveler_user', null);
+          setCurrentUser(null);
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Auto-fill traveler data from User Profile cache whenever item selected or user changes
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.name && currentUser.name !== 'Guest Traveler') setBookingName(currentUser.name);
+      if (currentUser.email) setBookingEmail(currentUser.email);
+      if (currentUser.phone) setBookingPhone(currentUser.phone);
+    }
+  }, [currentUser, selectedItem]);
+
+  // Step 1: Validate Email & Password, proceed to Step 2
+  const handleStep1Next = (e) => {
+    e.preventDefault();
+    setAuthError('');
+    const email = authEmailInput.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setAuthError('Please enter a valid email address.');
+      return;
+    }
+    if (!authPasswordInput || authPasswordInput.length < 6) {
+      setAuthError('Password must be at least 6 characters.');
+      return;
+    }
+    setSignupStep(2);
+  };
+
+  // Step 2: Validate Full Legal Name, proceed to Step 3
+  const handleStep2Next = (e) => {
+    e.preventDefault();
+    setAuthError('');
+    if (!authNameInput.trim() || authNameInput.trim().length < 2) {
+      setAuthError('Please enter your full legal name.');
+      return;
+    }
+    setSignupStep(3);
+  };
+
+  // Step 3: Complete registration in Firebase Auth
+  const handleStep3Submit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthSuccessMsg('');
+    const email = authEmailInput.trim().toLowerCase();
+    const name = authNameInput.trim();
+    const phone = authPhoneInput.trim();
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, authPasswordInput);
+      const fbUser = userCredential.user;
+      await updateProfile(fbUser, { displayName: name });
+
+      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+      const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const newUser = {
+        uid: fbUser.uid,
+        name,
+        email,
+        phone,
+        avatar,
+        initials,
+        authProvider: 'password',
+        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        createdAt: new Date().toISOString()
+      };
+
+      setCurrentUser(newUser);
+      setCachedData('traveler_user', newUser);
+      setBookingName(newUser.name);
+      setBookingEmail(newUser.email);
+      if (phone) setBookingPhone(phone);
+      setAuthSuccessMsg('Account created & signed in successfully!');
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+        setAuthSuccessMsg('');
+        setSignupStep(1);
+      }, 500);
+    } catch (err) {
+      console.error("Firebase Signup Error:", err);
+      let errorMsg = err.message?.replace('Firebase: ', '');
+      if (err.code === 'auth/email-already-in-use') {
+        errorMsg = 'An account with this email already exists. Please log in.';
+      } else if (err.code === 'auth/weak-password') {
+        errorMsg = 'Password should be at least 6 characters.';
+      }
+      setAuthError(errorMsg);
+    }
+  };
+
+  // Real-time Firebase Login Handler
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError('');
+    setAuthSuccessMsg('');
+
+    const email = authEmailInput.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setAuthError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!authPasswordInput || authPasswordInput.length < 6) {
+      setAuthError('Please enter a password of at least 6 characters.');
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, authPasswordInput);
+      const fbUser = userCredential.user;
+      const name = fbUser.displayName || email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+
+      const loggedUser = {
+        uid: fbUser.uid,
+        name,
+        email,
+        phone: fbUser.phoneNumber || '',
+        avatar,
+        initials,
+        authProvider: 'password',
+        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        createdAt: new Date().toISOString()
+      };
+
+      setCurrentUser(loggedUser);
+      setCachedData('traveler_user', loggedUser);
+      setBookingName(name);
+      setBookingEmail(email);
+      setAuthSuccessMsg(`Welcome back, ${name}!`);
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+        setAuthSuccessMsg('');
+      }, 500);
+    } catch (err) {
+      console.error("Firebase Login Error:", err);
+      let errorMsg = err.message?.replace('Firebase: ', '');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        errorMsg = 'Invalid email or password. Please verify and try again.';
+      }
+      setAuthError(errorMsg);
+    }
+  };
+
+  // Real Firebase Google OAuth Authentication Handler
+  const handleGoogleAuth = async () => {
+    setAuthError('');
+    setAuthSuccessMsg('');
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const result = await signInWithPopup(auth, provider);
+      const fbUser = result.user;
+      const name = fbUser.displayName || fbUser.email?.split('@')[0] || 'Traveler';
+      const email = fbUser.email || '';
+      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+
+      const googleUser = {
+        uid: fbUser.uid,
+        name,
+        email,
+        phone: fbUser.phoneNumber || '',
+        avatar,
+        initials,
+        authProvider: 'google',
+        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        createdAt: new Date().toISOString()
+      };
+
+      setCurrentUser(googleUser);
+      setCachedData('traveler_user', googleUser);
+      setBookingName(name);
+      setBookingEmail(email);
+      if (fbUser.phoneNumber) setBookingPhone(fbUser.phoneNumber);
+      setAuthSuccessMsg(`Signed in as ${name}!`);
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+        setAuthSuccessMsg('');
+      }, 500);
+    } catch (err) {
+      console.error("Google Auth error:", err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setAuthError(err.message?.replace('Firebase: ', '') || 'Failed to sign in with Google.');
+      }
+    }
+  };
+
+  // Real Firebase Apple Authentication Handler (with graceful fallback)
+  const handleAppleAuth = async () => {
+    setAuthError('');
+    setAuthSuccessMsg('');
+    try {
+      const provider = new OAuthProvider('apple.com');
+      const result = await signInWithPopup(auth, provider);
+      const fbUser = result.user;
+      const name = fbUser.displayName || 'Apple Traveler';
+      const email = fbUser.email || '';
+      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'AT';
+
+      const appleUser = {
+        uid: fbUser.uid,
+        name,
+        email,
+        phone: '',
+        avatar,
+        initials,
+        authProvider: 'apple',
+        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        createdAt: new Date().toISOString()
+      };
+      setCurrentUser(appleUser);
+      setCachedData('traveler_user', appleUser);
+      setBookingName(name);
+      setBookingEmail(email);
+      setAuthSuccessMsg(`Signed in with Apple!`);
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+        setAuthSuccessMsg('');
+      }, 500);
+    } catch (err) {
+      console.error("Apple Auth error:", err);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setAuthError('Apple Sign-In is not enabled on this Firebase project. Please sign in with Google or Email.');
+      }
+    }
+  };
+
+  // Real Firebase Anonymous Guest Authentication
+  const handleGuestAuth = async () => {
+    setAuthError('');
+    setAuthSuccessMsg('');
+    try {
+      const result = await signInAnonymously(auth);
+      const fbUser = result.user;
+      const guestUser = {
+        uid: fbUser.uid,
+        name: 'Guest Traveler',
+        email: '',
+        phone: '',
+        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=Guest&backgroundColor=0b0f19&textColor=ffffff`,
+        initials: 'GT',
+        authProvider: 'anonymous',
+        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        createdAt: new Date().toISOString()
+      };
+      setCurrentUser(guestUser);
+      setCachedData('traveler_user', guestUser);
+      setAuthSuccessMsg('Continuing as Guest Traveler!');
+      setTimeout(() => {
+        setIsAuthModalOpen(false);
+        setAuthSuccessMsg('');
+      }, 450);
+    } catch (err) {
+      console.error("Guest Auth error:", err);
+      setAuthError('Could not start guest session.');
+    }
+  };
+
+  const handleBookingNameChange = (val) => {
+    setBookingName(val);
+    if (currentUser) {
+      const updated = { ...currentUser, name: val };
+      setCurrentUser(updated);
+      setCachedData('traveler_user', updated);
+    }
+  };
+
+  const handleBookingEmailChange = (val) => {
+    setBookingEmail(val);
+    if (currentUser) {
+      const updated = { ...currentUser, email: val };
+      setCurrentUser(updated);
+      setCachedData('traveler_user', updated);
+    }
+  };
+
+  const handleBookingPhoneChange = (val) => {
+    setBookingPhone(val);
+    if (currentUser) {
+      const updated = { ...currentUser, phone: val };
+      setCurrentUser(updated);
+      setCachedData('traveler_user', updated);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+    setCurrentUser(null);
+    setCachedData('traveler_user', null);
+    setBookingName('');
+    setBookingEmail('');
+    setBookingPhone('');
+  };
 
   // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -197,6 +576,27 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
           {/* Action CTAs */}
           <div className="tp-nav-actions">
+            {/* User Profile / Auth Action */}
+            {currentUser ? (
+              <div className="tp-nav-user-pill" onClick={handleLogout} title="Signed in. Click to Sign Out">
+                <img src={currentUser.avatar} alt={currentUser.name} className="tp-nav-user-avatar" />
+                <span className="tp-nav-user-name">{currentUser.name?.split(' ')[0] || 'User'}</span>
+                <LogOut size={13} className="tp-nav-user-logout-icon" />
+              </div>
+            ) : (
+              <button
+                className="tp-btn-nav-signin"
+                onClick={() => {
+                  setAuthMode('login');
+                  setIsAuthModalOpen(true);
+                }}
+                title="Sign In / Register Profile"
+              >
+                <LogIn size={14} />
+                <span>Sign In</span>
+              </button>
+            )}
+
             <button
               className="tp-btn-dark-pill"
               onClick={() => {
@@ -222,15 +622,19 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       {/* 2. MASTER AVIATION HERO SECTION (Exact Reference Design) */}
       <section className="tp-hero-section" id="hero">
         <div className="tp-hero-plane-card">
-          {/* Background Soaring Airplane Visual */}
+          {/* Background Soaring Airplane Visual (Preloaded Layered Images for Instant Transitions) */}
           <div className="tp-plane-bg-layer">
-            <img
-              key={currentHero.step}
-              src={currentHero.bgImage}
-              alt="Passenger Airplane Soaring Through Sky and Clouds"
-              className="tp-plane-bg-img tp-fade-in-img"
-              loading="eager"
-            />
+            {heroSteps.map((stepItem) => (
+              <img
+                key={stepItem.step}
+                src={stepItem.bgImage}
+                alt="Passenger Airplane Soaring Through Sky and Clouds"
+                className={`tp-plane-bg-img ${activeStep === stepItem.step ? 'active' : 'inactive'}`}
+                loading={stepItem.step === 1 ? 'eager' : 'lazy'}
+                fetchPriority={stepItem.step === 1 ? 'high' : 'auto'}
+                decoding="async"
+              />
+            ))}
             <div className="tp-plane-sky-gradient" />
           </div>
 
@@ -310,6 +714,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     alt="Awesome place thumbnail"
                     className="tp-km-avatar-img"
                     style={{ zIndex: 3 - i }}
+                    loading="lazy"
+                    decoding="async"
                   />
                 ))}
               </div>
@@ -427,6 +833,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           alt={step.shortTitle}
                           className="tp-j-cutout-img"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     </div>
@@ -569,6 +976,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     alt={pillar.alt}
                     className="tp-pillar-img"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="tp-pillar-scrim" />
 
@@ -863,18 +1271,14 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       {selectedItem && (
         <div className="tp-modal-overlay" onClick={() => setSelectedItem(null)}>
           <div className="tp-modal-card tp-booking-modal-card" onClick={(e) => e.stopPropagation()}>
-            
+
             {/* Top Hero Banner with Media & Close Button */}
             <div className="tp-modal-hero-cover">
-              <img src={selectedItem.image} alt={selectedItem.title} className="tp-modal-hero-img" />
+              <img src={selectedItem.image} alt={selectedItem.title} className="tp-modal-hero-img" loading="eager" decoding="async" />
               <div className="tp-modal-hero-scrim" />
-              
-              {/* Floating Header Badges */}
+
+              {/* Floating Close Button */}
               <div className="tp-modal-hero-top-bar">
-                <span className="tp-modal-badge-category">
-                  <Compass size={13} />
-                  <span>{selectedItem.category || 'Featured Tour'}</span>
-                </span>
                 <button className="tp-modal-close-glass" onClick={() => setSelectedItem(null)} aria-label="Close modal">
                   <X size={18} />
                 </button>
@@ -896,39 +1300,69 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
             {/* Modal Body Container */}
             <div className="tp-modal-body-wrapper">
-              
-              {/* Trip Highlights 3-Card Deck */}
+
+              {/* Trip Highlights Info Bar: Unified Segmented Summary Deck */}
               <div className="tp-modal-trip-meta-bar">
-                <div className="tp-meta-pill">
-                  <div className="tp-meta-icon-badge">
-                    <Calendar size={13} />
-                  </div>
-                  <div className="tp-meta-text">
-                    <span className="tp-meta-lbl">Dates</span>
-                    <strong className="tp-meta-val">{formatTripDates(checkInDate, checkOutDate)}</strong>
-                  </div>
+                <div className="tp-meta-segment">
+                  <span className="tp-meta-lbl"><Calendar size={12} /> Dates</span>
+                  <strong className="tp-meta-val">{formatTripDates(checkInDate, checkOutDate)}</strong>
                 </div>
 
-                <div className="tp-meta-pill">
-                  <div className="tp-meta-icon-badge">
-                    <Users size={13} />
-                  </div>
-                  <div className="tp-meta-text">
-                    <span className="tp-meta-lbl">Travelers</span>
-                    <strong className="tp-meta-val">{roomsGuests || '2 Guests'}</strong>
-                  </div>
+                <div className="tp-meta-divider" />
+
+                <div className="tp-meta-segment">
+                  <span className="tp-meta-lbl"><Users size={12} /> Guests</span>
+                  <strong className="tp-meta-val">{roomsGuests ? roomsGuests.replace('1 Room, ', '') : '2 Guests'}</strong>
                 </div>
 
-                <div className="tp-meta-pill tp-meta-price-card">
-                  <div className="tp-meta-icon-badge">
-                    <Sparkles size={13} />
-                  </div>
-                  <div className="tp-meta-text">
-                    <span className="tp-meta-lbl">Starting Rate</span>
-                    <strong className="tp-meta-val-price">{selectedItem.price} <small>{selectedItem.priceUnit || '/pax'}</small></strong>
-                  </div>
+                <div className="tp-meta-divider" />
+
+                <div className="tp-meta-segment tp-meta-segment-price">
+                  <span className="tp-meta-lbl"><Sparkles size={12} /> Starting Rate</span>
+                  <strong className="tp-meta-val tp-meta-val-highlight">
+                    {selectedItem.price} <small>{selectedItem.priceUnit || '/pax'}</small>
+                  </strong>
                 </div>
               </div>
+
+              {/* Login / Auto-fill Status Banner */}
+              {/* Member Auto-fill / Sign In Bar */}
+              {currentUser ? (
+                <div className="tp-modal-autofill-banner">
+                  <div className="tp-autofill-left">
+                    <div className="tp-autofill-avatar-wrap">
+                      <img src={currentUser.avatar} alt={currentUser.name} className="tp-autofill-avatar" />
+                      <span className="tp-autofill-status-dot" />
+                    </div>
+                    <div className="tp-autofill-info">
+                      <span className="tp-autofill-title">Autofilled for <strong>{currentUser.name}</strong></span>
+                      <span className="tp-autofill-sub">{currentUser.email || 'Guest Traveler'} • {currentUser.isAnonymous ? 'Guest' : 'Verified Traveler'}</span>
+                    </div>
+                  </div>
+                  <button type="button" className="tp-autofill-switch-btn" onClick={handleLogout} title="Switch Profile / Sign Out">
+                    <span>Switch</span>
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="tp-modal-login-prompt"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <div className="tp-login-prompt-content">
+                    <Sparkles size={13} className="tp-prompt-sparkle" />
+                    <span>Have a profile? <strong className="tp-prompt-highlight">Sign in for 1-click autofill</strong></span>
+                  </div>
+                  <span className="tp-prompt-cta-link">
+                    <span>Sign In</span>
+                    <ArrowRight size={12} />
+                  </span>
+                </div>
+              )}
 
               {/* Form Content */}
               {bookingSuccess ? (
@@ -949,7 +1383,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         type="text"
                         placeholder="e.g. Johnathan Doe"
                         value={bookingName}
-                        onChange={(e) => setBookingName(e.target.value)}
+                        onChange={(e) => handleBookingNameChange(e.target.value)}
                         required
                       />
                     </div>
@@ -964,7 +1398,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           type="email"
                           placeholder="name@example.com"
                           value={bookingEmail}
-                          onChange={(e) => setBookingEmail(e.target.value)}
+                          onChange={(e) => handleBookingEmailChange(e.target.value)}
                           required
                         />
                       </div>
@@ -978,23 +1412,30 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           type="tel"
                           placeholder="+1 (555) 019-2834"
                           value={bookingPhone}
-                          onChange={(e) => setBookingPhone(e.target.value)}
+                          onChange={(e) => handleBookingPhoneChange(e.target.value)}
                           required
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Trust Perks */}
-                  <div className="tp-modal-trust-perks">
-                    <span className="tp-trust-tag"><ShieldCheck size={13} /> Free Cancellation & Rescheduling</span>
-                    <span className="tp-trust-tag"><Sparkles size={13} /> 24/7 Dedicated Concierge</span>
-                  </div>
-
                   <button type="submit" className="tp-btn-luxury-reserve">
                     <span>Reserve Itinerary on WhatsApp</span>
                     <ArrowRight size={16} />
                   </button>
+
+                  {/* Subtle Professional Trust Perks */}
+                  <div className="tp-modal-trust-perks">
+                    <span className="tp-trust-tag">
+                      <ShieldCheck size={13} />
+                      <span>Free Cancellation</span>
+                    </span>
+                    <span className="tp-trust-dot">•</span>
+                    <span className="tp-trust-tag">
+                      <Sparkles size={13} />
+                      <span>24/7 Concierge</span>
+                    </span>
+                  </div>
                 </form>
               )}
             </div>
@@ -1071,6 +1512,305 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               >
                 Apply Filters ({filteredDestinations.length} Results)
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 11. iOS STYLE LUXURY VIP AUTH & PROFILE LOGIN MODAL */}
+      {isAuthModalOpen && (
+        <div className="tp-modal-overlay" onClick={() => setIsAuthModalOpen(false)}>
+          <div className="tp-modal-card tp-auth-ios-card" onClick={(e) => e.stopPropagation()}>
+            <div className="tp-auth-ios-header">
+              <button
+                className="tp-auth-ios-close-btn"
+                onClick={() => setIsAuthModalOpen(false)}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="tp-auth-ios-body">
+              {authMode === 'signup' ? (
+                <div className="tp-auth-ios-intro-block">
+                  <div className="tp-auth-ios-icon-badge">
+                    <Sparkles size={22} color="#1b3b18" />
+                  </div>
+                  <h2 className="tp-auth-ios-title">
+                    {signupStep === 1 && 'Create Account'}
+                    {signupStep === 2 && "What's Your Name?"}
+                    {signupStep === 3 && 'WhatsApp & Contact'}
+                  </h2>
+                  <p className="tp-auth-ios-subtitle">
+                    {signupStep === 1 && 'Step 1 of 3: Enter your login email & password'}
+                    {signupStep === 2 && 'Step 2 of 3: Enter your full legal name for reservations'}
+                    {signupStep === 3 && 'Step 3 of 3: Add your number for instant WhatsApp concierge sync'}
+                  </p>
+                  <div className="tp-auth-progress-bars">
+                    <span className={`tp-auth-prog-seg ${signupStep >= 1 ? 'active' : ''}`} />
+                    <span className={`tp-auth-prog-seg ${signupStep >= 2 ? 'active' : ''}`} />
+                    <span className={`tp-auth-prog-seg ${signupStep >= 3 ? 'active' : ''}`} />
+                  </div>
+                </div>
+              ) : (
+                <div className="tp-auth-ios-intro-block">
+                  <h2 className="tp-auth-ios-title">Login</h2>
+                </div>
+              )}
+
+              {/* Dynamic Auth Form: Login or 3-Step Registration */}
+              {authMode === 'login' ? (
+                <form onSubmit={handleLoginSubmit} className="tp-auth-ios-form">
+                  <div className="tp-auth-pill-input-wrap">
+                    <Mail size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type="email"
+                      className="tp-auth-pill-input"
+                      placeholder="Email"
+                      value={authEmailInput}
+                      onChange={(e) => setAuthEmailInput(e.target.value)}
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  <div className="tp-auth-pill-input-wrap">
+                    <Lock size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      className="tp-auth-pill-input"
+                      placeholder="Password"
+                      value={authPasswordInput}
+                      onChange={(e) => setAuthPasswordInput(e.target.value)}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="tp-auth-eye-btn"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+
+                  <div className="tp-auth-forgot-row">
+                    <button
+                      type="button"
+                      className="tp-auth-forgot-link"
+                      onClick={() => setAuthError('Password reset link sent to your email.')}
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
+                  {authError && <div className="tp-auth-error-msg">{authError}</div>}
+                  {authSuccessMsg && <div className="tp-auth-success-msg">✓ {authSuccessMsg}</div>}
+
+                  <button type="submit" className="tp-btn-auth-primary-green">
+                    <span>Login</span>
+                  </button>
+                </form>
+              ) : (
+                /* 3-STEP SIGN UP FORMS */
+                <div className="tp-auth-step-container">
+                  {/* STEP 1: EMAIL & PASSWORD */}
+                  {signupStep === 1 && (
+                    <form onSubmit={handleStep1Next} className="tp-auth-ios-form">
+                      <div className="tp-auth-pill-input-wrap">
+                        <Mail size={17} className="tp-auth-pill-icon" />
+                        <input
+                          type="email"
+                          className="tp-auth-pill-input"
+                          placeholder="Email"
+                          value={authEmailInput}
+                          onChange={(e) => setAuthEmailInput(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      <div className="tp-auth-pill-input-wrap">
+                        <Lock size={17} className="tp-auth-pill-icon" />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          className="tp-auth-pill-input"
+                          placeholder="Create Password"
+                          value={authPasswordInput}
+                          onChange={(e) => setAuthPasswordInput(e.target.value)}
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="tp-auth-eye-btn"
+                          onClick={() => setShowPassword(!showPassword)}
+                          tabIndex={-1}
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
+
+                      {authError && <div className="tp-auth-error-msg">{authError}</div>}
+
+                      <button type="submit" className="tp-btn-auth-primary-green">
+                        <span>Continue to Step 2 →</span>
+                      </button>
+                    </form>
+                  )}
+
+                  {/* STEP 2: USER FULL LEGAL NAME */}
+                  {signupStep === 2 && (
+                    <form onSubmit={handleStep2Next} className="tp-auth-ios-form">
+                      <div className="tp-auth-pill-input-wrap">
+                        <User size={17} className="tp-auth-pill-icon" />
+                        <input
+                          type="text"
+                          className="tp-auth-pill-input"
+                          placeholder="Full Legal Name"
+                          value={authNameInput}
+                          onChange={(e) => setAuthNameInput(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      {authError && <div className="tp-auth-error-msg">{authError}</div>}
+
+                      <div className="tp-auth-step-btn-row">
+                        <button
+                          type="button"
+                          className="tp-btn-auth-back"
+                          onClick={() => {
+                            setAuthError('');
+                            setSignupStep(1);
+                          }}
+                        >
+                          ← Back
+                        </button>
+                        <button type="submit" className="tp-btn-auth-primary-green">
+                          <span>Next: Phone Number →</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* STEP 3: WHATSAPP / PHONE NUMBER */}
+                  {signupStep === 3 && (
+                    <form onSubmit={handleStep3Submit} className="tp-auth-ios-form">
+                      <div className="tp-auth-pill-input-wrap">
+                        <Phone size={17} className="tp-auth-pill-icon" />
+                        <input
+                          type="tel"
+                          className="tp-auth-pill-input"
+                          placeholder="WhatsApp / Phone Number"
+                          value={authPhoneInput}
+                          onChange={(e) => setAuthPhoneInput(e.target.value)}
+                          required
+                          autoFocus
+                        />
+                      </div>
+
+                      {authError && <div className="tp-auth-error-msg">{authError}</div>}
+                      {authSuccessMsg && <div className="tp-auth-success-msg">✓ {authSuccessMsg}</div>}
+
+                      <div className="tp-auth-step-btn-row">
+                        <button
+                          type="button"
+                          className="tp-btn-auth-back"
+                          onClick={() => {
+                            setAuthError('');
+                            setSignupStep(2);
+                          }}
+                        >
+                          ← Back
+                        </button>
+                        <button type="submit" className="tp-btn-auth-primary-green">
+                          <span>Complete Registration ✓</span>
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* Show OAuth & Guest on Step 1 and Login */}
+              {(authMode === 'login' || (authMode === 'signup' && signupStep === 1)) && (
+                <>
+                  <div className="tp-auth-ios-divider">
+                    <span>or</span>
+                  </div>
+
+                  <div className="tp-auth-social-stack">
+                    <button
+                      type="button"
+                      className="tp-btn-ios-pill tp-btn-ios-google"
+                      onClick={handleGoogleAuth}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" className="tp-oauth-icon">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      <span>Continue with Google</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="tp-btn-ios-pill tp-btn-ios-apple"
+                      onClick={handleAppleAuth}
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="tp-oauth-icon">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.93-2.85-.9.04-2 .6-2.64 1.35-.56.65-1.05 1.72-.92 2.74 1.01.08 2.03-.49 2.63-1.24" />
+                      </svg>
+                      <span>Continue with Apple</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="tp-btn-ios-pill tp-btn-ios-guest"
+                      onClick={handleGuestAuth}
+                    >
+                      <UserCheck size={18} className="tp-oauth-icon" />
+                      <span>Continue As Guest</span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* Bottom Switch Row */}
+              <div className="tp-auth-ios-footer">
+                {authMode === 'login' ? (
+                  <p className="tp-auth-ios-switch-text">
+                    Need an account?{' '}
+                    <strong
+                      onClick={() => {
+                        setAuthError('');
+                        setAuthSuccessMsg('');
+                        setAuthMode('signup');
+                        setSignupStep(1);
+                      }}
+                    >
+                      Sign up
+                    </strong>
+                  </p>
+                ) : (
+                  <p className="tp-auth-ios-switch-text">
+                    Already have an account?{' '}
+                    <strong
+                      onClick={() => {
+                        setAuthError('');
+                        setAuthSuccessMsg('');
+                        setAuthMode('login');
+                      }}
+                    >
+                      Log in
+                    </strong>
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>

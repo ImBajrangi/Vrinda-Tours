@@ -30,3 +30,9 @@ be creative and expert professional designer please
 ## Always do
 Do not use unusual hover translateY like animations please
 you are expert UI UX designer and frontend developer
+
+
+"Store third-party API credentials and Firebase project IDs in environment variables (.env.local / VITE_*) with fallback defaults to ensure seamless environment switching between staging and production."
+
+"Never use hardcoded mock authentication credentials or dummy test users (Google Traveler, etc.) in frontend components; always implement real Firebase Auth SDK methods with environment variables and real-time state listeners."
+
