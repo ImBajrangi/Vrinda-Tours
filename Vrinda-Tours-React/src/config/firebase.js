@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { initializeFirestore, getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 // Firebase configuration loaded from environment variables with fallback
@@ -19,7 +19,16 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize and export Firebase services
 export const auth = getAuth(app);
-export const firestore = getFirestore(app);
+
+let db;
+try {
+  db = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true
+  });
+} catch (e) {
+  db = getFirestore(app);
+}
+export const firestore = db;
 
 // Initialize Analytics conditionally where supported
 export let analytics = null;

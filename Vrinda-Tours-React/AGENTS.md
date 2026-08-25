@@ -36,3 +36,5 @@ you are expert UI UX designer and frontend developer
 
 "Never use hardcoded mock authentication credentials or dummy test users (Google Traveler, etc.) in frontend components; always implement real Firebase Auth SDK methods with environment variables and real-time state listeners."
 
+"Always use subtle, ultra-thin, light outlines and borders (e.g., 1px solid rgba(0, 0, 0, 0.06-0.08) or #e2e8f0) instead of thick, heavy, or dark strokes to maintain a clean, refined, high-end modern aesthetic."
+

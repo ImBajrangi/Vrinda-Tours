@@ -2,11 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Compass, Calendar, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, CheckCircle2, Play, SlidersHorizontal,
-  X, Plane, Building2, Bus, Car, Mail, Send, ChevronRight,
-  Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Github, Globe,
+  X, Plane, Building2, Bus, Car, Mail, Send, ChevronRight, ChevronDown,
+  Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff
 } from 'lucide-react';
+
+const PinterestIcon = ({ size = 14, className = "" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.546.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
+  </svg>
+);
 import {
   heroSteps,
   awesomePlaceAvatars,
@@ -37,10 +43,61 @@ import {
 } from 'firebase/auth';
 import './PartnerLandingPage.css';
 
+// Validates phone number (supports Indian 10-digit mobile, +91, 0, and international 7-15 digits) without OTP verification needed
+export const validatePhoneNumber = (rawPhone) => {
+  if (!rawPhone || !rawPhone.trim()) {
+    return { isValid: false, message: 'Please enter your mobile or WhatsApp number.' };
+  }
+
+  const cleaned = rawPhone.trim().replace(/[\s\-\(\)]/g, '');
+  const digitsOnly = cleaned.replace(/\D/g, '');
+
+  let localDigits = digitsOnly;
+  if (cleaned.startsWith('+91')) {
+    localDigits = cleaned.slice(3).replace(/\D/g, '');
+  } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
+    localDigits = digitsOnly.slice(2);
+  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
+    localDigits = digitsOnly.slice(1);
+  }
+
+  // 10-digit Indian Mobile Number
+  if (localDigits.length === 10) {
+    if (/^[6-9]\d{9}$/.test(localDigits)) {
+      return {
+        isValid: true,
+        formatted: `+91 ${localDigits.slice(0, 5)} ${localDigits.slice(5)}`,
+        clean: `+91${localDigits}`
+      };
+    }
+    return { isValid: false, message: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' };
+  }
+
+  // International phone numbers (7 to 15 digits)
+  if (digitsOnly.length >= 7 && digitsOnly.length <= 15) {
+    return {
+      isValid: true,
+      formatted: cleaned.startsWith('+') ? cleaned : `+${digitsOnly}`,
+      clean: cleaned.startsWith('+') ? cleaned : `+${digitsOnly}`
+    };
+  }
+
+  return { isValid: false, message: 'Please enter a valid 10-digit mobile number.' };
+};
+
 export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
   const currentHero = heroSteps.find(h => h.step === activeStep) || heroSteps[0];
+
+  // Continuous auto-loop Hero Slider every 5.5s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep((prev) => (prev % heroSteps.length) + 1);
+    }, 5500);
+
+    return () => clearInterval(interval);
+  }, [activeStep]);
 
   // Preload all Hero background pictures in memory for zero-latency, instant transitions
   useEffect(() => {
@@ -100,7 +157,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [priceFilter, setPriceFilter] = useState(250);
+  const [priceFilter, setPriceFilter] = useState(15000);
   const [minRatingFilter, setMinRatingFilter] = useState(4.5);
 
   // Real-time Authentication & Firebase State Synchronization
@@ -122,6 +179,41 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [authRememberMe, setAuthRememberMe] = useState(true);
   const [authError, setAuthError] = useState('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState('');
+  const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
+  const [floatingToast, setFloatingToast] = useState(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef(null);
+
+  // Smart display name helper that handles titles like 'Dr.', 'Mr.', 'Prof.'
+  const getDisplayName = (name) => {
+    if (!name) return 'Traveler';
+    const parts = name.trim().split(/\s+/);
+    const titles = ['dr', 'dr.', 'mr', 'mr.', 'mrs', 'mrs.', 'ms', 'ms.', 'prof', 'prof.', 'shri', 'smt', 'pandit'];
+    if (parts.length > 1 && titles.includes(parts[0].toLowerCase())) {
+      return `${parts[0]} ${parts[1]}`;
+    }
+    return parts[0];
+  };
+
+  // Close profile menu when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Booking Form State
   const [bookingName, setBookingName] = useState('');
@@ -138,11 +230,14 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
         const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
 
+        const cached = getCachedData('traveler_user', null);
+        const existingPhone = (cached && (cached.uid === fbUser.uid || cached.email === email) && cached.phone) ? cached.phone : (fbUser.phoneNumber || '');
+
         const userObj = {
           uid: fbUser.uid,
           name,
           email,
-          phone: fbUser.phoneNumber || '',
+          phone: existingPhone,
           avatar,
           initials,
           authProvider: fbUser.providerData?.[0]?.providerId || (fbUser.isAnonymous ? 'anonymous' : 'password'),
@@ -166,6 +261,64 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
     return () => unsubscribe();
   }, []);
+
+  // Proactive registration & complete profile toast notification
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const dismissed = sessionStorage.getItem('vrinda_toast_dismissed');
+      if (dismissed) return;
+
+      if (!currentUser) {
+        setFloatingToast({
+          id: 'register_prompt',
+          icon: <Sparkles size={18} />,
+          highlight: true,
+          title: 'Unlock 15% VIP Member Discount',
+          desc: 'Sign in or register your profile for instant booking vouchers & live GPS navigation.',
+          ctaText: 'Sign In / Register',
+          onCta: () => {
+            setAuthMode('signup');
+            setSignupStep(1);
+            setIsAuthModalOpen(true);
+            setFloatingToast(null);
+          }
+        });
+      } else if (!currentUser.phone) {
+        setFloatingToast({
+          id: 'phone_prompt',
+          icon: <Phone size={18} />,
+          highlight: true,
+          title: 'Complete Your Profile',
+          desc: 'Add your WhatsApp number to receive booking confirmations & driver arrival alerts.',
+          ctaText: 'Add Phone Number',
+          onCta: () => {
+            setPendingGoogleUser(currentUser);
+            setAuthPhoneInput(currentUser.phone || '');
+            setAuthMode('phone_prompt');
+            setIsAuthModalOpen(true);
+            setFloatingToast(null);
+          }
+        });
+      } else if (currentUser.isAnonymous) {
+        setFloatingToast({
+          id: 'guest_prompt',
+          icon: <UserCheck size={18} />,
+          highlight: false,
+          title: 'Register Full Profile',
+          desc: 'You are browsing as Guest. Register to sync bookings and get pilgrim discounts.',
+          ctaText: 'Register Now',
+          onCta: () => {
+            setAuthMode('signup');
+            setSignupStep(1);
+            setIsAuthModalOpen(true);
+            setFloatingToast(null);
+          }
+        });
+      }
+    }, 2800);
+
+    return () => clearTimeout(timer);
+  }, [currentUser]);
 
   // Auto-fill traveler data from User Profile cache whenever item selected or user changes
   useEffect(() => {
@@ -210,7 +363,13 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     setAuthSuccessMsg('');
     const email = authEmailInput.trim().toLowerCase();
     const name = authNameInput.trim();
-    const phone = authPhoneInput.trim();
+    
+    const phoneValidation = validatePhoneNumber(authPhoneInput);
+    if (!phoneValidation.isValid) {
+      setAuthError(phoneValidation.message);
+      return;
+    }
+    const phone = phoneValidation.formatted;
 
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, authPasswordInput);
@@ -323,11 +482,17 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
       const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
 
+      // Check if this user already has a saved phone number
+      const cached = getCachedData('traveler_user', null);
+      const existingPhone = (cached && (cached.uid === fbUser.uid || cached.email === email) && cached.phone)
+        ? cached.phone
+        : (fbUser.phoneNumber || '');
+
       const googleUser = {
         uid: fbUser.uid,
         name,
         email,
-        phone: fbUser.phoneNumber || '',
+        phone: existingPhone,
         avatar,
         initials,
         authProvider: 'google',
@@ -335,22 +500,76 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         createdAt: new Date().toISOString()
       };
 
-      setCurrentUser(googleUser);
-      setCachedData('traveler_user', googleUser);
-      setBookingName(name);
-      setBookingEmail(email);
-      if (fbUser.phoneNumber) setBookingPhone(fbUser.phoneNumber);
-      setAuthSuccessMsg(`Signed in as ${name}!`);
-      setTimeout(() => {
-        setIsAuthModalOpen(false);
-        setAuthSuccessMsg('');
-      }, 500);
+      if (existingPhone) {
+        // User already has phone number -> Login successful immediately!
+        setCurrentUser(googleUser);
+        setCachedData('traveler_user', googleUser);
+        setBookingName(name);
+        setBookingEmail(email);
+        setBookingPhone(existingPhone);
+        setAuthSuccessMsg(`Welcome back, ${name}!`);
+        setTimeout(() => {
+          setIsAuthModalOpen(false);
+          setAuthSuccessMsg('');
+          setPendingGoogleUser(null);
+        }, 500);
+      } else {
+        // We don't have user's phone number -> Prompt as part of sign-in process
+        setPendingGoogleUser(googleUser);
+        setAuthMode('phone_prompt');
+        setAuthPhoneInput('');
+        setBookingName(name);
+        setBookingEmail(email);
+      }
     } catch (err) {
       console.error("Google Auth error:", err);
       if (err.code !== 'auth/popup-closed-by-user') {
         setAuthError(err.message?.replace('Firebase: ', '') || 'Failed to sign in with Google.');
       }
     }
+  };
+
+  // Handler for Phone Prompt Confirmation in Sign-in Process
+  const handlePhonePromptSubmit = (e) => {
+    if (e) e.preventDefault();
+    setAuthError('');
+    const phoneValidation = validatePhoneNumber(authPhoneInput);
+    if (!phoneValidation.isValid) {
+      setAuthError(phoneValidation.message);
+      return;
+    }
+    const sanitizedPhone = phoneValidation.formatted;
+    const targetUser = pendingGoogleUser || currentUser;
+    const completedUser = {
+      ...targetUser,
+      phone: sanitizedPhone
+    };
+    setCurrentUser(completedUser);
+    setCachedData('traveler_user', completedUser);
+    setBookingPhone(sanitizedPhone);
+    setAuthSuccessMsg(`Welcome, ${completedUser.name}!`);
+    setTimeout(() => {
+      setIsAuthModalOpen(false);
+      setAuthSuccessMsg('');
+      setPendingGoogleUser(null);
+      setAuthMode('login');
+    }, 400);
+  };
+
+  // Handler to skip phone number entry
+  const handlePhonePromptSkip = () => {
+    const targetUser = pendingGoogleUser || currentUser;
+    if (targetUser) {
+      setCurrentUser(targetUser);
+      setCachedData('traveler_user', targetUser);
+    }
+    setAuthSuccessMsg('Welcome!');
+    setTimeout(() => {
+      setIsAuthModalOpen(false);
+      setAuthSuccessMsg('');
+      setPendingGoogleUser(null);
+      setAuthMode('login');
+    }, 400);
   };
 
   // Real Firebase Apple Authentication Handler (with graceful fallback)
@@ -389,7 +608,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     } catch (err) {
       console.error("Apple Auth error:", err);
       if (err.code !== 'auth/popup-closed-by-user') {
-        setAuthError('Apple Sign-In is not enabled on this Firebase project. Please sign in with Google or Email.');
+        setAuthError('Apple Sign-In is Coming Soon...');
       }
     }
   };
@@ -527,6 +746,13 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
+    if (bookingPhone) {
+      const validation = validatePhoneNumber(bookingPhone);
+      if (!validation.isValid) {
+        alert(validation.message);
+        return;
+      }
+    }
     setBookingSuccess(true);
     setTimeout(() => {
       const message = encodeURIComponent(
@@ -570,7 +796,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           <nav className="tp-nav-menu">
             <a href="#about" className="tp-nav-item uppercase">ABOUT</a>
             <a href="#popular" className="tp-nav-item uppercase">TOUR</a>
-            <a href="#explore" className="tp-nav-item uppercase">PACKAGE</a>
+            <a href="#explore" className="tp-nav-item uppercase">BRIJ PACKAGES</a>
             <a href="#footer" className="tp-nav-item uppercase">CONTACT</a>
           </nav>
 
@@ -578,10 +804,157 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           <div className="tp-nav-actions">
             {/* User Profile / Auth Action */}
             {currentUser ? (
-              <div className="tp-nav-user-pill" onClick={handleLogout} title="Signed in. Click to Sign Out">
-                <img src={currentUser.avatar} alt={currentUser.name} className="tp-nav-user-avatar" />
-                <span className="tp-nav-user-name">{currentUser.name?.split(' ')[0] || 'User'}</span>
-                <LogOut size={13} className="tp-nav-user-logout-icon" />
+              <div className="tp-nav-user-wrapper" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  className={`tp-nav-user-pill ${isProfileMenuOpen ? 'active' : ''}`}
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  title="Account Profile & Settings"
+                >
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name}
+                    className="tp-nav-user-avatar"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0b0f19&color=ffffff&bold=true`;
+                    }}
+                  />
+                  <span className="tp-nav-user-name">{getDisplayName(currentUser.name)}</span>
+                  <ChevronDown size={14} className={`tp-nav-user-chevron ${isProfileMenuOpen ? 'open' : ''}`} />
+                </button>
+
+                {isProfileMenuOpen && (
+                  <div className="tp-profile-dropdown">
+                    <div className="tp-profile-dropdown-header">
+                      <img
+                        src={currentUser.avatar}
+                        alt={currentUser.name}
+                        className="tp-profile-dropdown-avatar"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0b0f19&color=ffffff&bold=true`;
+                        }}
+                      />
+                      <div className="tp-profile-dropdown-user-info">
+                        <h4 className="tp-profile-dropdown-name">{currentUser.name}</h4>
+                        <p className="tp-profile-dropdown-email">{currentUser.email || 'Guest Traveler'}</p>
+                        <span className="tp-profile-dropdown-badge">
+                          <Sparkles size={10} /> {currentUser.authProvider === 'google' ? 'Google Account' : currentUser.isAnonymous ? 'Guest Pass' : 'Verified Member'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Incomplete Registration Banner or Verified Status */}
+                    {!currentUser.phone ? (
+                      <div className="tp-profile-incomplete-card">
+                        <div className="tp-profile-incomplete-header">
+                          <span className="tp-incomplete-badge">⚠️ Action Required</span>
+                          <span className="tp-incomplete-pct">60%</span>
+                        </div>
+                        <div className="tp-profile-progress-bar">
+                          <div className="tp-profile-progress-fill" style={{ width: '60%' }} />
+                        </div>
+                        <p className="tp-profile-incomplete-desc">
+                          Add WhatsApp for booking vouchers & live driver GPS.
+                        </p>
+                        <button
+                          type="button"
+                          className="tp-btn-complete-profile"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setPendingGoogleUser(currentUser);
+                            setAuthPhoneInput(currentUser.phone || '');
+                            setAuthMode('phone_prompt');
+                            setIsAuthModalOpen(true);
+                          }}
+                        >
+                          <Phone size={12} />
+                          <span>Add WhatsApp Number</span>
+                        </button>
+                      </div>
+                    ) : currentUser.isAnonymous ? (
+                      <div className="tp-profile-incomplete-card">
+                        <div className="tp-profile-incomplete-header">
+                          <span className="tp-incomplete-badge">⚠️ Guest Mode</span>
+                          <span className="tp-incomplete-pct">30%</span>
+                        </div>
+                        <div className="tp-profile-progress-bar">
+                          <div className="tp-profile-progress-fill" style={{ width: '30%' }} />
+                        </div>
+                        <p className="tp-profile-incomplete-desc">
+                          Register to sync bookings & unlock 15% discount.
+                        </p>
+                        <button
+                          type="button"
+                          className="tp-btn-complete-profile"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setAuthMode('signup');
+                            setSignupStep(1);
+                            setIsAuthModalOpen(true);
+                          }}
+                        >
+                          <UserCheck size={12} />
+                          <span>Complete Registration</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="tp-profile-verified-card">
+                        <div className="tp-profile-verified-pill">
+                          <CheckCircle2 size={13} color="#059669" />
+                          <span>100% Complete • Verified Member</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="tp-profile-dropdown-divider" />
+
+                    <div className="tp-profile-dropdown-menu">
+                      <button
+                        type="button"
+                        className="tp-profile-dropdown-item"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          setSelectedItem(popularPlaces[0]);
+                        }}
+                      >
+                        <Compass size={15} />
+                        <span>Book A Tour / Stay</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="tp-profile-dropdown-item"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          if (onOpenPartnerHub) onOpenPartnerHub();
+                        }}
+                      >
+                        <Building2 size={15} />
+                        <span>Partner & Driver Hub</span>
+                      </button>
+                    </div>
+
+                    <div className="tp-profile-dropdown-divider" />
+
+                    <div className="tp-profile-dropdown-footer">
+                      <button
+                        type="button"
+                        className="tp-profile-dropdown-logout-btn"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          handleLogout();
+                        }}
+                      >
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <button
@@ -640,17 +1013,29 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
           {/* Left Content Area with Step Indicator */}
           <div className="tp-hero-left-wrapper">
-            {/* Vertical Step Indicator (1, 2, 3) */}
+            {/* Step Indicator (Vertical on Desktop, Segmented Capsule on Mobile) */}
             <div className="tp-step-indicator">
               <div className="tp-step-line" />
-              {[1, 2, 3].map((stepNum) => (
+              {heroSteps.map((stepItem) => (
                 <button
-                  key={stepNum}
-                  className={`tp-step-node ${activeStep === stepNum ? 'active' : ''}`}
-                  onClick={() => setActiveStep(stepNum)}
-                  title={`Step ${stepNum}`}
+                  key={stepItem.step}
+                  className={`tp-step-node ${activeStep === stepItem.step ? 'active' : ''}`}
+                  onClick={() => setActiveStep(stepItem.step)}
+                  title={`Step ${stepItem.step}: ${stepItem.tagline}`}
                 >
-                  {stepNum}
+                  {activeStep === stepItem.step && (
+                    <svg className="tp-step-ring" viewBox="0 0 36 36">
+                      <circle className="tp-step-ring-bg" cx="18" cy="18" r="16" />
+                      <circle
+                        key={`ring-${stepItem.step}-${activeStep}`}
+                        className="tp-step-ring-progress"
+                        cx="18"
+                        cy="18"
+                        r="16"
+                      />
+                    </svg>
+                  )}
+                  <span className="tp-step-num">{stepItem.step}</span>
                 </button>
               ))}
             </div>
@@ -679,8 +1064,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 </button>
                 <button
                   className="tp-btn-circle-play"
-                  onClick={() => setIsVideoModalOpen(true)}
-                  title="Experience In-Flight Virtual Tour"
+                  onClick={() => {
+                    setActiveStep((prev) => (prev % heroSteps.length) + 1);
+                  }}
+                  title="Next Flight Experience"
                 >
                   <div className="tp-blue-dot-icon">
                     <Play size={12} fill="#2563eb" color="#2563eb" className="tp-play-mini-icon" />
@@ -735,17 +1122,45 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           <div className="tp-social-pill-capsule">
             <span className="tp-follow-label">Follow</span>
             <div className="tp-social-pill-icons">
-              <a href="#twitter" className="tp-social-pill-link" aria-label="Twitter">
-                <Twitter size={14} />
+              <a
+                href="https://www.instagram.com/vrindopnishad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tp-social-pill-link tp-social-instagram"
+                aria-label="Instagram"
+                title="Instagram @vrindopnishad"
+              >
+                <Instagram size={15} />
               </a>
-              <a href="#facebook" className="tp-social-pill-link tp-social-facebook" aria-label="Facebook">
-                <Facebook size={14} />
+              <a
+                href="https://www.youtube.com/@vrindopnishad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tp-social-pill-link tp-social-youtube"
+                aria-label="YouTube"
+                title="YouTube @vrindopnishad"
+              >
+                <Youtube size={15} />
               </a>
-              <a href="#instagram" className="tp-social-pill-link" aria-label="Instagram">
-                <Instagram size={14} />
+              <a
+                href="https://www.facebook.com/vrindopnishad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tp-social-pill-link tp-social-facebook"
+                aria-label="Facebook"
+                title="Facebook @vrindopnishad"
+              >
+                <Facebook size={15} />
               </a>
-              <a href="#github" className="tp-social-pill-link" aria-label="GitHub">
-                <Github size={14} />
+              <a
+                href="https://www.pinterest.com/vrindopnishad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tp-social-pill-link tp-social-pinterest"
+                aria-label="Pinterest"
+                title="Pinterest @vrindopnishad"
+              >
+                <PinterestIcon size={15} />
               </a>
             </div>
           </div>
@@ -885,12 +1300,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           {/* Section Header */}
           <div className="tp-section-header">
             <div className="tp-header-left">
-              <h2 className="tp-section-title">Popular Destinations</h2>
-              <p className="tp-section-tagline">Heaven on earth</p>
+              <h2 className="tp-section-title">Popular Brij Yatra Spots</h2>
+              <p className="tp-section-tagline">Sacred Brij Vibes & Highlights</p>
             </div>
             <div className="tp-header-right">
               <p className="tp-header-desc">
-                World-class destinations with breathtaking views and unforgettable experiences.
+                Sacred Dhams and divine leela sthalis with authentic darshans and spiritual bliss.
               </p>
             </div>
           </div>
@@ -1010,13 +1425,13 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         </div>
       </section>
 
-      {/* 5. SECTION: TOP DESTINATION (Matching Reference Bento Grid) */}
+      {/* 5. SECTION: TOP DESTINATION / BRIJ PACKAGES (Matching Reference Bento Grid) */}
       <section className="tp-section tp-explore-section" id="explore">
         <div className="tp-container">
           {/* Centered Minimalist Header */}
           <div className="tp-top-dest-header">
-            <h2 className="tp-top-dest-title">Top Destination</h2>
-            <p className="tp-top-dest-subtitle">specific reasons why this should be your main goal</p>
+            <h2 className="tp-top-dest-title">Brij Vibers Packages</h2>
+            <p className="tp-top-dest-subtitle">Curated spiritual yatras across Vrindavan, Mathura, Govardhan & Barsana</p>
           </div>
 
           {/* Clean Luxury Pill Filter Tabs */}
@@ -1036,7 +1451,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
           {/* Asymmetric 6-Card Bento Grid */}
           <div className="tp-explore-grid tp-bento-destination-grid">
-            {(topDestinationsByTab[activeTopTab] || topDestinationsByTab['Nusa Tenggara Timur']).map((dest, idx) => (
+            {(topDestinationsByTab[activeTopTab] || topDestinationsByTab['Vrindavan Dham']).map((dest, idx) => (
               <div
                 key={dest.id}
                 className={`tp-bento-card tp-bento-area-${idx + 1}`}
@@ -1246,17 +1661,45 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             <div className="tp-footer-col tp-footer-social-col">
               <h5 className="tp-footer-heading">Follow Us</h5>
               <div className="tp-footer-social-circles">
-                <a href="#twitter" className="tp-social-circle-link" aria-label="Twitter">
-                  <Twitter size={15} />
-                </a>
-                <a href="#instagram" className="tp-social-circle-link" aria-label="Instagram">
+                <a
+                  href="https://www.instagram.com/vrindopnishad"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tp-social-circle-link tp-footer-instagram"
+                  aria-label="Instagram"
+                  title="Instagram @vrindopnishad"
+                >
                   <Instagram size={15} />
                 </a>
-                <a href="#facebook" className="tp-social-circle-link" aria-label="Facebook">
+                <a
+                  href="https://www.youtube.com/@vrindopnishad"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tp-social-circle-link tp-footer-youtube"
+                  aria-label="YouTube"
+                  title="YouTube @vrindopnishad"
+                >
+                  <Youtube size={15} />
+                </a>
+                <a
+                  href="https://www.facebook.com/vrindopnishad"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tp-social-circle-link tp-footer-facebook"
+                  aria-label="Facebook"
+                  title="Facebook @vrindopnishad"
+                >
                   <Facebook size={15} />
                 </a>
-                <a href="#linkedin" className="tp-social-circle-link" aria-label="LinkedIn">
-                  <Linkedin size={15} />
+                <a
+                  href="https://www.pinterest.com/vrindopnishad"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tp-social-circle-link tp-footer-pinterest"
+                  aria-label="Pinterest"
+                  title="Pinterest @vrindopnishad"
+                >
+                  <PinterestIcon size={15} />
                 </a>
               </div>
               <p className="tp-footer-copy-text">{footerNavigation.copyright}</p>
@@ -1405,12 +1848,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     </div>
 
                     <div className="tp-input-group">
-                      <label>WhatsApp Number</label>
+                      <label>WhatsApp / Mobile Number</label>
                       <div className="tp-input-icon-wrap">
                         <Phone size={15} className="tp-field-icon" />
                         <input
                           type="tel"
-                          placeholder="+1 (555) 019-2834"
+                          placeholder="10-digit Mobile (e.g. 9876543210)"
                           value={bookingPhone}
                           onChange={(e) => handleBookingPhoneChange(e.target.value)}
                           required
@@ -1467,45 +1910,64 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         <div className="tp-modal-overlay" onClick={() => setIsFilterModalOpen(false)}>
           <div className="tp-modal-card tp-filter-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="tp-modal-header">
-              <h3>Filter Destinations</h3>
-              <button className="tp-modal-close" onClick={() => setIsFilterModalOpen(false)}>
+              <div className="tp-modal-header-text">
+                <span className="tp-modal-tag">CUSTOMIZE BRIJ YATRA</span>
+                <h3 className="tp-modal-title">Filter Brij Vibers Packages</h3>
+              </div>
+              <button
+                className="tp-modal-close"
+                onClick={() => setIsFilterModalOpen(false)}
+                aria-label="Close modal"
+              >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="tp-filter-modal-body">
-              <div className="tp-filter-section">
-                <div className="tp-filter-label-row">
-                  <span>Maximum Price</span>
-                  <strong>${priceFilter} / person</strong>
-                </div>
+            <div className="tp-modal-body">
+              <div className="tp-filter-group">
+                <label className="tp-filter-label">
+                  <span>Maximum Price per Person</span>
+                  <strong className="tp-filter-val">
+                    {(priceFilter / 1000).toFixed(priceFilter % 1000 === 0 ? 0 : 1)}k/-
+                  </strong>
+                </label>
                 <input
                   type="range"
-                  min="20"
-                  max="300"
+                  min="1000"
+                  max="15000"
+                  step="500"
                   value={priceFilter}
                   onChange={(e) => setPriceFilter(Number(e.target.value))}
-                  className="tp-range-slider"
+                  className="tp-filter-range"
                 />
+                <div className="tp-range-labels">
+                  <span>1k/-</span>
+                  <span>7.5k/-</span>
+                  <span>15k+/-</span>
+                </div>
               </div>
 
-              <div className="tp-filter-section">
-                <div className="tp-filter-label-row">
+              <div className="tp-filter-group">
+                <label className="tp-filter-label">
                   <span>Minimum Rating</span>
-                  <strong>⭐ {minRatingFilter} & up</strong>
+                  <strong className="tp-filter-val">★ {minRatingFilter}</strong>
+                </label>
+                <div className="tp-rating-pill-group">
+                  {[4.0, 4.5, 4.8, 4.9].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      className={`tp-rating-pill ${minRatingFilter === rating ? 'active' : ''}`}
+                      onClick={() => setMinRatingFilter(rating)}
+                    >
+                      ★ {rating}+
+                    </button>
+                  ))}
                 </div>
-                <input
-                  type="range"
-                  min="4.0"
-                  max="5.0"
-                  step="0.1"
-                  value={minRatingFilter}
-                  onChange={(e) => setMinRatingFilter(Number(e.target.value))}
-                  className="tp-range-slider"
-                />
               </div>
 
               <button
+                type="button"
                 className="tp-btn-flight-cta"
                 style={{ width: '100%', marginTop: '1rem', height: '48px' }}
                 onClick={() => setIsFilterModalOpen(false)}
@@ -1532,7 +1994,44 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             </div>
 
             <div className="tp-auth-ios-body">
-              {authMode === 'signup' ? (
+              {authMode === 'phone_prompt' ? (
+                <div className="tp-auth-ios-intro-block tp-auth-prompt-intro">
+                  <div className="tp-auth-prompt-avatar-wrapper">
+                    <img
+                      src={
+                        (pendingGoogleUser?.avatar || currentUser?.avatar) ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(pendingGoogleUser?.name || currentUser?.name || 'User')}&background=0b0f19&color=ffffff&bold=true`
+                      }
+                      alt={pendingGoogleUser?.name || currentUser?.name || 'User avatar'}
+                      className="tp-auth-prompt-avatar-lg"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(pendingGoogleUser?.name || currentUser?.name || 'User')}&background=0b0f19&color=ffffff&bold=true`;
+                      }}
+                    />
+                    <div className="tp-auth-prompt-google-badge" title="Google Verified">
+                      <svg width="11" height="11" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <h2 className="tp-auth-ios-title" style={{ marginTop: '0.5rem', marginBottom: '0.2rem' }}>
+                    Welcome, {getDisplayName(pendingGoogleUser?.name || currentUser?.name)}
+                  </h2>
+                  <span className="tp-auth-prompt-email-badge">
+                    {pendingGoogleUser?.email || currentUser?.email}
+                  </span>
+
+                  <p className="tp-auth-ios-subtitle" style={{ marginTop: '0.4rem' }}>
+                    Please provide your WhatsApp / Phone number to receive instant booking vouchers and live trip updates.
+                  </p>
+                </div>
+              ) : authMode === 'signup' ? (
                 <div className="tp-auth-ios-intro-block">
                   <div className="tp-auth-ios-icon-badge">
                     <Sparkles size={22} color="#1b3b18" />
@@ -1559,8 +2058,38 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 </div>
               )}
 
-              {/* Dynamic Auth Form: Login or 3-Step Registration */}
-              {authMode === 'login' ? (
+              {/* Dynamic Auth Form: Phone Prompt, Login, or 3-Step Registration */}
+              {authMode === 'phone_prompt' ? (
+                <form onSubmit={handlePhonePromptSubmit} className="tp-auth-ios-form">
+                  <div className="tp-auth-pill-input-wrap">
+                    <Phone size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type="tel"
+                      className="tp-auth-pill-input"
+                      placeholder="10-digit Mobile (e.g. 9876543210)"
+                      value={authPhoneInput}
+                      onChange={(e) => setAuthPhoneInput(e.target.value)}
+                      required
+                      autoFocus
+                    />
+                  </div>
+
+                  {authError && <div className="tp-auth-error-msg">{authError}</div>}
+                  {authSuccessMsg && <div className="tp-auth-success-msg">✓ {authSuccessMsg}</div>}
+
+                  <button type="submit" className="tp-btn-auth-primary-green">
+                    <span>Complete Sign In ✓</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tp-auth-skip-btn"
+                    onClick={handlePhonePromptSkip}
+                  >
+                    Skip for now
+                  </button>
+                </form>
+              ) : authMode === 'login' ? (
                 <form onSubmit={handleLoginSubmit} className="tp-auth-ios-form">
                   <div className="tp-auth-pill-input-wrap">
                     <Mail size={17} className="tp-auth-pill-icon" />
@@ -1704,7 +2233,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         <input
                           type="tel"
                           className="tp-auth-pill-input"
-                          placeholder="WhatsApp / Phone Number"
+                          placeholder="10-digit Mobile (e.g. 9876543210)"
                           value={authPhoneInput}
                           onChange={(e) => setAuthPhoneInput(e.target.value)}
                           required
@@ -1735,8 +2264,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 </div>
               )}
 
-              {/* Show OAuth & Guest on Step 1 and Login */}
-              {(authMode === 'login' || (authMode === 'signup' && signupStep === 1)) && (
+              {/* Show OAuth & Guest on Step 1 and Login only */}
+              {authMode !== 'phone_prompt' && (authMode === 'login' || (authMode === 'signup' && signupStep === 1)) && (
                 <>
                   <div className="tp-auth-ios-divider">
                     <span>or</span>
@@ -1781,39 +2310,84 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               )}
 
               {/* Bottom Switch Row */}
-              <div className="tp-auth-ios-footer">
-                {authMode === 'login' ? (
-                  <p className="tp-auth-ios-switch-text">
-                    Need an account?{' '}
-                    <strong
-                      onClick={() => {
-                        setAuthError('');
-                        setAuthSuccessMsg('');
-                        setAuthMode('signup');
-                        setSignupStep(1);
-                      }}
-                    >
-                      Sign up
-                    </strong>
-                  </p>
-                ) : (
-                  <p className="tp-auth-ios-switch-text">
-                    Already have an account?{' '}
-                    <strong
-                      onClick={() => {
-                        setAuthError('');
-                        setAuthSuccessMsg('');
-                        setAuthMode('login');
-                      }}
-                    >
-                      Log in
-                    </strong>
-                  </p>
-                )}
-              </div>
+              {authMode !== 'phone_prompt' && (
+                <div className="tp-auth-ios-footer">
+                  {authMode === 'login' ? (
+                    <p className="tp-auth-ios-switch-text">
+                      Need an account?{' '}
+                      <strong
+                        onClick={() => {
+                          setAuthError('');
+                          setAuthSuccessMsg('');
+                          setAuthMode('signup');
+                          setSignupStep(1);
+                        }}
+                      >
+                        Sign up
+                      </strong>
+                    </p>
+                  ) : (
+                    <p className="tp-auth-ios-switch-text">
+                      Already have an account?{' '}
+                      <strong
+                        onClick={() => {
+                          setAuthError('');
+                          setAuthSuccessMsg('');
+                          setAuthMode('login');
+                        }}
+                      >
+                        Log in
+                      </strong>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
+      )}
+
+      {/* Floating Interactive Toast for Registration & Profile Completion Prompt */}
+      {floatingToast && (
+        <aside className="tp-floating-toast" role="status" aria-live="polite">
+          <div className={`tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
+            {floatingToast.icon}
+          </div>
+          <div className="tp-toast-body">
+            <h4 className="tp-toast-title">{floatingToast.title}</h4>
+            <p className="tp-toast-desc">{floatingToast.desc}</p>
+            <div className="tp-toast-actions">
+              <button
+                type="button"
+                className="tp-toast-cta"
+                onClick={floatingToast.onCta}
+              >
+                {floatingToast.ctaText}
+              </button>
+              <button
+                type="button"
+                className="tp-toast-dismiss"
+                onClick={() => {
+                  setFloatingToast(null);
+                  sessionStorage.setItem('vrinda_toast_dismissed', 'true');
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="tp-toast-close-btn"
+            onClick={() => {
+              setFloatingToast(null);
+              sessionStorage.setItem('vrinda_toast_dismissed', 'true');
+            }}
+            aria-label="Close notification"
+          >
+            <X size={15} />
+          </button>
+        </aside>
       )}
     </div>
   );

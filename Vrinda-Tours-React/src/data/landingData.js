@@ -16,28 +16,28 @@ export const setCachedData = (key, value) => {
   }
 };
 
-// Hero Slider Steps (1, 2, 3) - Curated High-Definition Commercial Aviation & Sky Photography
+// Hero Slider Steps (1, 2, 3) - Curated High-Definition Aviation & Sacred Brij Yatra Photography
 export const heroSteps = [
   {
     step: 1,
-    tagline: 'ELEVATE YOUR TRAVEL',
-    title: 'Experience\nThe Magic Of\nFlight!',
+    tagline: 'SACRED BRIJ YATRA & FLIGHTS',
+    title: 'Experience\nThe Magic Of\nBrij Vibers!',
     bgImage: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=2000&q=90',
     ctaText: 'Book A Trip Now'
   },
   {
     step: 2,
-    tagline: 'UNLIMITED DESTINATIONS',
-    title: 'Discover\nNew Horizons\nAbove Clouds!',
+    tagline: 'DIVINE PILGRIMAGE CIRCUITS',
+    title: 'Sacred \nDhams & Temple Trails!',
     bgImage: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=2000&q=90',
-    ctaText: 'Explore Flights'
+    ctaText: 'Explore Packages'
   },
   {
     step: 3,
-    tagline: 'PREMIUM IN-FLIGHT',
-    title: 'Fly In Pure\nLuxury &\nComfort!',
+    tagline: 'PREMIUM VIP CONCIERGE',
+    title: 'Brij Vibers In\nPure Luxury &\nDevotion!',
     bgImage: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=2000&q=90',
-    ctaText: 'View First Class'
+    ctaText: 'View VIP Packages'
   }
 ];
 
@@ -48,7 +48,6 @@ export const awesomePlaceAvatars = [
   'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=200&q=85'
 ];
 
-
 // Partner Brands
 export const partnerBrands = [
   { name: 'airbnb', logoType: 'airbnb' },
@@ -57,87 +56,89 @@ export const partnerBrands = [
   { name: 'Expedia', logoType: 'expedia' }
 ];
 
-// Journey Steps for the Animated Carousel Section ("Journey To The Skies Made Simple!")
+// Journey Steps for the Animated Carousel Section ("Journey To Sacred Brij Made Simple!")
 export const journeySteps = [
   {
     id: 'step_dest',
     stepNumber: 1,
-    title: 'Find Your\nDestination',
-    shortTitle: 'Find Your Destination',
-    desc: 'Explore 1,300+ worldwide routes tailored to your wanderlust.',
+    title: 'Choose Your\nBrij Package',
+    shortTitle: 'Choose Brij Package',
+    desc: 'Explore 50+ hand-curated Brij Vibes itineraries across Vrindavan, Mathura & Barsana.',
     photo: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=85',
-    linkText: 'EXPLORE ROUTES >',
+    linkText: 'EXPLORE PACKAGES >',
     iconType: 'pin'
   },
   {
     id: 'step_ticket',
     stepNumber: 2,
-    title: 'Book\nA Ticket',
-    shortTitle: 'Book A Ticket',
-    desc: 'Instant confirmation, flexible dates, and premium in-flight comfort.',
+    title: 'Book VIP\nDarshan & Stay',
+    shortTitle: 'Book Darshan & Stay',
+    desc: 'Instant confirmation, temple pass entry, ashrams & cab transfers.',
     photo: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=85',
-    linkText: 'LEARN MORE >',
+    linkText: 'VIEW DETAILS >',
     iconType: 'grid'
   },
   {
     id: 'step_pay',
     stepNumber: 3,
-    title: 'Pay &\nStart Journey',
-    shortTitle: 'Pay & Start Journey',
-    desc: 'Zero-fee checkout, mobile e-tickets, and priority airport boarding.',
+    title: 'Pray &\nBegin Yatra',
+    shortTitle: 'Pray & Begin Yatra',
+    desc: 'Zero-hidden fees, WhatsApp instant voucher & 24/7 dedicated Brij guide.',
     photo: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=600&q=85',
-    linkText: 'START JOURNEY >',
+    linkText: 'START YATRA >',
     iconType: 'card'
   }
 ];
 
-
-
-// 1. Popular Places (4 Top Grid Cards)
+// 1. Popular Places (Top 4 Brij Vibers & Highlights)
 export const popularPlaces = [
   {
-    id: 'pop_mindanao',
-    title: 'Mt. Mindanao',
-    location: 'Mindanao, Philippines',
-    price: '$24/day',
-    numericPrice: 24,
+    id: 'pop_vrindavan',
+    title: 'Bankey Bihari & Prem Mandir',
+    location: 'Vrindavan Dham',
+    price: '2.5k/-',
+    priceUnit: '/day',
+    numericPrice: 2500,
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    description: 'Majestic emerald volcanic lakes and pristine tropical rainforest ridges.',
-    tags: ['Nature', 'Hiking', 'Lake']
+    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+    description: 'Special VIP Darshan at Shri Bankey Bihari Ji, Nidhivan, and illuminated Prem Mandir.',
+    tags: ['Vrindavan', 'Darshan', 'Spiritual']
   },
   {
-    id: 'pop_tokyo',
-    title: 'Disneyland Tokyo',
-    location: 'Tokyo, Japan',
-    price: '$36/day',
-    numericPrice: 36,
+    id: 'pop_barsana',
+    title: 'Shri Radha Rani Temple',
+    location: 'Barsana Dham',
+    price: '3.5k/-',
+    priceUnit: '/day',
+    numericPrice: 3500,
     rating: 5.0,
-    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
-    description: 'Enchanting magical kingdom and world-famous fantasy attractions.',
-    tags: ['Theme Park', 'Family', 'Attraction']
+    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
+    description: 'Sacred hilltop darshan of Shriji Mandir, Mor Kuti, Maan Mandir & Rangili Mahal.',
+    tags: ['Barsana', 'Radha Rani', 'Yatra']
   },
   {
-    id: 'pop_thousand_island',
-    title: 'Thousand Island',
-    location: 'Jakarta, Indonesia',
-    price: '$14/day',
-    numericPrice: 14,
-    rating: 4.8,
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
-    description: 'Cluster of crystal clear coral islands and powdery white sandbars.',
-    tags: ['Beach', 'Snorkeling', 'Islands']
-  },
-  {
-    id: 'pop_basilica',
-    title: 'Basilica Santa',
-    location: 'Venice, Italy',
-    price: '$28/day',
-    numericPrice: 28,
+    id: 'pop_govardhan',
+    title: 'Govardhan Parikrama',
+    location: 'Govardhan',
+    price: '1.8k/-',
+    priceUnit: '/day',
+    numericPrice: 1800,
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=80',
-    description: 'Historic Venetian grand basilica and romantic canal-side architectures.',
-    tags: ['Culture', 'Heritage', 'Architecture']
+    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
+    description: 'Complete 21 km Govardhan Parikrama with dedicated guide, visiting Radha Kund & Mansi Ganga.',
+    tags: ['Govardhan', 'Parikrama', 'Giriraj']
+  },
+  {
+    id: 'pop_mathura',
+    title: 'Krishna Janmabhoomi & Gokul',
+    location: 'Mathura & Gokul',
+    price: '2.8k/-',
+    priceUnit: '/day',
+    numericPrice: 2800,
+    rating: 4.9,
+    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
+    description: 'Birthplace of Lord Krishna in Mathura, Vishram Ghat Yamuna Aarti, and Gokul Raman Reti.',
+    tags: ['Mathura', 'Janmabhoomi', 'Gokul']
   }
 ];
 
@@ -145,566 +146,563 @@ export const popularPlaces = [
 export const sweetMemoryFeatures = [
   {
     number: '01',
-    title: 'Find trips that fit your freedom',
-    desc: 'Including where freedom and flexibility, minutes and spontaneity meet luxury and purpose.'
+    title: 'Find Brij yatras tailored for you',
+    desc: 'Spiritual bliss, VIP darshan passes, comfortable stays, and seamless guided pilgrimage.'
   },
   {
     number: '02',
-    title: 'Get back to nature by travel',
-    desc: 'The world is waiting for you and you can freely experience the best you are and make friends.'
+    title: 'Immerse in divine devotion & culture',
+    desc: 'Experience sacred kirtans, heritage ghat aartis, and the enchanting leela sthalis of Brij.'
   },
   {
     number: '03',
-    title: 'Reignite those travel instincts',
-    desc: 'Make everyday count with journeys, trips & memories that last a glorious lifetime.'
+    title: 'Memories of Brij that last forever',
+    desc: 'Every moment in Brij Dham connects your soul to the eternal pastimes of Radha Krishna.'
   }
 ];
 
 // Floating Reviewers on the Hero Landscape
 export const memoryReviewers = [
   {
-    name: 'Verena Levine',
-    rating: '4.9',
+    name: 'Radhika Sharma',
+    rating: '5.0',
     position: 'top-left',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
   },
   {
-    name: 'Hamal Adam',
+    name: 'Anand Gopal',
     rating: '5.0',
     position: 'middle-right',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
   },
   {
-    name: 'Jiye Debang',
-    rating: '4.8',
+    name: 'Pooja Verma',
+    rating: '4.9',
     position: 'bottom-left',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80'
   }
 ];
 
-// 3. Top Destination Tabs and Bento Grid Data
+// 3. Top Destination Tabs and Bento Grid Data for Brij Vibers
 export const topDestinationTabs = [
-  'Nusa Tenggara Timur',
-  'Bali',
-  'Papua',
-  'Nusa Tenggara Barat',
-  'Kalimantan'
+  'Vrindavan',
+  'Mathura',
+  'Govardhan',
+  'Barsana & Nandgaon',
+  'Gokul & Mahavan'
 ];
 
 export const topDestinationsByTab = {
-  'Nusa Tenggara Timur': [
+  'Vrindavan': [
     {
-      id: 'ntt_1',
-      region: 'NTB',
-      title: 'Wildlife Experience',
-      rating: '4.5',
-      price: '$120',
+      id: 'vrn_1',
+      region: 'VRINDAVAN',
+      title: 'Shri Bankey Bihari Mandir',
+      rating: '5.0',
+      price: '2.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 120,
+      numericPrice: 2500,
       category: 'Top Destination',
-      location: 'Komodo Island, NTB',
+      location: 'Vrindavan',
       image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-1'
     },
     {
-      id: 'ntt_2',
-      region: 'NTB',
-      title: 'Warrior Tradition',
-      rating: '4.5',
-      price: '$95',
+      id: 'vrn_2',
+      region: 'VRINDAVAN',
+      title: 'Prem Mandir Light & Darshan',
+      rating: '4.9',
+      price: '1.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 95,
+      numericPrice: 1800,
       category: 'Top Destination',
-      location: 'Sumba Village, NTB',
+      location: 'Chhatikara Road, Vrindavan',
       image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-2'
     },
     {
-      id: 'ntt_3',
-      region: 'NTB',
-      title: 'Traditional Sumbanese Village',
-      rating: '4.5',
-      price: '$165',
+      id: 'vrn_3',
+      region: 'VRINDAVAN',
+      title: 'Nidhivan & Seva Kunj',
+      rating: '4.9',
+      price: '1.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 165,
+      numericPrice: 1500,
       category: 'Top Destination',
-      location: 'Waerobo, NTB',
+      location: 'Sacred Forest, Vrindavan',
       image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-3'
     },
     {
-      id: 'ntt_4',
-      region: 'NTB',
-      title: 'Misty Mountain Village',
-      rating: '4.5',
-      price: '$140',
+      id: 'vrn_4',
+      region: 'VRINDAVAN',
+      title: 'ISKCON Krishna Balaram Temple',
+      rating: '4.9',
+      price: '2k/-',
       priceUnit: '/Pax',
-      numericPrice: 140,
+      numericPrice: 2000,
       category: 'Top Destination',
-      location: 'Flores Highland, NTB',
+      location: 'Raman Reti, Vrindavan',
       image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=85',
       gridArea: 'card-4'
     },
     {
-      id: 'ntt_5',
-      region: 'NTB',
-      title: 'Waterfall',
-      rating: '4.5',
-      price: '$85',
+      id: 'vrn_5',
+      region: 'VRINDAVAN',
+      title: 'Kesi Ghat Sunset Boat Aarti',
+      rating: '4.8',
+      price: '1.2k/-',
       priceUnit: '/Pax',
-      numericPrice: 85,
+      numericPrice: 1200,
       category: 'Top Destination',
-      location: 'Tiu Kelep, NTB',
+      location: 'Yamuna Riverbank, Vrindavan',
       image: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-5'
     },
     {
-      id: 'ntt_6',
-      region: 'NTB',
-      title: 'Traditional Attire',
-      rating: '4.5',
-      price: '$90',
+      id: 'vrn_6',
+      region: 'VRINDAVAN',
+      title: 'Shri Radha Vallabh Mandir',
+      rating: '4.9',
+      price: '1.6k/-',
       priceUnit: '/Pax',
-      numericPrice: 90,
+      numericPrice: 1600,
       category: 'Top Destination',
-      location: 'Manggaraian, NTB',
+      location: 'Old Vrindavan',
       image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-6'
     }
   ],
-  'Bali': [
+  'Mathura': [
     {
-      id: 'bali_1',
-      region: 'BALI',
-      title: 'Sacred Monkey Forest',
-      rating: '4.9',
-      price: '$110',
+      id: 'mth_1',
+      region: 'MATHURA',
+      title: 'Shri Krishna Janmabhoomi',
+      rating: '5.0',
+      price: '2.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 110,
+      numericPrice: 2500,
       category: 'Top Destination',
-      location: 'Ubud, Bali',
+      location: 'Mathura Central',
       image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-1'
     },
     {
-      id: 'bali_2',
-      region: 'BALI',
-      title: 'Kecak Fire Dance',
+      id: 'mth_2',
+      region: 'MATHURA',
+      title: 'Vishram Ghat Maha Aarti',
       rating: '4.8',
-      price: '$95',
+      price: '1.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 95,
+      numericPrice: 1500,
       category: 'Top Destination',
-      location: 'Uluwatu, Bali',
+      location: 'Yamuna Bank, Mathura',
       image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-2'
     },
     {
-      id: 'bali_3',
-      region: 'BALI',
-      title: 'Tegallalang Rice Terrace',
+      id: 'mth_3',
+      region: 'MATHURA',
+      title: 'Dwarkadhish Temple',
       rating: '4.9',
-      price: '$150',
+      price: '1.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 150,
+      numericPrice: 1800,
       category: 'Top Destination',
-      location: 'Gianyar, Bali',
-      image: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=800&q=85',
+      location: 'Mathura Ghats',
+      image: 'https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-3'
     },
     {
-      id: 'bali_4',
-      region: 'BALI',
-      title: 'Ulun Danu Beratan Temple',
-      rating: '4.9',
-      price: '$135',
+      id: 'mth_4',
+      region: 'MATHURA',
+      title: 'Gita Mandir & Birla Temple',
+      rating: '4.7',
+      price: '1.2k/-',
       priceUnit: '/Pax',
-      numericPrice: 135,
+      numericPrice: 1200,
       category: 'Top Destination',
-      location: 'Bedugul, Bali',
-      image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1000&q=85',
+      location: 'Mathura Vrindavan Road',
+      image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-4'
     },
     {
-      id: 'bali_5',
-      region: 'BALI',
-      title: 'Sekumpul Waterfall',
-      rating: '4.8',
-      price: '$85',
+      id: 'mth_5',
+      region: 'MATHURA',
+      title: 'Kans Qila & Yamuna View',
+      rating: '4.6',
+      price: '1k/-',
       priceUnit: '/Pax',
-      numericPrice: 85,
+      numericPrice: 1000,
       category: 'Top Destination',
-      location: 'Singaraja, Bali',
-      image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=85',
+      location: 'Mathura',
+      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-5'
     },
     {
-      id: 'bali_6',
-      region: 'BALI',
-      title: 'Nusa Penida Kelingking',
-      rating: '4.9',
-      price: '$125',
-      priceUnit: '/Pax',
-      numericPrice: 125,
-      category: 'Top Destination',
-      location: 'Nusa Penida, Bali',
-      image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-6'
-    }
-  ],
-  'Papua': [
-    {
-      id: 'papua_1',
-      region: 'PAPUA',
-      title: 'Birds of Paradise',
+      id: 'mth_6',
+      region: 'MATHURA',
+      title: 'Bhuteshwar Mahadev Temple',
       rating: '4.8',
-      price: '$145',
+      price: '1.4k/-',
       priceUnit: '/Pax',
-      numericPrice: 145,
+      numericPrice: 1400,
       category: 'Top Destination',
-      location: 'Raja Ampat, Papua',
-      image: 'https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-1'
-    },
-    {
-      id: 'papua_2',
-      region: 'PAPUA',
-      title: 'Dani Tribe Heritage',
-      rating: '4.7',
-      price: '$115',
-      priceUnit: '/Pax',
-      numericPrice: 115,
-      category: 'Top Destination',
-      location: 'Baliem Valley, Papua',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-2'
-    },
-    {
-      id: 'papua_3',
-      region: 'PAPUA',
-      title: 'Wayag Karst Islands',
-      rating: '5.0',
-      price: '$220',
-      priceUnit: '/Pax',
-      numericPrice: 220,
-      category: 'Top Destination',
-      location: 'Raja Ampat, Papua',
-      image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-3'
-    },
-    {
-      id: 'papua_4',
-      region: 'PAPUA',
-      title: 'Misty Highland Rainforest',
-      rating: '4.9',
-      price: '$160',
-      priceUnit: '/Pax',
-      numericPrice: 160,
-      category: 'Top Destination',
-      location: 'Jayawijaya, Papua',
-      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=85',
-      gridArea: 'card-4'
-    },
-    {
-      id: 'papua_5',
-      region: 'PAPUA',
-      title: 'Sentani Lake Wonder',
-      rating: '4.8',
-      price: '$95',
-      priceUnit: '/Pax',
-      numericPrice: 95,
-      category: 'Top Destination',
-      location: 'Jayapura, Papua',
+      location: 'Mathura Kshetra',
       image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-5'
-    },
-    {
-      id: 'papua_6',
-      region: 'PAPUA',
-      title: 'Pianemo Lagoon Panorama',
-      rating: '4.9',
-      price: '$180',
-      priceUnit: '/Pax',
-      numericPrice: 180,
-      category: 'Top Destination',
-      location: 'Raja Ampat, Papua',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-6'
     }
   ],
-  'Nusa Tenggara Barat': [
+  'Govardhan': [
     {
-      id: 'ntb_1',
-      region: 'NTB',
-      title: 'Mount Rinjani Caldera',
-      rating: '4.9',
-      price: '$155',
+      id: 'gov_1',
+      region: 'GOVARDHAN',
+      title: 'Giriraj Mukharbind Darshan',
+      rating: '5.0',
+      price: '2k/-',
       priceUnit: '/Pax',
-      numericPrice: 155,
+      numericPrice: 2000,
       category: 'Top Destination',
-      location: 'Lombok, NTB',
-      image: 'https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=800&q=85',
+      location: 'Jatipura & Manasi Ganga',
+      image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-1'
     },
     {
-      id: 'ntb_2',
-      region: 'NTB',
-      title: 'Sasak Village Weaving',
-      rating: '4.7',
-      price: '$85',
+      id: 'gov_2',
+      region: 'GOVARDHAN',
+      title: 'Radha Kund & Shyam Kund',
+      rating: '4.9',
+      price: '1.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 85,
+      numericPrice: 1800,
       category: 'Top Destination',
-      location: 'Sade Village, NTB',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
+      location: 'Radha Kund Dham',
+      image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-2'
     },
     {
-      id: 'ntb_3',
-      region: 'NTB',
-      title: 'Pink Beach & Turquoise Bay',
+      id: 'gov_3',
+      region: 'GOVARDHAN',
+      title: 'Kusum Sarovar Heritage',
       rating: '4.9',
-      price: '$140',
+      price: '1.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 140,
+      numericPrice: 1500,
       category: 'Top Destination',
-      location: 'East Lombok, NTB',
-      image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Parikrama Marg',
+      image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-3'
     },
     {
-      id: 'ntb_4',
-      region: 'NTB',
-      title: 'Sembalun Valley Hills',
+      id: 'gov_4',
+      region: 'GOVARDHAN',
+      title: 'Daan Ghati Mandir',
       rating: '4.8',
-      price: '$130',
+      price: '1.6k/-',
       priceUnit: '/Pax',
-      numericPrice: 130,
+      numericPrice: 1600,
       category: 'Top Destination',
-      location: 'Sembalun, NTB',
-      image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1000&q=85',
-      gridArea: 'card-4'
-    },
-    {
-      id: 'ntb_5',
-      region: 'NTB',
-      title: 'Benang Stokel Cascades',
-      rating: '4.7',
-      price: '$75',
-      priceUnit: '/Pax',
-      numericPrice: 75,
-      category: 'Top Destination',
-      location: 'Central Lombok, NTB',
-      image: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-5'
-    },
-    {
-      id: 'ntb_6',
-      region: 'NTB',
-      title: 'Gili Meno Sea Turtles',
-      rating: '4.9',
-      price: '$110',
-      priceUnit: '/Pax',
-      numericPrice: 110,
-      category: 'Top Destination',
-      location: 'Gili Islands, NTB',
+      location: 'Govardhan Town',
       image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-6'
-    }
-  ],
-  'Kalimantan': [
-    {
-      id: 'kal_1',
-      region: 'KALIMANTAN',
-      title: 'Orangutan Jungle Safari',
-      rating: '4.9',
-      price: '$175',
-      priceUnit: '/Pax',
-      numericPrice: 175,
-      category: 'Top Destination',
-      location: 'Tanjung Puting, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-1'
-    },
-    {
-      id: 'kal_2',
-      region: 'KALIMANTAN',
-      title: 'Dayak Longhouse Culture',
-      rating: '4.8',
-      price: '$105',
-      priceUnit: '/Pax',
-      numericPrice: 105,
-      category: 'Top Destination',
-      location: 'Kapuas Hulu, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-2'
-    },
-    {
-      id: 'kal_3',
-      region: 'KALIMANTAN',
-      title: 'Derawan Jellyfish Lake',
-      rating: '5.0',
-      price: '$210',
-      priceUnit: '/Pax',
-      numericPrice: 210,
-      category: 'Top Destination',
-      location: 'Berau, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-3'
-    },
-    {
-      id: 'kal_4',
-      region: 'KALIMANTAN',
-      title: 'Lok Baintan Floating Market',
-      rating: '4.8',
-      price: '$90',
-      priceUnit: '/Pax',
-      numericPrice: 90,
-      category: 'Top Destination',
-      location: 'Banjarmasin, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=85',
       gridArea: 'card-4'
     },
     {
-      id: 'kal_5',
-      region: 'KALIMANTAN',
-      title: 'Labuan Cermin Mirror Lake',
-      rating: '4.9',
-      price: '$135',
+      id: 'gov_5',
+      region: 'GOVARDHAN',
+      title: 'Mansi Ganga Holy Snan',
+      rating: '4.7',
+      price: '1.2k/-',
       priceUnit: '/Pax',
-      numericPrice: 135,
+      numericPrice: 1200,
       category: 'Top Destination',
-      location: 'Biduk-Biduk, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=85',
+      location: 'Central Govardhan',
+      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-5'
     },
     {
-      id: 'kal_6',
-      region: 'KALIMANTAN',
-      title: 'Borneo Canopy Walkway',
-      rating: '4.7',
-      price: '$85',
+      id: 'gov_6',
+      region: 'GOVARDHAN',
+      title: 'Puchhari Ka Lautha',
+      rating: '4.8',
+      price: '1.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 85,
+      numericPrice: 1500,
       category: 'Top Destination',
-      location: 'Bukit Bangkirai, Kalimantan',
-      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Border',
+      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-6'
+    }
+  ],
+  'Barsana & Nandgaon': [
+    {
+      id: 'bar_1',
+      region: 'BARSANA',
+      title: 'Shriji Mandir (Radha Rani)',
+      rating: '5.0',
+      price: '3.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 3500,
+      category: 'Top Destination',
+      location: 'Bhanugarh Hill, Barsana',
+      image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-1'
+    },
+    {
+      id: 'bar_2',
+      region: 'BARSANA',
+      title: 'Maan Mandir & Mor Kuti',
+      rating: '4.9',
+      price: '2k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2000,
+      category: 'Top Destination',
+      location: 'Barsana Hilltop',
+      image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-2'
+    },
+    {
+      id: 'bar_3',
+      region: 'NANDGAON',
+      title: 'Nand Bhawan (Nand Baba Temple)',
+      rating: '4.9',
+      price: '2.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2500,
+      category: 'Top Destination',
+      location: 'Nandisvara Hill, Nandgaon',
+      image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-3'
+    },
+    {
+      id: 'bar_4',
+      region: 'BARSANA',
+      title: 'Kirti Mandir & Rangili Mahal',
+      rating: '4.9',
+      price: '1.8k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1800,
+      category: 'Top Destination',
+      location: 'Barsana Valley',
+      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-4'
+    },
+    {
+      id: 'bar_5',
+      region: 'BARSANA',
+      title: 'Sanket Van Leela Sthali',
+      rating: '4.7',
+      price: '1.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1500,
+      category: 'Top Destination',
+      location: 'Between Barsana & Nandgaon',
+      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-5'
+    },
+    {
+      id: 'bar_6',
+      region: 'NANDGAON',
+      title: 'Pavana Sarovar Holy Kund',
+      rating: '4.8',
+      price: '1.4k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1400,
+      category: 'Top Destination',
+      location: 'Nandgaon',
+      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-6'
+    }
+  ],
+  'Gokul & Mahavan': [
+    {
+      id: 'gok_1',
+      region: 'GOKUL',
+      title: 'Raman Reti Holy Sand Ashram',
+      rating: '5.0',
+      price: '2.2k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2200,
+      category: 'Top Destination',
+      location: 'Gokul Dham',
+      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-1'
+    },
+    {
+      id: 'gok_2',
+      region: 'GOKUL',
+      title: 'Chaurasi Khamba (Nand Bhawan)',
+      rating: '4.8',
+      price: '1.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1500,
+      category: 'Top Destination',
+      location: 'Mahavan, Gokul',
+      image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-2'
+    },
+    {
+      id: 'gok_3',
+      region: 'GOKUL',
+      title: 'Brahmand Ghat & Yamuna',
+      rating: '4.9',
+      price: '1.8k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1800,
+      category: 'Top Destination',
+      location: 'Gokul Riverbank',
+      image: 'https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-3'
+    },
+    {
+      id: 'gok_4',
+      region: 'GOKUL',
+      title: 'Ukhal Bandhan Leela Sthali',
+      rating: '4.7',
+      price: '1.4k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1400,
+      category: 'Top Destination',
+      location: 'Gokul',
+      image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-4'
+    },
+    {
+      id: 'gok_5',
+      region: 'GOKUL',
+      title: 'Gokulnath Ji Mandir',
+      rating: '4.8',
+      price: '1.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1500,
+      category: 'Top Destination',
+      location: 'Gokul Bazaar',
+      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=85',
+      gridArea: 'card-5'
+    },
+    {
+      id: 'gok_6',
+      region: 'MAHAVAN',
+      title: 'Yashoda Nandan Bal Leela',
+      rating: '4.8',
+      price: '1.6k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1600,
+      category: 'Top Destination',
+      location: 'Mahavan Kshetra',
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
       gridArea: 'card-6'
     }
   ]
 };
 
-// 3.5 Adventure Categories
-export const adventureCategories = [
+// 4. Explore More Brij Vibers Packages (Categories & Cards Grid)
+export const exploreCategories = [
   'Popular Destination',
-  'Islands',
-  'Surfing',
-  'National parks',
-  'Lake',
-  'Beach',
-  'Camp'
+  'Darshan',
+  'Parikrama',
+  'Barsana & Nandgaon',
+  'VIP Aarti',
+  '84 Kos Yatra'
 ];
 
-// 4. Explore More (6-card Grid)
 export const exploreDestinations = [
   {
-    id: 'exp_amalfi',
-    title: 'Amalfi Coast',
-    location: 'Amalfi, Italy',
-    price: '$148',
+    id: 'exp_84_kos',
+    title: 'Sampurna 84 Kos Brij Yatra',
+    location: 'Complete Brij Mandal',
+    price: '12k/-',
     priceUnit: '/Pax',
-    numericPrice: 148,
-    rating: 4.9,
-    category: 'Popular Destination',
+    numericPrice: 12000,
+    rating: 5.0,
+    category: '84 Kos Yatra',
     image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_taj_mahal',
-    title: 'Taj Mahal',
-    location: 'Agra, India',
-    price: '$110',
+    id: 'exp_vrindavan_vip',
+    title: 'VIP Bankey Bihari & Prem Mandir',
+    location: 'Vrindavan Dham',
+    price: '2.5k/-',
     priceUnit: '/Pax',
-    numericPrice: 110,
+    numericPrice: 2500,
     rating: 4.9,
-    category: 'Popular Destination',
+    category: 'Darshan',
     image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_lombok',
-    title: 'Lombok Island',
-    location: 'Bali, Indonesia',
-    price: '$138',
+    id: 'exp_govardhan_parikrama',
+    title: 'Govardhan & Radha Kund Parikrama',
+    location: 'Govardhan',
+    price: '3k/-',
     priceUnit: '/Pax',
-    numericPrice: 138,
-    rating: 4.8,
-    category: 'Islands',
+    numericPrice: 3000,
+    rating: 4.9,
+    category: 'Parikrama',
     image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_osaka',
-    title: 'Osaka Castle',
-    location: 'Osaka, Japan',
-    price: '$152',
+    id: 'exp_barsana_nandgaon',
+    title: 'Barsana Shriji & Nand Bhawan',
+    location: 'Barsana & Nandgaon',
+    price: '3.5k/-',
     priceUnit: '/Pax',
-    numericPrice: 152,
+    numericPrice: 3500,
     rating: 4.9,
-    category: 'Popular Destination',
+    category: 'Barsana & Nandgaon',
     image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_cape_reinga',
-    title: 'Cape Reinga',
-    location: 'Northland, New Zealand',
-    price: '$164',
+    id: 'exp_mathura_janmabhoomi',
+    title: 'Mathura Janmabhoomi & Yamuna Aarti',
+    location: 'Mathura & Vishram Ghat',
+    price: '2k/-',
     priceUnit: '/Pax',
-    numericPrice: 164,
+    numericPrice: 2000,
     rating: 4.9,
-    category: 'National parks',
+    category: 'Popular Destination',
     image: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_santorini',
-    title: 'Santorini Island',
-    location: 'Santorini, Greece',
-    price: '$172',
+    id: 'exp_gokul_raman_reti',
+    title: 'Gokul Raman Reti & Brahmand Ghat',
+    location: 'Gokul Dham',
+    price: '2.2k/-',
     priceUnit: '/Pax',
-    numericPrice: 172,
+    numericPrice: 2200,
     rating: 4.8,
-    category: 'Islands',
+    category: 'Popular Destination',
     image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80'
   },
-  // Additional items for "Show more" expansion
   {
-    id: 'exp_bali_surf',
-    title: 'Uluwatu Cliffs',
-    location: 'Bali, Indonesia',
-    price: '$125',
+    id: 'exp_yamuna_boat',
+    title: 'Yamuna Sunset Private Boat Aarti',
+    location: 'Kesi Ghat, Vrindavan',
+    price: '1.5k/-',
     priceUnit: '/Pax',
-    numericPrice: 125,
+    numericPrice: 1500,
     rating: 4.9,
-    category: 'Surfing',
+    category: 'VIP Aarti',
     image: 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_lake_como',
-    title: 'Lake Como',
-    location: 'Lombardy, Italy',
-    price: '$195',
+    id: 'exp_3day_brij',
+    title: 'Luxury 3-Day Complete Brij Vibers',
+    location: 'Complete Brij Mandal',
+    price: '8.5k/-',
     priceUnit: '/Pax',
-    numericPrice: 195,
+    numericPrice: 8500,
     rating: 5.0,
-    category: 'Lake',
+    category: '84 Kos Yatra',
     image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=800&q=80'
   },
   {
-    id: 'exp_fuji_camp',
-    title: 'Mount Fuji Campsite',
-    location: 'Honshu, Japan',
-    price: '$89',
+    id: 'exp_weekend_vrindavan',
+    title: 'Weekend Vrindavan Yatra Package',
+    location: 'Vrindavan & Mathura',
+    price: '4k/-',
     priceUnit: '/Pax',
-    numericPrice: 89,
+    numericPrice: 4000,
     rating: 4.9,
-    category: 'Camp',
+    category: 'Darshan',
     image: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=800&q=80'
   }
 ];
@@ -712,185 +710,183 @@ export const exploreDestinations = [
 // 5. Postal Stamp Destination Cards ("Let's go on an adventure")
 export const stampDestinations = [
   {
-    id: 'stamp_paris',
-    city: 'PARIS',
-    country: 'France',
+    id: 'stamp_vrindavan',
+    city: 'VRINDAVAN',
+    country: 'Brij Dham',
     image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80',
-    highlight: 'City of Lights & Eiffel Tower'
+    highlight: 'Bankey Bihari & Prem Mandir'
   },
   {
-    id: 'stamp_nyc',
-    city: 'NEW YORK',
-    country: 'United States',
+    id: 'stamp_barsana',
+    city: 'BARSANA',
+    country: 'Brij Dham',
     image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=500&q=80',
-    highlight: 'Manhattan Skyline & Liberty'
+    highlight: 'Shri Radha Rani Hilltop Mandir'
   },
   {
-    id: 'stamp_seoul',
-    city: 'SEOUL',
-    country: 'South Korea',
+    id: 'stamp_govardhan',
+    city: 'GOVARDHAN',
+    country: 'Brij Dham',
     image: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=500&q=80',
-    highlight: 'Gyeongbokgung Palace & Culture'
+    highlight: 'Giriraj Parikrama & Radha Kund'
   },
   {
-    id: 'stamp_bali',
-    city: 'BALI',
-    country: 'Indonesia',
+    id: 'stamp_mathura',
+    city: 'MATHURA',
+    country: 'Brij Dham',
     image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80',
-    highlight: 'Island of Gods & Sacred Shrines'
+    highlight: 'Krishna Janmabhoomi & Ghats'
   }
 ];
 
 // 6. Navigation Tabs in Hero Booking Capsule
 export const bookingTabs = [
-  { id: 'hostelry', label: 'Hostelry', icon: 'Building' },
+  { id: 'hostelry', label: 'Stays & Ashrams', icon: 'Building' },
   { id: 'flights', label: 'Flights', icon: 'Plane' },
-  { id: 'bus_shuttle', label: 'Bus & Shuttle', icon: 'Bus' },
-  { id: 'cars', label: 'Cars', icon: 'Car' }
+  { id: 'bus_shuttle', label: 'Brij Shuttles', icon: 'Bus' },
+  { id: 'cars', label: 'AC Cabs', icon: 'Car' }
 ];
 
-// 7. Travel Philosophy & Signature Expeditions Section ("Crafting Journeys That Inspire, Transform & Endure.")
+// 7. Travel Philosophy Section
 export const missionData = {
-  badge: 'OUR TRAVEL PHILOSOPHY',
-  titlePart1: "Crafting Journeys",
-  titleHighlight: 'That Inspire,',
-  titlePart2: 'Transform & Endure',
-  titlePart3: 'Across The Globe.',
-  description: 'Hand-crafted luxury expeditions, immersive cultural retreats, and breathtaking wilderness odysseys designed for the discerning traveler.',
-  primaryBtnText: 'Explore Tours',
-  secondaryBtnText: 'Custom Itinerary',
+  badge: 'OUR BRIJ YATRA PHILOSOPHY',
+  titlePart1: "Crafting Yatras",
+  titleHighlight: 'Of Pure Devotion,',
+  titlePart2: 'Comfort & Heritage',
+  titlePart3: 'Across Sacred Brij.',
+  description: 'Hand-crafted luxury Brij Vibers yatras, VIP temple darshans, and authentic spiritual retreats designed for families and pilgrims worldwide.',
+  primaryBtnText: 'Explore Brij Packages',
+  secondaryBtnText: 'Custom Yatra Plan',
   pillars: [
     {
       id: 'pillar_luxury',
-      title: 'Curated Luxury\nExpeditions',
-      description: 'Private charter voyages and boutique stays across world wonders.',
+      title: 'Curated Brij Vibers\nPackages',
+      description: 'Private AC transfers, verified ashrams & luxury hotels across Brij Mandal.',
       icon: 'Compass',
       image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
-      alt: 'Luxury private tropical resort with turquoise ocean'
+      alt: 'Sacred Brij Dham heritage and temple landscape'
     },
     {
       id: 'pillar_culture',
-      title: 'Immersive Cultural\nJourneys',
-      description: 'Deep heritage trails led by expert local historians and storytellers.',
+      title: 'Darshan &\nTemple Passes',
+      description: 'Skip long queues with our dedicated local guides and darshan assistance.',
       icon: 'MapPin',
       image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
       alt: 'Majestic ancient temple and heritage sunrise'
     },
     {
       id: 'pillar_adventure',
-      title: 'Alpine & Wilderness\nAdventures',
-      description: 'Thrilling mountain treks, safari glamping, and scenic flights.',
+      title: 'Parikrama &\nLeela Sthali Trails',
+      description: 'Guided Govardhan parikrama, sacred kund snan, and evening boat aartis.',
       icon: 'Plane',
       image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=85',
-      alt: 'Majestic high alpine peaks under golden sun'
+      alt: 'Serene Brij Dham hills under golden sun'
     }
   ],
   trustedBy: [
-    { id: 'tb_1', name: 'Airbnb Luxury', symbol: 'globe' },
-    { id: 'tb_2', name: 'Expedia Elite', symbol: 'cross' },
+    { id: 'tb_1', name: 'Vrinda Luxury Stays', symbol: 'globe' },
+    { id: 'tb_2', name: 'Brij Darshan Elite', symbol: 'cross' },
     { id: 'tb_3', name: 'Booking.com', symbol: 'cross' },
-    { id: 'tb_4', name: 'Emirates Holidays', symbol: 'sphere' },
-    { id: 'tb_5', name: 'National Geographic', symbol: 'globe' },
-    { id: 'tb_6', name: 'Relais & Châteaux', symbol: 'sphere' }
+    { id: 'tb_4', name: 'Brij Vibers Holidays', symbol: 'sphere' },
+    { id: 'tb_5', name: 'UP Tourism Approved', symbol: 'globe' },
+    { id: 'tb_6', name: 'Radha Krishna Trust', symbol: 'sphere' }
   ]
 };
 
-// 8. Featured Signature Tours & Travel Journal Section ("Real Journeys. Unrivaled Wonder. A World Awaits.")
+// 8. Featured Signature Tours & Travel Journal Section
 export const initiativesData = {
-  badge: 'FEATURED EXPEDITIONS',
-  title: 'Real Journeys. Unrivaled Wonder.\nA World Awaits.',
-  description: 'From secluded tropical archipelagos to historic imperial capitals, discover handpicked tour itineraries designed for unforgettable travel memories.',
-  viewAllText: 'View All Tours',
+  badge: 'FEATURED BRIJ Vibers EXPEDITIONS',
+  title: 'Real Devotion. Unrivaled Heritage.\nSacred Brij Awaits.',
+  description: 'From illuminated temple darshans to sacred Yamuna boat aartis, discover handpicked Brij Vibers itineraries designed for lifelong memories.',
+  viewAllText: 'View All Packages',
   cards: [
     {
-      id: 'init_tropical',
-      category: 'Island Escapes',
-      title: 'Tropical Island\nOdyssey',
-      description: 'Pristine coral atolls, overwater villas, and private lagoon cruises.',
+      id: 'init_vrindavan',
+      category: 'Vrindavan Yatra',
+      title: 'Bankey Bihari &\nPrem Mandir Tour',
+      description: 'VIP darshan passes, evening fountain show, and sacred Nidhivan trail.',
       image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=600&q=85',
-      linkText: 'Explore Tour'
+      linkText: 'Explore Package'
     },
     {
-      id: 'init_alpine',
-      category: 'Mountain Treks',
-      title: 'Swiss Alps &\nGlacier Trails',
-      description: 'Panoramic mountain railways, historic chalets, and alpine summits.',
+      id: 'init_govardhan',
+      category: 'Parikrama Yatra',
+      title: 'Giriraj Govardhan\n21km Holy Trail',
+      description: 'E-rickshaw or guided walking parikrama with Radha Kund & Mansi Ganga.',
       image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=85',
-      linkText: 'Explore Tour'
+      linkText: 'Explore Package'
     },
     {
-      id: 'init_heritage',
-      category: 'Cultural Odyssey',
-      title: 'Royal Palaces &\nHeritage Cities',
-      description: 'Centuries of grand architecture, royal forts, and vibrant bazaars.',
+      id: 'init_barsana',
+      category: 'Brij Dham',
+      title: 'Barsana & Nandgaon\nHeritage Leela Tour',
+      description: 'Shriji Mandir hilltop visit, Mor Kuti, and Nand Baba royal palace.',
       image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&q=85',
-      linkText: 'Explore Tour'
+      linkText: 'Explore Package'
     },
     {
-      id: 'init_safari',
-      category: 'Wild Safaris',
-      title: 'Serengeti Safari &\nWild Plains',
-      description: 'The Great Migration, open-air game drives, and luxury glamping.',
+      id: 'init_gokul',
+      category: 'Sacred Trails',
+      title: 'Gokul Raman Reti &\nYamuna Boat Aarti',
+      description: 'Rolling in sacred Raman Reti sand, Chaurasi Khamba, and sunset Yamuna aarti.',
       image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&q=85',
-      linkText: 'Explore Tour'
+      linkText: 'Explore Package'
     },
     {
-      id: 'init_nordic',
-      category: 'Arctic Wonders',
-      title: 'Nordic Fjords &\nNorthern Lights',
-      description: 'Deep glacial fjords, glass igloo stays, and magical auroras.',
+      id: 'init_84kos',
+      category: 'Chaurasi Kos',
+      title: 'Complete 84 Kos\nBrij Mahayatra',
+      description: 'Comprehensive 7-day divine pilgrimage covering all 12 sacred forests of Brij.',
       image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=85',
-      linkText: 'Explore Tour'
+      linkText: 'Explore Package'
     }
   ],
   newsletterCard: {
-    title: 'Stay Inspired. Travel Farther.',
-    description: 'Subscribe to our private travel journal for VIP flight perks, destination insider guides, and early access to signature tours.',
-    placeholder: 'Enter your email for travel guides',
+    title: 'Stay Connected With Brij Dham.',
+    description: 'Subscribe to our Brij Yatra journal for VIP festival schedules, darshan timings, and exclusive discounts on Brij Vibers packages.',
+    placeholder: 'Enter your email for yatra updates',
     buttonText: 'Subscribe',
-    joinText: 'Join 25,000+ passionate travelers'
+    joinText: 'Join 25,000+ blessed devotees'
   }
 };
 
 // 9. Master Footer Links
 export const footerNavigation = {
-  brandTagline: 'Vrinda Tours — Crafting unforgettable global journeys, bespoke luxury expeditions, and authentic travel memories since 2014.',
+  brandTagline: 'Vrinda Tours — Authentic Brij Vibers packages, VIP temple darshans, and memorable spiritual yatras across Mathura, Vrindavan & Barsana.',
   columns: [
     {
-      title: 'Destinations',
+      title: 'Brij Packages',
       links: [
-        { label: 'Popular Tours', href: '#popular' },
-        { label: 'Featured Expeditions', href: '#initiatives' },
-        { label: 'Explore Packages', href: '#explore' },
-        { label: 'Custom Itineraries', href: '#contact' }
+        { label: 'Popular Brij Yatras', href: '#popular' },
+        { label: 'Brij Vibers Packages', href: '#explore' },
+        { label: 'Giriraj Parikrama', href: '#initiatives' },
+        { label: 'Custom Yatra Plans', href: '#contact' }
       ]
     },
     {
-      title: 'Experiences',
+      title: 'Sacred Dhams',
       links: [
-        { label: 'Luxury Escapes', href: '#popular' },
-        { label: 'Mountain Treks', href: '#initiatives' },
-        { label: 'Cultural Trails', href: '#mission' },
-        { label: 'Wildlife Safaris', href: '#explore' }
+        { label: 'Vrindavan Dham', href: '#popular' },
+        { label: 'Barsana & Nandgaon', href: '#initiatives' },
+        { label: 'Govardhan Parikrama', href: '#mission' },
+        { label: 'Mathura & Gokul', href: '#explore' }
       ]
     },
     {
-      title: 'Support',
+      title: 'Yatra Support',
       links: [
-        { label: 'Travel FAQs', href: '#contact' },
-        { label: '24/7 Concierge', href: '#contact' },
+        { label: 'Darshan FAQs', href: '#contact' },
+        { label: '24/7 Brij Concierge', href: '#contact' },
         { label: 'Booking Terms', href: '#terms' },
         { label: 'Privacy Policy', href: '#privacy' }
       ]
     }
   ],
   socials: [
-    { name: 'Twitter', icon: 'Twitter', href: '#twitter' },
-    { name: 'Instagram', icon: 'Instagram', href: '#instagram' },
-    { name: 'Facebook', icon: 'Facebook', href: '#facebook' },
-    { name: 'Linkedin', icon: 'Linkedin', href: '#linkedin' }
+    { name: 'Instagram', icon: 'Instagram', href: 'https://www.instagram.com/vrindopnishad' },
+    { name: 'YouTube', icon: 'Youtube', href: 'https://www.youtube.com/@vrindopnishad' },
+    { name: 'Facebook', icon: 'Facebook', href: 'https://www.facebook.com/vrindopnishad' },
+    { name: 'Pinterest', icon: 'Pinterest', href: 'https://www.pinterest.com/vrindopnishad' }
   ],
   copyright: '© 2026 Vrinda Tours. All rights reserved.'
 };
-
-
