@@ -36,11 +36,11 @@ export const heroSteps = [
   },
   {
     step: 3,
-    tagline: 'PREMIUM VIP CONCIERGE',
+    tagline: 'PREMIUM CONCIERGE',
     title: 'Brij Vibers In\nPure Luxury &\nDevotion!',
     bgImage: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
     aspectRatio: '2.2/1',
-    ctaText: 'View VIP Packages'
+    ctaText: 'View Packages'
   }
 ];
 
@@ -109,7 +109,7 @@ export const popularPlaces = [
     image: '/vrinda-vihar/bihari-ji.jpeg',
     aspectRatio: '9/16',
     objectPosition: 'center 15%',
-    description: 'Special VIP Darshan at Shri Bankey Bihari Ji, Nidhivan, and illuminated Prem Mandir.',
+    description: 'Special Darshan at Shri Bankey Bihari Ji, Nidhivan, and illuminated Prem Mandir.',
     tags: ['Vrindavan', 'Darshan', 'Spiritual']
   },
   {
@@ -161,7 +161,7 @@ export const sweetMemoryFeatures = [
   {
     number: '01',
     title: 'Find Brij yatras tailored for you',
-    desc: 'Spiritual bliss, VIP darshan passes, comfortable stays, and seamless guided pilgrimage.'
+    desc: 'Spiritual bliss, darshan passes, comfortable stays, and seamless guided pilgrimage.'
   },
   {
     number: '02',
@@ -675,7 +675,7 @@ export const exploreCategories = [
   'Darshan',
   'Parikrama',
   'Barsana & Nandgaon',
-  'VIP Aarti',
+  'Aarti',
   '84 Kos Yatra'
 ];
 
@@ -694,7 +694,7 @@ export const exploreDestinations = [
   },
   {
     id: 'exp_vrindavan_vip',
-    title: 'VIP Bankey Bihari & Prem Mandir',
+    title: 'Bankey Bihari & Prem Mandir',
     location: 'Vrindavan Dham',
     price: '2.5k/-',
     priceUnit: '/Pax',
@@ -760,7 +760,7 @@ export const exploreDestinations = [
     priceUnit: '/Pax',
     numericPrice: 1500,
     rating: 4.9,
-    category: 'VIP Aarti',
+    category: 'Aarti',
     image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
     aspectRatio: '2.2/1'
   },
@@ -836,12 +836,12 @@ export const bookingTabs = [
 
 // 7. Travel Philosophy Section
 export const missionData = {
-  badge: 'OUR BRIJ YATRA PHILOSOPHY',
+  badge: 'Our Travel Philosophy',
   titlePart1: "Crafting Yatras",
   titleHighlight: 'Of Pure Devotion,',
   titlePart2: 'Comfort & Heritage',
   titlePart3: 'Across Sacred Brij.',
-  description: 'Hand-crafted luxury Brij Vibers yatras, VIP temple darshans, and authentic spiritual retreats designed for families and pilgrims worldwide.',
+  description: 'Hand-crafted luxury Brij Vibers yatras, temple darshans, and authentic spiritual retreats designed for families and pilgrims worldwide.',
   primaryBtnText: 'Explore Brij Packages',
   secondaryBtnText: 'Custom Yatra Plan',
   pillars: [
@@ -885,7 +885,7 @@ export const missionData = {
 
 // 8. Featured Signature Tours & Travel Journal Section
 export const initiativesData = {
-  badge: 'FEATURED BRIJ Vibers EXPEDITIONS',
+  badge: 'Featured Expeditions',
   title: 'Real Devotion. Unrivaled Heritage.\nSacred Brij Awaits.',
   description: 'From illuminated temple darshans to sacred Yamuna boat aartis, discover handpicked Brij Vibers itineraries designed for lifelong memories.',
   viewAllText: 'View All Packages',
@@ -894,7 +894,7 @@ export const initiativesData = {
       id: 'init_vrindavan',
       category: 'Vrindavan Yatra',
       title: 'Shri Bankey Bihari &\nNidhivan Darshan',
-      description: 'VIP darshan passes, evening fountain show, and sacred Nidhivan trail.',
+      description: 'darshan passes, evening fountain show, and sacred Nidhivan trail.',
       image: '/vrinda-vihar/bihari-ji.jpeg',
       aspectRatio: '9/16',
       linkText: 'Explore Package'
@@ -938,7 +938,7 @@ export const initiativesData = {
   ],
   newsletterCard: {
     title: 'Stay Connected With Brij Dham.',
-    description: 'Subscribe to our Brij Yatra journal for VIP festival schedules, darshan timings, and exclusive discounts on Brij Vibers packages.',
+    description: 'Subscribe to our Brij Yatra journal for festival schedules, darshan timings, and exclusive discounts on Brij Vibers packages.',
     placeholder: 'Enter your email for yatra updates',
     buttonText: 'Subscribe',
     joinText: 'Join 25,000+ blessed devotees'
@@ -1320,7 +1320,7 @@ export const vrindaViharGalleryData = [
 
 // 9. Master Footer Links
 export const footerNavigation = {
-  brandTagline: 'Vrinda Tours — Authentic Brij Vibers packages, VIP temple darshans, and memorable spiritual yatras across Mathura, Vrindavan & Barsana.',
+  brandTagline: 'Vrinda Tours — Authentic Brij Vibers packages, temple darshans, and memorable spiritual yatras across Mathura, Vrindavan & Barsana.',
   columns: [
     {
       title: 'Brij Packages',

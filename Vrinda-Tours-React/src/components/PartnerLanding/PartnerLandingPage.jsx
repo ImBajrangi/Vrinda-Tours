@@ -284,10 +284,26 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
   // Modals & Interactive States
   const [selectedItem, setSelectedItem] = useState(null);
-  const [activePopularCardId, setActivePopularCardId] = useState(popularPlaces[0]?.id || null);
+  const [activePopularCardId, setActivePopularCardId] = useState(null);
   const [activeGalleryCardId, setActiveGalleryCardId] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Collapse active mobile card when tapping outside
+  useEffect(() => {
+    const handleOutsideTap = (e) => {
+      if (!e.target.closest('.tp-popular-card') && !e.target.closest('.tp-gallery-card')) {
+        setActivePopularCardId(null);
+        setActiveGalleryCardId(null);
+      }
+    };
+    document.addEventListener('click', handleOutsideTap);
+    document.addEventListener('touchstart', handleOutsideTap, { passive: true });
+    return () => {
+      document.removeEventListener('click', handleOutsideTap);
+      document.removeEventListener('touchstart', handleOutsideTap);
+    };
+  }, []);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -310,7 +326,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [currentUser, setCurrentUser] = useState(() => {
     const cached = getCachedData('traveler_user', null);
     // Purge mock dummy accounts from previous versions
-    if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google VIP Member')) {
+    if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google Member')) {
       setCachedData('traveler_user', null);
       return null;
     }
@@ -398,7 +414,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         if (userObj.phone) setBookingPhone(userObj.phone);
       } else {
         const cached = getCachedData('traveler_user', null);
-        if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google VIP Member')) {
+        if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google Member')) {
           setCachedData('traveler_user', null);
           setCurrentUser(null);
         }
@@ -419,9 +435,9 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           id: 'register_prompt',
           icon: <Sparkles size={18} />,
           highlight: true,
-          title: 'Unlock 15% VIP Member Discount',
+          title: 'Unlock 15% Member Discount',
           desc: 'Sign in or register your profile for instant booking vouchers & live GPS navigation.',
-          ctaText: 'Sign In / Register',
+          ctaText: 'Register',
           onCta: () => {
             setAuthMode('signup');
             setSignupStep(1);
@@ -1111,7 +1127,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   setAuthMode('login');
                   setIsAuthModalOpen(true);
                 }}
-                title="Sign In / Register Profile"
+                title="Register Profile"
               >
                 <LogIn size={14} />
                 <span>Sign In</span>
@@ -1259,7 +1275,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     }}
                   >
                     <LogIn size={15} />
-                    <span>Sign In / Register</span>
+                    <span>Register</span>
                   </button>
                 </div>
               )}
@@ -1343,7 +1359,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   }}
                 >
                   <Calendar size={16} />
-                  <span>Book VIP Yatra</span>
+                  <span>Book Yatra</span>
                 </button>
 
                 <button
@@ -1763,7 +1779,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                               setSelectedItem(place);
                             }}
                           >
-                            <span>View Darshan</span>
+                            <span className="tp-btn-txt-desktop">View Darshan</span>
+                            <span className="tp-btn-txt-mobile">Darshan</span>
                           </button>
 
                           <button
@@ -1932,8 +1949,32 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
       {/* 5.5. SECTION: VRINDA VIHAR DIVINE DARSHAN GALLERY (Authentic Aspect Ratio Preservation) */}
       <section className="tp-section tp-gallery-section" id="gallery">
-        {/* Controls Bar: Category Filter Pills + Search & Ratio Filter */}
+        {/* Controls Bar: Full-Width Search & Filter Pills */}
         <div className="tp-gallery-controls">
+          {/* 1. Full-Width Search Input */}
+          <div className="tp-gallery-search-wrap">
+            <Search size={16} className="tp-gallery-search-icon" />
+            <input
+              type="text"
+              className="tp-gallery-search-input"
+              placeholder="Search deity, temple, or holy kund..."
+              value={gallerySearch}
+              onChange={(e) => setGallerySearch(e.target.value)}
+            />
+            {gallerySearch && (
+              <button
+                type="button"
+                className="tp-gallery-search-clear"
+                onClick={() => setGallerySearch('')}
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
+          {/* 2. Category Filter Pills */}
           <div className="tp-gallery-tabs-scroll">
             <div className="tp-gallery-tabs">
               {vrindaViharGalleryCategories.map((cat) => (
@@ -1948,41 +1989,23 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               ))}
             </div>
           </div>
-
-          {/* Quick Search Input */}
-          <div className="tp-gallery-search-wrap">
-            <Search size={15} className="tp-gallery-search-icon" />
-            <input
-              type="text"
-              className="tp-gallery-search-input"
-              placeholder="Search deity, temple, or holy kund..."
-              value={gallerySearch}
-              onChange={(e) => setGallerySearch(e.target.value)}
-            />
-            {gallerySearch && (
-              <button
-                className="tp-gallery-search-clear"
-                onClick={() => setGallerySearch('')}
-                title="Clear search"
-              >
-                <X size={13} />
-              </button>
-            )}
-          </div>
         </div>
 
-        {/* Results Metric */}
-        <div className="tp-gallery-meta-row">
-          <span className="tp-gallery-count-pill">
-            <ImageIcon size={13} />
+        {/* Search Feedback (Only shown when active search filter applied) */}
+        {gallerySearch && (
+          <div className="tp-gallery-search-feedback">
             <span>
-              Showing <strong>{displayedGalleryItems.length}</strong> of <strong>{filteredGalleryItems.length}</strong> Sacred Photographs
+              Showing results for "<strong>{gallerySearch}</strong>" ({filteredGalleryItems.length} found)
             </span>
-          </span>
-          <span className="tp-gallery-ratio-hint">
-            Preserving 9:16 Portrait • 4:5 Shringar • 16:9 Landscape • 2.2:1 Panoramic
-          </span>
-        </div>
+            <button
+              type="button"
+              className="tp-gallery-search-reset-link"
+              onClick={() => setGallerySearch('')}
+            >
+              Clear Search
+            </button>
+          </div>
+        )}
 
         {/* Aspect-Ratio Calibrated Dynamic Gallery Grid (Exact San Francisco Reference Card UI) */}
         {filteredGalleryItems.length > 0 ? (
@@ -2058,7 +2081,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                                   setLightboxItem(item);
                                 }}
                               >
-                                <span>View Darshan</span>
+                                <span className="tp-btn-txt-desktop">View Darshan</span>
+                                <span className="tp-btn-txt-mobile">Darshan</span>
                               </button>
 
                               <button
@@ -2083,7 +2107,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               ))}
             </div>
 
-            {/* Elegant Minimalist "View More" Capsule */}
+            {/* Minimalist Gallery Load More Action Deck */}
             {filteredGalleryItems.length > INITIAL_GALLERY_LIMIT && (
               <div className="tp-gallery-action-deck">
                 {hasMoreGalleryItems ? (
@@ -2096,29 +2120,22 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                       )
                     }
                   >
-                    <span>View More Photographs</span>
-                    <span className="tp-gallery-more-indicator">
-                      {displayedGalleryItems.length} of {filteredGalleryItems.length}
-                    </span>
-                    <ChevronDown size={14} className="tp-gallery-more-chevron" />
+                    <span>Show More</span>
+                    <ChevronDown size={18} className="tp-gallery-more-chevron" />
                   </button>
                 ) : (
-                  <div className="tp-gallery-complete-deck">
-                    <span className="tp-gallery-complete-badge">
-                      All {filteredGalleryItems.length} sacred photographs displayed
-                    </span>
-                    <button
-                      type="button"
-                      className="tp-btn-gallery-collapse-minimal"
-                      onClick={() => {
-                        setGalleryVisibleCount(INITIAL_GALLERY_LIMIT);
-                        const el = document.getElementById('gallery');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    >
-                      Show Less ↑
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    className="tp-btn-gallery-collapse-minimal"
+                    onClick={() => {
+                      setGalleryVisibleCount(INITIAL_GALLERY_LIMIT);
+                      const el = document.getElementById('gallery');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    <span>Show Less</span>
+                    <ChevronDown size={18} className="tp-gallery-collapse-chevron" />
+                  </button>
                 )}
               </div>
             )}
@@ -2503,8 +2520,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
                   <div className="tp-modal-cta-row">
                     <button type="submit" className="tp-btn-auth-primary-green">
-                      <span>Reserve Itinerary on WhatsApp</span>
-                      <ArrowRight size={16} />
+                      <span>Reserve on WhatsApp</span>
+                      <ArrowRight size={16} className="tp-modal-btn-arrow" />
                     </button>
                     <button
                       type="button"
@@ -2514,6 +2531,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                       }}
                       title="Save / Share Yatra"
+                      aria-label="Save / Share Yatra"
                     >
                       <Heart size={18} />
                     </button>
@@ -2631,7 +2649,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         </div>
       )}
 
-      {/* 11. iOS STYLE LUXURY VIP AUTH & PROFILE LOGIN MODAL */}
+      {/* 11. iOS STYLE LUXURY AUTH & PROFILE LOGIN MODAL */}
       {isAuthModalOpen && (
         <div className="tp-modal-overlay" onClick={() => setIsAuthModalOpen(false)}>
           <div className="tp-modal-card tp-auth-ios-card" onClick={(e) => e.stopPropagation()}>
@@ -3070,7 +3088,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     }}
                   >
                     <Calendar size={16} />
-                    <span>Book VIP Darshan Yatra</span>
+                    <span>Book Darshan Yatra</span>
                   </button>
 
                   <button
