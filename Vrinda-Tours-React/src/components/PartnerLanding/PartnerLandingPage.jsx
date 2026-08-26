@@ -38,6 +38,142 @@ import { validatePhoneNumber } from '../../utils/phoneValidator';
 import { syncPilgrimToSupabase, getPilgrimReferralStats } from '../../services/referralService';
 import './PartnerLandingPage.css';
 
+// Real-time zero-latency Journey Accordion Component
+function PartnerJourneySection({ onSelectItem }) {
+  const [activeStep, setActiveStep] = useState(2);
+  const [isHovered, setIsHovered] = useState(false);
+  const touchStartXRef = useRef(null);
+
+  // Auto-advance loop every 5s (pauses on hover)
+  useEffect(() => {
+    if (isHovered) return;
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev === 3 ? 1 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isHovered]);
+
+  const handleTouchStart = (e) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartXRef.current - touchEndX;
+    if (diff > 35) {
+      setActiveStep((prev) => (prev === 3 ? 1 : prev + 1));
+    } else if (diff < -35) {
+      setActiveStep((prev) => (prev === 1 ? 3 : prev - 1));
+    }
+    touchStartXRef.current = null;
+  };
+
+  return (
+    <section className="tp-journey-section" id="journey">
+      <div className="tp-container">
+        <div className="tp-journey-header">
+          <h2 className="tp-journey-title">Journey To The Skies Made Simple</h2>
+          <p className="tp-journey-sub">Find your destination, book premium tickets, and fly with ease.</p>
+        </div>
+
+        {/* Real-time zero delay Accordion Stage */}
+        <div
+          className="tp-journey-stage"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{ touchAction: 'pan-y manipulation' }}
+        >
+          {journeySteps.map((step) => {
+            const isActive = activeStep === step.stepNumber;
+            return (
+              <div
+                key={step.id}
+                className={`tp-journey-card ${isActive ? 'tp-j-active' : 'tp-j-inactive'}`}
+                onPointerDown={() => setActiveStep(step.stepNumber)}
+                onClick={() => setActiveStep(step.stepNumber)}
+                style={{ touchAction: 'manipulation', cursor: 'pointer' }}
+              >
+                {/* Inactive Capsule Tab Layer */}
+                <div className="tp-j-inactive-view">
+                  <div className="tp-j-inactive-icon-wrap">
+                    {step.iconType === 'pin' && <MapPin size={22} className="tp-j-inactive-icon" />}
+                    {step.iconType === 'card' && <CreditCard size={22} className="tp-j-inactive-icon" />}
+                    {step.iconType === 'grid' && <Ticket size={22} className="tp-j-inactive-icon" />}
+                  </div>
+                  <h4 className="tp-j-inactive-title">
+                    {step.title.split('\n').map((line, idx) => (
+                      <span key={idx} className="tp-j-inactive-line">{line}</span>
+                    ))}
+                  </h4>
+                </div>
+
+                {/* Active Expanded Card Layer */}
+                <div className="tp-j-active-view">
+                  {/* Top Header Row with Curved Organic Photo Window */}
+                  <div className="tp-j-top-row">
+                    <div className="tp-j-photo-window">
+                      <img
+                        src={step.photo}
+                        alt={step.shortTitle}
+                        className="tp-j-cutout-img"
+                        loading="eager"
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="tp-j-body">
+                    <h3 className="tp-j-active-title">
+                      {step.title.split('\n').map((line, idx) => (
+                        <React.Fragment key={idx}>
+                          {line}
+                          {idx < step.title.split('\n').length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </h3>
+                    <p className="tp-j-active-desc">{step.desc}</p>
+                    <button
+                      type="button"
+                      className="tp-j-learn-more-btn"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onSelectItem) {
+                          onSelectItem(popularPlaces[step.stepNumber - 1] || popularPlaces[0]);
+                        }
+                      }}
+                    >
+                      <span>{step.linkText}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Carousel Dots Indicator */}
+        <div className="tp-journey-dots-row">
+          {journeySteps.map((s) => (
+            <span
+              key={s.id}
+              className={`tp-j-dot ${activeStep === s.stepNumber ? 'active' : ''}`}
+              onPointerDown={() => setActiveStep(s.stepNumber)}
+              onClick={() => setActiveStep(s.stepNumber)}
+              title={s.shortTitle}
+              style={{ cursor: 'pointer', touchAction: 'manipulation' }}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
@@ -61,33 +197,6 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       }
     });
   }, []);
-
-  // Journey Animated Carousel State (Defaulting to step 2 "Book A Ticket" matching reference design)
-  const [activeJourneyStep, setActiveJourneyStep] = useState(2);
-  const [touchStartX, setTouchStartX] = useState(null);
-
-  const handleTouchStart = (e) => {
-    setTouchStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e) => {
-    if (!touchStartX) return;
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX - touchEndX;
-    if (diff > 45) {
-      setActiveJourneyStep(prev => (prev === 3 ? 1 : prev + 1));
-    } else if (diff < -45) {
-      setActiveJourneyStep(prev => (prev === 1 ? 3 : prev - 1));
-    }
-    setTouchStartX(null);
-  };
-
-  // Calculate 3-card ordered carousel (Active card is always centered, flanked symmetrically by left and right cards)
-  const orderedJourneySteps = (() => {
-    if (activeJourneyStep === 1) return [journeySteps[2], journeySteps[0], journeySteps[1]]; // [3, 1, 2]
-    if (activeJourneyStep === 2) return [journeySteps[0], journeySteps[1], journeySteps[2]]; // [1, 2, 3]
-    return [journeySteps[1], journeySteps[2], journeySteps[0]]; // [2, 3, 1]
-  })();
 
   // Booking Tab & State
 
@@ -1731,97 +1840,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         </div>
       </section>
 
-      {/* 3.5. JOURNEY TO THE SKIES MADE SIMPLE */}
-      <section className="tp-journey-section" id="journey">
-        <div className="tp-container">
-          <div className="tp-journey-header">
-            <h2 className="tp-journey-title">Journey To The Skies Made Simple</h2>
-            <p className="tp-journey-sub">Find your destination, book premium tickets, and fly with ease.</p>
-          </div>
-
-          {/* 3-Card Stage Matching Reference Design */}
-          <div
-            className="tp-journey-stage"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            {orderedJourneySteps.map((step) => {
-              const isActive = activeJourneyStep === step.stepNumber;
-              return (
-                <div
-                  key={step.id}
-                  className={`tp-journey-card ${isActive ? 'tp-j-active' : 'tp-j-inactive'}`}
-                  onClick={() => setActiveJourneyStep(step.stepNumber)}
-                >
-                  {/* Synchronized Inactive View Layer */}
-                  <div className="tp-j-inactive-view">
-                    <div className="tp-j-inactive-icon-wrap">
-                      {step.iconType === 'pin' && <MapPin size={22} className="tp-j-inactive-icon" />}
-                      {step.iconType === 'card' && <CreditCard size={22} className="tp-j-inactive-icon" />}
-                      {step.iconType === 'grid' && <Ticket size={22} className="tp-j-inactive-icon" />}
-                    </div>
-                    <h4 className="tp-j-inactive-title">
-                      {step.title.split('\n').map((line, idx) => (
-                        <span key={idx} className="tp-j-inactive-line">{line}</span>
-                      ))}
-                    </h4>
-                  </div>
-
-                  {/* Synchronized Active View Layer */}
-                  <div className="tp-j-active-view">
-                    {/* Top Header Row with Curved Organic Photo Window */}
-                    <div className="tp-j-top-row">
-                      <div className="tp-j-photo-window">
-                        <img
-                          src={step.photo}
-                          alt={step.shortTitle}
-                          className="tp-j-cutout-img"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Card Body */}
-                    <div className="tp-j-body">
-                      <h3 className="tp-j-active-title">
-                        {step.title.split('\n').map((line, idx) => (
-                          <React.Fragment key={idx}>
-                            {line}
-                            {idx < step.title.split('\n').length - 1 && <br />}
-                          </React.Fragment>
-                        ))}
-                      </h3>
-                      <p className="tp-j-active-desc">{step.desc}</p>
-                      <button
-                        className="tp-j-learn-more-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedItem(popularPlaces[step.stepNumber - 1] || popularPlaces[0]);
-                        }}
-                      >
-                        <span>{step.linkText}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Carousel Dots Indicator */}
-          <div className="tp-journey-dots-row">
-            {journeySteps.map((s) => (
-              <span
-                key={s.id}
-                className={`tp-j-dot ${activeJourneyStep === s.stepNumber ? 'active' : ''}`}
-                onClick={() => setActiveJourneyStep(s.stepNumber)}
-                title={s.shortTitle}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 3.5. JOURNEY TO THE SKIES MADE SIMPLE (Zero-Latency Accordion) */}
+      <PartnerJourneySection onSelectItem={setSelectedItem} />
 
       {/* 4. SECTION: POPULAR PLACE */}
       <section className="tp-section tp-popular-section" id="popular">
