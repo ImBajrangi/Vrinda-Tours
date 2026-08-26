@@ -32,18 +32,7 @@ import {
   getCachedData,
   setCachedData
 } from '../../data/landingData';
-import { auth } from '../../config/firebase';
-import {
-  GoogleAuthProvider,
-  OAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signOut,
-  onAuthStateChanged,
-  signInAnonymously
-} from 'firebase/auth';
+import { supabase } from '../../config/supabase';
 import './PartnerLandingPage.css';
 
 // Validates phone number (supports Indian 10-digit mobile, +91, 0, and international 7-15 digits) without OTP verification needed
@@ -421,45 +410,67 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     });
   };
 
-  // Sync Firebase Auth state changes in real-time
+  // Build a user object from a Supabase session
+  const buildUserFromSession = (session) => {
+    if (!session?.user) return null;
+    const u = session.user;
+    const meta = u.user_metadata || {};
+    const name = meta.full_name || meta.name || u.email?.split('@')[0] || 'Traveler';
+    const email = u.email || '';
+    const avatar = meta.avatar_url || meta.picture || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+    const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+    const cached = getCachedData('traveler_user', null);
+    const existingPhone = (cached && (cached.uid === u.id || cached.email === email) && cached.phone) ? cached.phone : (meta.phone || '');
+    return {
+      uid: u.id,
+      name,
+      email,
+      phone: existingPhone,
+      avatar,
+      initials,
+      authProvider: u.app_metadata?.provider || 'password',
+      memberId: `VRD-${u.id.slice(0, 5).toUpperCase()}`,
+      isAnonymous: false
+    };
+  };
+
+  // Sync Supabase Auth state changes in real-time
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
-      if (fbUser) {
-        const name = fbUser.displayName || fbUser.email?.split('@')[0] || (fbUser.isAnonymous ? 'Guest Traveler' : 'Traveler');
-        const email = fbUser.email || '';
-        const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
-        const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+    // Load existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        const userObj = buildUserFromSession(session);
+        if (userObj) {
+          setCurrentUser(userObj);
+          setCachedData('traveler_user', userObj);
+          if (userObj.name) setBookingName(userObj.name);
+          if (userObj.email) setBookingEmail(userObj.email);
+          if (userObj.phone) setBookingPhone(userObj.phone);
+        }
+      }
+    });
 
-        const cached = getCachedData('traveler_user', null);
-        const existingPhone = (cached && (cached.uid === fbUser.uid || cached.email === email) && cached.phone) ? cached.phone : (fbUser.phoneNumber || '');
-
-        const userObj = {
-          uid: fbUser.uid,
-          name,
-          email,
-          phone: existingPhone,
-          avatar,
-          initials,
-          authProvider: fbUser.providerData?.[0]?.providerId || (fbUser.isAnonymous ? 'anonymous' : 'password'),
-          memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
-          isAnonymous: fbUser.isAnonymous
-        };
-
-        setCurrentUser(userObj);
-        setCachedData('traveler_user', userObj);
-        if (userObj.name && userObj.name !== 'Guest Traveler') setBookingName(userObj.name);
-        if (userObj.email) setBookingEmail(userObj.email);
-        if (userObj.phone) setBookingPhone(userObj.phone);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        const userObj = buildUserFromSession(session);
+        if (userObj) {
+          setCurrentUser(userObj);
+          setCachedData('traveler_user', userObj);
+          if (userObj.name) setBookingName(userObj.name);
+          if (userObj.email) setBookingEmail(userObj.email);
+          if (userObj.phone) setBookingPhone(userObj.phone);
+        }
       } else {
+        // Signed out — clear only real (non-guest) users
         const cached = getCachedData('traveler_user', null);
-        if (cached && (cached.email === 'traveler@gmail.com' || cached.name === 'Google Traveler' || cached.tier === 'Google Member')) {
+        if (cached && !cached.isAnonymous) {
           setCachedData('traveler_user', null);
           setCurrentUser(null);
         }
       }
     });
 
-    return () => unsubscribe();
+    return () => subscription.unsubscribe();
   }, []);
 
   // Proactive registration & complete profile toast notification
@@ -556,7 +567,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     setSignupStep(3);
   };
 
-  // Step 3: Complete registration in Firebase Auth
+  // Step 3: Complete registration via Supabase Auth
   const handleStep3Submit = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -572,21 +583,28 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     const phone = phoneValidation.formatted;
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, authPasswordInput);
-      const fbUser = userCredential.user;
-      await updateProfile(fbUser, { displayName: name });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: authPasswordInput,
+        options: {
+          data: { full_name: name, phone }
+        }
+      });
+
+      if (error) throw error;
 
       const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
       const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const uid = data.user?.id || '';
       const newUser = {
-        uid: fbUser.uid,
+        uid,
         name,
         email,
         phone,
         avatar,
         initials,
         authProvider: 'password',
-        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        memberId: `VRD-${uid.slice(0, 5).toUpperCase()}`,
         createdAt: new Date().toISOString()
       };
 
@@ -602,18 +620,18 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         setSignupStep(1);
       }, 500);
     } catch (err) {
-      console.error("Firebase Signup Error:", err);
-      let errorMsg = err.message?.replace('Firebase: ', '');
-      if (err.code === 'auth/email-already-in-use') {
+      console.error('Supabase Signup Error:', err);
+      let errorMsg = err.message || 'Signup failed. Please try again.';
+      if (errorMsg.includes('already registered') || errorMsg.includes('already in use') || errorMsg.includes('User already registered')) {
         errorMsg = 'An account with this email already exists. Please log in.';
-      } else if (err.code === 'auth/weak-password') {
+      } else if (errorMsg.includes('Password')) {
         errorMsg = 'Password should be at least 6 characters.';
       }
       setAuthError(errorMsg);
     }
   };
 
-  // Real-time Firebase Login Handler
+  // Supabase Email/Password Login Handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -631,21 +649,26 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     }
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, authPasswordInput);
-      const fbUser = userCredential.user;
-      const name = fbUser.displayName || email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password: authPasswordInput });
+      if (error) throw error;
+
+      const u = data.user;
+      const meta = u.user_metadata || {};
+      const name = meta.full_name || meta.name || email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      const avatar = meta.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
       const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
+      const cached = getCachedData('traveler_user', null);
+      const existingPhone = (cached && cached.uid === u.id && cached.phone) ? cached.phone : (meta.phone || '');
 
       const loggedUser = {
-        uid: fbUser.uid,
+        uid: u.id,
         name,
         email,
-        phone: fbUser.phoneNumber || '',
+        phone: existingPhone,
         avatar,
         initials,
         authProvider: 'password',
-        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
+        memberId: `VRD-${u.id.slice(0, 5).toUpperCase()}`,
         createdAt: new Date().toISOString()
       };
 
@@ -659,72 +682,36 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         setAuthSuccessMsg('');
       }, 500);
     } catch (err) {
-      console.error("Firebase Login Error:", err);
-      let errorMsg = err.message?.replace('Firebase: ', '');
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+      console.error('Supabase Login Error:', err);
+      let errorMsg = err.message || 'Login failed.';
+      if (errorMsg.includes('Invalid login credentials') || errorMsg.includes('invalid_credentials')) {
         errorMsg = 'Invalid email or password. Please verify and try again.';
       }
       setAuthError(errorMsg);
     }
   };
 
-  // Real Firebase Google OAuth Authentication Handler
+  // Supabase Google OAuth (redirect flow)
   const handleGoogleAuth = async () => {
     setAuthError('');
     setAuthSuccessMsg('');
     try {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, provider);
-      const fbUser = result.user;
-      const name = fbUser.displayName || fbUser.email?.split('@')[0] || 'Traveler';
-      const email = fbUser.email || '';
-      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
-      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
-
-      // Check if this user already has a saved phone number
-      const cached = getCachedData('traveler_user', null);
-      const existingPhone = (cached && (cached.uid === fbUser.uid || cached.email === email) && cached.phone)
-        ? cached.phone
-        : (fbUser.phoneNumber || '');
-
-      const googleUser = {
-        uid: fbUser.uid,
-        name,
-        email,
-        phone: existingPhone,
-        avatar,
-        initials,
-        authProvider: 'google',
-        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
-        createdAt: new Date().toISOString()
-      };
-
-      if (existingPhone) {
-        // User already has phone number -> Login successful immediately!
-        setCurrentUser(googleUser);
-        setCachedData('traveler_user', googleUser);
-        setBookingName(name);
-        setBookingEmail(email);
-        setBookingPhone(existingPhone);
-        setAuthSuccessMsg(`Welcome back, ${name}!`);
-        setTimeout(() => {
-          setIsAuthModalOpen(false);
-          setAuthSuccessMsg('');
-          setPendingGoogleUser(null);
-        }, 500);
-      } else {
-        // We don't have user's phone number -> Prompt as part of sign-in process
-        setPendingGoogleUser(googleUser);
-        setAuthMode('phone_prompt');
-        setAuthPhoneInput('');
-        setBookingName(name);
-        setBookingEmail(email);
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: { prompt: 'select_account' }
+        }
+      });
+      if (error) throw error;
+      // Supabase redirects the browser — onAuthStateChange will fire on return
     } catch (err) {
-      console.error("Google Auth error:", err);
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setAuthError(err.message?.replace('Firebase: ', '') || 'Failed to sign in with Google.');
+      console.error('Google OAuth error:', err);
+      const msg = err.message || '';
+      if (msg.includes('missing OAuth secret') || msg.includes('validation_failed') || err.status === 400) {
+        setAuthError('Google Sign-In is not yet configured. Please use email & password login.');
+      } else {
+        setAuthError(msg || 'Failed to sign in with Google.');
       }
     }
   };
@@ -772,76 +759,50 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     }, 400);
   };
 
-  // Real Firebase Apple Authentication Handler (with graceful fallback)
+  // Supabase Apple OAuth (redirect flow)
   const handleAppleAuth = async () => {
     setAuthError('');
     setAuthSuccessMsg('');
     try {
-      const provider = new OAuthProvider('apple.com');
-      const result = await signInWithPopup(auth, provider);
-      const fbUser = result.user;
-      const name = fbUser.displayName || 'Apple Traveler';
-      const email = fbUser.email || '';
-      const avatar = fbUser.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
-      const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'AT';
-
-      const appleUser = {
-        uid: fbUser.uid,
-        name,
-        email,
-        phone: '',
-        avatar,
-        initials,
-        authProvider: 'apple',
-        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
-        createdAt: new Date().toISOString()
-      };
-      setCurrentUser(appleUser);
-      setCachedData('traveler_user', appleUser);
-      setBookingName(name);
-      setBookingEmail(email);
-      setAuthSuccessMsg(`Signed in with Apple!`);
-      setTimeout(() => {
-        setIsAuthModalOpen(false);
-        setAuthSuccessMsg('');
-      }, 500);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: { redirectTo: window.location.origin }
+      });
+      if (error) throw error;
+      // Supabase redirects the browser — onAuthStateChange will fire on return
     } catch (err) {
-      console.error("Apple Auth error:", err);
-      if (err.code !== 'auth/popup-closed-by-user') {
+      console.error('Apple OAuth error:', err);
+      const msg = err.message || '';
+      if (msg.includes('missing OAuth secret') || msg.includes('validation_failed') || err.status === 400) {
+        setAuthError('Apple Sign-In is not yet configured. Please use email & password login.');
+      } else {
         setAuthError('Apple Sign-In is Coming Soon...');
       }
     }
   };
 
-  // Real Firebase Anonymous Guest Authentication
-  const handleGuestAuth = async () => {
-    setAuthError('');
-    setAuthSuccessMsg('');
-    try {
-      const result = await signInAnonymously(auth);
-      const fbUser = result.user;
-      const guestUser = {
-        uid: fbUser.uid,
-        name: 'Guest Traveler',
-        email: '',
-        phone: '',
-        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=Guest&backgroundColor=0b0f19&textColor=ffffff`,
-        initials: 'GT',
-        authProvider: 'anonymous',
-        memberId: `VRD-${fbUser.uid.slice(0, 5).toUpperCase()}`,
-        createdAt: new Date().toISOString()
-      };
-      setCurrentUser(guestUser);
-      setCachedData('traveler_user', guestUser);
-      setAuthSuccessMsg('Continuing as Guest Traveler!');
-      setTimeout(() => {
-        setIsAuthModalOpen(false);
-        setAuthSuccessMsg('');
-      }, 450);
-    } catch (err) {
-      console.error("Guest Auth error:", err);
-      setAuthError('Could not start guest session.');
-    }
+  // Guest mode — local-only state (Supabase free tier does not support anonymous auth)
+  const handleGuestAuth = () => {
+    const guestId = `guest_${Date.now()}`;
+    const guestUser = {
+      uid: guestId,
+      name: 'Guest Traveler',
+      email: '',
+      phone: '',
+      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=Guest&backgroundColor=0b0f19&textColor=ffffff`,
+      initials: 'GT',
+      authProvider: 'anonymous',
+      memberId: `VRD-${guestId.slice(-5).toUpperCase()}`,
+      isAnonymous: true,
+      createdAt: new Date().toISOString()
+    };
+    setCurrentUser(guestUser);
+    setCachedData('traveler_user', guestUser);
+    setAuthSuccessMsg('Continuing as Guest Traveler!');
+    setTimeout(() => {
+      setIsAuthModalOpen(false);
+      setAuthSuccessMsg('');
+    }, 450);
   };
 
   const handleBookingNameChange = (val) => {
@@ -873,9 +834,9 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
     } catch (err) {
-      console.error("Logout error:", err);
+      console.error('Logout error:', err);
     }
     setCurrentUser(null);
     setCachedData('traveler_user', null);
@@ -1931,16 +1892,6 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   />
                   <div className="tp-pillar-scrim" />
 
-                  {/* Top/Middle Circular Glass Badge */}
-                  <div className="tp-pillar-badge-wrap">
-                    <div className="tp-pillar-icon-circle">
-                      {pillar.icon === 'Compass' && <Compass size={20} className="tp-pillar-icon" />}
-                      {pillar.icon === 'MapPin' && <MapPin size={20} className="tp-pillar-icon" />}
-                      {pillar.icon === 'Plane' && <Plane size={20} className="tp-pillar-icon" />}
-                      {pillar.icon === 'Globe' && <Globe size={20} className="tp-pillar-icon" />}
-                    </div>
-                  </div>
-
                   {/* Lower Overlay Content */}
                   <div className="tp-pillar-content">
                     <h3 className="tp-pillar-title">
@@ -1995,12 +1946,6 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               >
                 <img src={dest.image} alt={dest.title} className="tp-bento-img" loading="lazy" />
                 <div className="tp-bento-scrim" />
-
-                {/* Top-Left Rating Pill */}
-                <div className="tp-bento-rating-badge">
-                  <Star size={11} fill="#fbbf24" color="#fbbf24" />
-                  <span>{dest.rating}</span>
-                </div>
 
                 {/* Bottom Overlay Content */}
                 <div className="tp-bento-content">
