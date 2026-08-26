@@ -38,3 +38,5 @@ you are expert UI UX designer and frontend developer
 
 "Always use subtle, ultra-thin, light outlines and borders (e.g., 1px solid rgba(0, 0, 0, 0.06-0.08) or #e2e8f0) instead of thick, heavy, or dark strokes to maintain a clean, refined, high-end modern aesthetic."
 
+Luxury Editorial Design Standard: "Avoid progress bars, oversized badges, or dashboard-style meters on consumer luxury landing pages. Prefer minimalist capsule buttons with integrated subtle count chips and micro-interactions."
+

@@ -16,36 +16,39 @@ export const setCachedData = (key, value) => {
   }
 };
 
-// Hero Slider Steps (1, 2, 3) - Curated High-Definition Aviation & Sacred Brij Yatra Photography
+// Hero Slider Steps (1, 2, 3) - Curated High-Definition Sacred Brij Yatra Photography
 export const heroSteps = [
   {
     step: 1,
-    tagline: 'SACRED BRIJ YATRA & FLIGHTS',
+    tagline: 'SACRED BRIJ YATRA & DARSHAN',
     title: 'Experience\nThe Magic Of\nBrij Vibers!',
-    bgImage: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=2000&q=90',
+    bgImage: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    aspectRatio: '16/9',
     ctaText: 'Book A Trip Now'
   },
   {
     step: 2,
     tagline: 'DIVINE PILGRIMAGE CIRCUITS',
     title: 'Sacred \nDhams & Temple Trails!',
-    bgImage: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=2000&q=90',
+    bgImage: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
     ctaText: 'Explore Packages'
   },
   {
     step: 3,
     tagline: 'PREMIUM VIP CONCIERGE',
     title: 'Brij Vibers In\nPure Luxury &\nDevotion!',
-    bgImage: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=2000&q=90',
+    bgImage: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
     ctaText: 'View VIP Packages'
   }
 ];
 
 // Awesome Places Thumbnail Avatars for the Know More Card
 export const awesomePlaceAvatars = [
-  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=200&q=85',
-  'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=200&q=85',
-  'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=200&q=85'
+  '/vrinda-vihar/radha-raman-ji-smile.jpeg',
+  '/vrinda-vihar/radha-vallabh-ji-1.png',
+  '/vrinda-vihar/bihari-ji.jpeg'
 ];
 
 // Partner Brands
@@ -64,7 +67,8 @@ export const journeySteps = [
     title: 'Choose Your\nBrij Package',
     shortTitle: 'Choose Brij Package',
     desc: 'Explore 50+ hand-curated Brij Vibes itineraries across Vrindavan, Mathura & Barsana.',
-    photo: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=85',
+    photo: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    aspectRatio: '9/16',
     linkText: 'EXPLORE PACKAGES >',
     iconType: 'pin'
   },
@@ -74,7 +78,8 @@ export const journeySteps = [
     title: 'Book VIP\nDarshan & Stay',
     shortTitle: 'Book Darshan & Stay',
     desc: 'Instant confirmation, temple pass entry, ashrams & cab transfers.',
-    photo: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=85',
+    photo: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    aspectRatio: '4/5',
     linkText: 'VIEW DETAILS >',
     iconType: 'grid'
   },
@@ -84,7 +89,8 @@ export const journeySteps = [
     title: 'Pray &\nBegin Yatra',
     shortTitle: 'Pray & Begin Yatra',
     desc: 'Zero-hidden fees, WhatsApp instant voucher & 24/7 dedicated Brij guide.',
-    photo: 'https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?auto=format&fit=crop&w=600&q=85',
+    photo: '/vrinda-vihar/bihari-ji.jpeg',
+    aspectRatio: '9/16',
     linkText: 'START YATRA >',
     iconType: 'card'
   }
@@ -99,8 +105,10 @@ export const popularPlaces = [
     price: '2.5k/-',
     priceUnit: '/day',
     numericPrice: 2500,
-    rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+    rating: 5.0,
+    image: '/vrinda-vihar/bihari-ji.jpeg',
+    aspectRatio: '9/16',
+    objectPosition: 'center 15%',
     description: 'Special VIP Darshan at Shri Bankey Bihari Ji, Nidhivan, and illuminated Prem Mandir.',
     tags: ['Vrindavan', 'Darshan', 'Spiritual']
   },
@@ -112,33 +120,39 @@ export const popularPlaces = [
     priceUnit: '/day',
     numericPrice: 3500,
     rating: 5.0,
-    image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    aspectRatio: '16/9',
+    objectPosition: 'center center',
     description: 'Sacred hilltop darshan of Shriji Mandir, Mor Kuti, Maan Mandir & Rangili Mahal.',
     tags: ['Barsana', 'Radha Rani', 'Yatra']
   },
   {
     id: 'pop_govardhan',
-    title: 'Govardhan Parikrama',
+    title: 'Govardhan Parikrama & Radha Kund',
     location: 'Govardhan',
     price: '1.8k/-',
     priceUnit: '/day',
     numericPrice: 1800,
     rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
+    objectPosition: 'center center',
     description: 'Complete 21 km Govardhan Parikrama with dedicated guide, visiting Radha Kund & Mansi Ganga.',
     tags: ['Govardhan', 'Parikrama', 'Giriraj']
   },
   {
-    id: 'pop_mathura',
-    title: 'Krishna Janmabhoomi & Gokul',
-    location: 'Mathura & Gokul',
-    price: '2.8k/-',
+    id: 'pop_radharaman',
+    title: 'Shri Radha Raman Ji Darshan',
+    location: 'Vrindavan Heritage',
+    price: '2.2k/-',
     priceUnit: '/day',
-    numericPrice: 2800,
-    rating: 4.9,
-    image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
-    description: 'Birthplace of Lord Krishna in Mathura, Vishram Ghat Yamuna Aarti, and Gokul Raman Reti.',
-    tags: ['Mathura', 'Janmabhoomi', 'Gokul']
+    numericPrice: 2200,
+    rating: 5.0,
+    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    aspectRatio: '4/5',
+    objectPosition: 'center top',
+    description: 'Self-manifested Shaligram deity darshan, divine aarti, and old Vrindavan heritage parikrama.',
+    tags: ['Radha Raman', 'Darshan', 'Vrindavan']
   }
 ];
 
@@ -167,28 +181,28 @@ export const memoryReviewers = [
     name: 'Radhika Sharma',
     rating: '5.0',
     position: 'top-left',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+    avatar: '/vrinda-vihar/radha-raman-ji-smile.jpeg'
   },
   {
     name: 'Anand Gopal',
     rating: '5.0',
     position: 'middle-right',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
+    avatar: '/vrinda-vihar/radha-vallabh-ji-1.png'
   },
   {
     name: 'Pooja Verma',
     rating: '4.9',
     position: 'bottom-left',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80'
+    avatar: '/vrinda-vihar/bihari-ji.jpeg'
   }
 ];
 
 // 3. Top Destination Tabs and Bento Grid Data for Brij Vibers
 export const topDestinationTabs = [
   'Vrindavan',
-  'Mathura',
   'Govardhan',
   'Barsana & Nandgaon',
+  'Mathura',
   'Gokul & Mahavan'
 ];
 
@@ -197,159 +211,91 @@ export const topDestinationsByTab = {
     {
       id: 'vrn_1',
       region: 'VRINDAVAN',
-      title: 'Shri Bankey Bihari Mandir',
+      title: 'Shri Kunj Bihari Ji Mandir',
       rating: '5.0',
       price: '2.5k/-',
       priceUnit: '/Pax',
       numericPrice: 2500,
       category: 'Top Destination',
-      location: 'Vrindavan',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+      location: 'Nidhivan Marg, Vrindavan',
+      image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 15%',
       gridArea: 'card-1'
     },
     {
       id: 'vrn_2',
       region: 'VRINDAVAN',
-      title: 'Prem Mandir Light & Darshan',
+      title: 'Gopeshwar Mahadev Mandir',
+      rating: '4.9',
+      price: '1.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1500,
+      category: 'Top Destination',
+      location: 'Near Vamshi Vat, Vrindavan',
+      image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
+      gridArea: 'card-2'
+    },
+    {
+      id: 'vrn_3',
+      region: 'VRINDAVAN',
+      title: 'Shri Radha Raman Ji Divine Abhishek',
+      rating: '5.0',
+      price: '3k/-',
+      priceUnit: '/Pax',
+      numericPrice: 3000,
+      category: 'Top Destination',
+      location: 'Radha Raman Mandir, Vrindavan',
+      image: '/vrinda-vihar/radha-raman-ji-abhishek.png',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
+      gridArea: 'card-3'
+    },
+    {
+      id: 'vrn_4',
+      region: 'VRINDAVAN',
+      title: 'Shri Radha Vallabh Mandir Heritage',
+      rating: '4.9',
+      price: '2k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2000,
+      category: 'Top Destination',
+      location: 'Gotam Nagar, Vrindavan',
+      image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 25%',
+      gridArea: 'card-4'
+    },
+    {
+      id: 'vrn_5',
+      region: 'VRINDAVAN',
+      title: 'Shri Priya Kant Ju Mandir',
       rating: '4.9',
       price: '1.8k/-',
       priceUnit: '/Pax',
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Chhatikara Road, Vrindavan',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-2'
-    },
-    {
-      id: 'vrn_3',
-      region: 'VRINDAVAN',
-      title: 'Nidhivan & Seva Kunj',
-      rating: '4.9',
-      price: '1.5k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1500,
-      category: 'Top Destination',
-      location: 'Sacred Forest, Vrindavan',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-3'
-    },
-    {
-      id: 'vrn_4',
-      region: 'VRINDAVAN',
-      title: 'ISKCON Krishna Balaram Temple',
-      rating: '4.9',
-      price: '2k/-',
-      priceUnit: '/Pax',
-      numericPrice: 2000,
-      category: 'Top Destination',
-      location: 'Raman Reti, Vrindavan',
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1000&q=85',
-      gridArea: 'card-4'
-    },
-    {
-      id: 'vrn_5',
-      region: 'VRINDAVAN',
-      title: 'Kesi Ghat Sunset Boat Aarti',
-      rating: '4.8',
-      price: '1.2k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1200,
-      category: 'Top Destination',
-      location: 'Yamuna Riverbank, Vrindavan',
-      image: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
       gridArea: 'card-5'
     },
     {
       id: 'vrn_6',
       region: 'VRINDAVAN',
-      title: 'Shri Radha Vallabh Mandir',
-      rating: '4.9',
-      price: '1.6k/-',
+      title: 'Shri Radha Vallabh Ji Divine Shringar',
+      rating: '5.0',
+      price: '2.2k/-',
       priceUnit: '/Pax',
-      numericPrice: 1600,
+      numericPrice: 2200,
       category: 'Top Destination',
       location: 'Old Vrindavan',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-6'
-    }
-  ],
-  'Mathura': [
-    {
-      id: 'mth_1',
-      region: 'MATHURA',
-      title: 'Shri Krishna Janmabhoomi',
-      rating: '5.0',
-      price: '2.5k/-',
-      priceUnit: '/Pax',
-      numericPrice: 2500,
-      category: 'Top Destination',
-      location: 'Mathura Central',
-      image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-1'
-    },
-    {
-      id: 'mth_2',
-      region: 'MATHURA',
-      title: 'Vishram Ghat Maha Aarti',
-      rating: '4.8',
-      price: '1.5k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1500,
-      category: 'Top Destination',
-      location: 'Yamuna Bank, Mathura',
-      image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-2'
-    },
-    {
-      id: 'mth_3',
-      region: 'MATHURA',
-      title: 'Dwarkadhish Temple',
-      rating: '4.9',
-      price: '1.8k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1800,
-      category: 'Top Destination',
-      location: 'Mathura Ghats',
-      image: 'https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-3'
-    },
-    {
-      id: 'mth_4',
-      region: 'MATHURA',
-      title: 'Gita Mandir & Birla Temple',
-      rating: '4.7',
-      price: '1.2k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1200,
-      category: 'Top Destination',
-      location: 'Mathura Vrindavan Road',
-      image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-4'
-    },
-    {
-      id: 'mth_5',
-      region: 'MATHURA',
-      title: 'Kans Qila & Yamuna View',
-      rating: '4.6',
-      price: '1k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1000,
-      category: 'Top Destination',
-      location: 'Mathura',
-      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-5'
-    },
-    {
-      id: 'mth_6',
-      region: 'MATHURA',
-      title: 'Bhuteshwar Mahadev Temple',
-      rating: '4.8',
-      price: '1.4k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1400,
-      category: 'Top Destination',
-      location: 'Mathura Kshetra',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/radha-vallabh-ji-4.png',
+      aspectRatio: '4/5',
+      objectPosition: 'center top',
       gridArea: 'card-6'
     }
   ],
@@ -357,79 +303,91 @@ export const topDestinationsByTab = {
     {
       id: 'gov_1',
       region: 'GOVARDHAN',
-      title: 'Giriraj Mukharbind Darshan',
+      title: 'Shri Vallabhacharya Ji Baithakji',
       rating: '5.0',
       price: '2k/-',
       priceUnit: '/Pax',
       numericPrice: 2000,
       category: 'Top Destination',
-      location: 'Jatipura & Manasi Ganga',
-      image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
+      location: 'Jatipura & Govardhan Parikrama',
+      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
       gridArea: 'card-1'
     },
     {
       id: 'gov_2',
       region: 'GOVARDHAN',
-      title: 'Radha Kund & Shyam Kund',
+      title: 'Gau Seva & Giriraj Sanctuary',
       rating: '4.9',
-      price: '1.8k/-',
+      price: '1.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 1800,
+      numericPrice: 1500,
       category: 'Top Destination',
-      location: 'Radha Kund Dham',
-      image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Talab & Gaushala',
+      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
       gridArea: 'card-2'
     },
     {
       id: 'gov_3',
       region: 'GOVARDHAN',
-      title: 'Kusum Sarovar Heritage',
-      rating: '4.9',
-      price: '1.5k/-',
+      title: 'Radha Kund & Shyam Kund Holy Snan',
+      rating: '5.0',
+      price: '2.5k/-',
       priceUnit: '/Pax',
-      numericPrice: 1500,
+      numericPrice: 2500,
       category: 'Top Destination',
-      location: 'Govardhan Parikrama Marg',
-      image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
+      location: 'Radha Kund Dham',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
       gridArea: 'card-3'
     },
     {
       id: 'gov_4',
       region: 'GOVARDHAN',
-      title: 'Daan Ghati Mandir',
-      rating: '4.8',
-      price: '1.6k/-',
+      title: 'Krishna Kund Sacred Ghats',
+      rating: '4.9',
+      price: '1.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 1600,
+      numericPrice: 1800,
       category: 'Top Destination',
-      location: 'Govardhan Town',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Parikrama Marg',
+      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
       gridArea: 'card-4'
     },
     {
       id: 'gov_5',
       region: 'GOVARDHAN',
-      title: 'Mansi Ganga Holy Snan',
-      rating: '4.7',
-      price: '1.2k/-',
+      title: 'Krishna Kund Sunset Parikrama',
+      rating: '4.8',
+      price: '1.6k/-',
       priceUnit: '/Pax',
-      numericPrice: 1200,
+      numericPrice: 1600,
       category: 'Top Destination',
-      location: 'Central Govardhan',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Kund Kshetra',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
       gridArea: 'card-5'
     },
     {
       id: 'gov_6',
       region: 'GOVARDHAN',
-      title: 'Puchhari Ka Lautha',
-      rating: '4.8',
-      price: '1.5k/-',
+      title: 'Shri Radha Raman Ji Charanamrit & Prasad',
+      rating: '5.0',
+      price: '2k/-',
       priceUnit: '/Pax',
-      numericPrice: 1500,
+      numericPrice: 2000,
       category: 'Top Destination',
-      location: 'Govardhan Border',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
+      location: 'Govardhan Yatra Special',
+      image: '/vrinda-vihar/radha-raman-ji-charanamrit.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 15%',
       gridArea: 'card-6'
     }
   ],
@@ -437,79 +395,183 @@ export const topDestinationsByTab = {
     {
       id: 'bar_1',
       region: 'BARSANA',
-      title: 'Shriji Mandir (Radha Rani)',
+      title: 'Shri Radha Rani Mandir Hilltop',
       rating: '5.0',
       price: '3.5k/-',
       priceUnit: '/Pax',
       numericPrice: 3500,
       category: 'Top Destination',
       location: 'Bhanugarh Hill, Barsana',
-      image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      aspectRatio: '16/9',
+      objectPosition: 'center center',
       gridArea: 'card-1'
     },
     {
       id: 'bar_2',
       region: 'BARSANA',
-      title: 'Maan Mandir & Mor Kuti',
+      title: 'Shri Radha Vallabh Ji Leela Darshan',
       rating: '4.9',
       price: '2k/-',
       priceUnit: '/Pax',
       numericPrice: 2000,
       category: 'Top Destination',
-      location: 'Barsana Hilltop',
-      image: 'https://images.unsplash.com/photo-1514890547357-a9ee288728e0?auto=format&fit=crop&w=800&q=85',
+      location: 'Barsana Valley',
+      image: '/vrinda-vihar/radha-vallabh-ji-5.png',
+      aspectRatio: '2/3',
+      objectPosition: 'center top',
       gridArea: 'card-2'
     },
     {
       id: 'bar_3',
-      region: 'NANDGAON',
-      title: 'Nand Bhawan (Nand Baba Temple)',
-      rating: '4.9',
-      price: '2.5k/-',
+      region: 'BARSANA',
+      title: 'Shri Radha Vallabh Ji Divine Shringar',
+      rating: '5.0',
+      price: '2.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 2500,
+      numericPrice: 2800,
       category: 'Top Destination',
-      location: 'Nandisvara Hill, Nandgaon',
-      image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=85',
+      location: 'Barsana Heritage',
+      image: '/vrinda-vihar/radha-vallabh-ji-3.png',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
       gridArea: 'card-3'
     },
     {
       id: 'bar_4',
       region: 'BARSANA',
-      title: 'Kirti Mandir & Rangili Mahal',
+      title: 'Barsana Holy Parikrama & Kunds',
       rating: '4.9',
-      price: '1.8k/-',
+      price: '2.2k/-',
       priceUnit: '/Pax',
-      numericPrice: 1800,
+      numericPrice: 2200,
       category: 'Top Destination',
-      location: 'Barsana Valley',
-      image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=85',
+      location: 'Barsana Circuit',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      aspectRatio: '16/9',
+      objectPosition: 'center center',
       gridArea: 'card-4'
     },
     {
       id: 'bar_5',
       region: 'BARSANA',
-      title: 'Sanket Van Leela Sthali',
-      rating: '4.7',
-      price: '1.5k/-',
+      title: 'Sanket Van & Mor Kuti Trail',
+      rating: '4.8',
+      price: '1.8k/-',
       priceUnit: '/Pax',
-      numericPrice: 1500,
+      numericPrice: 1800,
       category: 'Top Destination',
       location: 'Between Barsana & Nandgaon',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/radha-vallabh-ji-6.png',
+      aspectRatio: '4/5',
+      objectPosition: 'center top',
       gridArea: 'card-5'
     },
     {
       id: 'bar_6',
-      region: 'NANDGAON',
-      title: 'Pavana Sarovar Holy Kund',
+      region: 'BARSANA',
+      title: 'Shri Radha Vallabh Ji Pushpa Shringar',
+      rating: '4.9',
+      price: '1.9k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1900,
+      category: 'Top Destination',
+      location: 'Brij Mandal',
+      image: '/vrinda-vihar/radha-vallabh-ji-7.png',
+      aspectRatio: '4/5',
+      objectPosition: 'center top',
+      gridArea: 'card-6'
+    }
+  ],
+  'Mathura': [
+    {
+      id: 'mth_1',
+      region: 'MATHURA',
+      title: 'Shri Bankey Bihari Ji Supreme Darshan',
+      rating: '5.0',
+      price: '2.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2500,
+      category: 'Top Destination',
+      location: 'Mathura & Vrindavan Kshetra',
+      image: '/vrinda-vihar/bihari-ji.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 15%',
+      gridArea: 'card-1'
+    },
+    {
+      id: 'mth_2',
+      region: 'MATHURA',
+      title: 'Vishram Ghat & Holy Kunds',
+      rating: '4.8',
+      price: '1.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1500,
+      category: 'Top Destination',
+      location: 'Yamuna Bank, Mathura',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
+      gridArea: 'card-2'
+    },
+    {
+      id: 'mth_3',
+      region: 'MATHURA',
+      title: 'Shri Radha Raman Ji Maha Darshan',
+      rating: '5.0',
+      price: '2.8k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2800,
+      category: 'Top Destination',
+      location: 'Mathura Heritage',
+      image: '/vrinda-vihar/radha-raman-ji-2.jpeg',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
+      gridArea: 'card-3'
+    },
+    {
+      id: 'mth_4',
+      region: 'MATHURA',
+      title: 'Yamuna Riverbank & Sacred Snan',
+      rating: '4.9',
+      price: '1.8k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1800,
+      category: 'Top Destination',
+      location: 'Mathura Kshetra',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
+      gridArea: 'card-4'
+    },
+    {
+      id: 'mth_5',
+      region: 'MATHURA',
+      title: 'Bhuteshwar Mahadev & Gopeshwar',
       rating: '4.8',
       price: '1.4k/-',
       priceUnit: '/Pax',
       numericPrice: 1400,
       category: 'Top Destination',
-      location: 'Nandgaon',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=85',
+      location: 'Mathura Kshetra',
+      image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
+      gridArea: 'card-5'
+    },
+    {
+      id: 'mth_6',
+      region: 'MATHURA',
+      title: 'Shri Priya Kant Ju Grand Mandir',
+      rating: '4.9',
+      price: '1.6k/-',
+      priceUnit: '/Pax',
+      numericPrice: 1600,
+      category: 'Top Destination',
+      location: 'Mathura Vrindavan Marg',
+      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
       gridArea: 'card-6'
     }
   ],
@@ -517,79 +579,91 @@ export const topDestinationsByTab = {
     {
       id: 'gok_1',
       region: 'GOKUL',
-      title: 'Raman Reti Holy Sand Ashram',
+      title: 'Raman Reti Holy Sand & Gau Seva',
       rating: '5.0',
       price: '2.2k/-',
       priceUnit: '/Pax',
       numericPrice: 2200,
       category: 'Top Destination',
       location: 'Gokul Dham',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
       gridArea: 'card-1'
     },
     {
       id: 'gok_2',
       region: 'GOKUL',
-      title: 'Chaurasi Khamba (Nand Bhawan)',
+      title: 'Chaurasi Khamba & Mahavan Baithak',
       rating: '4.8',
       price: '1.5k/-',
       priceUnit: '/Pax',
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Mahavan, Gokul',
-      image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+      aspectRatio: '9/16',
+      objectPosition: 'center 20%',
       gridArea: 'card-2'
     },
     {
       id: 'gok_3',
       region: 'GOKUL',
-      title: 'Brahmand Ghat & Yamuna',
+      title: 'Shriji & Yashoda Nandan Bal Leela',
+      rating: '5.0',
+      price: '2.5k/-',
+      priceUnit: '/Pax',
+      numericPrice: 2500,
+      category: 'Top Destination',
+      location: 'Gokul Dham',
+      image: '/vrinda-vihar/radha-raman-ji-shriJi.jpeg',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
+      gridArea: 'card-3'
+    },
+    {
+      id: 'gok_4',
+      region: 'GOKUL',
+      title: 'Brahmand Ghat & Sacred Yamuna Kund',
       rating: '4.9',
       price: '1.8k/-',
       priceUnit: '/Pax',
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Gokul Riverbank',
-      image: 'https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?auto=format&fit=crop&w=800&q=85',
-      gridArea: 'card-3'
-    },
-    {
-      id: 'gok_4',
-      region: 'GOKUL',
-      title: 'Ukhal Bandhan Leela Sthali',
-      rating: '4.7',
-      price: '1.4k/-',
-      priceUnit: '/Pax',
-      numericPrice: 1400,
-      category: 'Top Destination',
-      location: 'Gokul',
-      image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      aspectRatio: '2.2/1',
+      objectPosition: 'center center',
       gridArea: 'card-4'
     },
     {
       id: 'gok_5',
       region: 'GOKUL',
-      title: 'Gokulnath Ji Mandir',
+      title: 'Gokulnath Ji Mandir & Shringar',
       rating: '4.8',
       price: '1.5k/-',
       priceUnit: '/Pax',
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Gokul Bazaar',
-      image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/radha-vallabh-ji-1.png',
+      aspectRatio: '4/5',
+      objectPosition: 'center top',
       gridArea: 'card-5'
     },
     {
       id: 'gok_6',
       region: 'MAHAVAN',
-      title: 'Yashoda Nandan Bal Leela',
+      title: 'Ukhal Bandhan Leela Sthali',
       rating: '4.8',
       price: '1.6k/-',
       priceUnit: '/Pax',
       numericPrice: 1600,
       category: 'Top Destination',
       location: 'Mahavan Kshetra',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
+      image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+      aspectRatio: '3/4',
+      objectPosition: 'center top',
       gridArea: 'card-6'
     }
   ]
@@ -615,7 +689,8 @@ export const exploreDestinations = [
     numericPrice: 12000,
     rating: 5.0,
     category: '84 Kos Yatra',
-    image: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1'
   },
   {
     id: 'exp_vrindavan_vip',
@@ -624,9 +699,10 @@ export const exploreDestinations = [
     price: '2.5k/-',
     priceUnit: '/Pax',
     numericPrice: 2500,
-    rating: 4.9,
+    rating: 5.0,
     category: 'Darshan',
-    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/bihari-ji.jpeg',
+    aspectRatio: '9/16'
   },
   {
     id: 'exp_govardhan_parikrama',
@@ -637,7 +713,8 @@ export const exploreDestinations = [
     numericPrice: 3000,
     rating: 4.9,
     category: 'Parikrama',
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1'
   },
   {
     id: 'exp_barsana_nandgaon',
@@ -646,64 +723,70 @@ export const exploreDestinations = [
     price: '3.5k/-',
     priceUnit: '/Pax',
     numericPrice: 3500,
-    rating: 4.9,
+    rating: 5.0,
     category: 'Barsana & Nandgaon',
-    image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    aspectRatio: '16/9'
   },
   {
     id: 'exp_mathura_janmabhoomi',
-    title: 'Mathura Janmabhoomi & Yamuna Aarti',
-    location: 'Mathura & Vishram Ghat',
-    price: '2k/-',
-    priceUnit: '/Pax',
-    numericPrice: 2000,
-    rating: 4.9,
-    category: 'Popular Destination',
-    image: 'https://images.unsplash.com/photo-1507699622108-4be3abd695ad?auto=format&fit=crop&w=800&q=80'
-  },
-  {
-    id: 'exp_gokul_raman_reti',
-    title: 'Gokul Raman Reti & Brahmand Ghat',
-    location: 'Gokul Dham',
+    title: 'Shri Radha Raman Ji Special Darshan',
+    location: 'Vrindavan & Mathura',
     price: '2.2k/-',
     priceUnit: '/Pax',
     numericPrice: 2200,
+    rating: 5.0,
+    category: 'Popular Destination',
+    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    aspectRatio: '4/5'
+  },
+  {
+    id: 'exp_gokul_raman_reti',
+    title: 'Gokul Raman Reti & Gau Sanctuary',
+    location: 'Gokul Dham',
+    price: '2k/-',
+    priceUnit: '/Pax',
+    numericPrice: 2000,
     rating: 4.8,
     category: 'Popular Destination',
-    image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+    aspectRatio: '9/16'
   },
   {
     id: 'exp_yamuna_boat',
-    title: 'Yamuna Sunset Private Boat Aarti',
-    location: 'Kesi Ghat, Vrindavan',
+    title: 'Krishna Kund & Yamuna Holy Trail',
+    location: 'Sacred Kunds of Brij',
     price: '1.5k/-',
     priceUnit: '/Pax',
     numericPrice: 1500,
     rating: 4.9,
     category: 'VIP Aarti',
-    image: 'https://images.unsplash.com/photo-1502680390469-be75c86b636f?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+    aspectRatio: '2.2/1'
   },
   {
     id: 'exp_3day_brij',
-    title: 'Luxury 3-Day Complete Brij Vibers',
+    title: 'Radha Vallabh Ji Heritage Trail',
     location: 'Complete Brij Mandal',
     price: '8.5k/-',
     priceUnit: '/Pax',
     numericPrice: 8500,
     rating: 5.0,
     category: '84 Kos Yatra',
-    image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    aspectRatio: '9/16'
   },
   {
     id: 'exp_weekend_vrindavan',
-    title: 'Weekend Vrindavan Yatra Package',
-    location: 'Vrindavan & Mathura',
+    title: 'Shri Priya Kant Ju & Old Vrindavan',
+    location: 'Vrindavan Dham',
     price: '4k/-',
     priceUnit: '/Pax',
     numericPrice: 4000,
     rating: 4.9,
     category: 'Darshan',
-    image: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=800&q=80'
+    image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+    aspectRatio: '3/4'
   }
 ];
 
@@ -713,29 +796,33 @@ export const stampDestinations = [
     id: 'stamp_vrindavan',
     city: 'VRINDAVAN',
     country: 'Brij Dham',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500&q=80',
-    highlight: 'Bankey Bihari & Prem Mandir'
+    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    aspectRatio: '4/5',
+    highlight: 'Shri Radha Raman Ji & Bihari Ji'
   },
   {
     id: 'stamp_barsana',
     city: 'BARSANA',
     country: 'Brij Dham',
-    image: 'https://images.unsplash.com/photo-1538688525198-9b88f6f53126?auto=format&fit=crop&w=500&q=80',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    aspectRatio: '16/9',
     highlight: 'Shri Radha Rani Hilltop Mandir'
   },
   {
     id: 'stamp_govardhan',
     city: 'GOVARDHAN',
     country: 'Brij Dham',
-    image: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=500&q=80',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
     highlight: 'Giriraj Parikrama & Radha Kund'
   },
   {
-    id: 'stamp_mathura',
-    city: 'MATHURA',
+    id: 'stamp_kunjbihari',
+    city: 'NIDHIVAN',
     country: 'Brij Dham',
-    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=500&q=80',
-    highlight: 'Krishna Janmabhoomi & Ghats'
+    image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+    aspectRatio: '9/16',
+    highlight: 'Shri Kunj Bihari Ji & Seva Kunj'
   }
 ];
 
@@ -763,24 +850,27 @@ export const missionData = {
       title: 'Curated Brij Vibers\nPackages',
       description: 'Private AC transfers, verified ashrams & luxury hotels across Brij Mandal.',
       icon: 'Compass',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85',
-      alt: 'Sacred Brij Dham heritage and temple landscape'
+      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      aspectRatio: '3/4',
+      alt: 'Shri Priya Kant Ju Mandir Vrindavan'
     },
     {
       id: 'pillar_culture',
       title: 'Darshan &\nTemple Passes',
       description: 'Skip long queues with our dedicated local guides and darshan assistance.',
       icon: 'MapPin',
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=85',
-      alt: 'Majestic ancient temple and heritage sunrise'
+      image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+      aspectRatio: '3/4',
+      alt: 'Shri Radha Vallabh Ji Divine Darshan'
     },
     {
       id: 'pillar_adventure',
       title: 'Parikrama &\nLeela Sthali Trails',
       description: 'Guided Govardhan parikrama, sacred kund snan, and evening boat aartis.',
       icon: 'Plane',
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=85',
-      alt: 'Serene Brij Dham hills under golden sun'
+      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      aspectRatio: '2.2/1',
+      alt: 'Krishna Kund Sacred Snan Ghat Govardhan'
     }
   ],
   trustedBy: [
@@ -803,9 +893,10 @@ export const initiativesData = {
     {
       id: 'init_vrindavan',
       category: 'Vrindavan Yatra',
-      title: 'Bankey Bihari &\nPrem Mandir Tour',
+      title: 'Shri Bankey Bihari &\nNidhivan Darshan',
       description: 'VIP darshan passes, evening fountain show, and sacred Nidhivan trail.',
-      image: 'https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=600&q=85',
+      image: '/vrinda-vihar/bihari-ji.jpeg',
+      aspectRatio: '9/16',
       linkText: 'Explore Package'
     },
     {
@@ -813,7 +904,8 @@ export const initiativesData = {
       category: 'Parikrama Yatra',
       title: 'Giriraj Govardhan\n21km Holy Trail',
       description: 'E-rickshaw or guided walking parikrama with Radha Kund & Mansi Ganga.',
-      image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=85',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
       linkText: 'Explore Package'
     },
     {
@@ -821,15 +913,17 @@ export const initiativesData = {
       category: 'Brij Dham',
       title: 'Barsana & Nandgaon\nHeritage Leela Tour',
       description: 'Shriji Mandir hilltop visit, Mor Kuti, and Nand Baba royal palace.',
-      image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&q=85',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      aspectRatio: '16/9',
       linkText: 'Explore Package'
     },
     {
       id: 'init_gokul',
       category: 'Sacred Trails',
-      title: 'Gokul Raman Reti &\nYamuna Boat Aarti',
-      description: 'Rolling in sacred Raman Reti sand, Chaurasi Khamba, and sunset Yamuna aarti.',
-      image: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&q=85',
+      title: 'Gokul Raman Reti &\nGau Sanctuary',
+      description: 'Rolling in sacred Raman Reti sand, Chaurasi Khamba, and holy Gaushala seva.',
+      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      aspectRatio: '9/16',
       linkText: 'Explore Package'
     },
     {
@@ -837,7 +931,8 @@ export const initiativesData = {
       category: 'Chaurasi Kos',
       title: 'Complete 84 Kos\nBrij Mahayatra',
       description: 'Comprehensive 7-day divine pilgrimage covering all 12 sacred forests of Brij.',
-      image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=600&q=85',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      aspectRatio: '2.2/1',
       linkText: 'Explore Package'
     }
   ],
@@ -849,6 +944,379 @@ export const initiativesData = {
     joinText: 'Join 25,000+ blessed devotees'
   }
 };
+
+// ============================================================================
+// 10. COMPREHENSIVE VRINDA VIHAR DIVINE DARSHAN & LEELA GALLERY DATA
+// Categorized collection of all 29 authentic images with aspect ratios & metadata
+// ============================================================================
+export const vrindaViharGalleryCategories = [
+  'All Darshans',
+  'Shri Radha Raman Ji',
+  'Shri Radha Vallabh Ji',
+  'Bankey & Kunj Bihari',
+  'Govardhan & Sacred Kunds',
+  'Barsana & Sacred Temples'
+];
+
+export const vrindaViharGalleryData = [
+  // --- Bankey & Kunj Bihari ---
+  {
+    id: 'g_bihari_1',
+    title: 'Shri Bankey Bihari Ji Maharaj',
+    category: 'Bankey & Kunj Bihari',
+    location: 'Bankey Bihari Mandir, Vrindavan',
+    image: '/vrinda-vihar/bihari-ji.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Divine darshan of Shri Bankey Bihari Ji in full floral shringar, the heart of Vrindavan Dham.',
+    tags: ['Bankey Bihari', 'Vrindavan', 'Main Deity']
+  },
+  {
+    id: 'g_kunj_bihari',
+    title: 'Bankey Bihari Mandir Sabha Mandap',
+    category: 'Bankey & Kunj Bihari',
+    location: 'Shri Bankey Bihari Mandir, Vrindavan',
+    image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Devotees gathered inside the ornate temple courtyard and sanctum for holy darshan.',
+    tags: ['Bankey Bihari', 'Sabha Mandap', 'Vrindavan']
+  },
+
+  // --- Shri Radha Raman Ji Collection ---
+  {
+    id: 'g_rr_abhishek',
+    title: 'Shri Radha Raman Ji Divine Abhishek',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-abhishek.png',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Portrait',
+    dimensions: '2160 × 2870',
+    description: 'Sacred milk and panchamrit mahabhishek of self-manifested Shaligram Shri Radha Raman Dev.',
+    tags: ['Abhishek', 'Radha Raman', 'High Res']
+  },
+  {
+    id: 'g_rr_smile',
+    title: 'Shri Radha Raman Ji Divine Smile',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-smile.jpeg',
+    aspectRatio: '1/1',
+    ratioLabel: '1:1 Square',
+    dimensions: '1079 × 1081',
+    description: 'The mesmerizing, eternal divine smile of Shri Radha Raman Lal Ju.',
+    tags: ['Divine Smile', 'Radha Raman', 'Spotlight']
+  },
+  {
+    id: 'g_rr_butterfly',
+    title: 'Shri Radha Raman Ji Butterfly Shringar',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-butterfly.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Shringar',
+    dimensions: '1280 × 1600',
+    description: 'Unique butterfly-themed ornate crown and velvet mukut shringar.',
+    tags: ['Butterfly Shringar', 'Crown', 'Radha Raman']
+  },
+  {
+    id: 'g_rr_1',
+    title: 'Shri Radha Raman Ji Majestic Shringar',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Portrait',
+    dimensions: '1654 × 2069',
+    description: 'Grand royal attire with diamond chandrika and fragrant lotus garland.',
+    tags: ['Royal Shringar', 'Radha Raman', 'Vrindavan']
+  },
+  {
+    id: 'g_rr_2',
+    title: 'Shri Radha Raman Ji Evening Aarti',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-2.jpeg',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Portrait',
+    dimensions: '1080 × 1440',
+    description: 'Evening sandhya darshan with shimmering silks and jewel-studded tilak.',
+    tags: ['Sandhya Darshan', 'Radha Raman']
+  },
+  {
+    id: 'g_rr_charanamrit',
+    title: 'Shri Radha Raman Ji Charanamrit',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-charanamrit.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '630 × 1120',
+    description: 'Auspicious holy charanamrit seva and lotus feet blessings of Thakur Ji.',
+    tags: ['Charanamrit', 'Blessings', 'Radha Raman']
+  },
+  {
+    id: 'g_rr_prashadi',
+    title: 'Shri Radha Raman Ji Mahaprasadi',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-prashadi.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '630 × 1120',
+    description: 'Chappan bhog mahaprasad offered with love at Shri Radha Raman temple.',
+    tags: ['Mahaprasad', 'Bhog', 'Radha Raman']
+  },
+  {
+    id: 'g_rr_shriji',
+    title: 'Shri Radha Raman Ji with Shriji Crown',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji-shriJi.jpeg',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Portrait',
+    dimensions: '1080 × 1440',
+    description: 'Radha Rani throne & crown placed beside Thakur Shri Radha Raman Ji.',
+    tags: ['Shriji', 'Divine Throne', 'Radha Raman']
+  },
+  {
+    id: 'g_rr_main',
+    title: 'Shri Radha Raman Lal Ju',
+    category: 'Shri Radha Raman Ji',
+    location: 'Radha Raman Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-raman-ji.jpeg',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Portrait',
+    dimensions: '1279 × 1600',
+    description: 'Complete darshan of Gopal Bhatt Goswami’s worshipped Shaligram deity.',
+    tags: ['Shaligram', 'Goswami', 'Radha Raman']
+  },
+
+  // --- Shri Radha Vallabh Ji Collection ---
+  {
+    id: 'g_rv_temple',
+    title: 'Shri Radha Vallabh Mandir Entrance',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Gotam Nagar, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Ancient red sandstone temple established by Hit Harivansh Mahaprabhu.',
+    tags: ['Temple Architecture', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_1',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 1)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-1.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Shringar',
+    dimensions: '867 × 1083',
+    description: 'Brimming with nectar, adorned in gold zardozi vestments and pearl mala.',
+    tags: ['Hit Harivansh', 'Radha Vallabh', 'Shringar']
+  },
+  {
+    id: 'g_rv_2',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 2)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Shringar',
+    dimensions: '1080 × 1384',
+    description: 'Royal emerald robes and divine chandrika crowning Thakur Ji.',
+    tags: ['Emerald Robes', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_3',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 3)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-3.png',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Shringar',
+    dimensions: '1074 × 1388',
+    description: 'Radiant festive shringar during auspicious Brij utsav celebrations.',
+    tags: ['Utsav', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_4',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 4)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-4.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Shringar',
+    dimensions: '1023 × 1280',
+    description: 'Exquisite silk pitambari and peacock feather mukut darshan.',
+    tags: ['Pitambari', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_5',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 5)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-5.png',
+    aspectRatio: '2/3',
+    ratioLabel: '2:3 Portrait',
+    dimensions: '853 × 1280',
+    description: 'Intricate silver filigree work and fresh jasmine garland shringar.',
+    tags: ['Filigree', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_6',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 6)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-6.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Shringar',
+    dimensions: '999 × 1251',
+    description: 'Golden crown and divine flute adornment of Shri Radha Vallabh Lal.',
+    tags: ['Golden Crown', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_7',
+    title: 'Shri Radha Vallabh Ji Shringar (Series 7)',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji-7.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Shringar',
+    dimensions: '916 × 1145',
+    description: 'Sublime evening shringar reflecting Radha Rani’s eternal presence.',
+    tags: ['Eternal Presence', 'Radha Vallabh']
+  },
+  {
+    id: 'g_rv_full',
+    title: 'Shri Radha Vallabh Lal Ju',
+    category: 'Shri Radha Vallabh Ji',
+    location: 'Radha Vallabh Mandir, Vrindavan',
+    image: '/vrinda-vihar/radha-vallabh-ji.png',
+    aspectRatio: '4/5',
+    ratioLabel: '4:5 Portrait',
+    dimensions: '1280 × 1600',
+    description: 'Full altar darshan with Radha Rani’s divine gaddi beside Thakur Ji.',
+    tags: ['Full Altar', 'Radha Vallabh']
+  },
+
+  // --- Govardhan & Sacred Kunds ---
+  {
+    id: 'g_radha_kund',
+    title: 'Radha Kund & Shyam Kund Ghats',
+    category: 'Govardhan & Sacred Kunds',
+    location: 'Radha Kund, Govardhan',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
+    ratioLabel: '2.2:1 Panoramic',
+    dimensions: '1280 × 582',
+    description: 'The most sacred kund in entire universe, consecrated by Srimati Radharani.',
+    tags: ['Radha Kund', 'Holy Snan', 'Panoramic']
+  },
+  {
+    id: 'g_krishna_kund_1',
+    title: 'Krishna Kund Holy Waterbody',
+    category: 'Govardhan & Sacred Kunds',
+    location: 'Govardhan Parikrama Marg',
+    image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+    aspectRatio: '2.2/1',
+    ratioLabel: '2.2:1 Panoramic',
+    dimensions: '1280 × 582',
+    description: 'Sacred Krishna Kund dug by Lord Krishna’s flute during divine leelas.',
+    tags: ['Krishna Kund', 'Govardhan', 'Panoramic']
+  },
+  {
+    id: 'g_krishna_kund_2',
+    title: 'Krishna Kund Parikrama Vista',
+    category: 'Govardhan & Sacred Kunds',
+    location: 'Govardhan Parikrama Marg',
+    image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    aspectRatio: '2.2/1',
+    ratioLabel: '2.2:1 Panoramic',
+    dimensions: '1280 × 582',
+    description: 'Sunset reflections across the holy waters of Krishna Kund in Govardhan.',
+    tags: ['Sunset Kund', 'Govardhan', 'Panoramic']
+  },
+  {
+    id: 'g_gau_dewa',
+    title: 'Gau Seva & Cow Sanctuary Govardhan',
+    category: 'Govardhan & Sacred Kunds',
+    location: 'Giriraj Govardhan Foothills',
+    image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Traditional Gau Seva and protected cow herds around Giriraj Govardhan.',
+    tags: ['Gau Seva', 'Giriraj', 'Govardhan']
+  },
+  {
+    id: 'g_vallabhacharya',
+    title: 'Shri Vallabhacharya Ji Baithakji',
+    category: 'Govardhan & Sacred Kunds',
+    location: 'Jatipura, Govardhan',
+    image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Sacred Baithak of Jagadguru Mahaprabhu Shri Vallabhacharya at Govardhan.',
+    tags: ['Vallabhacharya', 'Baithakji', 'Govardhan']
+  },
+
+  // --- Barsana & Sacred Temples ---
+  {
+    id: 'g_barsana_mandir',
+    title: 'Shri Radha Rani Mandir (Shriji Mandir)',
+    category: 'Barsana & Sacred Temples',
+    location: 'Bhanugarh Hill, Barsana',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    aspectRatio: '16/9',
+    ratioLabel: '16:9 Landscape',
+    dimensions: '1200 × 708',
+    description: 'The iconic hilltop palace temple dedicated to Ladli Ji (Radha Rani) in Barsana.',
+    tags: ['Barsana', 'Radha Rani', 'Hilltop Palace']
+  },
+  {
+    id: 'g_priya_kant',
+    title: 'Shri Priya Kant Ju Mandir',
+    category: 'Barsana & Sacred Temples',
+    location: 'Chhatikara Road, Vrindavan',
+    image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+    aspectRatio: '3/4',
+    ratioLabel: '3:4 Portrait',
+    dimensions: '1200 × 1600',
+    description: 'Magnificent lotus-shaped temple dedicated to Priya Kant Ju (Radha Krishna).',
+    tags: ['Priya Kant Ju', 'Lotus Temple', 'Vrindavan']
+  },
+  {
+    id: 'g_gopeshwar',
+    title: 'Shri Gopeshwar Mahadev Mandir',
+    category: 'Barsana & Sacred Temples',
+    location: 'Near Vamshi Vat, Vrindavan',
+    image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Lord Shiva in Gopi roop to witness the eternal Maharaas of Radha Krishna.',
+    tags: ['Gopeshwar Mahadev', 'Shiva in Gopi Roop', 'Vrindavan']
+  },
+  {
+    id: 'g_rv_portrait',
+    title: 'Shri Radha Vallabh Temple Sanctum',
+    category: 'Barsana & Sacred Temples',
+    location: 'Vrindavan Heritage Zone',
+    image: '/vrinda-vihar/radha-vallabh-ji.jpeg',
+    aspectRatio: '9/16',
+    ratioLabel: '9:16 Portrait',
+    dimensions: '720 × 1280',
+    description: 'Inner sanctum view of the sacred Radha Vallabh temple in historic Vrindavan.',
+    tags: ['Sanctum', 'Radha Vallabh', 'Heritage']
+  }
+];
 
 // 9. Master Footer Links
 export const footerNavigation = {

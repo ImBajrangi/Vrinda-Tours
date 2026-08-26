@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Compass, Calendar, Users, MapPin, Search, Star,
-  ArrowRight, ArrowLeft, CheckCircle2, Play, SlidersHorizontal,
-  X, Plane, Building2, Bus, Car, Mail, Send, ChevronRight, ChevronDown,
+  ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
+  X, Menu, Plane, Building2, Bus, Car, Mail, Send, ChevronRight, ChevronDown,
   Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
-  LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff
+  LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
+  Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -26,6 +27,8 @@ import {
   topDestinationTabs,
   topDestinationsByTab,
   bookingTabs,
+  vrindaViharGalleryCategories,
+  vrindaViharGalleryData,
   getCachedData,
   setCachedData
 } from '../../data/landingData';
@@ -151,14 +154,157 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [activeCategory, setActiveCategory] = useState('Popular Destination');
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
+  // Vrinda Vihar Divine Darshan Gallery State
+  const [galleryCategory, setGalleryCategory] = useState(() => getCachedData('gallery_cat', 'All Darshans'));
+  const [gallerySearch, setGallerySearch] = useState('');
+  const [lightboxItem, setLightboxItem] = useState(null);
+
+  // Progressive Reveal / "Show More" Pagination Controls
+  const INITIAL_GALLERY_LIMIT = 8;
+  const GALLERY_BATCH_SIZE = 8;
+  const [galleryVisibleCount, setGalleryVisibleCount] = useState(INITIAL_GALLERY_LIMIT);
+
+  // Responsive balanced column layout for the gallery (prevents WebKit column fragmentation & empty gaps)
+  const [galleryColsCount, setGalleryColsCount] = useState(4);
+
+  useEffect(() => {
+    const updateCols = () => {
+      const w = window.innerWidth;
+      if (w < 640) {
+        setGalleryColsCount(2);
+      } else if (w < 1024) {
+        setGalleryColsCount(3);
+      } else {
+        setGalleryColsCount(4);
+      }
+    };
+    updateCols();
+    window.addEventListener('resize', updateCols, { passive: true });
+    return () => window.removeEventListener('resize', updateCols);
+  }, []);
+
+  // Filtered gallery items based on category and search query
+  const filteredGalleryItems = useMemo(() => {
+    return vrindaViharGalleryData.filter((item) => {
+      const matchCategory = galleryCategory === 'All Darshans' || item.category === galleryCategory;
+      if (!matchCategory) return false;
+
+      if (!gallerySearch.trim()) return true;
+      const q = gallerySearch.toLowerCase();
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.location.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
+        item.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    });
+  }, [galleryCategory, gallerySearch]);
+
+  // Displayed subset of items for progressive reveal
+  const displayedGalleryItems = useMemo(() => {
+    return filteredGalleryItems.slice(0, galleryVisibleCount);
+  }, [filteredGalleryItems, galleryVisibleCount]);
+
+  const hasMoreGalleryItems = galleryVisibleCount < filteredGalleryItems.length;
+
+  // Distribute displayed items using height-weighted shortest-column packing (auto-fills blanks, level bottoms)
+  const galleryColumns = useMemo(() => {
+    const cols = Array.from({ length: galleryColsCount }, () => ({
+      items: [],
+      heightWeight: 0
+    }));
+
+    displayedGalleryItems.forEach((item) => {
+      let weight = 1.25; // default 4/5
+      if (item.aspectRatio === '9/16') weight = 1.77;
+      else if (item.aspectRatio === '3/4') weight = 1.33;
+      else if (item.aspectRatio === '4/5') weight = 1.25;
+      else if (item.aspectRatio === '1/1') weight = 1.0;
+      else if (item.aspectRatio === '16/9') weight = 0.62;
+      else if (item.aspectRatio === '2.2/1') weight = 0.62;
+
+      // Find the column with the minimum cumulative height
+      let minCol = cols[0];
+      for (let i = 1; i < cols.length; i++) {
+        if (cols[i].heightWeight < minCol.heightWeight) {
+          minCol = cols[i];
+        }
+      }
+
+      minCol.items.push(item);
+      minCol.heightWeight += weight;
+    });
+
+    return cols.map((c) => c.items);
+  }, [displayedGalleryItems, galleryColsCount]);
+
+  // Category counts map for interactive pill badges
+  const categoryCounts = useMemo(() => {
+    const counts = { 'All Darshans': vrindaViharGalleryData.length };
+    vrindaViharGalleryCategories.forEach((cat) => {
+      if (cat !== 'All Darshans') {
+        counts[cat] = vrindaViharGalleryData.filter((i) => i.category === cat).length;
+      }
+    });
+    return counts;
+  }, []);
+
+  // Persist gallery category & reset visible count
+  const handleGalleryCategoryChange = (cat) => {
+    setGalleryCategory(cat);
+    setCachedData('gallery_cat', cat);
+    setGalleryVisibleCount(INITIAL_GALLERY_LIMIT);
+  };
+
+  // Keyboard navigation for Lightbox (Esc to close, Left/Right arrow to navigate)
+  useEffect(() => {
+    if (!lightboxItem) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setLightboxItem(null);
+      } else if (e.key === 'ArrowLeft') {
+        const currentIndex = filteredGalleryItems.findIndex((i) => i.id === lightboxItem.id);
+        if (currentIndex !== -1) {
+          const prevIndex = (currentIndex - 1 + filteredGalleryItems.length) % filteredGalleryItems.length;
+          setLightboxItem(filteredGalleryItems[prevIndex]);
+        }
+      } else if (e.key === 'ArrowRight') {
+        const currentIndex = filteredGalleryItems.findIndex((i) => i.id === lightboxItem.id);
+        if (currentIndex !== -1) {
+          const nextIndex = (currentIndex + 1) % filteredGalleryItems.length;
+          setLightboxItem(filteredGalleryItems[nextIndex]);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxItem, filteredGalleryItems]);
+
   // Modals & Interactive States
   const [selectedItem, setSelectedItem] = useState(null);
+  const [activePopularCardId, setActivePopularCardId] = useState(popularPlaces[0]?.id || null);
+  const [activeGalleryCardId, setActiveGalleryCardId] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [priceFilter, setPriceFilter] = useState(15000);
   const [minRatingFilter, setMinRatingFilter] = useState(4.5);
+
+  // Lock body scroll when mobile menu drawer is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   // Real-time Authentication & Firebase State Synchronization
   const [currentUser, setCurrentUser] = useState(() => {
@@ -363,7 +509,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     setAuthSuccessMsg('');
     const email = authEmailInput.trim().toLowerCase();
     const name = authNameInput.trim();
-    
+
     const phoneValidation = validatePhoneNumber(authPhoneInput);
     if (!phoneValidation.isValid) {
       setAuthError(phoneValidation.message);
@@ -794,17 +940,19 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
           {/* Navigation Links */}
           <nav className="tp-nav-menu">
-            <a href="#about" className="tp-nav-item uppercase">ABOUT</a>
-            <a href="#popular" className="tp-nav-item uppercase">TOUR</a>
-            <a href="#explore" className="tp-nav-item uppercase">BRIJ PACKAGES</a>
-            <a href="#footer" className="tp-nav-item uppercase">CONTACT</a>
+            <a href="#about" className="tp-nav-item">About</a>
+            <a href="#popular" className="tp-nav-item">Tours</a>
+            <a href="#explore" className="tp-nav-item">Packages</a>
+            <a href="#gallery" className="tp-nav-item">Divine Darshan</a>
+            <a href="#initiatives" className="tp-nav-item">Journal</a>
+            <a href="#contact" className="tp-nav-item">Contact</a>
           </nav>
 
           {/* Action CTAs */}
           <div className="tp-nav-actions">
-            {/* User Profile / Auth Action */}
+            {/* User Profile / Auth Action (Desktop) */}
             {currentUser ? (
-              <div className="tp-nav-user-wrapper" ref={profileMenuRef}>
+              <div className="tp-nav-user-wrapper tp-desktop-auth" ref={profileMenuRef}>
                 <button
                   type="button"
                   className={`tp-nav-user-pill ${isProfileMenuOpen ? 'active' : ''}`}
@@ -858,7 +1006,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           <div className="tp-profile-progress-fill" style={{ width: '60%' }} />
                         </div>
                         <p className="tp-profile-incomplete-desc">
-                          Add WhatsApp for booking vouchers & live driver GPS.
+                          Add WhatsApp for live GPS & booking vouchers.
                         </p>
                         <button
                           type="button"
@@ -872,7 +1020,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           }}
                         >
                           <Phone size={12} />
-                          <span>Add WhatsApp Number</span>
+                          <span>Add WhatsApp for Live GPS</span>
                         </button>
                       </div>
                     ) : currentUser.isAnonymous ? (
@@ -958,7 +1106,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               </div>
             ) : (
               <button
-                className="tp-btn-nav-signin"
+                className="tp-btn-nav-signin tp-desktop-auth"
                 onClick={() => {
                   setAuthMode('login');
                   setIsAuthModalOpen(true);
@@ -970,6 +1118,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               </button>
             )}
 
+            {/* Book Trip Button */}
             <button
               className="tp-btn-dark-pill"
               onClick={() => {
@@ -979,18 +1128,265 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               Book Trip
             </button>
 
-            {/* Quick Live Pilgrim Map Switcher */}
+            {/* Quick Live Pilgrim Map Switcher (Desktop) */}
             <button
-              className="tp-btn-map-toggle"
+              className="tp-btn-map-toggle tp-desktop-map-btn"
               onClick={onClose}
               title="Switch to Live Vrinda Pilgrim Map & GPS Booking"
             >
               <MapPin size={15} />
               <span>Live Map</span>
             </button>
+
+            {/* Mobile Hamburger Menu Button */}
+            <button
+              type="button"
+              className={`tp-hamburger-btn ${isMobileMenuOpen ? 'open' : ''}`}
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle Navigation Menu"
+            >
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* MOBILE FULL-SCREEN NAVIGATION DRAWER (Vrindopnishad Design) */}
+      {isMobileMenuOpen && (
+        <div className="tp-mobile-drawer-overlay" onClick={() => setIsMobileMenuOpen(false)}>
+          <div className="tp-mobile-drawer" onClick={(e) => e.stopPropagation()}>
+            {/* Top Header inside Mobile Drawer */}
+            <div className="tp-mobile-drawer-header">
+              <div
+                className="tp-brand"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                <div className="tp-logo-mark-modern">
+                  <div className="tp-logo-outer-ring">
+                    <div className="tp-logo-inner-dot" />
+                  </div>
+                </div>
+                <span className="tp-logo-text-black">Vrinda.</span>
+              </div>
+
+              <button
+                type="button"
+                className="tp-mobile-drawer-close-btn"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Scrollable Drawer Body */}
+            <div className="tp-mobile-drawer-body">
+              {/* 1. Integrated User Profile Card / Auth Section */}
+              {currentUser ? (
+                <div className="tp-mobile-profile-card">
+                  <div className="tp-mobile-profile-header">
+                    <img
+                      src={currentUser.avatar}
+                      alt={currentUser.name}
+                      className="tp-mobile-profile-avatar"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0f172a&color=ffffff&bold=true`;
+                      }}
+                    />
+                    <div className="tp-mobile-profile-info">
+                      <h4 className="tp-mobile-profile-name">{currentUser.name}</h4>
+                      <p className="tp-mobile-profile-email">{currentUser.email || 'Guest Pilgrim'}</p>
+                      <span className="tp-mobile-profile-badge">
+                        <Sparkles size={11} /> {currentUser.authProvider === 'google' ? 'Google Account' : currentUser.isAnonymous ? 'Guest Pass' : 'Verified Member'}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="tp-mobile-profile-logout-btn"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleLogout();
+                      }}
+                      title="Sign Out"
+                      aria-label="Sign Out"
+                    >
+                      <LogOut size={15} />
+                    </button>
+                  </div>
+
+                  {!currentUser.phone ? (
+                    <button
+                      type="button"
+                      className="tp-mobile-action-strip"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setPendingGoogleUser(currentUser);
+                        setAuthPhoneInput(currentUser.phone || '');
+                        setAuthMode('phone_prompt');
+                        setIsAuthModalOpen(true);
+                      }}
+                    >
+                      <Phone size={13} />
+                      <span>Add WhatsApp for Live GPS</span>
+                      <ArrowRight size={13} className="tp-strip-arrow" />
+                    </button>
+                  ) : (
+                    <div className="tp-mobile-verified-strip">
+                      <CheckCircle2 size={13} color="#059669" />
+                      <span>100% Profile Complete • Verified</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="tp-mobile-guest-card">
+                  <div className="tp-mobile-guest-text">
+                    <h4>Namaste, Pilgrim! 🙏</h4>
+                    <p>Sign in to sync bookings, live GPS & member discounts.</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-signin"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setAuthMode('login');
+                      setIsAuthModalOpen(true);
+                    }}
+                  >
+                    <LogIn size={15} />
+                    <span>Sign In / Register</span>
+                  </button>
+                </div>
+              )}
+
+              {/* 2. Main Navigation Links (Vrindopnishad List Style) */}
+              <div className="tp-mobile-nav-block">
+                <div className="tp-mobile-section-label">PILGRIMAGE SECTIONS</div>
+                <div className="tp-mobile-nav-list">
+                  <a
+                    href="#about"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>About Vrinda</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                  <a
+                    href="#popular"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Sacred Dhams & Trails</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                  <a
+                    href="#explore"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Brij Tour Packages</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                  <a
+                    href="#gallery"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Divine Darshan Gallery</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                  <a
+                    href="#initiatives"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Pilgrim Journal & Stories</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                  {onOpenPartnerHub && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        onOpenPartnerHub();
+                      }}
+                    >
+                      <span>Partner & Driver Hub</span>
+                      <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+                  <a
+                    href="#contact"
+                    className="tp-mobile-nav-item"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>Contact & Support</span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </a>
+                </div>
+              </div>
+
+              {/* 3. Action Buttons Suite (Max 2 Buttons) */}
+              <div className="tp-mobile-cta-suite">
+                <button
+                  type="button"
+                  className="tp-btn-mobile-primary-action"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setSelectedItem(popularPlaces[0]);
+                  }}
+                >
+                  <Calendar size={16} />
+                  <span>Book VIP Yatra</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="tp-btn-mobile-outline-action"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    if (onClose) onClose();
+                  }}
+                >
+                  <MapPin size={16} />
+                  <span>Live Pilgrim GPS Map</span>
+                </button>
+              </div>
+
+              {/* 4. Vrindopnishad Network Ecosystem Links */}
+              <div className="tp-mobile-ecosystem-block">
+                <div className="tp-mobile-section-label">VRINDOPNISHAD NETWORK</div>
+                <ul className="tp-mobile-ecosystem-list">
+                  <li>
+                    <a href="https://path.vrindopnishad.in/" target="_blank" rel="noopener noreferrer">
+                      <span>Vrindopnishad Path</span>
+                      <ArrowUpRight size={16} />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://pic.vrindopnishad.in/" target="_blank" rel="noopener noreferrer">
+                      <span>Chitra Vrinda HD Darshan</span>
+                      <ArrowUpRight size={16} />
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://api.whatsapp.com/send?phone=917618218181&text=Radhe%20Radhe%21%20I%20want%20to%20inquire%20about%20a%20Vrinda%20Yatra" target="_blank" rel="noopener noreferrer">
+                      <span>24x7 WhatsApp Concierge</span>
+                      <ArrowUpRight size={16} />
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 2. MASTER AVIATION HERO SECTION (Exact Reference Design) */}
       <section className="tp-hero-section" id="hero">
@@ -1311,27 +1707,84 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           </div>
 
 
-          {/* 4-Card Grid */}
+          {/* 4-Card Grid (Anchor Overlay Architecture) */}
           <div className="tp-popular-grid">
-            {popularPlaces.map((place) => (
-              <div
-                key={place.id}
-                className="tp-popular-card"
-                onClick={() => setSelectedItem(place)}
-              >
-                <div className="tp-card-media">
-                  <img src={place.image} alt={place.title} className="tp-card-img" loading="lazy" />
-                  <div className="tp-price-badge">{place.price}</div>
-                </div>
-                <div className="tp-card-info">
-                  <h3 className="tp-card-title">{place.title}</h3>
-                  <div className="tp-card-location">
-                    <MapPin size={14} className="tp-loc-icon" />
-                    <span>{place.location}</span>
+            {popularPlaces.map((place) => {
+              const isActive = activePopularCardId === place.id;
+              return (
+                <div key={place.id} className="tp-popular-card-anchor">
+                  <div
+                    className={`tp-popular-card tp-morph-card ${isActive ? 'is-active' : ''}`}
+                    onClick={(e) => {
+                      if (window.innerWidth <= 900) {
+                        if (activePopularCardId !== place.id) {
+                          e.stopPropagation();
+                          setActivePopularCardId(place.id);
+                          return;
+                        }
+                      }
+                      setSelectedItem(place);
+                    }}
+                  >
+                    <div className="tp-card-media">
+                      <img src={place.image} alt={place.title} className="tp-card-img" loading="lazy" />
+                      <div className="tp-price-badge">{place.price}</div>
+                    </div>
+                    <div className="tp-card-info">
+                      <h3 className="tp-card-title">{place.title}</h3>
+
+                      {/* Resting Location Row */}
+                      <div className="tp-card-location tp-card-resting-loc">
+                        <MapPin size={13} className="tp-loc-icon" />
+                        <span>{place.location.includes(',') ? place.location.split(',')[0] : place.location}</span>
+                      </div>
+
+                      {/* Morph Content Revealed as Floating Overlay on Hover / Active */}
+                      <div className="tp-card-morph-body">
+                        <p className="tp-card-morph-sub">{place.category || 'Vrindavan Yatra'}</p>
+
+                        <div className="tp-card-morph-tags">
+                          <span className="tp-card-tag-item">
+                            <Tag size={13} className="tp-card-tag-icon" />
+                            <span>from <strong>{place.price}</strong></span>
+                          </span>
+                          <span className="tp-card-tag-item">
+                            <MapPin size={13} className="tp-card-tag-icon" />
+                            <span>{place.location.includes(',') ? place.location.split(',')[0] : place.location}</span>
+                          </span>
+                        </div>
+
+                        <div className="tp-card-morph-cta-suite">
+                          <button
+                            type="button"
+                            className="tp-btn-card-pill-action"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedItem(place);
+                            }}
+                          >
+                            <span>View Darshan</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            className="tp-btn-card-heart-pill"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const text = `Experience holy darshan of ${place.title} with Vrinda Tours: ${window.location.href}`;
+                              window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                            title="Favorite / Share"
+                          >
+                            <Heart size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1475,6 +1928,217 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* 5.5. SECTION: VRINDA VIHAR DIVINE DARSHAN GALLERY (Authentic Aspect Ratio Preservation) */}
+      <section className="tp-section tp-gallery-section" id="gallery">
+        {/* Controls Bar: Category Filter Pills + Search & Ratio Filter */}
+        <div className="tp-gallery-controls">
+          <div className="tp-gallery-tabs-scroll">
+            <div className="tp-gallery-tabs">
+              {vrindaViharGalleryCategories.map((cat) => (
+                <button
+                  key={cat}
+                  className={`tp-gallery-tab-btn ${galleryCategory === cat ? 'active' : ''}`}
+                  onClick={() => handleGalleryCategoryChange(cat)}
+                >
+                  <span>{cat}</span>
+                  <span className="tp-gallery-tab-count">{categoryCounts[cat] || 0}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Search Input */}
+          <div className="tp-gallery-search-wrap">
+            <Search size={15} className="tp-gallery-search-icon" />
+            <input
+              type="text"
+              className="tp-gallery-search-input"
+              placeholder="Search deity, temple, or holy kund..."
+              value={gallerySearch}
+              onChange={(e) => setGallerySearch(e.target.value)}
+            />
+            {gallerySearch && (
+              <button
+                className="tp-gallery-search-clear"
+                onClick={() => setGallerySearch('')}
+                title="Clear search"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Results Metric */}
+        <div className="tp-gallery-meta-row">
+          <span className="tp-gallery-count-pill">
+            <ImageIcon size={13} />
+            <span>
+              Showing <strong>{displayedGalleryItems.length}</strong> of <strong>{filteredGalleryItems.length}</strong> Sacred Photographs
+            </span>
+          </span>
+          <span className="tp-gallery-ratio-hint">
+            Preserving 9:16 Portrait • 4:5 Shringar • 16:9 Landscape • 2.2:1 Panoramic
+          </span>
+        </div>
+
+        {/* Aspect-Ratio Calibrated Dynamic Gallery Grid (Exact San Francisco Reference Card UI) */}
+        {filteredGalleryItems.length > 0 ? (
+          <>
+            <div className="tp-gallery-flex-grid">
+              {galleryColumns.map((colItems, colIdx) => (
+                <div key={colIdx} className="tp-gallery-flex-col">
+                  {colItems.map((item) => {
+                    const isActive = activeGalleryCardId === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`tp-gallery-card tp-morph-card ${isActive ? 'is-active' : ''}`}
+                        onClick={(e) => {
+                          if (window.innerWidth <= 900) {
+                            if (activeGalleryCardId !== item.id) {
+                              e.stopPropagation();
+                              setActiveGalleryCardId(item.id);
+                              return;
+                            }
+                          }
+                          setLightboxItem(item);
+                        }}
+                      >
+                        {/* 1. Picture Handling: Soft Rounded Inset Picture Container */}
+                        <div
+                          className="tp-gallery-card-img-wrap"
+                          style={{
+                            aspectRatio: item.aspectRatio || '4/5'
+                          }}
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="tp-gallery-card-photo"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="tp-price-badge">{item.price ? `${item.price}/-` : '1.2k/-'}</div>
+                        </div>
+
+                        {/* 2. Content Section: Resting State & Hover/Active Morph */}
+                        <div className="tp-gallery-card-body">
+                          <h4 className="tp-gallery-card-heading">{item.title}</h4>
+
+                          {/* Resting Location Row */}
+                          <div className="tp-card-location tp-card-resting-loc">
+                            <MapPin size={13} className="tp-loc-icon" />
+                            <span>{item.location.includes(',') ? item.location.split(',')[0] : item.location}</span>
+                          </div>
+
+                          {/* Morph Body Revealed on Hover / Active */}
+                          <div className="tp-card-morph-body">
+                            <p className="tp-gallery-card-category-sub">{item.category}</p>
+
+                            <div className="tp-gallery-card-tags-row">
+                              <span className="tp-card-tag-item">
+                                <Tag size={13} className="tp-card-tag-icon" />
+                                <span>from <strong>{item.price || '₹1,200'}</strong></span>
+                              </span>
+                              <span className="tp-card-tag-item">
+                                <MapPin size={13} className="tp-card-tag-icon" />
+                                <span>{item.location.includes(',') ? item.location.split(',')[0] : item.location}</span>
+                              </span>
+                            </div>
+
+                            <div className="tp-gallery-card-cta-suite">
+                              <button
+                                type="button"
+                                className="tp-btn-card-pill-action"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setLightboxItem(item);
+                                }}
+                              >
+                                <span>View Darshan</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                className="tp-btn-card-heart-pill"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const text = `Experience holy darshan of ${item.title} in Vrindavan: ${window.location.origin}${item.image}`;
+                                  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                                }}
+                                title="Share Darshan on WhatsApp"
+                              >
+                                <Heart size={16} />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {/* Elegant Minimalist "View More" Capsule */}
+            {filteredGalleryItems.length > INITIAL_GALLERY_LIMIT && (
+              <div className="tp-gallery-action-deck">
+                {hasMoreGalleryItems ? (
+                  <button
+                    type="button"
+                    className="tp-btn-gallery-more"
+                    onClick={() =>
+                      setGalleryVisibleCount((prev) =>
+                        Math.min(prev + GALLERY_BATCH_SIZE, filteredGalleryItems.length)
+                      )
+                    }
+                  >
+                    <span>View More Photographs</span>
+                    <span className="tp-gallery-more-indicator">
+                      {displayedGalleryItems.length} of {filteredGalleryItems.length}
+                    </span>
+                    <ChevronDown size={14} className="tp-gallery-more-chevron" />
+                  </button>
+                ) : (
+                  <div className="tp-gallery-complete-deck">
+                    <span className="tp-gallery-complete-badge">
+                      All {filteredGalleryItems.length} sacred photographs displayed
+                    </span>
+                    <button
+                      type="button"
+                      className="tp-btn-gallery-collapse-minimal"
+                      onClick={() => {
+                        setGalleryVisibleCount(INITIAL_GALLERY_LIMIT);
+                        const el = document.getElementById('gallery');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    >
+                      Show Less ↑
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="tp-gallery-empty-state">
+            <ImageIcon size={36} className="tp-gallery-empty-icon" />
+            <h4>No Sacred Darshan found for "{gallerySearch}"</h4>
+            <p>Try searching for Radha Raman, Bihari Ji, Govardhan, or Radha Vallabh.</p>
+            <button
+              className="tp-btn-gallery-reset"
+              onClick={() => {
+                setGallerySearch('');
+                handleGalleryCategoryChange('All Darshans');
+              }}
+            >
+              Reset All Filters
+            </button>
+          </div>
+        )}
       </section>
 
       {/* 6. SECTION: FEATURED EXPEDITIONS & TOURS (Refined Luxury Layout) */}
@@ -1744,49 +2408,32 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             {/* Modal Body Container */}
             <div className="tp-modal-body-wrapper">
 
-              {/* Trip Highlights Info Bar: Unified Segmented Summary Deck */}
+              {/* Trip Highlights Info Bar: Clean Modern Inline Meta Row (Matching Reference Image) */}
               <div className="tp-modal-trip-meta-bar">
-                <div className="tp-meta-segment">
-                  <span className="tp-meta-lbl"><Calendar size={12} /> Dates</span>
-                  <strong className="tp-meta-val">{formatTripDates(checkInDate, checkOutDate)}</strong>
+                <div className="tp-meta-chip-item">
+                  <Tag size={14} className="tp-meta-chip-icon" />
+                  <span className="tp-meta-chip-text">
+                    from <strong>{selectedItem.price}</strong> <small>{selectedItem.priceUnit || '/day'}</small>
+                  </span>
                 </div>
 
-                <div className="tp-meta-divider" />
-
-                <div className="tp-meta-segment">
-                  <span className="tp-meta-lbl"><Users size={12} /> Guests</span>
-                  <strong className="tp-meta-val">{roomsGuests ? roomsGuests.replace('1 Room, ', '') : '2 Guests'}</strong>
+                <div className="tp-meta-chip-item">
+                  <Calendar size={14} className="tp-meta-chip-icon" />
+                  <span className="tp-meta-chip-text">
+                    <strong>{formatTripDates(checkInDate, checkOutDate)}</strong>
+                  </span>
                 </div>
 
-                <div className="tp-meta-divider" />
-
-                <div className="tp-meta-segment tp-meta-segment-price">
-                  <span className="tp-meta-lbl"><Sparkles size={12} /> Starting Rate</span>
-                  <strong className="tp-meta-val tp-meta-val-highlight">
-                    {selectedItem.price} <small>{selectedItem.priceUnit || '/pax'}</small>
-                  </strong>
+                <div className="tp-meta-chip-item">
+                  <Users size={14} className="tp-meta-chip-icon" />
+                  <span className="tp-meta-chip-text">
+                    <strong>{roomsGuests ? roomsGuests.replace('1 Room, ', '') : '2 Guests'}</strong>
+                  </span>
                 </div>
               </div>
 
-              {/* Login / Auto-fill Status Banner */}
-              {/* Member Auto-fill / Sign In Bar */}
-              {currentUser ? (
-                <div className="tp-modal-autofill-banner">
-                  <div className="tp-autofill-left">
-                    <div className="tp-autofill-avatar-wrap">
-                      <img src={currentUser.avatar} alt={currentUser.name} className="tp-autofill-avatar" />
-                      <span className="tp-autofill-status-dot" />
-                    </div>
-                    <div className="tp-autofill-info">
-                      <span className="tp-autofill-title">Autofilled for <strong>{currentUser.name}</strong></span>
-                      <span className="tp-autofill-sub">{currentUser.email || 'Guest Traveler'} • {currentUser.isAnonymous ? 'Guest' : 'Verified Traveler'}</span>
-                    </div>
-                  </div>
-                  <button type="button" className="tp-autofill-switch-btn" onClick={handleLogout} title="Switch Profile / Sign Out">
-                    <span>Switch</span>
-                  </button>
-                </div>
-              ) : (
+              {/* Sign In Prompt for Guest Travelers */}
+              {!currentUser && (
                 <div
                   className="tp-modal-login-prompt"
                   onClick={() => {
@@ -1798,7 +2445,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 >
                   <div className="tp-login-prompt-content">
                     <Sparkles size={13} className="tp-prompt-sparkle" />
-                    <span>Have a profile? <strong className="tp-prompt-highlight">Sign in for 1-click autofill</strong></span>
+                    <span>Sign in for <strong>1-click booking autofill</strong></span>
                   </div>
                   <span className="tp-prompt-cta-link">
                     <span>Sign In</span>
@@ -1817,55 +2464,60 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   <p>Opening WhatsApp to connect with your dedicated Vrinda Tours travel concierge...</p>
                 </div>
               ) : (
-                <form onSubmit={handleBookingSubmit} className="tp-booking-form">
-                  <div className="tp-input-group">
-                    <label>Your Full Name</label>
-                    <div className="tp-input-icon-wrap">
-                      <Users size={15} className="tp-field-icon" />
-                      <input
-                        type="text"
-                        placeholder="e.g. Johnathan Doe"
-                        value={bookingName}
-                        onChange={(e) => handleBookingNameChange(e.target.value)}
-                        required
-                      />
-                    </div>
+                <form onSubmit={handleBookingSubmit} className="tp-auth-ios-form">
+                  <div className="tp-auth-pill-input-wrap">
+                    <User size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type="text"
+                      className="tp-auth-pill-input"
+                      placeholder="Your Full Name"
+                      value={bookingName}
+                      onChange={(e) => handleBookingNameChange(e.target.value)}
+                      required
+                    />
                   </div>
 
-                  <div className="tp-form-row-2col">
-                    <div className="tp-input-group">
-                      <label>Email Address</label>
-                      <div className="tp-input-icon-wrap">
-                        <Mail size={15} className="tp-field-icon" />
-                        <input
-                          type="email"
-                          placeholder="name@example.com"
-                          value={bookingEmail}
-                          onChange={(e) => handleBookingEmailChange(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div className="tp-input-group">
-                      <label>WhatsApp / Mobile Number</label>
-                      <div className="tp-input-icon-wrap">
-                        <Phone size={15} className="tp-field-icon" />
-                        <input
-                          type="tel"
-                          placeholder="10-digit Mobile (e.g. 9876543210)"
-                          value={bookingPhone}
-                          onChange={(e) => handleBookingPhoneChange(e.target.value)}
-                          required
-                        />
-                      </div>
-                    </div>
+                  <div className="tp-auth-pill-input-wrap">
+                    <Mail size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type="email"
+                      className="tp-auth-pill-input"
+                      placeholder="Email Address"
+                      value={bookingEmail}
+                      onChange={(e) => handleBookingEmailChange(e.target.value)}
+                      required
+                    />
                   </div>
 
-                  <button type="submit" className="tp-btn-luxury-reserve">
-                    <span>Reserve Itinerary on WhatsApp</span>
-                    <ArrowRight size={16} />
-                  </button>
+                  <div className="tp-auth-pill-input-wrap">
+                    <Phone size={17} className="tp-auth-pill-icon" />
+                    <input
+                      type="tel"
+                      className="tp-auth-pill-input"
+                      placeholder="10-digit Mobile (e.g. 9876543210)"
+                      value={bookingPhone}
+                      onChange={(e) => handleBookingPhoneChange(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="tp-modal-cta-row">
+                    <button type="submit" className="tp-btn-auth-primary-green">
+                      <span>Reserve Itinerary on WhatsApp</span>
+                      <ArrowRight size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      className="tp-btn-modal-heart-circle"
+                      onClick={() => {
+                        const text = `Experience holy darshan of ${selectedItem.title} with Vrinda Tours: ${window.location.href}`;
+                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                      }}
+                      title="Save / Share Yatra"
+                    >
+                      <Heart size={18} />
+                    </button>
+                  </div>
 
                   {/* Subtle Professional Trust Perks */}
                   <div className="tp-modal-trust-perks">
@@ -1968,11 +2620,11 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
               <button
                 type="button"
-                className="tp-btn-flight-cta"
-                style={{ width: '100%', marginTop: '1rem', height: '48px' }}
+                className="tp-btn-luxury-reserve"
+                style={{ width: '100%', marginTop: '0.75rem' }}
                 onClick={() => setIsFilterModalOpen(false)}
               >
-                Apply Filters ({filteredDestinations.length} Results)
+                <span>Apply Filters ({filteredDestinations.length} Results)</span>
               </button>
             </div>
           </div>
@@ -2342,6 +2994,98 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 12. VRINDA VIHAR MASTER CARD LIGHTBOX (MATCHING REFERENCE UI) */}
+      {lightboxItem && (
+        <div
+          className="tp-lightbox-overlay"
+          onClick={() => setLightboxItem(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightboxItem.title}
+        >
+          <div className="tp-lightbox-card-wrapper" onClick={(e) => e.stopPropagation()}>
+            {/* Master White Studio Card (Exact San Francisco Reference Card UI) */}
+            <div className="tp-master-card-container">
+              {/* 1. Inset Picture Container with Soft Rounded Corners */}
+              <div className="tp-master-card-img-frame">
+                <img
+                  src={lightboxItem.image}
+                  alt={lightboxItem.title}
+                  className="tp-master-card-img"
+                />
+
+                {/* Floating Top Header Badges on Image */}
+                <div className="tp-master-card-top-row">
+                  <span className="tp-master-count-pill">
+                    {filteredGalleryItems.findIndex((i) => i.id === lightboxItem.id) + 1} / {filteredGalleryItems.length}
+                  </span>
+
+                  <button
+                    type="button"
+                    className="tp-master-glass-btn tp-master-close-btn"
+                    onClick={() => setLightboxItem(null)}
+                    title="Close (Esc)"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. Content Section Below Picture on Clean White Card */}
+              <div className="tp-master-card-body">
+                <h2 className="tp-master-card-title">{lightboxItem.title}</h2>
+                <p className="tp-master-card-category">{lightboxItem.category}</p>
+
+                <div className="tp-master-meta-tags">
+                  <span className="tp-master-meta-tag">
+                    <Tag size={13} className="tp-master-meta-icon" />
+                    <span>from <strong>{lightboxItem.price || '₹1,200'}</strong></span>
+                  </span>
+                  <span className="tp-master-meta-tag">
+                    <MapPin size={13} className="tp-master-meta-icon" />
+                    <span>{lightboxItem.location}</span>
+                  </span>
+                </div>
+
+                <div className="tp-master-cta-row">
+                  <button
+                    type="button"
+                    className="tp-btn-master-primary"
+                    onClick={() => {
+                      const itemToBook = {
+                        ...popularPlaces[0],
+                        title: lightboxItem.title,
+                        location: lightboxItem.location,
+                        image: lightboxItem.image,
+                        description: lightboxItem.description,
+                        category: lightboxItem.category
+                      };
+                      setLightboxItem(null);
+                      setSelectedItem(itemToBook);
+                    }}
+                  >
+                    <Calendar size={16} />
+                    <span>Book VIP Darshan Yatra</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tp-btn-master-icon"
+                    onClick={() => {
+                      const text = `Experience divine darshan of ${lightboxItem.title} in Vrindavan: ${window.location.origin}${lightboxItem.image}`;
+                      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                    }}
+                    title="Share Darshan on WhatsApp"
+                  >
+                    <Heart size={18} />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
