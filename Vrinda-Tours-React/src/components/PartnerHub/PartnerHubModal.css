@@ -1075,3 +1075,132 @@
 .ph-modal-submit-btn:active {
   transform: scale(0.98);
 }
+
+/* ==========================================================================
+   Realtime Verification Banners & Category Lock Rules
+   ========================================================================== */
+
+.ph-verification-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  animation: phFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.ph-verification-banner.pending {
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  color: #92400e;
+}
+
+.ph-verification-banner.verified {
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  color: #166534;
+}
+
+.ph-verif-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ph-verification-banner.pending .ph-verif-icon-box {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.ph-verification-banner.verified .ph-verif-icon-box {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.ph-verif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ph-verif-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.ph-verif-title-row strong {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.ph-verification-banner p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+.ph-pulse-badge {
+  font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+  padding: 1.5px 6px;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ph-verified-badge {
+  font-family: 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  padding: 1.5px 6px;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Category Locked Bar */
+.ph-role-chip.locked-other {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ph-role-chip.locked-other:hover {
+  border-color: transparent !important;
+  color: #71717a !important;
+  background: transparent !important;
+}
+
+.ph-category-lock-alert {
+  background: #f4f4f5;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #52525b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}

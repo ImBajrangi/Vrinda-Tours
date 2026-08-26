@@ -159,7 +159,9 @@ export default function MapView({
     };
   }, []);
 
-  // Dynamically switch basemap tile layers (CARTO default, Google, Satellite, OSM backup)
+  // Dynamically switch basemap tile layers (CARTO default, Google on-demand, Satellite on-demand, OSM backup)
+  // BILLING OPTIMIZATION: Google Maps API key is ONLY read & tile URLs constructed when user explicitly
+  // selects 'google' or 'satellite' style. Default CARTO and OSM never touch the Google API.
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -169,35 +171,48 @@ export default function MapView({
       activeTileLayerRef.current = null;
     }
 
-    const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || 'cb1_25xx_1_ef24909b63d9228a6de7508f';
-    const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBv0aMdC-Esw0-y63bcCu_JCxfiNqxzOhk';
-
     let tileLayer;
+    const needsGoogle = mapStyle === 'google' || mapStyle === 'satellite';
 
-    if (mapStyle === 'google') {
-      // Google Maps Roadmap
-      tileLayer = L.tileLayer(
-        `https://mt{s}.google.com/vt/lyrs=m&apistyle=s.t:33|p.v:off|s.t:3|p.v:off|s.t:2|p.v:off&x={x}&y={y}&z={z}&key=${googleKey}`,
-        {
-          maxZoom: 20,
-          minZoom: 2,
-          subdomains: ['0', '1', '2', '3'],
-          attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>',
-        }
-      );
-    } else if (mapStyle === 'satellite') {
-      // Google Satellite / Hybrid
-      tileLayer = L.tileLayer(
-        `https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=${googleKey}`,
-        {
-          maxZoom: 20,
-          minZoom: 2,
-          subdomains: ['0', '1', '2', '3'],
-          attribution: '&copy; <a href="https://maps.google.com">Google Earth</a>',
-        }
-      );
+    if (needsGoogle) {
+      // Only read Google Maps API key when actually needed — saves billing on every other map style
+      const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+
+      if (!googleKey) {
+        // No API key configured — fallback to free OSM instead of leaking a hardcoded key
+        tileLayer = L.tileLayer(
+          'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+          {
+            maxZoom: 19,
+            minZoom: 2,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }
+        );
+      } else if (mapStyle === 'google') {
+        // Google Maps Roadmap — only loaded on explicit user action
+        tileLayer = L.tileLayer(
+          `https://mt{s}.google.com/vt/lyrs=m&apistyle=s.t:33|p.v:off|s.t:3|p.v:off|s.t:2|p.v:off&x={x}&y={y}&z={z}&key=${googleKey}`,
+          {
+            maxZoom: 20,
+            minZoom: 2,
+            subdomains: ['0', '1', '2', '3'],
+            attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>',
+          }
+        );
+      } else {
+        // Google Satellite / Hybrid — only loaded on explicit user action
+        tileLayer = L.tileLayer(
+          `https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=${googleKey}`,
+          {
+            maxZoom: 20,
+            minZoom: 2,
+            subdomains: ['0', '1', '2', '3'],
+            attribution: '&copy; <a href="https://maps.google.com">Google Earth</a>',
+          }
+        );
+      }
     } else if (mapStyle === 'osm') {
-      // OpenStreetMap HOT
+      // OpenStreetMap HOT — free, no API key needed
       tileLayer = L.tileLayer(
         'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
         {
@@ -207,9 +222,11 @@ export default function MapView({
         }
       );
     } else {
-      // Primary Default: CARTO Voyager
+      // Primary Default: CARTO Voyager — free tier, no Google API usage
+      const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || '';
+      const cartoSuffix = cartoKey ? `?key=${cartoKey}` : '';
       tileLayer = L.tileLayer(
-        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoSuffix}`,
         {
           maxZoom: 20,
           minZoom: 2,
@@ -219,11 +236,11 @@ export default function MapView({
       );
     }
 
-    tileLayer.on('tileerror', (error) => {
-      console.warn('Map tile error, fallback to OSM HOT:', error);
+    tileLayer.on('tileerror', () => {
+      // Silent fail — tiles will show blank for that region
     });
 
-  tileLayer.addTo(map);
+    tileLayer.addTo(map);
     tileLayer.bringToBack();
     activeTileLayerRef.current = tileLayer;
   }, [mapStyle]);

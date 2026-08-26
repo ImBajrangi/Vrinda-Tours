@@ -1,12 +1,19 @@
 import { useState } from 'react';
 import { 
   Utensils, Star, Phone, MessageCircle, CheckCircle2, 
-  Clock, Users, Sparkles, LogOut, Flame, ShieldCheck 
+  Clock, Users, Sparkles, LogOut, Flame, ShieldCheck, Lock 
 } from 'lucide-react';
 import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function RestaurantPortalTab({ partner, onLogout }) {
+  const isVerified = Boolean(partner?.verified);
   const [rushStatus, setRushStatus] = useState('open'); // 'open' | 'rush' | 'closed'
+
+  const cuisineType = partner?.metadata?.cuisineType || partner?.type || 'Pure Sattvic Bhojnalaya';
+  const seatingCapacity = partner?.metadata?.seatingCapacity || '30-60 Devotees';
+  const zone = partner?.metadata?.zone || partner?.zone || 'Vrindavan Parikrama Marg';
+  const rating = partner?.rating || '4.8';
+
   const [specials, setSpecials] = useState({
     thali56: true,
     kachori: true,
@@ -55,11 +62,40 @@ export default function RestaurantPortalTab({ partner, onLogout }) {
 
   return (
     <>
+      {/* Realtime Admin Verification Banner */}
+      {!isVerified ? (
+        <div className="ph-verification-banner pending">
+          <div className="ph-verif-icon-box">
+            <Clock size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Admin Review In Progress</strong>
+              <span className="ph-pulse-badge">● Pending</span>
+            </div>
+            <p>Our Braj admin operations team is reviewing your bhojnalaya/dining registration. Live menu &amp; queue are active in preview mode.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="ph-verification-banner verified">
+          <div className="ph-verif-icon-box">
+            <ShieldCheck size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Verified Dining Partner</strong>
+              <span className="ph-verified-badge">✓ Active &amp; Locked</span>
+            </div>
+            <p>Your dining outlet is certified on Vrinda Pilgrim Map with 100% direct guest billing and zero commission cuts.</p>
+          </div>
+        </div>
+      )}
+
       {/* Profile Bar */}
       <div className="ph-profile-card">
         <div className="ph-avatar-box">
           <img 
-            src={partner?.photo || "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=120&auto=format&fit=crop&q=80"} 
+            src={partner?.photo_url || partner?.photo || "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=120&auto=format&fit=crop&q=80"} 
             alt={partner?.name || 'Restaurant'} 
           />
           <span className="ph-avatar-badge">🍽️</span>
@@ -67,10 +103,10 @@ export default function RestaurantPortalTab({ partner, onLogout }) {
         <div className="ph-profile-info">
           <div className="ph-name-line">
             <h4>{partner?.name || 'Brijwasin Dining'}</h4>
-            <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> 4.8</span>
+            <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {rating}</span>
           </div>
           <div className="ph-sub-line">
-            <span>Sattvic Bhojanalaya • Barsana Main Road</span>
+            <span>{cuisineType} • {seatingCapacity} • {zone}</span>
           </div>
         </div>
         <button className="ph-btn-logout" onClick={onLogout} title="Sign Out">

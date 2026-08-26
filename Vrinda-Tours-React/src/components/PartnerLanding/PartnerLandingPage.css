@@ -1294,28 +1294,8 @@
 .tp-j-top-row {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
-}
-
-.tp-j-glass-badge {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(191, 219, 254, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #1d4ed8;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.tp-journey-card.tp-j-active:hover .tp-j-glass-badge {
-  transform: rotate(12deg) scale(1.05);
 }
 
 /* Organic Cutout Semicircle Window - Enlarged Luxury Scale */
@@ -1458,10 +1438,10 @@
 
   /* Center Active Card (Always Centered) */
   .tp-journey-card.tp-j-active {
-    flex: 0 0 225px;
-    width: 225px;
+    flex: 1 1 auto;
+    width: auto;
     min-width: 215px;
-    max-width: 240px;
+    max-width: 265px;
     height: 395px;
     border-radius: 26px;
     padding: 1.25rem 1.1rem 1.4rem;
@@ -1500,18 +1480,6 @@
     flex-shrink: 0;
   }
 
-  .tp-j-glass-badge {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(191, 219, 254, 0.85);
-    color: #1d4ed8;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
-  }
-
   .tp-j-body {
     margin-top: 0.2rem;
     display: flex;
@@ -1522,7 +1490,7 @@
   }
 
   .tp-j-active-title {
-    font-size: 1.25rem;
+    font-size: 1.22rem;
     font-weight: 900;
     line-height: 1.22;
     color: #0f172a;
@@ -1548,10 +1516,10 @@
   /* Symmetrical Left and Right Inactive Capsule Bars */
   .tp-journey-card.tp-j-inactive {
     display: flex;
-    flex: 0 0 64px;
-    width: 64px;
-    min-width: 58px;
-    max-width: 68px;
+    flex: 0 0 52px;
+    width: 52px;
+    min-width: 46px;
+    max-width: 56px;
     height: 340px;
     border-radius: 24px;
     background-color: #f8fafc;
@@ -1593,10 +1561,10 @@
   }
 
   .tp-journey-card.tp-j-inactive .tp-j-inactive-title {
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     font-weight: 800;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.15;
     color: var(--tp-dark);
     display: flex;
     flex-direction: column;
@@ -1709,7 +1677,6 @@
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.3s ease;
-  contain: paint;
 }
 
 .tp-popular-card-anchor:hover .tp-popular-card,
@@ -2900,12 +2867,12 @@
 
 .tp-modal-card {
   background: #ffffff;
-  border-radius: 36px;
+  border-radius: 30px;
+  clip-path: inset(0 round 30px);
   padding: 0;
   width: 100%;
   max-width: 520px;
   max-height: min(90vh, 760px);
-  overflow-y: auto;
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
   display: flex;
   flex-direction: column;
@@ -2913,7 +2880,6 @@
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.06);
   isolation: isolate;
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
   animation: tpModalPop 0.42s cubic-bezier(0.34, 1.4, 0.64, 1);
   transform-origin: center center;
 }
@@ -2948,8 +2914,6 @@
   padding: 1.2rem 1.4rem;
   box-sizing: border-box;
   flex-shrink: 0;
-  border-top-left-radius: 36px;
-  border-top-right-radius: 36px;
 }
 
 .tp-modal-hero-img {
@@ -2959,8 +2923,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-top-left-radius: 36px;
-  border-top-right-radius: 36px;
   transition: transform 0.6s cubic-bezier(0.34, 1.2, 0.64, 1);
 }
 
@@ -2971,10 +2933,85 @@
 .tp-modal-hero-scrim {
   position: absolute;
   inset: 0;
-  border-top-left-radius: 36px;
-  border-top-right-radius: 36px;
   background: linear-gradient(180deg, rgba(11, 15, 25, 0.4) 0%, rgba(11, 15, 25, 0.1) 40%, rgba(11, 15, 25, 0.88) 100%);
   pointer-events: none;
+}
+
+/* ==========================================================================
+   AUTH & REFERRAL MODAL OVERLAY & CARD
+   ========================================================================== */
+.tp-auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 15, 25, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+  box-sizing: border-box;
+  animation: tpOverlayFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tp-auth-modal-card {
+  background: #ffffff;
+  border-radius: 28px;
+  clip-path: inset(0 round 28px);
+  padding: 1.6rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  animation: tpModalPop 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transform-origin: center center;
+  position: relative;
+  z-index: 100000;
+}
+
+.tp-auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tp-auth-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.tp-auth-modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tp-auth-modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.tp-auth-modal-body {
+  display: flex;
+  flex-direction: column;
 }
 
 .tp-modal-close-icon,
@@ -4135,6 +4172,52 @@
 .tp-auth-pill-input-wrap:focus-within {
   border-color: #1b3b18;
   box-shadow: 0 0 0 3px rgba(27, 59, 24, 0.08);
+}
+
+.tp-auth-referral-toggle-row {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0.15rem 0 0.35rem 0;
+}
+
+.tp-auth-referral-toggle-btn {
+  background: transparent;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.tp-auth-referral-toggle-btn:hover {
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+.tp-auth-referral-bonus-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ec4899;
+  background: #fdf2f8;
+  border: 1px solid #fbcfe8;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.tp-auth-pill-referral-wrap {
+  border-color: #fbcfe8;
+  background: #fff5f9;
+}
+
+.tp-auth-pill-referral-wrap:focus-within {
+  border-color: #ec4899;
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12);
 }
 
 .tp-auth-pill-icon {
@@ -5474,6 +5557,7 @@
 
   .tp-booking-modal-card {
     border-radius: 24px;
+    clip-path: inset(0 round 24px);
     max-width: 100%;
   }
 
@@ -5799,7 +5883,6 @@
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
     border-color 0.3s ease;
-  contain: paint;
 }
 
 .tp-gallery-card:hover,

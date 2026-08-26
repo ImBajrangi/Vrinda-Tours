@@ -66,3 +66,11 @@ not only that but make it more responsive and optimized for mobile and desktop b
 
 you can even use css variables to make it more dynamic and optimized.
 
+Auto-SEO Verification Rule:
+
+"Whenever new public landing pages or routes are introduced, automatically generate corresponding Schema.org JSON-LD snippets and append the URL to sitemap.xml."
+
+Asset Compression & WebP Rule:
+
+"All images used for thumbnails or cards should have lazy-loading attributes (loading='lazy') and explicit width/height dimensions to guarantee 100/100 Google Core Web Vitals (LCP & CLS)."
+

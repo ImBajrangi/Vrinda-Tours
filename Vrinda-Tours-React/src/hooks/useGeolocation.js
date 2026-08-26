@@ -25,10 +25,20 @@ export function useGeolocation() {
         const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setPosition(loc);
         setLoading(false);
+        setError(null);
         try { localStorage.setItem('vt_user_pos', JSON.stringify(loc)); } catch {}
       },
-      (err) => { setError(err.message); setLoading(false); },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+      (err) => {
+        // Graceful handling of temporary location errors (e.g. kCLErrorLocationUnknown)
+        if (err.code === 2 || err.code === 3) {
+          // Position unavailable or timeout - keep last known position
+          setLoading(false);
+        } else {
+          setError(err.message);
+          setLoading(false);
+        }
+      },
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
     );
   }, []);
 

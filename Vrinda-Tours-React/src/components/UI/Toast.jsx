@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import './UI.css';
 
 export default function Toast({ message, type = 'error', onDismiss }) {
@@ -17,7 +17,7 @@ export default function Toast({ message, type = 'error', onDismiss }) {
   }, [message, onDismiss]);
 
   if (!message) return null;
-  const Icon = type === 'success' ? CheckCircle2 : AlertCircle;
+  const Icon = type === 'success' ? CheckCircleIcon : ExclamationCircleIcon;
   const cleanMessage = String(message)
     .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')
     .replace(/\s+/g, ' ')
@@ -30,7 +30,7 @@ export default function Toast({ message, type = 'error', onDismiss }) {
       role="alert"
     >
       <div className="toast-icon-badge">
-        <Icon size={16} />
+        <Icon style={{ width: 16, height: 16 }} />
       </div>
       <span className="toast-message">{cleanMessage}</span>
     </div>

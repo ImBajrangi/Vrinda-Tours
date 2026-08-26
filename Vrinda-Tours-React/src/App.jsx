@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
 import { Navigation } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
@@ -6,28 +6,34 @@ import MapView from './components/Map/MapView';
 import Header from './components/Header/Header';
 import CategoryPills from './components/CategoryPills/CategoryPills';
 import LocationCard from './components/LocationCard/LocationCard';
-import HotelBooking from './components/BookingSheets/HotelBooking';
-import RestaurantBooking from './components/BookingSheets/RestaurantBooking';
 import { useFirebaseDrivers } from './hooks/useFirebaseDrivers';
 import { useFirebaseLocations } from './hooks/useFirebaseLocations';
 import { useFavorites } from './hooks/useFavorites';
 import { fetchNavigationRoute, openExternalGoogleMaps } from './utils/navigationService';
-import RideSheet from './components/BookingSheets/RideSheet';
 import RideStatusBanner from './components/UI/RideStatusBanner';
-import FavoritesListSheet from './components/UI/FavoritesListSheet';
 import NavigationBanner from './components/UI/NavigationBanner';
 import MapStyleSwitcher from './components/UI/MapStyleSwitcher';
-import DriversPanel from './components/Admin/DriversPanel';
-import AdminPanel from './components/Admin/AdminPanel';
-import PartnerHubModal from './components/PartnerHub/PartnerHubModal';
-import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
 import Toast from './components/UI/Toast';
 import './components/UI/UI.css';
 import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteField } from 'firebase/firestore';
 import { firestore } from './config/firebase';
 import { locations as initialData } from './data/locations';
-
 import AnnouncementBanner from './components/UI/AnnouncementBanner';
+
+// Lazy-loaded on-demand portals & modals for instant initial load (<100ms)
+const HotelBooking = lazy(() => import('./components/BookingSheets/HotelBooking'));
+const RestaurantBooking = lazy(() => import('./components/BookingSheets/RestaurantBooking'));
+const RideSheet = lazy(() => import('./components/BookingSheets/RideSheet'));
+const FavoritesListSheet = lazy(() => import('./components/UI/FavoritesListSheet'));
+const DriversPanel = lazy(() => import('./components/Admin/DriversPanel'));
+const AdminPanel = lazy(() => import('./components/Admin/AdminPanel'));
+const DriverPortalModal = lazy(() => import('./components/Driver/DriverPortalModal'));
+const DriverLandingPage = lazy(() => import('./components/Driver/DriverLandingPage'));
+const HotelLandingPage = lazy(() => import('./components/Hotel/HotelLandingPage'));
+const RestaurantLandingPage = lazy(() => import('./components/Restaurant/RestaurantLandingPage'));
+const AgencyLandingPage = lazy(() => import('./components/Agency/AgencyLandingPage'));
+const PartnerHubModal = lazy(() => import('./components/PartnerHub/PartnerHubModal'));
+const PartnerLandingPage = lazy(() => import('./components/PartnerLanding/PartnerLandingPage'));
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -42,9 +48,35 @@ export default function App() {
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
   const [driverPortalVisible, setDriverPortalVisible] = useState(false);
+  const [partnerHubVisible, setPartnerHubVisible] = useState(false);
+  const [activePartnerId, setActivePartnerId] = useState(() => sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id'));
+  const [activePartnerRole, setActivePartnerRole] = useState(() => sessionStorage.getItem('vt_partner_role') || 'driver');
+  const [driverLandingVisible, setDriverLandingVisible] = useState(false);
+  const [hotelLandingVisible, setHotelLandingVisible] = useState(false);
+  const [restaurantLandingVisible, setRestaurantLandingVisible] = useState(false);
+  const [agencyLandingVisible, setAgencyLandingVisible] = useState(false);
   const [partnerLandingVisible, setPartnerLandingVisible] = useState(true);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [toast, setToast] = useState(null);
+
+  const handleOpenPartnerDashboard = useCallback((id, role) => {
+    setDriverLandingVisible(false);
+    setHotelLandingVisible(false);
+    setRestaurantLandingVisible(false);
+    setAgencyLandingVisible(false);
+    setPartnerLandingVisible(false);
+    setDriverPortalVisible(false);
+    
+    if (id) {
+      setActivePartnerId(id);
+      sessionStorage.setItem('vt_partner_id', id);
+    }
+    if (role) {
+      setActivePartnerRole(role);
+      sessionStorage.setItem('vt_partner_role', role);
+    }
+    setPartnerHubVisible(true);
+  }, []);
 
   const { position, loading, requestLocation } = useGeolocation();
   const { drivers, firebaseReady } = useFirebaseDrivers();
@@ -190,7 +222,10 @@ export default function App() {
   }, [firebaseReady]);
 
   return (
-    <>
+    <main id="main-content" className="app-main-viewport">
+      <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
+        Vrinda Vihar — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws
+      </h1>
       <AnnouncementBanner />
 
       <MapView
@@ -206,7 +241,7 @@ export default function App() {
 
       <Header
         onSelectLocation={handleSelectLocation}
-        onOpenDriverPortal={() => setDriverPortalVisible(true)}
+        onOpenDriverPortal={() => handleOpenPartnerDashboard(activePartnerId, activePartnerRole)}
         onOpenDrivers={() => setDriversVisible(true)}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
@@ -240,89 +275,146 @@ export default function App() {
         onToast={setToast}
       />
 
-      {activeFilter === 'favourites' && !activeLocation && !isSearchActive && !activeRide && !rideRequest && !hotelBooking && !restaurantBooking && !driversVisible && !adminVisible && !driverPortalVisible && !partnerLandingVisible && (
-        <FavoritesListSheet
-          favoriteLocations={favoriteLocations}
-          userPosition={position}
-          onSelectLocation={handleSelectLocation}
-          onRemoveFavorite={(loc) => {
-            removeFavorite(loc);
-            setToast({ message: `Removed ${loc.name} from Favourites`, type: 'info' });
-          }}
-          onExploreAll={() => setActiveFilter('all')}
-          onClose={() => setActiveFilter('all')}
-        />
-      )}
+      <Suspense fallback={null}>
+        {activeFilter === 'favourites' && !activeLocation && !isSearchActive && !activeRide && !rideRequest && !hotelBooking && !restaurantBooking && !driversVisible && !adminVisible && !driverPortalVisible && !partnerLandingVisible && (
+          <FavoritesListSheet
+            favoriteLocations={favoriteLocations}
+            userPosition={position}
+            onSelectLocation={handleSelectLocation}
+            onRemoveFavorite={(loc) => {
+              removeFavorite(loc);
+              setToast({ message: `Removed ${loc.name} from Favourites`, type: 'info' });
+            }}
+            onExploreAll={() => setActiveFilter('all')}
+            onClose={() => setActiveFilter('all')}
+          />
+        )}
 
-      {hotelBooking && (
-        <HotelBooking location={hotelBooking} onClose={() => setHotelBooking(null)} />
-      )}
+        {hotelBooking && (
+          <HotelBooking location={hotelBooking} onClose={() => setHotelBooking(null)} />
+        )}
 
-      {restaurantBooking && (
-        <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
-      )}
+        {restaurantBooking && (
+          <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
+        )}
 
-      {rideRequest && (
-        <RideSheet
-          destination={rideRequest.destination}
-          drivers={drivers}
-          userPosition={position}
-          onSelectDriver={handleRequestRide}
-          onClose={() => setRideRequest(null)}
-        />
-      )}
+        {rideRequest && (
+          <RideSheet
+            destination={rideRequest.destination}
+            drivers={drivers}
+            userPosition={position}
+            onSelectDriver={handleRequestRide}
+            onClose={() => setRideRequest(null)}
+          />
+        )}
 
-      {activeRide && (
-        <RideStatusBanner
-          status={activeRide.status}
-          driver={activeRide.driver}
-          onCancel={handleCancelRide}
-        />
-      )}
+        {driversVisible && (
+          <DriversPanel
+            drivers={drivers}
+            onClose={() => setDriversVisible(false)}
+            onOpenAdmin={() => setAdminVisible(true)}
+            onOpenDriverPortal={() => {
+              setDriversVisible(false);
+              setDriverPortalVisible(true);
+            }}
+            onOpenDriverLanding={() => {
+              setDriversVisible(false);
+              setDriverLandingVisible(true);
+            }}
+          />
+        )}
 
-      {driversVisible && (
-        <DriversPanel
-          drivers={drivers}
-          onClose={() => setDriversVisible(false)}
-          onOpenAdmin={() => setAdminVisible(true)}
-          onOpenDriverPortal={() => {
-            setDriversVisible(false);
-            setDriverPortalVisible(true);
-          }}
-        />
-      )}
+        {adminVisible && (
+          <AdminPanel
+            drivers={drivers}
+            locations={locations}
+            userPosition={position}
+            onSelectLocation={handleSelectLocation}
+            onClose={() => setAdminVisible(false)}
+          />
+        )}
 
-      {adminVisible && (
-        <AdminPanel
-          drivers={drivers}
-          userPosition={position}
-          onClose={() => setAdminVisible(false)}
-        />
-      )}
+        {driverLandingVisible && (
+          <DriverLandingPage
+            drivers={drivers}
+            onClose={() => setDriverLandingVisible(false)}
+            onOpenHotelPage={() => { setDriverLandingVisible(false); setHotelLandingVisible(true); }}
+            onOpenRestaurantPage={() => { setDriverLandingVisible(false); setRestaurantLandingVisible(true); }}
+            onOpenAgencyPage={() => { setDriverLandingVisible(false); setAgencyLandingVisible(true); }}
+            onOpenDriverCompanion={(id, role) => handleOpenPartnerDashboard(id, role || 'driver')}
+          />
+        )}
 
-      {driverPortalVisible && (
-        <PartnerHubModal
-          drivers={drivers}
-          onClose={() => setDriverPortalVisible(false)}
-          onOpenLanding={() => {
-            setDriverPortalVisible(false);
-            setPartnerLandingVisible(true);
-          }}
-        />
-      )}
+        {hotelLandingVisible && (
+          <HotelLandingPage
+            onClose={() => setHotelLandingVisible(false)}
+            onOpenDriverPage={() => { setHotelLandingVisible(false); setDriverLandingVisible(true); }}
+            onOpenRestaurantPage={() => { setHotelLandingVisible(false); setRestaurantLandingVisible(true); }}
+            onOpenAgencyPage={() => { setHotelLandingVisible(false); setAgencyLandingVisible(true); }}
+            onOpenHotelCompanion={(id, role) => handleOpenPartnerDashboard(id, role || 'hotel')}
+          />
+        )}
 
-      {partnerLandingVisible && (
-        <PartnerLandingPage
-          onClose={() => setPartnerLandingVisible(false)}
-          onOpenPartnerHub={(role) => {
-            setPartnerLandingVisible(false);
-            setDriverPortalVisible(true);
-          }}
-        />
-      )}
+        {restaurantLandingVisible && (
+          <RestaurantLandingPage
+            onClose={() => setRestaurantLandingVisible(false)}
+            onOpenDriverPage={() => { setRestaurantLandingVisible(false); setDriverLandingVisible(true); }}
+            onOpenHotelPage={() => { setRestaurantLandingVisible(false); setHotelLandingVisible(true); }}
+            onOpenAgencyPage={() => { setRestaurantLandingVisible(false); setAgencyLandingVisible(true); }}
+            onOpenRestaurantCompanion={(id, role) => handleOpenPartnerDashboard(id, role || 'restaurant')}
+          />
+        )}
+
+        {agencyLandingVisible && (
+          <AgencyLandingPage
+            onClose={() => setAgencyLandingVisible(false)}
+            onOpenDriverPage={() => { setAgencyLandingVisible(false); setDriverLandingVisible(true); }}
+            onOpenHotelPage={() => { setAgencyLandingVisible(false); setHotelLandingVisible(true); }}
+            onOpenRestaurantPage={() => { setAgencyLandingVisible(false); setRestaurantLandingVisible(true); }}
+            onOpenAgencyCompanion={(id, role) => handleOpenPartnerDashboard(id, role || 'agency')}
+          />
+        )}
+
+        {partnerHubVisible && (
+          <PartnerHubModal
+            partnerId={activePartnerId}
+            initialRole={activePartnerRole}
+            drivers={drivers}
+            onClose={() => setPartnerHubVisible(false)}
+            onOpenLanding={(role) => {
+              setPartnerHubVisible(false);
+              if (role === 'hotel') setHotelLandingVisible(true);
+              else if (role === 'restaurant') setRestaurantLandingVisible(true);
+              else if (role === 'agency') setAgencyLandingVisible(true);
+              else setDriverLandingVisible(true);
+            }}
+          />
+        )}
+
+        {driverPortalVisible && (
+          <DriverPortalModal
+            drivers={drivers}
+            onClose={() => setDriverPortalVisible(false)}
+            onOpenLanding={(role) => {
+              setDriverPortalVisible(false);
+              if (role === 'hotel') setHotelLandingVisible(true);
+              else if (role === 'restaurant') setRestaurantLandingVisible(true);
+              else if (role === 'agency') setAgencyLandingVisible(true);
+              else setDriverLandingVisible(true);
+            }}
+          />
+        )}
+
+        {partnerLandingVisible && (
+          <PartnerLandingPage
+            onClose={() => setPartnerLandingVisible(false)}
+            onOpenPartnerHub={(role) => handleOpenPartnerDashboard(null, role)}
+          />
+        )}
+      </Suspense>
 
       {/* Map Controls Cluster (Cornered when space is available + Smart Glide) */}
-      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest || (activeRoute && isNavExpanded) || (activeFilter === 'favourites' && !partnerLandingVisible) ? 'card-visible' : (activeRoute && !isNavExpanded) ? 'capsule-visible' : ''} ${hotelBooking || restaurantBooking || driverPortalVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
+      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest || (activeRoute && isNavExpanded) || (activeFilter === 'favourites' && !partnerLandingVisible && !driverLandingVisible && !hotelLandingVisible && !restaurantLandingVisible && !agencyLandingVisible) ? 'card-visible' : (activeRoute && !isNavExpanded) ? 'capsule-visible' : ''} ${hotelBooking || restaurantBooking || partnerHubVisible || driverPortalVisible || driverLandingVisible || hotelLandingVisible || restaurantLandingVisible || agencyLandingVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
         <MapStyleSwitcher
           activeStyle={mapStyle}
           onStyleChange={(newStyle) => {
@@ -353,6 +445,6 @@ export default function App() {
       {toast && (
         <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
       )}
-    </>
+    </main>
   );
 }

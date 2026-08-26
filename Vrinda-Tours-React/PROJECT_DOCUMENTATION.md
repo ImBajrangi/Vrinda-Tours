@@ -1,6 +1,6 @@
-# Brij Yatra — Vrinda Tours (React Architecture & Guide)
+# Brij Yatra — Vrinda Vihar (React Architecture & Guide)
 
-Welcome to **Brij Yatra (Vrinda Tours)** — a modern, responsive web application for sacred pilgrimage guidance in the Brij 84 Kos region (Vrindavan, Mathura, Barsana, Nandgaon, Govardhan).
+Welcome to **Brij Yatra (Vrinda Vihar)** — a modern, responsive web application for sacred pilgrimage guidance in the Brij 84 Kos region (Vrindavan, Mathura, Barsana, Nandgaon, Govardhan).
 
 This document breaks down the full application structure, real-time Firebase backend, driver companion portal, map cluster rendering, and the **Graphify Knowledge Graph** setup.
 

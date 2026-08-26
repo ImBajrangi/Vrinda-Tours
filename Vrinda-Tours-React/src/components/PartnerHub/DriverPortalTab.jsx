@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import { 
   Zap, Star, Navigation, Phone, CheckCircle2, 
-  MapPin, Clock, ShieldCheck, Compass, LogOut 
+  MapPin, Clock, ShieldCheck, Compass, LogOut, Lock, Car 
 } from 'lucide-react';
 
 export default function DriverPortalTab({ partner, onLogout }) {
-  const [isOnline, setIsOnline] = useState(true);
-  const [onlineHours, setOnlineHours] = useState('2.4h');
-  const [ridesCount, setRidesCount] = useState(4);
-  const [rating, setRating] = useState('4.9');
+  const isVerified = Boolean(partner?.verified);
+  const [isOnline, setIsOnline] = useState(isVerified);
+  const [onlineHours, setOnlineHours] = useState('1.8h');
+  const [ridesCount, setRidesCount] = useState(isVerified ? 6 : 1);
+  const rating = partner?.rating || '4.9';
+
+  const vehicleType = partner?.metadata?.vehicleType || partner?.vehicleType || 'E-Rickshaw';
+  const vehicleNo = partner?.metadata?.vehicleNo || partner?.vehicleNo || 'UP-85 VT 2026';
+  const zone = partner?.metadata?.zone || partner?.zone || 'Vrindavan Parikrama Marg';
 
   // Simulated live ride requests for field preview
   const [incomingRides, setIncomingRides] = useState([
@@ -45,11 +50,40 @@ export default function DriverPortalTab({ partner, onLogout }) {
 
   return (
     <>
+      {/* Realtime Admin Verification Banner */}
+      {!isVerified ? (
+        <div className="ph-verification-banner pending">
+          <div className="ph-verif-icon-box">
+            <Clock size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Admin Review In Progress</strong>
+              <span className="ph-pulse-badge">● Pending</span>
+            </div>
+            <p>Our Braj admin operations team is verifying your registration. Dashboard features are active in preview mode.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="ph-verification-banner verified">
+          <div className="ph-verif-icon-box">
+            <ShieldCheck size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Verified Brij Driver Partner</strong>
+              <span className="ph-verified-badge">✓ Active &amp; Locked</span>
+            </div>
+            <p>Your driver account is verified by Admin. Category is locked with 0% platform fee and live pilgrim ride priority.</p>
+          </div>
+        </div>
+      )}
+
       {/* Profile Bar */}
       <div className="ph-profile-card">
         <div className="ph-avatar-box">
           <img 
-            src={partner?.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partner?.name || 'Radhe'}&backgroundColor=f1f5f9`} 
+            src={partner?.photo_url || partner?.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(partner?.name || 'Radhe')}&backgroundColor=f1f5f9`} 
             alt={partner?.name || 'Driver'} 
           />
           <span className="ph-avatar-badge">🛺</span>
@@ -60,7 +94,7 @@ export default function DriverPortalTab({ partner, onLogout }) {
             <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {rating}</span>
           </div>
           <div className="ph-sub-line">
-            <span>{partner?.vehicleType || 'E-Rickshaw'} • {partner?.vehicleNo || 'UP-85 VT 2026'}</span>
+            <span>{vehicleType} • {vehicleNo} • {zone}</span>
           </div>
         </div>
         <button className="ph-btn-logout" onClick={onLogout} title="Sign Out">
@@ -75,7 +109,7 @@ export default function DriverPortalTab({ partner, onLogout }) {
             <Zap size={20} />
           </div>
           <div className="ph-status-text">
-            <h4>{isOnline ? 'Online & Available' : 'Offline'}</h4>
+            <h4>{isOnline ? 'Online & Ready for Rides' : 'Offline'}</h4>
             <span>{isOnline ? 'Broadcasting live GPS to nearby pilgrims' : 'Go online to receive ride dispatches'}</span>
           </div>
         </div>
@@ -92,14 +126,13 @@ export default function DriverPortalTab({ partner, onLogout }) {
         </div>
         <div className="ph-stat-card">
           <span className="ph-stat-val">{onlineHours}</span>
-          <span className="ph-stat-lbl">Online</span>
+          <span className="ph-stat-lbl">Online Time</span>
         </div>
         <div className="ph-stat-card">
           <div className="ph-stat-val">
-            <Star size={14} fill="#f59e0b" color="#f59e0b" />
-            <span>{rating}</span>
+            <span>₹{ridesCount * 85}</span>
           </div>
-          <span className="ph-stat-lbl">Rating</span>
+          <span className="ph-stat-lbl">100% Payout</span>
         </div>
       </div>
 

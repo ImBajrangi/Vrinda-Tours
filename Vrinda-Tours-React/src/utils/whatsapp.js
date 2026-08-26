@@ -11,18 +11,18 @@ export function openWhatsApp(phone, message) {
 }
 
 export function generateHotelMessage(loc, checkin, checkout, guests, roomType) {
-  return `🙏 *Vrinda Tours — Room Booking Request*\n\n🏨 *Hotel*: ${loc.name}\n📅 *Check-in*: ${checkin}\n📅 *Check-out*: ${checkout}\n👥 *Guests*: ${guests}\n🛏️ *Room Type*: ${roomType}\n\nPlease confirm availability and rate. 🙏`;
+  return `🙏 *Vrinda Vihar — Room Booking Request*\n\n🏨 *Hotel*: ${loc.name}\n📅 *Check-in*: ${checkin}\n📅 *Check-out*: ${checkout}\n👥 *Guests*: ${guests}\n🛏️ *Room Type*: ${roomType}\n\nPlease confirm availability and rate. 🙏`;
 }
 
 export function generateRestaurantMessage(loc, date, time, guests, special) {
-  let msg = `🙏 *Vrinda Tours — Table Reservation*\n\n🍽️ *Restaurant*: ${loc.name}\n📅 *Date*: ${date}\n🕐 *Time*: ${time}\n👥 *Guests*: ${guests}`;
+  let msg = `🙏 *Vrinda Vihar — Table Reservation*\n\n🍽️ *Restaurant*: ${loc.name}\n📅 *Date*: ${date}\n🕐 *Time*: ${time}\n👥 *Guests*: ${guests}`;
   if (special) msg += `\n📝 *Special Request*: ${special}`;
   msg += `\n\nPlease confirm the reservation. 🙏`;
   return msg;
 }
 
 export function generateRideMessage(userLocation, dest) {
-  let msg = `🙏 *Vrinda Tours Ride Request*\n\n`;
+  let msg = `🙏 *Vrinda Vihar Ride Request*\n\n`;
   msg += `📍 *Pickup*: ${userLocation ? `Maps: https://maps.google.com/?q=${userLocation.lat},${userLocation.lng}` : 'Barsana Center'}\n`;
   if (dest) msg += `🏁 *Destination*: ${dest.name}\n`;
   msg += `\nPlease confirm if you can pick me up. 🙏`;

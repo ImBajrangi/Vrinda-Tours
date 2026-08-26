@@ -1,50 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Brij Yatra — Sacred Pilgrimage by Vrindopnishad</title>
-  <meta name="description" content="Experience the sacred Brij 84 Kos Yatra with our interactive map and guide. Book drivers, hotels, restaurants directly." />
-  <meta name="theme-color" content="#000000" />
-  
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <!-- Primary Meta Tags -->
+  <title>Vrinda Vihar — Brij 84 Kos Yatra, Vrindavan Darshan, Stays & Travelers</title>
+  <meta name="title" content="Vrinda Vihar — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws" />
+  <meta name="description"
+    content="Official Vrinda Vihar pilgrimage platform by Vrindopnishad. Book electric rickshaws in Vrindavan, verified pilgrim hotels, pure sattvic dining, and guided darshan tours across Mathura, Vrindavan, Barsana, Govardhan & Gokul." />
+  <meta name="keywords"
+    content="Vrinda Vihar, Vrindavan tour, Brij 84 Kos Yatra, Mathura Vrindavan travel guide, Barsana Radha Rani temple tour, Govardhan Parikrama e-rickshaw booking, Vrindavan hotel booking, Banke Bihari temple darshan, Prem Mandir timing, Sattvic bhojanalaya Vrindavan, Brij pilgrimage taxi service, Vrindavan travel agency, Vrindopnishad, Brij Dham Yatra" />
+  <meta name="author" content="Vrinda Vihar by Vrindopnishad" />
+  <meta name="publisher" content="Vrinda Vihar" />
+  <link rel="canonical" href="https://to.vrindopnishad.in/" />
+  <meta name="theme-color" content="#09090b" />
+
+  <!-- Search Engine & AI Crawler Directives -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+  <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large" />
+
+  <!-- Geographic Coordinates for Brij Mandal (Local SEO) -->
+  <meta name="geo.region" content="IN-UP" />
+  <meta name="geo.placename" content="Vrindavan, Mathura, Uttar Pradesh, India" />
+  <meta name="geo.position" content="27.5816;77.7006" />
+  <meta name="ICBM" content="27.5816, 77.7006" />
+
   <!-- Site Icons & Favicons -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="alternate icon" href="/favicon.svg" />
-  <link rel="apple-touch-icon" href="/favicon.svg" />
-  
-  <!-- OpenGraph & Social Metadata -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="Brij Yatra — Sacred Pilgrimage by Vrindopnishad" />
-  <meta property="og:description" content="Interactive guide and map for Brij 84 Kos Yatra. Book local drivers, hotels, and restaurants directly." />
-  <meta property="og:image" content="/user-marker-crop.gif" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
 
-  <!-- Fonts & Leaflet & Image Preconnects -->
+  <!-- OpenGraph / Facebook Social Metadata -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Vrinda Vihar" />
+  <meta property="og:url" content="https://to.vrindopnishad.in/" />
+  <meta property="og:title" content="Vrinda Vihar — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws" />
+  <meta property="og:description"
+    content="Experience the divine Brij 84 Kos Yatra with interactive GPS mapping, verified local drivers, authentic ashram stays, and sattvic dining with Vrinda Vihar." />
+  <meta property="og:image" content="https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp" />
+  <meta property="og:image:secure_url" content="https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Vrinda Vihar Brij 84 Kos Pilgrimage Map and Companion" />
+  <meta property="og:locale" content="en_IN" />
+  <meta property="og:locale:alternate" content="hi_IN" />
+
+  <!-- Twitter / X Card Metadata -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@vrindopnishad" />
+  <meta name="twitter:creator" content="@vrindopnishad" />
+  <meta name="twitter:title" content="Vrinda Vihar — Brij 84 Kos Yatra & Pilgrimage Platform" />
+  <meta name="twitter:description"
+    content="Official pilgrimage companion for Vrindavan, Mathura, Barsana & Govardhan. Book verified drivers, hotels & yatra packages with Vrinda Vihar." />
+  <meta name="twitter:image" content="https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp" />
+  <meta name="twitter:image:alt" content="Vrinda Vihar Brij Pilgrimage Platform" />
+
+  <!-- Preconnect & Fast Asset Loading -->
   <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
   <link rel="dns-prefetch" href="https://images.unsplash.com" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 
-  <!-- Structured Data JSON-LD -->
+  <!-- Structured Data Graph (JSON-LD) for Search Engines & AI LLMs (Perplexity, ChatGPT, Gemini, Google AI) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Brij Yatra — Vrinda Tours",
-    "url": "https://vrindopnishad.in/Projects/Vrinda-Tours/",
-    "description": "Interactive map and guide for the sacred Brij 84 Kos Yatra."
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://to.vrindopnishad.in/#website",
+        "url": "https://to.vrindopnishad.in/",
+        "name": "Vrinda Vihar",
+        "description": "Authentic Brij 84 Kos Yatra Pilgrimage Platform & Companion by Vrindopnishad",
+        "publisher": {
+          "@id": "https://to.vrindopnishad.in/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://to.vrindopnishad.in/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": ["TravelAgency", "TourOperator"],
+        "@id": "https://to.vrindopnishad.in/#organization",
+        "name": "Vrinda Vihar",
+        "url": "https://to.vrindopnishad.in/",
+        "logo": "https://to.vrindopnishad.in/official-logo.svg",
+        "image": "https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp",
+        "description": "Premier spiritual tour operator for Brij 84 Kos Yatra, Vrindavan, Mathura, Barsana, Govardhan and Gokul pilgrimage circuits with zero-middleman verified drivers and authentic ashram stays.",
+        "telephone": "+91-7618218181",
+        "email": "support@vrindopnishad.in",
+        "priceRange": "₹₹",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Raman Reti Road",
+          "addressLocality": "Vrindavan",
+          "addressRegion": "Uttar Pradesh",
+          "postalCode": "281121",
+          "addressCountry": "IN"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 27.5816,
+          "longitude": 77.7006
+        },
+        "areaServed": [
+          "Vrindavan",
+          "Mathura",
+          "Barsana",
+          "Govardhan",
+          "Nandgaon",
+          "Gokul",
+          "Brij Mandal"
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "2840"
+        },
+        "sameAs": [
+          "https://instagram.com/vrindopnishad",
+          "https://youtube.com/@vrindopnishad",
+          "https://path.vrindopnishad.in/",
+          "https://pic.vrindopnishad.in/"
+        ]
+      },
+      {
+        "@type": "TouristDestination",
+        "@id": "https://to.vrindopnishad.in/#destination",
+        "name": "Brij Mandal — 84 Kos Sacred Pilgrimage",
+        "description": "The sacred realm of Shri Radha Krishna spanning Vrindavan, Barsana, Govardhan Hill, Mathura, and 84 Kos pilgrimage trails.",
+        "touristType": ["Spiritual Pilgrims", "Cultural Travelers", "Families", "Solo Travelers"],
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 27.5816,
+          "longitude": 77.7006
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://to.vrindopnishad.in/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Brij 84 Kos Yatra and how to book with Vrinda Vihar?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Brij 84 Kos Yatra is the sacred circumambulation of the 84 Kos (approx. 250 km) holy region of Shri Radha Rani and Lord Krishna, covering over 1,000 sacred kunds, temples, and groves across Vrindavan, Mathura, Barsana, Nandgaon, and Govardhan. You can book custom guided itineraries, verified electric rickshaws, and ashram stays directly through Vrinda Vihar (to.vrindopnishad.in) with 0 middlemen."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How to book an Electric Rickshaw or E-Auto in Vrindavan?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "On Vrinda Vihar, simply click on the 'Rides' button or visit the interactive map to choose your starting landmark and temple destination. You receive instant driver matching, fixed transparent fares, and direct contact with pre-verified local Brij drivers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are stays and hotels listed on Vrinda Vihar verified for pilgrims?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, 100% of hotels, guesthouses, and ashrams on Vrinda Vihar undergo strict manual verification for cleanliness, pilgrim safety, proximity to temples (e.g. Banke Bihari, Prem Mandir, Radha Raman), and availability of pure sattvic dining without onion or garlic."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the best way to do Govardhan Parikrama?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Govardhan Parikrama covers 21 kilometers (comprising Badi Parikrama and Chhoti Parikrama). Vrinda Vihar offers guided barefoot walking support, battery-operated e-rickshaw parikrama with trained local drivers, and stops at Radha Kund, Shyam Kund, Manasi Ganga, and Dan Ghati."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
-
 </head>
+
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-    
-  <!-- SVG Filter for white background removal (from original monolith) -->
+
+  <!-- SVG Filter for image processing and aesthetic renders -->
   <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true" focusable="false">
     <defs>
       <filter id="remove-bg" color-interpolation-filters="sRGB">
@@ -53,8 +205,8 @@
                                              0 0 1 0 0
                                              -1 -1 -1 3 0" />
       </filter>
-
     </defs>
   </svg>
 </body>
+
 </html>

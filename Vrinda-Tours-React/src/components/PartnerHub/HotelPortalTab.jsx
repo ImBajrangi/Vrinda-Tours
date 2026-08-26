@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { 
   Building2, Star, Phone, MessageCircle, CheckCircle2, 
-  Calendar, Users, Sparkles, LogOut, Bed, Navigation, Plus, Minus 
+  Calendar, Users, Sparkles, LogOut, Bed, Navigation, Plus, Minus,
+  Clock, ShieldCheck, Lock
 } from 'lucide-react';
 import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function HotelPortalTab({ partner, onLogout }) {
+  const isVerified = Boolean(partner?.verified);
   const [shuttleSummoned, setShuttleSummoned] = useState(false);
+
+  const hotelType = partner?.metadata?.hotelType || partner?.type || 'Temple Guesthouse & Ashram';
+  const roomCount = partner?.metadata?.roomCount || '8-15 Rooms';
+  const zone = partner?.metadata?.zone || partner?.zone || 'Vrindavan Parikrama Marg';
+  const rating = partner?.rating || '4.9';
+
   const [rooms, setRooms] = useState({
     standard: { available: 4, total: 8 },
     deluxe: { available: 2, total: 4 },
@@ -57,8 +65,8 @@ export default function HotelPortalTab({ partner, onLogout }) {
   const handleSummonShuttle = () => {
     setShuttleSummoned(true);
     setTimeout(() => {
-      alert('🛺 E-Rickshaw shuttle dispatched to Radha Krishna Dham front porch! ETA: 3 mins.');
-    }, 400);
+      setShuttleSummoned(false);
+    }, 6000);
   };
 
   const totalAvail = rooms.standard.available + rooms.deluxe.available + rooms.suite.available;
@@ -66,11 +74,40 @@ export default function HotelPortalTab({ partner, onLogout }) {
 
   return (
     <>
+      {/* Realtime Admin Verification Banner */}
+      {!isVerified ? (
+        <div className="ph-verification-banner pending">
+          <div className="ph-verif-icon-box">
+            <Clock size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Admin Review In Progress</strong>
+              <span className="ph-pulse-badge">● Pending</span>
+            </div>
+            <p>Our Braj admin team is verifying your property registration. You can adjust room inventory and preview guest bookings.</p>
+          </div>
+        </div>
+      ) : (
+        <div className="ph-verification-banner verified">
+          <div className="ph-verif-icon-box">
+            <ShieldCheck size={16} />
+          </div>
+          <div className="ph-verif-content">
+            <div className="ph-verif-title-row">
+              <strong>Verified Hotel Partner</strong>
+              <span className="ph-verified-badge">✓ Active &amp; Locked</span>
+            </div>
+            <p>Your property is live on Vrinda Pilgrim Stay Map with 0% OTA commission and instant WhatsApp guest vouchers.</p>
+          </div>
+        </div>
+      )}
+
       {/* Profile Bar */}
       <div className="ph-profile-card">
         <div className="ph-avatar-box">
           <img 
-            src={partner?.photo || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=120&auto=format&fit=crop&q=80"} 
+            src={partner?.photo_url || partner?.photo || "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=120&auto=format&fit=crop&q=80"} 
             alt={partner?.name || 'Hotel'} 
           />
           <span className="ph-avatar-badge">🏨</span>
@@ -78,10 +115,10 @@ export default function HotelPortalTab({ partner, onLogout }) {
         <div className="ph-profile-info">
           <div className="ph-name-line">
             <h4>{partner?.name || 'Radha Krishna Dham'}</h4>
-            <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> 4.9</span>
+            <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {rating}</span>
           </div>
           <div className="ph-sub-line">
-            <span>Temple Guesthouse & Ashram • Near Barsana Mandir</span>
+            <span>{hotelType} • {roomCount} • {zone}</span>
           </div>
         </div>
         <button className="ph-btn-logout" onClick={onLogout} title="Sign Out">

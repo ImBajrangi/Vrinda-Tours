@@ -8,7 +8,7 @@ import { calculateDistance, formatDistance, calculateETA } from '../../utils/dis
 import { openWhatsApp, generateHotelMessage, generateRestaurantMessage } from '../../utils/whatsapp';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import { useFavorites } from '../../hooks/useFavorites';
-import './LocationCard.css';
+import { shareWebPPicture } from '../../utils/imageOptimizer';
 
 export default function LocationCard({ 
   location, 
@@ -147,15 +147,17 @@ export default function LocationCard({
 
   // Handlers
   const handleShare = async () => {
-    if (navigator.share && activeLoc) {
-      try {
-        await navigator.share({ 
-          title: activeLoc.name, 
-          text: activeLoc.description, 
-          url: `https://www.google.com/maps/search/?api=1&query=${activeLoc.lat},${activeLoc.lng}` 
-        });
-      } catch {}
-    }
+    if (!activeLoc) return;
+    await shareWebPPicture({
+      imageUrl: activeLoc.image || '/handdrawn_vrinda_hero.webp',
+      title: `${activeLoc.name} — Vrinda Vihar`,
+      text: `${activeLoc.name} (${activeLoc.category}) • ${activeLoc.description || 'Sacred Brij Dham Darshan'}`,
+      url: `https://to.vrindopnishad.in/?loc=${encodeURIComponent(activeLoc.name)}`,
+      filename: `${(activeLoc.name || 'darshan').toLowerCase().replace(/[^a-z0-9]/g, '-')}.webp`,
+      onSuccess: () => {
+        if (onToast) onToast({ message: '✨ Darshan shared in compressed WebP format', type: 'success' });
+      }
+    });
   };
 
   const handleDirections = () => {

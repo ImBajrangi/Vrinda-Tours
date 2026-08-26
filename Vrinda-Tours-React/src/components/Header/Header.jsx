@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { 
-  Search, User, Car, X, ArrowLeft, Landmark, Sparkles, BedDouble, 
-  UtensilsCrossed, Home, Info, ArrowUpRight, TrendingUp, Briefcase, Heart 
-} from 'lucide-react';
+  MagnifyingGlassIcon, XMarkIcon, ArrowLeftIcon, ArrowUpRightIcon, 
+  SparklesIcon, BuildingOffice2Icon, BuildingStorefrontIcon, 
+  HomeIcon, InformationCircleIcon, BriefcaseIcon, TruckIcon,
+  ArrowTrendingUpIcon
+} from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
+import { Landmark } from 'lucide-react';
 import { locations } from '../../data/locations';
 import CategoryPills from '../CategoryPills/CategoryPills';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -112,16 +117,16 @@ export default function Header({
       case 'Temple':
         return { Icon: Landmark, color: '#b45309', bg: '#fef3c7' };
       case 'Holy Site':
-        return { Icon: Sparkles, color: '#0284c7', bg: '#e0f2fe' };
+        return { Icon: SparklesIcon, color: '#0284c7', bg: '#e0f2fe' };
       case 'Hotel':
-        return { Icon: BedDouble, color: '#15803d', bg: '#dcfce7' };
+        return { Icon: BuildingOffice2Icon, color: '#15803d', bg: '#dcfce7' };
       case 'Dining':
       case 'Restaurant':
-        return { Icon: UtensilsCrossed, color: '#c2410c', bg: '#ffedd5' };
+        return { Icon: BuildingStorefrontIcon, color: '#c2410c', bg: '#ffedd5' };
       case 'Town':
-        return { Icon: Home, color: '#4f46e5', bg: '#e0e7ff' };
+        return { Icon: HomeIcon, color: '#4f46e5', bg: '#e0e7ff' };
       default:
-        return { Icon: Info, color: '#3f3f46', bg: '#f4f4f5' };
+        return { Icon: InformationCircleIcon, color: '#3f3f46', bg: '#f4f4f5' };
     }
   };
 
@@ -141,8 +146,15 @@ export default function Header({
         <div className="header-top-row">
           {/* Brand Logo - Visible in resting mode */}
           {!isFocused && (
-            <div className="header-brand-logo" title="Vrindopnishad">
-              <img src="/official-logo.svg" alt="Vrindopnishad Logo" className="site-brand-logo" />
+            <div className="header-brand-logo" title="Vrinda Vihar — Sacred Brij 84 Kos Pilgrimage">
+              <img 
+                src="/official-logo.svg" 
+                alt="Vrinda Vihar Official Logo" 
+                className="site-brand-logo"
+                width="34"
+                height="34"
+                loading="eager"
+              />
             </div>
           )}
 
@@ -162,10 +174,10 @@ export default function Header({
               title="Back"
               aria-label="Exit search"
             >
-              <ArrowLeft size={18} />
+              <ArrowLeftIcon style={{ width: 18, height: 18 }} />
             </button>
           ) : (
-            <Search size={16} className="search-icon" aria-hidden="true" />
+            <MagnifyingGlassIcon style={{ width: 16, height: 16 }} className="search-icon" aria-hidden="true" />
           )}
 
           <input
@@ -191,7 +203,7 @@ export default function Header({
               aria-label="Clear search input"
               title="Clear"
             >
-              <X size={14} />
+              <XMarkIcon style={{ width: 14, height: 14 }} />
             </button>
           ) : isFocused ? (
             <button 
@@ -201,7 +213,7 @@ export default function Header({
               aria-label="Close search"
               title="Close"
             >
-              <X size={14} />
+              <XMarkIcon style={{ width: 14, height: 14 }} />
             </button>
           ) : null}
         </div>
@@ -215,7 +227,7 @@ export default function Header({
               title="Find Local Drivers & Rides"
               aria-label="Find Rides"
             >
-              <Car size={16} />
+              <TruckIcon style={{ width: 16, height: 16 }} />
               <span className="btn-text">Rides</span>
             </button>
 
@@ -226,7 +238,7 @@ export default function Header({
               title="Brij Staff & Partner Hub (Drivers, Dining, Stays, Admin)"
               aria-label="Partner Hub"
             >
-              <Briefcase size={15} />
+              <BriefcaseIcon style={{ width: 15, height: 15 }} />
               <span className="btn-text">Partner</span>
             </button>
           </>
@@ -259,12 +271,12 @@ export default function Header({
               <span>Matching Destinations ({searchResults.length})</span>
             ) : favorites.length > 0 ? (
               <div className="sr-header-trending">
-                <Heart size={13} fill="#e11d48" color="#e11d48" />
+                <HeartSolid style={{ width: 13, height: 13, color: '#e11d48' }} />
                 <span>Your Favourites & Trending Places</span>
               </div>
             ) : (
               <div className="sr-header-trending">
-                <TrendingUp size={13} color="#71717a" />
+                <ArrowTrendingUpIcon style={{ width: 13, height: 13, color: '#71717a' }} />
                 <span>Trending Pilgrimage Sites</span>
               </div>
             )}
@@ -297,7 +309,7 @@ export default function Header({
                       className="sr-icon-avatar"
                       style={{ background: meta.bg, color: meta.color }}
                     >
-                      <IconComponent size={16} />
+                      <IconComponent style={{ width: 16, height: 16 }} size={16} />
                     </div>
 
                     <div className="sr-text">
@@ -306,7 +318,7 @@ export default function Header({
                         <div className="sr-badges-row">
                           {isItemFav && (
                             <span className="sr-fav-badge" title="In your favourites">
-                              <Heart size={10} fill="#e11d48" color="#e11d48" />
+                              <HeartSolid style={{ width: 10, height: 10, color: '#e11d48' }} />
                             </span>
                           )}
                           {loc.rating && (
@@ -322,7 +334,7 @@ export default function Header({
                       </div>
                     </div>
 
-                    <ArrowUpRight size={15} className="sr-arrow" />
+                    <ArrowUpRightIcon style={{ width: 15, height: 15 }} className="sr-arrow" />
                   </div>
                 );
               })}

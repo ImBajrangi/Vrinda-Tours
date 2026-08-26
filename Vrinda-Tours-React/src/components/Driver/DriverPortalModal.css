@@ -1020,6 +1020,33 @@
   border: none;
 }
 
+.dp-register-cta-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.dp-register-link-btn {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.dp-register-link-btn:hover {
+  color: #1d4ed8;
+}
+
 @media (max-width: 380px) {
   .dp-modal-container {
     width: 96%;

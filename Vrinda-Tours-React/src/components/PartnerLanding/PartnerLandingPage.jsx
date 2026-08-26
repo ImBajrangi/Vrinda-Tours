@@ -6,7 +6,7 @@ import {
   Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
-  Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag
+  Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -33,49 +33,10 @@ import {
   setCachedData
 } from '../../data/landingData';
 import { supabase } from '../../config/supabase';
+import { shareWebPPicture, getOptimizedWebPUrl } from '../../utils/imageOptimizer';
+import { validatePhoneNumber } from '../../utils/phoneValidator';
+import { syncPilgrimToSupabase, getPilgrimReferralStats } from '../../services/referralService';
 import './PartnerLandingPage.css';
-
-// Validates phone number (supports Indian 10-digit mobile, +91, 0, and international 7-15 digits) without OTP verification needed
-export const validatePhoneNumber = (rawPhone) => {
-  if (!rawPhone || !rawPhone.trim()) {
-    return { isValid: false, message: 'Please enter your mobile or WhatsApp number.' };
-  }
-
-  const cleaned = rawPhone.trim().replace(/[\s\-\(\)]/g, '');
-  const digitsOnly = cleaned.replace(/\D/g, '');
-
-  let localDigits = digitsOnly;
-  if (cleaned.startsWith('+91')) {
-    localDigits = cleaned.slice(3).replace(/\D/g, '');
-  } else if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
-    localDigits = digitsOnly.slice(2);
-  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
-    localDigits = digitsOnly.slice(1);
-  }
-
-  // 10-digit Indian Mobile Number
-  if (localDigits.length === 10) {
-    if (/^[6-9]\d{9}$/.test(localDigits)) {
-      return {
-        isValid: true,
-        formatted: `+91 ${localDigits.slice(0, 5)} ${localDigits.slice(5)}`,
-        clean: `+91${localDigits}`
-      };
-    }
-    return { isValid: false, message: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' };
-  }
-
-  // International phone numbers (7 to 15 digits)
-  if (digitsOnly.length >= 7 && digitsOnly.length <= 15) {
-    return {
-      isValid: true,
-      formatted: cleaned.startsWith('+') ? cleaned : `+${digitsOnly}`,
-      clean: cleaned.startsWith('+') ? cleaned : `+${digitsOnly}`
-    };
-  }
-
-  return { isValid: false, message: 'Please enter a valid 10-digit mobile number.' };
-};
 
 export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   // Hero Step Slider State
@@ -333,7 +294,58 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
   const [floatingToast, setFloatingToast] = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [copiedReferral, setCopiedReferral] = useState(false);
+  const [authReferralInput, setAuthReferralInput] = useState(() => {
+    try {
+      return localStorage.getItem('vrinda_referrer_code') || '';
+    } catch {
+      return '';
+    }
+  });
+  const [showReferralField, setShowReferralField] = useState(() => {
+    try {
+      return !!localStorage.getItem('vrinda_referrer_code');
+    } catch {
+      return false;
+    }
+  });
+  const [referralStats, setReferralStats] = useState({ totalReferrals: 0, totalPoints: 0, referralsList: [] });
   const profileMenuRef = useRef(null);
+
+  // Fetch live referral stats from Supabase when user opens the referral modal
+  useEffect(() => {
+    if (isReferralModalOpen && currentUser) {
+      getPilgrimReferralStats(currentUser).then((stats) => {
+        if (stats) setReferralStats(stats);
+      });
+    }
+  }, [isReferralModalOpen, currentUser]);
+
+  // Professional Referral Program Guard - prompts unauthenticated users to register first
+  const handleOpenReferralProgram = () => {
+    if (!currentUser) {
+      setFloatingToast({
+        id: `ref_register_prompt_${Date.now()}`,
+        icon: <Gift size={18} color="#ec4899" />,
+        highlight: true,
+        title: '✨ Sign In to Access Referral Rewards',
+        desc: 'Please register your free pilgrim profile to generate your unique invite code and earn 500 Brij Reward Points!',
+        ctaText: 'Sign In / Register',
+        onCta: () => {
+          setIsAuthModalOpen(true);
+          setAuthMode('signup');
+          setSignupStep(1);
+          setFloatingToast(null);
+        }
+      });
+      setIsAuthModalOpen(true);
+      setAuthMode('signup');
+      setSignupStep(1);
+      return;
+    }
+    setIsReferralModalOpen(true);
+  };
 
   // Smart display name helper that handles titles like 'Dr.', 'Mr.', 'Prof.'
   const getDisplayName = (name) => {
@@ -364,6 +376,34 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
+  }, []);
+
+  // Capture & store referral code from URL if present (e.g. ?ref=VRINDA-12345)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const refCode = params.get('ref');
+      if (refCode) {
+        const cleanRef = refCode.trim().toUpperCase();
+        localStorage.setItem('vrinda_referrer_code', cleanRef);
+        setAuthReferralInput(cleanRef);
+        setShowReferralField(true);
+        setFloatingToast({
+          id: `ref_welcome_${Date.now()}`,
+          icon: <Gift size={18} color="#ec4899" />,
+          highlight: true,
+          title: '🎁 Pilgrim Invite Applied!',
+          desc: `Welcome! Referred with code ${cleanRef}. 500 Brij Points unlocked on registration.`,
+          ctaText: 'Sign In / Register',
+          onCta: () => {
+            setIsAuthModalOpen(true);
+            setAuthMode('signup');
+            setSignupStep(1);
+            setFloatingToast(null);
+          }
+        });
+      }
+    } catch { }
   }, []);
 
   // Booking Form State
@@ -595,7 +635,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
       const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
       const avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0b0f19&textColor=ffffff`;
-      const uid = data.user?.id || '';
+      const uid = data.user?.id || `usr_${Date.now()}`;
+      const refCodeEntered = (authReferralInput.trim() || localStorage.getItem('vrinda_referrer_code') || '').toUpperCase();
+      const uniqueRefCode = `VRINDA-${(uid.replace(/[^a-zA-Z0-9]/g, '').slice(-5) || 'PILGRIM').toUpperCase()}`;
+
       const newUser = {
         uid,
         name,
@@ -605,6 +648,9 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         initials,
         authProvider: 'password',
         memberId: `VRD-${uid.slice(0, 5).toUpperCase()}`,
+        referralCode: uniqueRefCode,
+        referredBy: refCodeEntered || null,
+        rewardPoints: refCodeEntered ? 500 : 0,
         createdAt: new Date().toISOString()
       };
 
@@ -613,12 +659,17 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       setBookingName(newUser.name);
       setBookingEmail(newUser.email);
       if (phone) setBookingPhone(phone);
-      setAuthSuccessMsg('Account created & signed in successfully!');
+      
+      // Async Supabase Sync
+      syncPilgrimToSupabase(newUser, refCodeEntered).catch(console.error);
+
+      setAuthSuccessMsg(refCodeEntered ? '🎉 Registration complete! +500 Brij Reward Points added.' : 'Account created & signed in successfully!');
       setTimeout(() => {
         setIsAuthModalOpen(false);
         setAuthSuccessMsg('');
         setSignupStep(1);
-      }, 500);
+        setIsReferralModalOpen(true);
+      }, 600);
     } catch (err) {
       console.error('Supabase Signup Error:', err);
       let errorMsg = err.message || 'Signup failed. Please try again.';
@@ -659,6 +710,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
       const cached = getCachedData('traveler_user', null);
       const existingPhone = (cached && cached.uid === u.id && cached.phone) ? cached.phone : (meta.phone || '');
+      const refCodeEntered = (authReferralInput.trim() || localStorage.getItem('vrinda_referrer_code') || '').toUpperCase();
+      const uniqueRefCode = `VRINDA-${(u.id.replace(/[^a-zA-Z0-9]/g, '').slice(-5) || 'PILGRIM').toUpperCase()}`;
+      const prevPoints = cached?.rewardPoints || 0;
+      const bonus = (refCodeEntered && !cached?.referredBy) ? 500 : 0;
 
       const loggedUser = {
         uid: u.id,
@@ -669,14 +724,21 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         initials,
         authProvider: 'password',
         memberId: `VRD-${u.id.slice(0, 5).toUpperCase()}`,
-        createdAt: new Date().toISOString()
+        referralCode: cached?.referralCode || uniqueRefCode,
+        referredBy: cached?.referredBy || (refCodeEntered || null),
+        rewardPoints: prevPoints + bonus,
+        createdAt: cached?.createdAt || new Date().toISOString()
       };
 
       setCurrentUser(loggedUser);
       setCachedData('traveler_user', loggedUser);
       setBookingName(name);
       setBookingEmail(email);
-      setAuthSuccessMsg(`Welcome back, ${name}!`);
+
+      // Async Supabase Sync
+      syncPilgrimToSupabase(loggedUser, refCodeEntered).catch(console.error);
+
+      setAuthSuccessMsg(bonus > 0 ? `Welcome back, ${name}! +500 Referral Points added.` : `Welcome back, ${name}!`);
       setTimeout(() => {
         setIsAuthModalOpen(false);
         setAuthSuccessMsg('');
@@ -914,11 +976,23 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     if (finalPhone) {
       const validation = validatePhoneNumber(finalPhone);
       if (!validation.isValid) {
-        alert(validation.message);
+        setFloatingToast({
+          id: `err_${Date.now()}`,
+          title: 'Invalid Phone Number',
+          desc: validation.message,
+          highlight: true
+        });
+        setTimeout(() => setFloatingToast(null), 4000);
         return;
       }
     } else {
-      alert('Please enter your 10-digit mobile number for booking confirmation.');
+      setFloatingToast({
+        id: `err_${Date.now()}`,
+        title: 'Phone Required',
+        desc: 'Please enter your 10-digit mobile number for booking confirmation.',
+        highlight: true
+      });
+      setTimeout(() => setFloatingToast(null), 4000);
       return;
     }
 
@@ -1116,6 +1190,18 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         className="tp-profile-dropdown-item"
                         onClick={() => {
                           setIsProfileMenuOpen(false);
+                          handleOpenReferralProgram();
+                        }}
+                      >
+                        <Gift size={15} color="#ec4899" />
+                        <span>Refer Pilgrims & Earn 500 Pts</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        className="tp-profile-dropdown-item"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
                           if (onOpenPartnerHub) onOpenPartnerHub();
                         }}
                       >
@@ -1284,7 +1370,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               ) : (
                 <div className="tp-mobile-guest-card">
                   <div className="tp-mobile-guest-text">
-                    <h4>Namaste, Pilgrim! 🙏</h4>
+                    <h4>Jay Radhe, Dost! 🙏</h4>
                     <p>Sign in to sync bookings, live GPS & member discounts.</p>
                   </div>
                   <button
@@ -1346,6 +1432,21 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     <span>Pilgrim Journal & Stories</span>
                     <ArrowRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
+                  <button
+                    type="button"
+                    className="tp-mobile-nav-item tp-mobile-nav-item-btn"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleOpenReferralProgram();
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Gift size={16} color="#ec4899" />
+                      <span>Refer Pilgrims (Earn 500 Pts)</span>
+                    </span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </button>
+
                   {onOpenPartnerHub && (
                     <button
                       type="button"
@@ -1666,16 +1767,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     </h4>
                   </div>
 
-
                   {/* Synchronized Active View Layer */}
                   <div className="tp-j-active-view">
-                    {/* Top Header Row with Glass Icon & Organic Ocean Cutout */}
+                    {/* Top Header Row with Curved Organic Photo Window */}
                     <div className="tp-j-top-row">
-                      <div className="tp-j-glass-badge">
-                        <LayoutGrid size={18} className="tp-j-glass-icon" />
-                      </div>
-
-                      {/* Curved Organic Ocean Speedboat Window */}
                       <div className="tp-j-photo-window">
                         <img
                           src={step.photo}
@@ -2492,7 +2587,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     <CheckCircle2 size={42} className="tp-success-icon" />
                   </div>
                   <h4>Reservation Confirmed!</h4>
-                  <p>Opening WhatsApp to connect with your dedicated Vrinda Tours travel concierge...</p>
+                  <p>Opening WhatsApp to connect with your dedicated Vrinda Vihar travel concierge...</p>
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="tp-auth-ios-form">
@@ -2850,6 +2945,32 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     </button>
                   </div>
 
+                  {/* Optional Referral Code for Login */}
+                  <div className="tp-auth-referral-toggle-row">
+                    <button
+                      type="button"
+                      className="tp-auth-referral-toggle-btn"
+                      onClick={() => setShowReferralField(!showReferralField)}
+                    >
+                      <Gift size={14} color="#ec4899" />
+                      <span>{showReferralField ? 'Hide Referral Code' : 'Have a Referral / Invite Code?'}</span>
+                      <span className="tp-auth-referral-bonus-badge">+500 Pts</span>
+                    </button>
+                  </div>
+
+                  {showReferralField && (
+                    <div className="tp-auth-pill-input-wrap tp-auth-pill-referral-wrap">
+                      <Gift size={17} className="tp-auth-pill-icon" color="#ec4899" />
+                      <input
+                        type="text"
+                        className="tp-auth-pill-input"
+                        placeholder="Referral Code (e.g. VRINDA-ABC12)"
+                        value={authReferralInput}
+                        onChange={(e) => setAuthReferralInput(e.target.value.toUpperCase())}
+                      />
+                    </div>
+                  )}
+
                   {authError && <div className="tp-auth-error-msg">{authError}</div>}
                   {authSuccessMsg && <div className="tp-auth-success-msg">✓ {authSuccessMsg}</div>}
 
@@ -2895,6 +3016,32 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
+
+                      {/* Optional Referral Code for Sign Up Step 1 */}
+                      <div className="tp-auth-referral-toggle-row">
+                        <button
+                          type="button"
+                          className="tp-auth-referral-toggle-btn"
+                          onClick={() => setShowReferralField(!showReferralField)}
+                        >
+                          <Gift size={14} color="#ec4899" />
+                          <span>{showReferralField ? 'Hide Referral Code' : 'Have a Referral / Invite Code?'}</span>
+                          <span className="tp-auth-referral-bonus-badge">+500 Pts</span>
+                        </button>
+                      </div>
+
+                      {showReferralField && (
+                        <div className="tp-auth-pill-input-wrap tp-auth-pill-referral-wrap">
+                          <Gift size={17} className="tp-auth-pill-icon" color="#ec4899" />
+                          <input
+                            type="text"
+                            className="tp-auth-pill-input"
+                            placeholder="Referral Code (e.g. VRINDA-ABC12)"
+                            value={authReferralInput}
+                            onChange={(e) => setAuthReferralInput(e.target.value.toUpperCase())}
+                          />
+                        </div>
+                      )}
 
                       {authError && <div className="tp-auth-error-msg">{authError}</div>}
 
@@ -3138,6 +3285,35 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
                   <button
                     type="button"
+                    className="tp-btn-master-icon"
+                    onClick={() => {
+                      shareWebPPicture({
+                        imageUrl: lightboxItem.image,
+                        title: `${lightboxItem.title} — Vrinda Vihar`,
+                        text: `Divine Darshan: ${lightboxItem.title} in ${lightboxItem.location} (${lightboxItem.category}). Explore sacred Brij Dhams on Vrinda Vihar.`,
+                        url: `https://to.vrindopnishad.in/#gallery`,
+                        filename: `${lightboxItem.title.toLowerCase().replace(/[^a-z0-9]/g, '-')}.webp`,
+                        onSuccess: () => {
+                          setFloatingToast({
+                            id: `share_${lightboxItem.id}_${Date.now()}`,
+                            icon: <Sparkles size={18} color="#10b981" />,
+                            highlight: true,
+                            title: '✨ Picture Shared in WebP',
+                            desc: 'High-quality, ultra-lightweight WebP image prepared for sharing.',
+                            ctaText: 'View Gallery',
+                            onCta: () => setFloatingToast(null)
+                          });
+                        }
+                      });
+                    }}
+                    title="Share WebP Picture"
+                    aria-label="Share WebP Picture"
+                  >
+                    <Share2 size={18} />
+                  </button>
+
+                  <button
+                    type="button"
                     className={`tp-btn-master-icon ${favoriteIds.includes(lightboxItem.id) ? 'is-favorited' : ''}`}
                     onClick={() => toggleFavorite(lightboxItem.id, lightboxItem.title)}
                     title={favoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
@@ -3153,6 +3329,174 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pilgrim Referral & Rewards Modal */}
+      {isReferralModalOpen && (
+        <div className="tp-auth-modal-overlay" onClick={() => setIsReferralModalOpen(false)}>
+          <div
+            className="tp-auth-modal-card"
+            style={{ maxWidth: '440px' }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="referral-modal-title"
+          >
+            <div className="tp-auth-modal-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fdf2f8', border: '1px solid #fbcfe8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Gift size={20} color="#ec4899" />
+                </div>
+                <div>
+                  <h3 id="referral-modal-title" className="tp-auth-modal-title" style={{ fontSize: '1.1rem', margin: 0 }}>
+                    Pilgrim Referral Program
+                  </h3>
+                  <span style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 800 }}>✨ Earn 500 Brij Points</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="tp-auth-modal-close-btn"
+                onClick={() => setIsReferralModalOpen(false)}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {!currentUser ? (
+              <div className="tp-auth-modal-body" style={{ textAlign: 'center', padding: '1rem 0.5rem' }}>
+                <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#fdf2f8', border: '1.5px solid #fbcfe8', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+                  <Gift size={26} color="#ec4899" />
+                </div>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.4rem 0' }}>
+                  Register to Unlock Your Referral Code
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, margin: '0 0 1.3rem 0' }}>
+                  Create your free pilgrim profile in 30 seconds to generate your personal invite link, share with friends & family, and earn <strong>500 Brij Reward Points</strong> per referral!
+                </p>
+                <button
+                  type="button"
+                  className="tp-btn-auth-primary-green"
+                  style={{ width: '100%', marginBottom: '0.75rem' }}
+                  onClick={() => {
+                    setIsReferralModalOpen(false);
+                    setIsAuthModalOpen(true);
+                    setAuthMode('signup');
+                    setSignupStep(1);
+                  }}
+                >
+                  <span>Sign In / Create Free Account →</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsReferralModalOpen(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
+                >
+                  Maybe Later
+                </button>
+              </div>
+            ) : (
+              <div className="tp-auth-modal-body" style={{ marginTop: '1rem' }}>
+                <p style={{ fontSize: '0.84rem', color: '#52525b', lineHeight: 1.5, margin: '0 0 1.2rem 0' }}>
+                  Invite your spiritual family and friends to Vrinda Vihar. When they take their first e-rickshaw ride or hotel stay, <strong>both of you earn 500 Brij Reward Points</strong> and unlock <strong>15% OFF</strong> on divine stays!
+                </p>
+
+                {/* Referral Code Box */}
+                <div style={{ background: '#fafafa', border: '1.5px dashed #cbd5e1', borderRadius: '16px', padding: '1rem', marginBottom: '1.2rem', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
+                    Your Unique Pilgrim Invite Code
+                  </span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#09090b', letterSpacing: '0.08em', fontFamily: 'monospace', margin: '4px 0 6px 0' }}>
+                    {currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`}
+                  </div>
+
+                  {/* Live Supabase Stats */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', margin: '6px 0 10px 0', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 9px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 800, color: '#047857' }}>
+                      🌟 {referralStats.totalPoints || currentUser.rewardPoints || 0} Brij Points
+                    </div>
+                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '3px 9px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 800, color: '#1d4ed8' }}>
+                      👥 {referralStats.totalReferrals || 0} Devotees Joined
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const code = currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`;
+                      const link = `${window.location.origin}/?ref=${code}`;
+                      navigator.clipboard?.writeText(link);
+                      setCopiedReferral(true);
+                      setTimeout(() => setCopiedReferral(false), 2500);
+                    }}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 14px',
+                      borderRadius: '999px',
+                      background: copiedReferral ? '#16a34a' : '#18181b',
+                      color: '#ffffff',
+                      fontSize: '0.78rem',
+                      fontWeight: 800,
+                      border: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <Share2 size={13} />
+                    <span>{copiedReferral ? '✓ Link Copied to Clipboard!' : 'Copy Referral Link'}</span>
+                  </button>
+                </div>
+
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                      `Radhe Radhe! 🙏 Use my invite link on Vrinda Vihar to get 500 Brij Reward Points and 15% OFF on verified stays & E-Rickshaw rides across Vrindavan, Mathura & Barsana:\n\n${window.location.origin}/?ref=${currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      padding: '0.85rem',
+                      background: '#25D366',
+                      color: '#ffffff',
+                      borderRadius: '999px',
+                      fontWeight: 800,
+                      fontSize: '0.88rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)'
+                    }}
+                  >
+                    <Send size={15} />
+                    <span>Share Invite via WhatsApp</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsReferralModalOpen(false)}
+                    style={{
+                      padding: '0.75rem',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#71717a',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

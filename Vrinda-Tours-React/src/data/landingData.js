@@ -22,7 +22,7 @@ export const heroSteps = [
     step: 1,
     tagline: 'SACRED BRIJ YATRA & DARSHAN',
     title: 'Experience\nThe Magic Of\nBrij Vibers!',
-    bgImage: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    bgImage: '/vrinda-vihar/radha-rani-temple-barsana.webp',
     aspectRatio: '16/9',
     ctaText: 'Book A Trip Now'
   },
@@ -30,7 +30,7 @@ export const heroSteps = [
     step: 2,
     tagline: 'DIVINE PILGRIMAGE CIRCUITS',
     title: 'Sacred \nDhams & Temple Trails!',
-    bgImage: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    bgImage: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     ctaText: 'Explore Packages'
   },
@@ -38,7 +38,7 @@ export const heroSteps = [
     step: 3,
     tagline: 'PREMIUM CONCIERGE',
     title: 'Brij Vibers In\nPure Luxury &\nDevotion!',
-    bgImage: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    bgImage: '/vrinda-vihar/radha-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     ctaText: 'View Packages'
   }
@@ -46,9 +46,9 @@ export const heroSteps = [
 
 // Awesome Places Thumbnail Avatars for the Know More Card
 export const awesomePlaceAvatars = [
-  '/vrinda-vihar/radha-raman-ji-smile.jpeg',
-  '/vrinda-vihar/radha-vallabh-ji-1.png',
-  '/vrinda-vihar/bihari-ji.jpeg'
+  '/vrinda-vihar/radha-raman-ji-smile.webp',
+  '/vrinda-vihar/radha-vallabh-ji-1.webp',
+  '/vrinda-vihar/bihari-ji.webp'
 ];
 
 // Partner Brands
@@ -67,7 +67,7 @@ export const journeySteps = [
     title: 'Choose Your\nBrij Package',
     shortTitle: 'Choose Brij Package',
     desc: 'Explore 50+ hand-curated Brij Vibes itineraries across Vrindavan, Mathura & Barsana.',
-    photo: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    photo: '/vrinda-vihar/radha-vallabh-ji-temple.webp',
     aspectRatio: '9/16',
     linkText: 'EXPLORE PACKAGES >',
     iconType: 'pin'
@@ -78,7 +78,7 @@ export const journeySteps = [
     title: 'Book VIP\nDarshan & Stay',
     shortTitle: 'Book Darshan & Stay',
     desc: 'Instant confirmation, temple pass entry, ashrams & cab transfers.',
-    photo: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    photo: '/vrinda-vihar/radha-raman-ji-1.webp',
     aspectRatio: '4/5',
     linkText: 'VIEW DETAILS >',
     iconType: 'grid'
@@ -89,7 +89,7 @@ export const journeySteps = [
     title: 'Pray &\nBegin Yatra',
     shortTitle: 'Pray & Begin Yatra',
     desc: 'Zero-hidden fees, WhatsApp instant voucher & 24/7 dedicated Brij guide.',
-    photo: '/vrinda-vihar/bihari-ji.jpeg',
+    photo: '/vrinda-vihar/bihari-ji.webp',
     aspectRatio: '9/16',
     linkText: 'START YATRA >',
     iconType: 'card'
@@ -106,7 +106,7 @@ export const popularPlaces = [
     priceUnit: '/day',
     numericPrice: 2500,
     rating: 5.0,
-    image: '/vrinda-vihar/bihari-ji.jpeg',
+    image: '/vrinda-vihar/bihari-ji.webp',
     aspectRatio: '9/16',
     objectPosition: 'center 15%',
     description: 'Special Darshan at Shri Bankey Bihari Ji, Nidhivan, and illuminated Prem Mandir.',
@@ -120,7 +120,7 @@ export const popularPlaces = [
     priceUnit: '/day',
     numericPrice: 3500,
     rating: 5.0,
-    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
     aspectRatio: '16/9',
     objectPosition: 'center center',
     description: 'Sacred hilltop darshan of Shriji Mandir, Mor Kuti, Maan Mandir & Rangili Mahal.',
@@ -134,7 +134,7 @@ export const popularPlaces = [
     priceUnit: '/day',
     numericPrice: 1800,
     rating: 4.9,
-    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     objectPosition: 'center center',
     description: 'Complete 21 km Govardhan Parikrama with dedicated guide, visiting Radha Kund & Mansi Ganga.',
@@ -148,7 +148,7 @@ export const popularPlaces = [
     priceUnit: '/day',
     numericPrice: 2200,
     rating: 5.0,
-    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-1.webp',
     aspectRatio: '4/5',
     objectPosition: 'center top',
     description: 'Self-manifested Shaligram deity darshan, divine aarti, and old Vrindavan heritage parikrama.',
@@ -181,19 +181,19 @@ export const memoryReviewers = [
     name: 'Radhika Sharma',
     rating: '5.0',
     position: 'top-left',
-    avatar: '/vrinda-vihar/radha-raman-ji-smile.jpeg'
+    avatar: '/vrinda-vihar/radha-raman-ji-smile.webp'
   },
   {
     name: 'Anand Gopal',
     rating: '5.0',
     position: 'middle-right',
-    avatar: '/vrinda-vihar/radha-vallabh-ji-1.png'
+    avatar: '/vrinda-vihar/radha-vallabh-ji-1.webp'
   },
   {
     name: 'Pooja Verma',
     rating: '4.9',
     position: 'bottom-left',
-    avatar: '/vrinda-vihar/bihari-ji.jpeg'
+    avatar: '/vrinda-vihar/bihari-ji.webp'
   }
 ];
 
@@ -218,7 +218,7 @@ export const topDestinationsByTab = {
       numericPrice: 2500,
       category: 'Top Destination',
       location: 'Nidhivan Marg, Vrindavan',
-      image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+      image: '/vrinda-vihar/kunj-bihari-ji.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 15%',
       gridArea: 'card-1'
@@ -233,7 +233,7 @@ export const topDestinationsByTab = {
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Near Vamshi Vat, Vrindavan',
-      image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+      image: '/vrinda-vihar/gopeshwar-ji.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-2'
@@ -248,7 +248,7 @@ export const topDestinationsByTab = {
       numericPrice: 3000,
       category: 'Top Destination',
       location: 'Radha Raman Mandir, Vrindavan',
-      image: '/vrinda-vihar/radha-raman-ji-abhishek.png',
+      image: '/vrinda-vihar/radha-raman-ji-abhishek.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-3'
@@ -263,7 +263,7 @@ export const topDestinationsByTab = {
       numericPrice: 2000,
       category: 'Top Destination',
       location: 'Gotam Nagar, Vrindavan',
-      image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+      image: '/vrinda-vihar/radha-vallabh-ji-temple.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 25%',
       gridArea: 'card-4'
@@ -278,7 +278,7 @@ export const topDestinationsByTab = {
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Chhatikara Road, Vrindavan',
-      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      image: '/vrinda-vihar/shri-priya-kaant-ju.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-5'
@@ -293,7 +293,7 @@ export const topDestinationsByTab = {
       numericPrice: 2200,
       category: 'Top Destination',
       location: 'Old Vrindavan',
-      image: '/vrinda-vihar/radha-vallabh-ji-4.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-4.webp',
       aspectRatio: '4/5',
       objectPosition: 'center top',
       gridArea: 'card-6'
@@ -310,7 +310,7 @@ export const topDestinationsByTab = {
       numericPrice: 2000,
       category: 'Top Destination',
       location: 'Jatipura & Govardhan Parikrama',
-      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-1'
@@ -325,7 +325,7 @@ export const topDestinationsByTab = {
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Govardhan Talab & Gaushala',
-      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      image: '/vrinda-vihar/gau-dewa-govardhan.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-2'
@@ -340,7 +340,7 @@ export const topDestinationsByTab = {
       numericPrice: 2500,
       category: 'Top Destination',
       location: 'Radha Kund Dham',
-      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-3'
@@ -355,7 +355,7 @@ export const topDestinationsByTab = {
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Govardhan Parikrama Marg',
-      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-4'
@@ -370,7 +370,7 @@ export const topDestinationsByTab = {
       numericPrice: 1600,
       category: 'Top Destination',
       location: 'Govardhan Kund Kshetra',
-      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-5'
@@ -385,7 +385,7 @@ export const topDestinationsByTab = {
       numericPrice: 2000,
       category: 'Top Destination',
       location: 'Govardhan Yatra Special',
-      image: '/vrinda-vihar/radha-raman-ji-charanamrit.jpeg',
+      image: '/vrinda-vihar/radha-raman-ji-charanamrit.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 15%',
       gridArea: 'card-6'
@@ -402,7 +402,7 @@ export const topDestinationsByTab = {
       numericPrice: 3500,
       category: 'Top Destination',
       location: 'Bhanugarh Hill, Barsana',
-      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
       aspectRatio: '16/9',
       objectPosition: 'center center',
       gridArea: 'card-1'
@@ -417,7 +417,7 @@ export const topDestinationsByTab = {
       numericPrice: 2000,
       category: 'Top Destination',
       location: 'Barsana Valley',
-      image: '/vrinda-vihar/radha-vallabh-ji-5.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-5.webp',
       aspectRatio: '2/3',
       objectPosition: 'center top',
       gridArea: 'card-2'
@@ -432,7 +432,7 @@ export const topDestinationsByTab = {
       numericPrice: 2800,
       category: 'Top Destination',
       location: 'Barsana Heritage',
-      image: '/vrinda-vihar/radha-vallabh-ji-3.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-3.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-3'
@@ -447,7 +447,7 @@ export const topDestinationsByTab = {
       numericPrice: 2200,
       category: 'Top Destination',
       location: 'Barsana Circuit',
-      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
       aspectRatio: '16/9',
       objectPosition: 'center center',
       gridArea: 'card-4'
@@ -462,7 +462,7 @@ export const topDestinationsByTab = {
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Between Barsana & Nandgaon',
-      image: '/vrinda-vihar/radha-vallabh-ji-6.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-6.webp',
       aspectRatio: '4/5',
       objectPosition: 'center top',
       gridArea: 'card-5'
@@ -477,7 +477,7 @@ export const topDestinationsByTab = {
       numericPrice: 1900,
       category: 'Top Destination',
       location: 'Brij Mandal',
-      image: '/vrinda-vihar/radha-vallabh-ji-7.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-7.webp',
       aspectRatio: '4/5',
       objectPosition: 'center top',
       gridArea: 'card-6'
@@ -494,7 +494,7 @@ export const topDestinationsByTab = {
       numericPrice: 2500,
       category: 'Top Destination',
       location: 'Mathura & Vrindavan Kshetra',
-      image: '/vrinda-vihar/bihari-ji.jpeg',
+      image: '/vrinda-vihar/bihari-ji.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 15%',
       gridArea: 'card-1'
@@ -509,7 +509,7 @@ export const topDestinationsByTab = {
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Yamuna Bank, Mathura',
-      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-2'
@@ -524,7 +524,7 @@ export const topDestinationsByTab = {
       numericPrice: 2800,
       category: 'Top Destination',
       location: 'Mathura Heritage',
-      image: '/vrinda-vihar/radha-raman-ji-2.jpeg',
+      image: '/vrinda-vihar/radha-raman-ji-2.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-3'
@@ -539,7 +539,7 @@ export const topDestinationsByTab = {
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Mathura Kshetra',
-      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-4'
@@ -554,7 +554,7 @@ export const topDestinationsByTab = {
       numericPrice: 1400,
       category: 'Top Destination',
       location: 'Mathura Kshetra',
-      image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+      image: '/vrinda-vihar/gopeshwar-ji.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-5'
@@ -569,7 +569,7 @@ export const topDestinationsByTab = {
       numericPrice: 1600,
       category: 'Top Destination',
       location: 'Mathura Vrindavan Marg',
-      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      image: '/vrinda-vihar/shri-priya-kaant-ju.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-6'
@@ -586,7 +586,7 @@ export const topDestinationsByTab = {
       numericPrice: 2200,
       category: 'Top Destination',
       location: 'Gokul Dham',
-      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      image: '/vrinda-vihar/gau-dewa-govardhan.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-1'
@@ -601,7 +601,7 @@ export const topDestinationsByTab = {
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Mahavan, Gokul',
-      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+      image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.webp',
       aspectRatio: '9/16',
       objectPosition: 'center 20%',
       gridArea: 'card-2'
@@ -616,7 +616,7 @@ export const topDestinationsByTab = {
       numericPrice: 2500,
       category: 'Top Destination',
       location: 'Gokul Dham',
-      image: '/vrinda-vihar/radha-raman-ji-shriJi.jpeg',
+      image: '/vrinda-vihar/radha-raman-ji-shriJi.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-3'
@@ -631,7 +631,7 @@ export const topDestinationsByTab = {
       numericPrice: 1800,
       category: 'Top Destination',
       location: 'Gokul Riverbank',
-      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan.webp',
       aspectRatio: '2.2/1',
       objectPosition: 'center center',
       gridArea: 'card-4'
@@ -646,7 +646,7 @@ export const topDestinationsByTab = {
       numericPrice: 1500,
       category: 'Top Destination',
       location: 'Gokul Bazaar',
-      image: '/vrinda-vihar/radha-vallabh-ji-1.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-1.webp',
       aspectRatio: '4/5',
       objectPosition: 'center top',
       gridArea: 'card-5'
@@ -661,7 +661,7 @@ export const topDestinationsByTab = {
       numericPrice: 1600,
       category: 'Top Destination',
       location: 'Mahavan Kshetra',
-      image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-2.webp',
       aspectRatio: '3/4',
       objectPosition: 'center top',
       gridArea: 'card-6'
@@ -689,7 +689,7 @@ export const exploreDestinations = [
     numericPrice: 12000,
     rating: 5.0,
     category: '84 Kos Yatra',
-    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
     aspectRatio: '2.2/1'
   },
   {
@@ -701,7 +701,7 @@ export const exploreDestinations = [
     numericPrice: 2500,
     rating: 5.0,
     category: 'Darshan',
-    image: '/vrinda-vihar/bihari-ji.jpeg',
+    image: '/vrinda-vihar/bihari-ji.webp',
     aspectRatio: '9/16'
   },
   {
@@ -713,7 +713,7 @@ export const exploreDestinations = [
     numericPrice: 3000,
     rating: 4.9,
     category: 'Parikrama',
-    image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
     aspectRatio: '2.2/1'
   },
   {
@@ -725,7 +725,7 @@ export const exploreDestinations = [
     numericPrice: 3500,
     rating: 5.0,
     category: 'Barsana & Nandgaon',
-    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
     aspectRatio: '16/9'
   },
   {
@@ -737,7 +737,7 @@ export const exploreDestinations = [
     numericPrice: 2200,
     rating: 5.0,
     category: 'Popular Destination',
-    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-1.webp',
     aspectRatio: '4/5'
   },
   {
@@ -749,7 +749,7 @@ export const exploreDestinations = [
     numericPrice: 2000,
     rating: 4.8,
     category: 'Popular Destination',
-    image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+    image: '/vrinda-vihar/gau-dewa-govardhan.webp',
     aspectRatio: '9/16'
   },
   {
@@ -761,7 +761,7 @@ export const exploreDestinations = [
     numericPrice: 1500,
     rating: 4.9,
     category: 'Aarti',
-    image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+    image: '/vrinda-vihar/krishn-kund-govardhan.webp',
     aspectRatio: '2.2/1'
   },
   {
@@ -773,7 +773,7 @@ export const exploreDestinations = [
     numericPrice: 8500,
     rating: 5.0,
     category: '84 Kos Yatra',
-    image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    image: '/vrinda-vihar/radha-vallabh-ji-temple.webp',
     aspectRatio: '9/16'
   },
   {
@@ -785,7 +785,7 @@ export const exploreDestinations = [
     numericPrice: 4000,
     rating: 4.9,
     category: 'Darshan',
-    image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+    image: '/vrinda-vihar/shri-priya-kaant-ju.webp',
     aspectRatio: '3/4'
   }
 ];
@@ -796,7 +796,7 @@ export const stampDestinations = [
     id: 'stamp_vrindavan',
     city: 'VRINDAVAN',
     country: 'Brij Dham',
-    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-1.webp',
     aspectRatio: '4/5',
     highlight: 'Shri Radha Raman Ji & Bihari Ji'
   },
@@ -804,7 +804,7 @@ export const stampDestinations = [
     id: 'stamp_barsana',
     city: 'BARSANA',
     country: 'Brij Dham',
-    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
     aspectRatio: '16/9',
     highlight: 'Shri Radha Rani Hilltop Mandir'
   },
@@ -812,7 +812,7 @@ export const stampDestinations = [
     id: 'stamp_govardhan',
     city: 'GOVARDHAN',
     country: 'Brij Dham',
-    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     highlight: 'Giriraj Parikrama & Radha Kund'
   },
@@ -820,7 +820,7 @@ export const stampDestinations = [
     id: 'stamp_kunjbihari',
     city: 'NIDHIVAN',
     country: 'Brij Dham',
-    image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+    image: '/vrinda-vihar/kunj-bihari-ji.webp',
     aspectRatio: '9/16',
     highlight: 'Shri Kunj Bihari Ji & Seva Kunj'
   }
@@ -850,7 +850,7 @@ export const missionData = {
       title: 'Curated Brij Vibers\nPackages',
       description: 'Private AC transfers, verified ashrams & luxury hotels across Brij Mandal.',
       icon: 'Compass',
-      image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+      image: '/vrinda-vihar/shri-priya-kaant-ju.webp',
       aspectRatio: '3/4',
       alt: 'Shri Priya Kant Ju Mandir Vrindavan'
     },
@@ -859,7 +859,7 @@ export const missionData = {
       title: 'Darshan &\nTemple Passes',
       description: 'Skip long queues with our dedicated local guides and darshan assistance.',
       icon: 'MapPin',
-      image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+      image: '/vrinda-vihar/radha-vallabh-ji-2.webp',
       aspectRatio: '3/4',
       alt: 'Shri Radha Vallabh Ji Divine Darshan'
     },
@@ -868,7 +868,7 @@ export const missionData = {
       title: 'Parikrama &\nLeela Sthali Trails',
       description: 'Guided Govardhan parikrama, sacred kund snan, and evening boat aartis.',
       icon: 'Plane',
-      image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan.webp',
       aspectRatio: '2.2/1',
       alt: 'Krishna Kund Sacred Snan Ghat Govardhan'
     }
@@ -895,7 +895,7 @@ export const initiativesData = {
       category: 'Vrindavan Yatra',
       title: 'Shri Bankey Bihari &\nNidhivan Darshan',
       description: 'darshan passes, evening fountain show, and sacred Nidhivan trail.',
-      image: '/vrinda-vihar/bihari-ji.jpeg',
+      image: '/vrinda-vihar/bihari-ji.webp',
       aspectRatio: '9/16',
       linkText: 'Explore Package'
     },
@@ -904,7 +904,7 @@ export const initiativesData = {
       category: 'Parikrama Yatra',
       title: 'Giriraj Govardhan\n21km Holy Trail',
       description: 'E-rickshaw or guided walking parikrama with Radha Kund & Mansi Ganga.',
-      image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       linkText: 'Explore Package'
     },
@@ -913,7 +913,7 @@ export const initiativesData = {
       category: 'Brij Dham',
       title: 'Barsana & Nandgaon\nHeritage Leela Tour',
       description: 'Shriji Mandir hilltop visit, Mor Kuti, and Nand Baba royal palace.',
-      image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+      image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
       aspectRatio: '16/9',
       linkText: 'Explore Package'
     },
@@ -922,7 +922,7 @@ export const initiativesData = {
       category: 'Sacred Trails',
       title: 'Gokul Raman Reti &\nGau Sanctuary',
       description: 'Rolling in sacred Raman Reti sand, Chaurasi Khamba, and holy Gaushala seva.',
-      image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+      image: '/vrinda-vihar/gau-dewa-govardhan.webp',
       aspectRatio: '9/16',
       linkText: 'Explore Package'
     },
@@ -931,7 +931,7 @@ export const initiativesData = {
       category: 'Chaurasi Kos',
       title: 'Complete 84 Kos\nBrij Mahayatra',
       description: 'Comprehensive 7-day divine pilgrimage covering all 12 sacred forests of Brij.',
-      image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+      image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
       aspectRatio: '2.2/1',
       linkText: 'Explore Package'
     }
@@ -965,7 +965,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Bankey Bihari Ji Maharaj',
     category: 'Bankey & Kunj Bihari',
     location: 'Bankey Bihari Mandir, Vrindavan',
-    image: '/vrinda-vihar/bihari-ji.jpeg',
+    image: '/vrinda-vihar/bihari-ji.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -977,7 +977,7 @@ export const vrindaViharGalleryData = [
     title: 'Bankey Bihari Mandir Sabha Mandap',
     category: 'Bankey & Kunj Bihari',
     location: 'Shri Bankey Bihari Mandir, Vrindavan',
-    image: '/vrinda-vihar/kunj-bihari-ji.jpeg',
+    image: '/vrinda-vihar/kunj-bihari-ji.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -991,7 +991,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Divine Abhishek',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-abhishek.png',
+    image: '/vrinda-vihar/radha-raman-ji-abhishek.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Portrait',
     dimensions: '2160 × 2870',
@@ -1003,7 +1003,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Divine Smile',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-smile.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-smile.webp',
     aspectRatio: '1/1',
     ratioLabel: '1:1 Square',
     dimensions: '1079 × 1081',
@@ -1015,7 +1015,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Butterfly Shringar',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-butterfly.png',
+    image: '/vrinda-vihar/radha-raman-ji-butterfly.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Shringar',
     dimensions: '1280 × 1600',
@@ -1027,7 +1027,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Majestic Shringar',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-1.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-1.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Portrait',
     dimensions: '1654 × 2069',
@@ -1039,7 +1039,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Evening Aarti',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-2.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-2.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Portrait',
     dimensions: '1080 × 1440',
@@ -1051,7 +1051,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Charanamrit',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-charanamrit.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-charanamrit.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '630 × 1120',
@@ -1063,7 +1063,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji Mahaprasadi',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-prashadi.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-prashadi.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '630 × 1120',
@@ -1075,7 +1075,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Ji with Shriji Crown',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji-shriJi.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji-shriJi.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Portrait',
     dimensions: '1080 × 1440',
@@ -1087,7 +1087,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Raman Lal Ju',
     category: 'Shri Radha Raman Ji',
     location: 'Radha Raman Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-raman-ji.jpeg',
+    image: '/vrinda-vihar/radha-raman-ji.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Portrait',
     dimensions: '1279 × 1600',
@@ -1101,7 +1101,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Mandir Entrance',
     category: 'Shri Radha Vallabh Ji',
     location: 'Gotam Nagar, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-temple.jpeg',
+    image: '/vrinda-vihar/radha-vallabh-ji-temple.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -1113,7 +1113,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 1)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-1.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-1.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Shringar',
     dimensions: '867 × 1083',
@@ -1125,7 +1125,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 2)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-2.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-2.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Shringar',
     dimensions: '1080 × 1384',
@@ -1137,7 +1137,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 3)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-3.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-3.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Shringar',
     dimensions: '1074 × 1388',
@@ -1149,7 +1149,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 4)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-4.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-4.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Shringar',
     dimensions: '1023 × 1280',
@@ -1161,7 +1161,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 5)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-5.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-5.webp',
     aspectRatio: '2/3',
     ratioLabel: '2:3 Portrait',
     dimensions: '853 × 1280',
@@ -1173,7 +1173,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 6)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-6.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-6.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Shringar',
     dimensions: '999 × 1251',
@@ -1185,7 +1185,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Ji Shringar (Series 7)',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji-7.png',
+    image: '/vrinda-vihar/radha-vallabh-ji-7.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Shringar',
     dimensions: '916 × 1145',
@@ -1197,7 +1197,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Lal Ju',
     category: 'Shri Radha Vallabh Ji',
     location: 'Radha Vallabh Mandir, Vrindavan',
-    image: '/vrinda-vihar/radha-vallabh-ji.png',
+    image: '/vrinda-vihar/radha-vallabh-ji.webp',
     aspectRatio: '4/5',
     ratioLabel: '4:5 Portrait',
     dimensions: '1280 × 1600',
@@ -1211,7 +1211,7 @@ export const vrindaViharGalleryData = [
     title: 'Radha Kund & Shyam Kund Ghats',
     category: 'Govardhan & Sacred Kunds',
     location: 'Radha Kund, Govardhan',
-    image: '/vrinda-vihar/radha-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/radha-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     ratioLabel: '2.2:1 Panoramic',
     dimensions: '1280 × 582',
@@ -1223,7 +1223,7 @@ export const vrindaViharGalleryData = [
     title: 'Krishna Kund Holy Waterbody',
     category: 'Govardhan & Sacred Kunds',
     location: 'Govardhan Parikrama Marg',
-    image: '/vrinda-vihar/krishn-kund-govardhan.jpeg',
+    image: '/vrinda-vihar/krishn-kund-govardhan.webp',
     aspectRatio: '2.2/1',
     ratioLabel: '2.2:1 Panoramic',
     dimensions: '1280 × 582',
@@ -1235,7 +1235,7 @@ export const vrindaViharGalleryData = [
     title: 'Krishna Kund Parikrama Vista',
     category: 'Govardhan & Sacred Kunds',
     location: 'Govardhan Parikrama Marg',
-    image: '/vrinda-vihar/krishn-kund-govardhan-2.jpeg',
+    image: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     ratioLabel: '2.2:1 Panoramic',
     dimensions: '1280 × 582',
@@ -1247,7 +1247,7 @@ export const vrindaViharGalleryData = [
     title: 'Gau Seva & Cow Sanctuary Govardhan',
     category: 'Govardhan & Sacred Kunds',
     location: 'Giriraj Govardhan Foothills',
-    image: '/vrinda-vihar/gau-dewa-govardhan.jpeg',
+    image: '/vrinda-vihar/gau-dewa-govardhan.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -1259,7 +1259,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Vallabhacharya Ji Baithakji',
     category: 'Govardhan & Sacred Kunds',
     location: 'Jatipura, Govardhan',
-    image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.jpeg',
+    image: '/vrinda-vihar/shri-vallabhacharya-ji-govardhan.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -1273,7 +1273,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Rani Mandir (Shriji Mandir)',
     category: 'Barsana & Sacred Temples',
     location: 'Bhanugarh Hill, Barsana',
-    image: '/vrinda-vihar/radha-rani-temple-barsana.jpg',
+    image: '/vrinda-vihar/radha-rani-temple-barsana.webp',
     aspectRatio: '16/9',
     ratioLabel: '16:9 Landscape',
     dimensions: '1200 × 708',
@@ -1285,7 +1285,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Priya Kant Ju Mandir',
     category: 'Barsana & Sacred Temples',
     location: 'Chhatikara Road, Vrindavan',
-    image: '/vrinda-vihar/shri-priya-kaant-ju.jpeg',
+    image: '/vrinda-vihar/shri-priya-kaant-ju.webp',
     aspectRatio: '3/4',
     ratioLabel: '3:4 Portrait',
     dimensions: '1200 × 1600',
@@ -1297,7 +1297,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Gopeshwar Mahadev Mandir',
     category: 'Barsana & Sacred Temples',
     location: 'Near Vamshi Vat, Vrindavan',
-    image: '/vrinda-vihar/gopeshwar-ji.jpeg',
+    image: '/vrinda-vihar/gopeshwar-ji.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -1309,7 +1309,7 @@ export const vrindaViharGalleryData = [
     title: 'Shri Radha Vallabh Temple Sanctum',
     category: 'Barsana & Sacred Temples',
     location: 'Vrindavan Heritage Zone',
-    image: '/vrinda-vihar/radha-vallabh-ji.jpeg',
+    image: '/vrinda-vihar/radha-vallabh-ji.webp',
     aspectRatio: '9/16',
     ratioLabel: '9:16 Portrait',
     dimensions: '720 × 1280',
@@ -1320,13 +1320,13 @@ export const vrindaViharGalleryData = [
 
 // 9. Master Footer Links
 export const footerNavigation = {
-  brandTagline: 'Vrinda Tours — Authentic Brij Vibers packages, temple darshans, and memorable spiritual yatras across Mathura, Vrindavan & Barsana.',
+  brandTagline: 'Vrinda Vihar — Authentic Brij pilgrimage packages, temple darshans, and memorable spiritual yatras across Mathura, Vrindavan, Barsana & Govardhan.',
   columns: [
     {
       title: 'Brij Packages',
       links: [
         { label: 'Popular Brij Yatras', href: '#popular' },
-        { label: 'Brij Vibers Packages', href: '#explore' },
+        { label: 'Brij Yatra Packages', href: '#explore' },
         { label: 'Giriraj Parikrama', href: '#initiatives' },
         { label: 'Custom Yatra Plans', href: '#contact' }
       ]
@@ -1356,5 +1356,5 @@ export const footerNavigation = {
     { name: 'Facebook', icon: 'Facebook', href: 'https://www.facebook.com/vrindopnishad' },
     { name: 'Pinterest', icon: 'Pinterest', href: 'https://www.pinterest.com/vrindopnishad' }
   ],
-  copyright: '© 2026 Vrinda Tours. All rights reserved.'
+  copyright: '© 2026 Vrinda Vihar by Vrindopnishad. All rights reserved.'
 };

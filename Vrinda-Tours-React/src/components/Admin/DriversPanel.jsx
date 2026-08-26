@@ -3,9 +3,16 @@ import { X, Phone, Trash2, LogIn, Star, ShieldAlert, Shield, Search } from 'luci
 import { doc, deleteDoc } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { VehicleGraphic } from '../Driver/DriverLandingPage';
 import './DriversPanel.css';
 
-export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
+export default function DriversPanel({ 
+  drivers, 
+  onClose, 
+  onOpenAdmin,
+  onOpenDriverPortal,
+  onOpenDriverLanding
+}) {
   const [isAdmin] = useState(sessionStorage.getItem('vt_admin') === 'true');
   const [deletingId, setDeletingId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,20 +34,10 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
     if (!deletingId) return;
     try {
       await deleteDoc(doc(firestore, 'drivers', deletingId));
-      setDeletingId(null);
     } catch {
-      alert('Failed to delete driver');
-    }
-  };
-
-  const getVehicleEmoji = (type) => {
-    switch ((type || '').toLowerCase()) {
-      case 'e-rickshaw': return '🛺';
-      case 'auto': return '🛺';
-      case 'taxi': return '🚗';
-      case 'bike': return '🛵';
-      case 'bus': return '🚌';
-      default: return '🛺';
+      // Graceful fail
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -68,11 +65,37 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
           <div className="dp-actions">
             {!isAdmin && (
               <button className="btn-admin-login" onClick={onOpenAdmin} title="Admin Login">
-                <LogIn size={14} /> Admin
+                <LogIn size={13} />
+                <span>Admin</span>
               </button>
             )}
-            <button className="drivers-panel-close" onClick={triggerClose} title="Close"><X size={17} /></button>
+            <button className="drivers-panel-close" onClick={triggerClose} title="Close">
+              <X size={16} />
+            </button>
           </div>
+        </div>
+
+        {/* Driver Partner Callout Banner */}
+        <div className="dp-partner-callout-banner">
+          <div className="dp-callout-text">
+            <strong>Drive with Vrinda Vihar</strong>
+            <span>0% Commission • 100% Direct Cash/UPI</span>
+          </div>
+          <button 
+            type="button" 
+            className="dp-callout-action-btn"
+            onClick={() => {
+              if (onOpenDriverLanding) {
+                onClose();
+                onOpenDriverLanding();
+              } else if (onOpenDriverPortal) {
+                onClose();
+                onOpenDriverPortal();
+              }
+            }}
+          >
+            Register Free →
+          </button>
         </div>
 
         {drivers.length > 2 && (
@@ -97,14 +120,30 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
         <div className="drivers-panel-body">
           <div className="drivers-list">
             {filtered.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#71717a' }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>
-                  {searchQuery ? `No drivers matching "${searchQuery}"` : 'No registered drivers found.'}
-                </p>
+              <div className="dp-empty-state-card">
+                <div className="dp-empty-icon-circle">
+                  <Shield size={24} color="#94a3b8" />
+                </div>
+                <h4>{searchQuery ? `No drivers matching "${searchQuery}"` : 'No Registered Drivers Yet'}</h4>
+                <p>Be the first driver partner in your area to receive live devotee ride requests directly.</p>
+                <button 
+                  type="button" 
+                  className="dp-empty-register-btn"
+                  onClick={() => {
+                    if (onOpenDriverLanding) {
+                      onClose();
+                      onOpenDriverLanding();
+                    } else if (onOpenDriverPortal) {
+                      onClose();
+                      onOpenDriverPortal();
+                    }
+                  }}
+                >
+                  Join as Driver Partner →
+                </button>
               </div>
             ) : (
               filtered.map((d) => {
-                const emoji = getVehicleEmoji(d.vehicleType);
                 const status = d.status || 'offline';
                 return (
                   <div key={d.id} className="driver-item">
@@ -113,7 +152,9 @@ export default function DriversPanel({ drivers, onClose, onOpenAdmin }) {
                         src={d.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.name}&backgroundColor=f1f5f9`} 
                         alt={d.name} 
                       />
-                      <span className="di-emoji-badge">{emoji}</span>
+                      <div className="di-vehicle-badge">
+                        <VehicleGraphic type={d.vehicleType} size={11} />
+                      </div>
                     </div>
                     <div className="di-info">
                       <div className="di-name-row">

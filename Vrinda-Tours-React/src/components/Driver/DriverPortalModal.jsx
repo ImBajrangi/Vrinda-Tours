@@ -9,7 +9,7 @@ import { calculateDistance } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import './DriverPortalModal.css';
 
-export default function DriverPortalModal({ onClose, drivers = [] }) {
+export default function DriverPortalModal({ onClose, onOpenLanding, drivers = [] }) {
   const [driverId, setDriverId] = useState(() => sessionStorage.getItem('vt_driver_id'));
   const [driverData, setDriverData] = useState(null);
   const [loginPhone, setLoginPhone] = useState('');
@@ -430,6 +430,22 @@ export default function DriverPortalModal({ onClose, drivers = [] }) {
               <button type="submit" className="dp-login-submit" disabled={isLoggingIn}>
                 {isLoggingIn ? 'Verifying...' : 'Enter Dashboard'}
               </button>
+
+              {onOpenLanding && (
+                <div className="dp-register-cta-banner">
+                  <span>Want to drive with us?</span>
+                  <button 
+                    type="button" 
+                    className="dp-register-link-btn"
+                    onClick={() => {
+                      onClose();
+                      onOpenLanding();
+                    }}
+                  >
+                    Register as Driver Partner →
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         ) : (
