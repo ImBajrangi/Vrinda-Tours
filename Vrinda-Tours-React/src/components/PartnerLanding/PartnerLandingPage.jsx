@@ -20,6 +20,7 @@ import {
   partnerBrands,
   journeySteps,
   popularPlaces,
+  tripPackages,
   missionData,
   initiativesData,
   footerNavigation,
@@ -37,6 +38,577 @@ import { shareWebPPicture, getOptimizedWebPUrl } from '../../utils/imageOptimize
 import { validatePhoneNumber } from '../../utils/phoneValidator';
 import { syncPilgrimToSupabase, getPilgrimReferralStats } from '../../services/referralService';
 import './PartnerLandingPage.css';
+
+// Interactive Trip Packages Selector Modal
+function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  if (!isOpen) return null;
+
+  const categories = [
+    { id: 'all', label: 'All Packages', count: (tripPackages || []).length },
+    { id: '1-day', label: '1-Day Express', count: (tripPackages || []).filter((p) => p.category === '1-day').length },
+    { id: 'parikrama', label: 'Parikrama', count: (tripPackages || []).filter((p) => p.category === 'parikrama').length },
+    { id: 'multi-day', label: 'Multi-Day Mahayatra', count: (tripPackages || []).filter((p) => p.category === 'multi-day').length }
+  ];
+
+  const filteredPackages = (tripPackages || []).filter((pkg) => {
+    const matchesCat = activeCategory === 'all' || pkg.category === activeCategory;
+    if (!matchesCat) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      pkg.title.toLowerCase().includes(q) ||
+      pkg.location.toLowerCase().includes(q) ||
+      (pkg.tagline && pkg.tagline.toLowerCase().includes(q)) ||
+      pkg.description.toLowerCase().includes(q) ||
+      (pkg.highlights && pkg.highlights.some((h) => h.toLowerCase().includes(q)))
+    );
+  });
+
+  return (
+    <div className="tp-modal-overlay tp-tpkg-overlay" onClick={onClose}>
+      <div className="tp-modal-card tp-tpkg-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Modal Header */}
+        <div className="tp-tpkg-header">
+          <div className="tp-tpkg-header-info">
+            <div className="tp-tpkg-badge">
+              <Sparkles size={13} />
+              <span>Sacred Brij Yatra Packages</span>
+            </div>
+            <h2 className="tp-tpkg-title">Choose Your Brij Yatra Package</h2>
+            <p className="tp-tpkg-subtitle">
+              Explore curated all-inclusive pilgrimage itineraries tailored for your convenience, VIP darshan passes, and budget.
+            </p>
+          </div>
+          <button className="tp-modal-close-icon tp-tpkg-close" onClick={onClose} aria-label="Close packages modal">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Search & Filter Bar */}
+        <div className="tp-tpkg-controls">
+          <div className="tp-tpkg-search-wrap">
+            <Search size={16} className="tp-tpkg-search-icon" />
+            <input
+              type="text"
+              className="tp-tpkg-search-input"
+              placeholder="Search by Dham, temple, or feature (e.g. Bankey Bihari, Govardhan, VIP)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="tp-tpkg-search-clear" onClick={() => setSearchQuery('')} aria-label="Clear search">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="tp-tpkg-category-pills">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`tp-tpkg-cat-pill ${activeCategory === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+              >
+                <span>{cat.label}</span>
+                <span className="tp-tpkg-cat-count">{cat.count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Packages Grid */}
+        <div className="tp-tpkg-grid">
+          {filteredPackages.length === 0 ? (
+            <div className="tp-tpkg-empty">
+              <Compass size={36} className="tp-tpkg-empty-icon" />
+              <h3>No yatra packages match your search</h3>
+              <p>Try searching for "Vrindavan", "Barsana", "Govardhan" or switch category.</p>
+              <button
+                type="button"
+                className="tp-tpkg-reset-btn"
+                onClick={() => {
+                  setSearchQuery('');
+                  setActiveCategory('all');
+                }}
+              >
+                View All Packages
+              </button>
+            </div>
+          ) : (
+            filteredPackages.map((pkg) => (
+              <div key={pkg.id} className="tp-tpkg-card">
+                {/* Card Image Banner */}
+                <div className="tp-tpkg-card-cover">
+                  <img src={pkg.image} alt={pkg.title} className="tp-tpkg-img" loading="lazy" />
+                  <div className="tp-tpkg-cover-gradient" />
+                  <span className="tp-tpkg-badge-top">{pkg.badge}</span>
+                  <span className="tp-tpkg-duration-pill">
+                    <Calendar size={12} />
+                    <span>{pkg.duration}</span>
+                  </span>
+                </div>
+
+                {/* Card Content */}
+                <div className="tp-tpkg-card-body">
+                  <div className="tp-tpkg-meta-row">
+                    <span className="tp-tpkg-location">
+                      <MapPin size={13} />
+                      <span>{pkg.location}</span>
+                    </span>
+                    <span className="tp-tpkg-rating">
+                      <Star size={13} fill="#fbbf24" color="#fbbf24" />
+                      <strong>{pkg.rating}</strong>
+                      <small>({pkg.reviewsCount})</small>
+                    </span>
+                  </div>
+
+                  <h3 className="tp-tpkg-card-title">{pkg.title}</h3>
+                  <p className="tp-tpkg-tagline">{pkg.tagline}</p>
+                  <p className="tp-tpkg-desc">{pkg.description}</p>
+
+                  {/* Highlights List */}
+                  <div className="tp-tpkg-highlights">
+                    <div className="tp-tpkg-hl-title">Highlights Included:</div>
+                    <ul className="tp-tpkg-hl-list">
+                      {(pkg.highlights || []).map((hl, idx) => (
+                        <li key={idx} className="tp-tpkg-hl-item">
+                          <CheckCircle2 size={13} className="tp-tpkg-check" />
+                          <span>{hl}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Included Feature Chips */}
+                  <div className="tp-tpkg-features">
+                    {(pkg.features || []).map((feat, idx) => (
+                      <span key={idx} className="tp-tpkg-feat-chip">
+                        {feat}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Feasibility Note */}
+                  <div className="tp-tpkg-feasibility">
+                    <Sparkles size={12} className="tp-tpkg-sparkle" />
+                    <span>{pkg.feasibility}</span>
+                  </div>
+
+                  {/* Pricing & Booking CTA Footer */}
+                  <div className="tp-tpkg-footer">
+                    <div className="tp-tpkg-pricing">
+                      <div className="tp-tpkg-orig-price">
+                        <span className="tp-tpkg-strike">{pkg.originalPrice}</span>
+                        <span className="tp-tpkg-save-badge">Save 25%</span>
+                      </div>
+                      <div className="tp-tpkg-final-price">
+                        <strong>{pkg.price}</strong>
+                        <small>{pkg.priceUnit}</small>
+                      </div>
+                      <div className="tp-tpkg-points-reward">
+                        <Gift size={11} />
+                        <span>+{pkg.pointsReward} Brij Points</span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="tp-tpkg-select-btn"
+                      onClick={() => onSelectPackage(pkg)}
+                    >
+                      <span>Book Package</span>
+                      <ArrowRight size={15} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Feasibility Guarantee Footer Bar */}
+        <div className="tp-tpkg-guarantee-bar">
+          <div className="tp-tpkg-guarantee-item">
+            <ShieldCheck size={16} className="tp-tpkg-g-icon" />
+            <span>100% Verified Brajwasi Guides</span>
+          </div>
+          <div className="tp-tpkg-guarantee-item">
+            <CheckCircle2 size={16} className="tp-tpkg-g-icon" />
+            <span>Free Date Rescheduling</span>
+          </div>
+          <div className="tp-tpkg-guarantee-item">
+            <Gift size={16} className="tp-tpkg-g-icon" />
+            <span>Earn Brij Devotee Points</span>
+          </div>
+          <div className="tp-tpkg-guarantee-item">
+            <Phone size={16} className="tp-tpkg-g-icon" />
+            <span>24/7 Pilgrimage Support</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Index of all searchable app services & tools
+const softwareServices = [
+  {
+    id: 'srv_live_map',
+    title: 'Live Pilgrim GPS Map & Navigation',
+    subtitle: 'Real-time interactive Brij map with 1300+ holy places & live GPS guide',
+    category: 'service',
+    badge: 'Live Tool',
+    icon: 'map',
+    actionType: 'live_map'
+  },
+  {
+    id: 'srv_yatra_packages',
+    title: 'Curated Brij Yatra & Trip Packages',
+    subtitle: '1-Day, 2-Day, Parikrama & 84 Kos all-inclusive pilgrimage itineraries',
+    category: 'service',
+    badge: 'Booking',
+    icon: 'compass',
+    actionType: 'packages_modal'
+  },
+  {
+    id: 'srv_vip_darshan',
+    title: 'VIP Darshan Passes & Guide Service',
+    subtitle: 'Priority entry passes & dedicated local Brajwasi guide assistance',
+    category: 'service',
+    badge: 'VIP Pass',
+    icon: 'ticket',
+    actionType: 'packages_modal'
+  },
+  {
+    id: 'srv_referrals',
+    title: 'Pilgrim Referral & Rewards Engine',
+    subtitle: 'Share your referral code with devotees & earn 500 Brij Points per trip',
+    category: 'service',
+    badge: '+500 Points',
+    icon: 'gift',
+    actionType: 'referral'
+  },
+  {
+    id: 'srv_partner_hub',
+    title: 'Driver, Hotel & Agency Partner Hub',
+    subtitle: 'Register as E-Rickshaw driver, tour guide, ashram, or travel agency',
+    category: 'service',
+    badge: 'Partners',
+    icon: 'building',
+    actionType: 'partner_hub'
+  },
+  {
+    id: 'srv_gallery',
+    title: '4K Ultra-HD Divine Darshan Gallery',
+    subtitle: 'Explore high-resolution sacred darshans, abhishek, and shringar of Brij deities',
+    category: 'service',
+    badge: '30+ Darshans',
+    icon: 'image',
+    actionType: 'scroll_gallery'
+  },
+  {
+    id: 'srv_auth',
+    title: 'Devotee Registration & Member Sign In',
+    subtitle: 'One-click sign in for booking autofill, live GPS syncing & member discounts',
+    category: 'service',
+    badge: 'Member Pass',
+    icon: 'user',
+    actionType: 'auth'
+  }
+];
+
+// Universal Spotlight Search & Discovery Modal (Apple Spotlight / Raycast Style)
+function OmniSearchModal({
+  isOpen,
+  onClose,
+  onSelectTrip,
+  onSelectPlace,
+  onSelectService,
+  onSelectGalleryItem
+}) {
+  const [query, setQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
+
+  // Auto-focus input when opened
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 60);
+      setSelectedIndex(0);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  // Flattened and searchable index of all sacred places
+  const allDestinations = [
+    ...popularPlaces,
+    ...(exploreDestinations || []),
+    ...Object.values(topDestinationsByTab || {}).flat()
+  ];
+  const uniqueDestinations = Array.from(new Map(allDestinations.map(item => [item.title, item])).values());
+
+  const searchResults = (() => {
+    const q = query.trim().toLowerCase();
+
+    // 1. Packages
+    const packages = (tripPackages || []).filter(p =>
+      !q ||
+      p.title.toLowerCase().includes(q) ||
+      p.location.toLowerCase().includes(q) ||
+      (p.tagline && p.tagline.toLowerCase().includes(q)) ||
+      p.description.toLowerCase().includes(q) ||
+      (p.highlights && p.highlights.some(h => h.toLowerCase().includes(q)))
+    ).map(p => ({ ...p, resultType: 'package' }));
+
+    // 2. Places / Dhams
+    const places = uniqueDestinations.filter(d =>
+      !q ||
+      d.title.toLowerCase().includes(q) ||
+      (d.location && d.location.toLowerCase().includes(q)) ||
+      (d.region && d.region.toLowerCase().includes(q)) ||
+      (d.description && d.description.toLowerCase().includes(q))
+    ).map(d => ({ ...d, resultType: 'place' }));
+
+    // 3. Software Services & Features
+    const services = softwareServices.filter(s =>
+      !q ||
+      s.title.toLowerCase().includes(q) ||
+      s.subtitle.toLowerCase().includes(q) ||
+      s.badge.toLowerCase().includes(q)
+    ).map(s => ({ ...s, resultType: 'service' }));
+
+    // 4. Gallery Items
+    const darshans = (vrindaViharGalleryData || []).filter(g =>
+      !q ||
+      g.title.toLowerCase().includes(q) ||
+      g.location.toLowerCase().includes(q) ||
+      g.category.toLowerCase().includes(q) ||
+      (g.tags && g.tags.some(t => t.toLowerCase().includes(q)))
+    ).map(g => ({ ...g, resultType: 'darshan' }));
+
+    let combined = [];
+    if (activeFilter === 'all') {
+      combined = [...packages, ...places, ...services, ...darshans];
+    } else if (activeFilter === 'package') {
+      combined = packages;
+    } else if (activeFilter === 'place') {
+      combined = places;
+    } else if (activeFilter === 'service') {
+      combined = services;
+    } else if (activeFilter === 'darshan') {
+      combined = darshans;
+    }
+
+    return combined;
+  })();
+
+  // Handle keyboard navigation (ArrowUp, ArrowDown, Enter)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      onClose();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev + 1) % (searchResults.length || 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex(prev => (prev - 1 + searchResults.length) % (searchResults.length || 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (searchResults[selectedIndex]) {
+        handleSelectResult(searchResults[selectedIndex]);
+      }
+    }
+  };
+
+  const handleSelectResult = (item) => {
+    onClose();
+    if (item.resultType === 'package') {
+      onSelectTrip(item);
+    } else if (item.resultType === 'place') {
+      onSelectPlace(item);
+    } else if (item.resultType === 'service') {
+      onSelectService(item);
+    } else if (item.resultType === 'darshan') {
+      onSelectGalleryItem(item);
+    }
+  };
+
+  return (
+    <div className="tp-modal-overlay tp-search-overlay" onClick={onClose}>
+      <div
+        className="tp-modal-card tp-omni-search-modal"
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
+      >
+        {/* Search Input Bar */}
+        <div className="tp-search-modal-header">
+          <Search size={20} className="tp-search-modal-icon" />
+          <input
+            ref={inputRef}
+            type="text"
+            className="tp-search-modal-input"
+            placeholder="Search trips, sacred dhams, services, VIP passes, darshans..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
+          />
+          {query && (
+            <button className="tp-search-clear-btn" onClick={() => setQuery('')} aria-label="Clear">
+              <X size={16} />
+            </button>
+          )}
+          <kbd className="tp-search-esc-hint" onClick={onClose}>ESC</kbd>
+        </div>
+
+        {/* Filter Pills */}
+        <div className="tp-search-filter-row">
+          <button
+            type="button"
+            className={`tp-search-pill ${activeFilter === 'all' ? 'active' : ''}`}
+            onClick={() => { setActiveFilter('all'); setSelectedIndex(0); }}
+          >
+            All Results ({searchResults.length})
+          </button>
+          <button
+            type="button"
+            className={`tp-search-pill ${activeFilter === 'package' ? 'active' : ''}`}
+            onClick={() => { setActiveFilter('package'); setSelectedIndex(0); }}
+          >
+            ✨ Yatra Packages
+          </button>
+          <button
+            type="button"
+            className={`tp-search-pill ${activeFilter === 'place' ? 'active' : ''}`}
+            onClick={() => { setActiveFilter('place'); setSelectedIndex(0); }}
+          >
+            🛕 Sacred Dhams
+          </button>
+          <button
+            type="button"
+            className={`tp-search-pill ${activeFilter === 'service' ? 'active' : ''}`}
+            onClick={() => { setActiveFilter('service'); setSelectedIndex(0); }}
+          >
+            ⚡ Software Tools
+          </button>
+          <button
+            type="button"
+            className={`tp-search-pill ${activeFilter === 'darshan' ? 'active' : ''}`}
+            onClick={() => { setActiveFilter('darshan'); setSelectedIndex(0); }}
+          >
+            🖼️ Darshans
+          </button>
+        </div>
+
+        {/* Quick Suggestion Tags (Only shown when query is empty) */}
+        {!query && (
+          <div className="tp-search-trending-bar">
+            <span className="tp-search-trending-label">Trending:</span>
+            <div className="tp-search-trending-tags">
+              {['Bankey Bihari VIP', 'Govardhan Parikrama', 'Live GPS Map', 'Barsana Yatra', 'Radha Raman Darshan', 'Referral 500 Pts'].map((tag, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="tp-trending-tag-pill"
+                  onClick={() => {
+                    setQuery(tag);
+                    setSelectedIndex(0);
+                  }}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Results List */}
+        <div className="tp-search-results-list">
+          {searchResults.length === 0 ? (
+            <div className="tp-search-empty-state">
+              <Compass size={32} />
+              <h4>No matches found for "{query}"</h4>
+              <p>Try searching for "Vrindavan", "VIP Pass", "Parikrama", or "GPS Map".</p>
+            </div>
+          ) : (
+            searchResults.map((item, idx) => {
+              const isSelected = idx === selectedIndex;
+              return (
+                <div
+                  key={`${item.resultType}-${item.id || idx}`}
+                  className={`tp-search-result-item ${isSelected ? 'selected' : ''}`}
+                  onClick={() => handleSelectResult(item)}
+                  onMouseEnter={() => setSelectedIndex(idx)}
+                >
+                  {/* Thumbnail / Icon */}
+                  <div className="tp-search-item-thumb">
+                    {item.image ? (
+                      <img src={item.image} alt={item.title} className="tp-search-thumb-img" loading="lazy" />
+                    ) : (
+                      <div className="tp-search-service-icon">
+                        {item.icon === 'map' && <MapPin size={18} />}
+                        {item.icon === 'compass' && <Compass size={18} />}
+                        {item.icon === 'ticket' && <Ticket size={18} />}
+                        {item.icon === 'gift' && <Gift size={18} />}
+                        {item.icon === 'building' && <Building2 size={18} />}
+                        {item.icon === 'image' && <ImageIcon size={18} />}
+                        {item.icon === 'user' && <User size={18} />}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Title & Description */}
+                  <div className="tp-search-item-info">
+                    <div className="tp-search-item-top">
+                      <span className="tp-search-item-title">{item.title}</span>
+                      <span className={`tp-search-type-badge tp-badge-${item.resultType}`}>
+                        {item.resultType === 'package' && 'Yatra Package'}
+                        {item.resultType === 'place' && 'Sacred Dham'}
+                        {item.resultType === 'service' && (item.badge || 'Tool')}
+                        {item.resultType === 'darshan' && 'Darshan 4K'}
+                      </span>
+                    </div>
+                    <p className="tp-search-item-sub">
+                      {item.subtitle || item.tagline || item.location || item.description || ''}
+                    </p>
+                  </div>
+
+                  {/* Price or Action Arrow */}
+                  <div className="tp-search-item-action">
+                    {item.price && (
+                      <span className="tp-search-item-price">
+                        <strong>{item.price}</strong>
+                        <small>{item.priceUnit || ''}</small>
+                      </span>
+                    )}
+                    <ArrowRight size={15} className="tp-search-arrow" />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Search Modal Footer */}
+        <div className="tp-search-modal-footer">
+          <div className="tp-search-footer-hint">
+            <span>Use <kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+            <span><kbd>↵</kbd> to select</span>
+            <span><kbd>ESC</kbd> to close</span>
+          </div>
+          <span className="tp-search-footer-brand">Vrinda Vihar Search</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Real-time zero-latency Journey Accordion Component
 function PartnerJourneySection({ onSelectItem }) {
@@ -343,10 +915,29 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
   // Modals & Interactive States
   const [selectedItem, setSelectedItem] = useState(null);
+  const [isTripPackagesModalOpen, setIsTripPackagesModalOpen] = useState(false);
+  const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
   const [activePopularCardId, setActivePopularCardId] = useState(null);
   const [activeGalleryCardId, setActiveGalleryCardId] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Global Keyboard Shortcut (Cmd+K / Ctrl+K) to open Spotlight Search
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsOmniSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
+  const handleSelectTripPackage = (pkg) => {
+    setIsTripPackagesModalOpen(false);
+    setSelectedItem(pkg);
+  };
 
   // Collapse active mobile card when tapping outside
   useEffect(() => {
@@ -1158,6 +1749,18 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
           {/* Action CTAs */}
           <div className="tp-nav-actions">
+            {/* Quick Spotlight Search Trigger (Desktop) */}
+            <button
+              type="button"
+              className="tp-btn-nav-search tp-desktop-auth"
+              onClick={() => setIsOmniSearchOpen(true)}
+              title="Quick Search Dhams, Trips & Services (⌘K)"
+            >
+              <Search size={14} className="tp-nav-search-icon" />
+              <span className="tp-nav-search-text">Search Brij...</span>
+              <kbd className="tp-nav-search-kbd">⌘K</kbd>
+            </button>
+
             {/* User Profile / Auth Action (Desktop) */}
             {currentUser ? (
               <div className="tp-nav-user-wrapper tp-desktop-auth" ref={profileMenuRef}>
@@ -1287,11 +1890,11 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         className="tp-profile-dropdown-item"
                         onClick={() => {
                           setIsProfileMenuOpen(false);
-                          setSelectedItem(popularPlaces[0]);
+                          setIsTripPackagesModalOpen(true);
                         }}
                       >
                         <Compass size={15} />
-                        <span>Book A Tour / Stay</span>
+                        <span>Book A Tour / Yatra</span>
                       </button>
 
                       <button
@@ -1355,7 +1958,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             <button
               className="tp-btn-dark-pill"
               onClick={() => {
-                setSelectedItem(popularPlaces[0]);
+                setIsTripPackagesModalOpen(true);
               }}
             >
               Book Trip
@@ -1369,6 +1972,16 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             >
               <MapPin size={15} />
               <span>Live Map</span>
+            </button>
+
+            {/* Mobile Search Quick Trigger */}
+            <button
+              type="button"
+              className="tp-btn-mobile-search-icon"
+              onClick={() => setIsOmniSearchOpen(true)}
+              aria-label="Search Dhams & Packages"
+            >
+              <Search size={18} />
             </button>
 
             {/* Mobile Hamburger Menu Button */}
@@ -1501,6 +2114,20 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               <div className="tp-mobile-nav-block">
                 <div className="tp-mobile-section-label">PILGRIMAGE SECTIONS</div>
                 <div className="tp-mobile-nav-list">
+                  <button
+                    type="button"
+                    className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-search-item"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsOmniSearchOpen(true);
+                    }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb', fontWeight: '700' }}>
+                      <Search size={18} />
+                      <span>Search All Dhams & Services</span>
+                    </span>
+                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                  </button>
                   <a
                     href="#about"
                     className="tp-mobile-nav-item"
@@ -1587,11 +2214,11 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   className="tp-btn-mobile-primary-action"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    setSelectedItem(popularPlaces[0]);
+                    setIsTripPackagesModalOpen(true);
                   }}
                 >
                   <Calendar size={16} />
-                  <span>Book Yatra</span>
+                  <span>Book Yatra Package</span>
                 </button>
 
                 <button
@@ -1717,6 +2344,28 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     <Play size={12} fill="#2563eb" color="#2563eb" className="tp-play-mini-icon" />
                   </div>
                 </button>
+              </div>
+
+              {/* Hero Interactive Universal Discovery Search Bar */}
+              <div className="tp-hero-search-bar" onClick={() => setIsOmniSearchOpen(true)}>
+                <div className="tp-hsb-left">
+                  <Search size={16} className="tp-hsb-icon" />
+                  <span className="tp-hsb-text">Search sacred dhams, yatra plans, VIP passes, GPS map...</span>
+                </div>
+                <div className="tp-hsb-right">
+                  <span className="tp-hsb-shortcut">⌘K</span>
+                  <button
+                    type="button"
+                    className="tp-hsb-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOmniSearchOpen(true);
+                    }}
+                  >
+                    <span>Search</span>
+                    <ArrowRight size={13} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2523,6 +3172,39 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
       {/* =========================================================================
           MODALS & POPUPS
           ========================================================================= */}
+      {/* Universal Omni-Search Spotlight Modal */}
+      <OmniSearchModal
+        isOpen={isOmniSearchOpen}
+        onClose={() => setIsOmniSearchOpen(false)}
+        onSelectTrip={(pkg) => setSelectedItem(pkg)}
+        onSelectPlace={(place) => setSelectedItem(place)}
+        onSelectService={(srv) => {
+          if (srv.actionType === 'live_map') {
+            if (onClose) onClose();
+          } else if (srv.actionType === 'packages_modal') {
+            setIsTripPackagesModalOpen(true);
+          } else if (srv.actionType === 'referral') {
+            handleOpenReferralProgram();
+          } else if (srv.actionType === 'partner_hub') {
+            if (onOpenPartnerHub) onOpenPartnerHub();
+          } else if (srv.actionType === 'scroll_gallery') {
+            const el = document.getElementById('gallery');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          } else if (srv.actionType === 'auth') {
+            setAuthMode('login');
+            setIsAuthModalOpen(true);
+          }
+        }}
+        onSelectGalleryItem={(item) => setLightboxItem(item)}
+      />
+
+      {/* Interactive Trip Packages Selector Modal */}
+      <TripPackagesModal
+        isOpen={isTripPackagesModalOpen}
+        onClose={() => setIsTripPackagesModalOpen(false)}
+        onSelectPackage={handleSelectTripPackage}
+      />
+
       {selectedItem && (
         <div className="tp-modal-overlay" onClick={() => setSelectedItem(null)}>
           <div className="tp-modal-card tp-booking-modal-card" onClick={(e) => e.stopPropagation()}>

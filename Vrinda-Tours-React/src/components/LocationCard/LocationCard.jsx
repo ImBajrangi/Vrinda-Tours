@@ -9,6 +9,7 @@ import { openWhatsApp, generateHotelMessage, generateRestaurantMessage } from '.
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import { useFavorites } from '../../hooks/useFavorites';
 import { shareWebPPicture } from '../../utils/imageOptimizer';
+import './LocationCard.css';
 
 export default function LocationCard({ 
   location, 
@@ -20,60 +21,26 @@ export default function LocationCard({
   onToast
 }) {
   const [displayLocation, setDisplayLocation] = useState(location);
-  const [isVisible, setIsVisible] = useState(false);
   const [mode, setMode] = useState('preview'); // 'preview' | 'ride' | 'hotel' | 'restaurant'
   const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
   const [imgError, setImgError] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  // Sync displayLocation and reset mode on new location
+  // Smoothly keep previous location alive during CSS exit transition
   useEffect(() => {
     if (location) {
       setDisplayLocation(location);
       setMode('preview');
       setImgError(false);
-      requestAnimationFrame(() => {
-        setIsVisible(true);
-      });
-    } else if (isVisible || displayLocation) {
-      setIsVisible(false);
-      setMode('preview');
+    } else {
       const timer = setTimeout(() => {
         setDisplayLocation(null);
-      }, 250);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [location, isVisible, displayLocation]);
+  }, [location]);
 
-  // Click outside to dismiss
-  useEffect(() => {
-    if (!displayLocation || !isVisible) return;
-
-    const handleClickOutside = (e) => {
-      const cardEl = document.querySelector('.location-card');
-      if (cardEl && cardEl.contains(e.target)) return;
-
-      // Allow clicks on other interactive UI elements
-      if (e.target.closest('.leaflet-marker-icon, .marker-wrapper, .leaflet-popup, .header-card, .category-pills-cluster, .fab, .zoom-btn, .admin-modal, .driver-portal-sheet')) {
-        return;
-      }
-
-      triggerClose();
-    };
-
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside, { passive: true });
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, [displayLocation, isVisible, triggerClose]);
-
-  const activeLoc = displayLocation;
+  const activeLoc = location || displayLocation;
 
   const stats = useMemo(() => {
     if (!activeLoc || !userPosition) return { distance: '--', eta: '--' };
@@ -218,11 +185,11 @@ export default function LocationCard({
   const catMeta = getCatMeta();
   const CatIcon = catMeta.Icon;
 
-  if (!activeLoc && !isVisible) return null;
+  if (!activeLoc) return null;
 
   return (
     <div 
-      className={`location-card ${isVisible && location ? 'visible' : ''} ${mode !== 'preview' ? 'booking-mode' : ''} ${isDragging ? 'dragging' : ''}`}
+      className={`location-card ${location ? 'visible' : ''} ${mode !== 'preview' ? 'booking-mode' : ''} ${isDragging ? 'dragging' : ''}`}
       style={sheetStyle}
     >
       {activeLoc && (

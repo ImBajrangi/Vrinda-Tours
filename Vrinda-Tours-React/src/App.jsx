@@ -120,6 +120,7 @@ export default function App() {
   }, []);
 
   const handleSelectLocation = useCallback((loc) => {
+    setIsSearchActive(false);
     setActiveLocation(loc);
   }, []);
 

@@ -137,6 +137,10 @@ export default function MapView({
 
     map.addLayer(cluster);
 
+    map.on('click', () => {
+      onSelectLocationRef.current?.(null);
+    });
+
     mapInstanceRef.current = map;
     clusterRef.current = cluster;
 
@@ -263,7 +267,12 @@ export default function MapView({
 
       const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false, true) });
       marker._locData = loc;
-      marker.on('click', () => onSelectLocationRef.current?.(loc));
+      marker.on('click', (e) => {
+        if (e) {
+          L.DomEvent.stopPropagation(e);
+        }
+        onSelectLocationRef.current?.(loc);
+      });
       
       // Interactive on-hover POI info tag
       marker.bindTooltip(
@@ -423,7 +432,12 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
             destMarker.closeTooltip();
           }
         }, 3200);
-        destMarker.on('click', () => onSelectLocationRef.current?.(destLoc));
+        destMarker.on('click', (e) => {
+          if (e) {
+            L.DomEvent.stopPropagation(e);
+          }
+          onSelectLocationRef.current?.(destLoc);
+        });
         destMarker.addTo(group);
 
         // Uber-style parabolic dotted walking line connecting road drop-off point to exact marker pin
