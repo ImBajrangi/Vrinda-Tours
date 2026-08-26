@@ -383,6 +383,44 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [bookingPhone, setBookingPhone] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
+  // Saved / Favorited Yatras & Sacred Darshans
+  const [favoriteIds, setFavoriteIds] = useState(() => getCachedData('traveler_favorites', []));
+
+  const toggleFavorite = (itemId, itemTitle) => {
+    if (!itemId) return;
+    setFavoriteIds((prev) => {
+      const isFav = prev.includes(itemId);
+      const updated = isFav ? prev.filter((id) => id !== itemId) : [...prev, itemId];
+      setCachedData('traveler_favorites', updated);
+
+      setFloatingToast({
+        id: `fav_${itemId}_${Date.now()}`,
+        icon: <Heart size={18} fill={isFav ? 'none' : '#ef4444'} color="#ef4444" />,
+        highlight: !isFav,
+        title: isFav ? 'Removed from Favourites' : 'Saved to Favourites ❤️',
+        desc: isFav
+          ? `"${itemTitle || 'Sacred Yatra'}" was removed from your saved list.`
+          : `"${itemTitle || 'Sacred Yatra'}" is now bookmarked in your favourites.`,
+        ctaText: isFav ? 'Undo' : 'View All',
+        onCta: () => {
+          if (isFav) {
+            setFavoriteIds((current) => {
+              const reAdded = [...current, itemId];
+              setCachedData('traveler_favorites', reAdded);
+              return reAdded;
+            });
+          } else {
+            const el = document.getElementById('gallery') || document.getElementById('popular');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }
+          setFloatingToast(null);
+        }
+      });
+
+      return updated;
+    });
+  };
+
   // Sync Firebase Auth state changes in real-time
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
@@ -908,24 +946,34 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
-    if (bookingPhone) {
-      const validation = validatePhoneNumber(bookingPhone);
+    const finalName = bookingName || currentUser?.name || 'Guest Traveler';
+    const finalEmail = bookingEmail || currentUser?.email || 'Not provided';
+    const finalPhone = bookingPhone || currentUser?.phone || '';
+
+    if (finalPhone) {
+      const validation = validatePhoneNumber(finalPhone);
       if (!validation.isValid) {
         alert(validation.message);
         return;
       }
+    } else {
+      alert('Please enter your 10-digit mobile number for booking confirmation.');
+      return;
     }
+
     setBookingSuccess(true);
     setTimeout(() => {
       const message = encodeURIComponent(
-        `Hello! I would like to confirm booking for *${selectedItem?.title || destination}*.\nGuest: ${bookingName}\nEmail: ${bookingEmail}\nPhone: ${bookingPhone}\nDates: ${checkInDate} to ${checkOutDate}\nParty: ${roomsGuests}`
+        `Hello! I would like to confirm booking for *${selectedItem?.title || destination}*.\nGuest: ${finalName}\nEmail: ${finalEmail}\nPhone: ${finalPhone}\nDates: ${checkInDate} to ${checkOutDate}\nParty: ${roomsGuests}`
       );
       window.open(`https://wa.me/919876543210?text=${message}`, '_blank');
       setSelectedItem(null);
       setBookingSuccess(false);
-      setBookingName('');
-      setBookingEmail('');
-      setBookingPhone('');
+      if (!currentUser) {
+        setBookingName('');
+        setBookingEmail('');
+        setBookingPhone('');
+      }
     }, 1200);
   };
 
@@ -1077,6 +1125,19 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     <div className="tp-profile-dropdown-divider" />
 
                     <div className="tp-profile-dropdown-menu">
+                      <button
+                        type="button"
+                        className="tp-profile-dropdown-item"
+                        onClick={() => {
+                          setIsProfileMenuOpen(false);
+                          const el = document.getElementById('gallery') || document.getElementById('popular');
+                          el?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      >
+                        <Heart size={15} fill={favoriteIds.length > 0 ? '#ef4444' : 'none'} color={favoriteIds.length > 0 ? '#ef4444' : 'currentColor'} />
+                        <span>Saved Favourites ({favoriteIds.length})</span>
+                      </button>
+
                       <button
                         type="button"
                         className="tp-profile-dropdown-item"
@@ -1785,15 +1846,20 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
                           <button
                             type="button"
-                            className="tp-btn-card-heart-pill"
+                            className={`tp-btn-card-heart-pill ${favoriteIds.includes(place.id) ? 'is-favorited' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              const text = `Experience holy darshan of ${place.title} with Vrinda Tours: ${window.location.href}`;
-                              window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                              toggleFavorite(place.id, place.title);
                             }}
-                            title="Favorite / Share"
+                            title={favoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
+                            aria-label={favoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
                           >
-                            <Heart size={16} />
+                            <Heart
+                              size={16}
+                              fill={favoriteIds.includes(place.id) ? '#ef4444' : 'none'}
+                              color={favoriteIds.includes(place.id) ? '#ef4444' : 'currentColor'}
+                              className={favoriteIds.includes(place.id) ? 'tp-heart-pop' : ''}
+                            />
                           </button>
                         </div>
                       </div>
@@ -2087,15 +2153,20 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
                               <button
                                 type="button"
-                                className="tp-btn-card-heart-pill"
+                                className={`tp-btn-card-heart-pill ${favoriteIds.includes(item.id) ? 'is-favorited' : ''}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const text = `Experience holy darshan of ${item.title} in Vrindavan: ${window.location.origin}${item.image}`;
-                                  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                                  toggleFavorite(item.id, item.title);
                                 }}
-                                title="Share Darshan on WhatsApp"
+                                title={favoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
+                                aria-label={favoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
                               >
-                                <Heart size={16} />
+                                <Heart
+                                  size={16}
+                                  fill={favoriteIds.includes(item.id) ? '#ef4444' : 'none'}
+                                  color={favoriteIds.includes(item.id) ? '#ef4444' : 'currentColor'}
+                                  className={favoriteIds.includes(item.id) ? 'tp-heart-pop' : ''}
+                                />
                               </button>
                             </div>
                           </div>
@@ -2401,12 +2472,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
               <img src={selectedItem.image} alt={selectedItem.title} className="tp-modal-hero-img" loading="eager" decoding="async" />
               <div className="tp-modal-hero-scrim" />
 
-              {/* Floating Close Button */}
-              <div className="tp-modal-hero-top-bar">
-                <button className="tp-modal-close-glass" onClick={() => setSelectedItem(null)} aria-label="Close modal">
-                  <X size={18} />
-                </button>
-              </div>
+              {/* Minimal Clean Close Icon */}
+              <button className="tp-modal-close-icon" onClick={() => setSelectedItem(null)} aria-label="Close modal">
+                <X size={20} />
+              </button>
 
               {/* Destination Title & Location Floating on Hero */}
               <div className="tp-modal-hero-content">
@@ -2482,30 +2551,59 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="tp-auth-ios-form">
-                  <div className="tp-auth-pill-input-wrap">
-                    <User size={17} className="tp-auth-pill-icon" />
-                    <input
-                      type="text"
-                      className="tp-auth-pill-input"
-                      placeholder="Your Full Name"
-                      value={bookingName}
-                      onChange={(e) => handleBookingNameChange(e.target.value)}
-                      required
-                    />
-                  </div>
+                  {currentUser && (
+                    <div className="tp-modal-traveler-strip">
+                      <div className="tp-traveler-strip-left">
+                        <div className="tp-traveler-strip-avatar">
+                          {currentUser.avatar ? (
+                            <img src={currentUser.avatar} alt={currentUser.name} />
+                          ) : (
+                            <User size={15} />
+                          )}
+                        </div>
+                        <div className="tp-traveler-strip-text">
+                          <span className="tp-traveler-strip-name">{currentUser.name}</span>
+                          <span className="tp-traveler-strip-email">{currentUser.email}</span>
+                        </div>
+                      </div>
+                      <span className="tp-traveler-strip-badge">
+                        <CheckCircle2 size={12} />
+                        <span>Verified</span>
+                      </span>
+                    </div>
+                  )}
 
-                  <div className="tp-auth-pill-input-wrap">
-                    <Mail size={17} className="tp-auth-pill-icon" />
-                    <input
-                      type="email"
-                      className="tp-auth-pill-input"
-                      placeholder="Email Address"
-                      value={bookingEmail}
-                      onChange={(e) => handleBookingEmailChange(e.target.value)}
-                      required
-                    />
-                  </div>
+                  {/* Show Name input ONLY if not already known */}
+                  {!currentUser?.name && (
+                    <div className="tp-auth-pill-input-wrap">
+                      <User size={17} className="tp-auth-pill-icon" />
+                      <input
+                        type="text"
+                        className="tp-auth-pill-input"
+                        placeholder="Your Full Name"
+                        value={bookingName}
+                        onChange={(e) => handleBookingNameChange(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
 
+                  {/* Show Email input ONLY if not already known */}
+                  {!currentUser?.email && (
+                    <div className="tp-auth-pill-input-wrap">
+                      <Mail size={17} className="tp-auth-pill-icon" />
+                      <input
+                        type="email"
+                        className="tp-auth-pill-input"
+                        placeholder="Email Address"
+                        value={bookingEmail}
+                        onChange={(e) => handleBookingEmailChange(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {/* Mobile input (the only missing piece when logged in) */}
                   <div className="tp-auth-pill-input-wrap">
                     <Phone size={17} className="tp-auth-pill-icon" />
                     <input
@@ -2525,15 +2623,17 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     </button>
                     <button
                       type="button"
-                      className="tp-btn-modal-heart-circle"
-                      onClick={() => {
-                        const text = `Experience holy darshan of ${selectedItem.title} with Vrinda Tours: ${window.location.href}`;
-                        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-                      }}
-                      title="Save / Share Yatra"
-                      aria-label="Save / Share Yatra"
+                      className={`tp-btn-modal-heart-circle ${favoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
+                      onClick={() => toggleFavorite(selectedItem?.id, selectedItem?.title)}
+                      title={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                      aria-label={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
                     >
-                      <Heart size={18} />
+                      <Heart
+                        size={18}
+                        fill={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
+                        color={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
+                        className={favoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
+                      />
                     </button>
                   </div>
 
@@ -3093,14 +3193,17 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
 
                   <button
                     type="button"
-                    className="tp-btn-master-icon"
-                    onClick={() => {
-                      const text = `Experience divine darshan of ${lightboxItem.title} in Vrindavan: ${window.location.origin}${lightboxItem.image}`;
-                      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-                    }}
-                    title="Share Darshan on WhatsApp"
+                    className={`tp-btn-master-icon ${favoriteIds.includes(lightboxItem.id) ? 'is-favorited' : ''}`}
+                    onClick={() => toggleFavorite(lightboxItem.id, lightboxItem.title)}
+                    title={favoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
+                    aria-label={favoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
                   >
-                    <Heart size={18} />
+                    <Heart
+                      size={18}
+                      fill={favoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'none'}
+                      color={favoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'currentColor'}
+                      className={favoriteIds.includes(lightboxItem.id) ? 'tp-heart-pop' : ''}
+                    />
                   </button>
                 </div>
               </div>
