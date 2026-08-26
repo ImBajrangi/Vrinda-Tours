@@ -1,12 +1,13 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { 
   Car, Navigation, Share2, BedDouble, UtensilsCrossed, 
   X, ArrowLeft, Star, Clock, Landmark, Sparkles, Home, Info,
-  Phone, ArrowRight, Calendar, Users, MessageCircle, Check
+  Phone, ArrowRight, Calendar, Users, MessageCircle, Check, Heart
 } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
 import { openWhatsApp, generateHotelMessage, generateRestaurantMessage } from '../../utils/whatsapp';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { useFavorites } from '../../hooks/useFavorites';
 import './LocationCard.css';
 
 export default function LocationCard({ 
@@ -15,13 +16,15 @@ export default function LocationCard({
   drivers = [],
   onRequestRide,
   onClose, 
-  onDirections 
+  onDirections,
+  onToast
 }) {
   const [displayLocation, setDisplayLocation] = useState(location);
   const [isVisible, setIsVisible] = useState(false);
   const [mode, setMode] = useState('preview'); // 'preview' | 'ride' | 'hotel' | 'restaurant'
   const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
   const [imgError, setImgError] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   // Sync displayLocation and reset mode on new location
   useEffect(() => {
@@ -183,6 +186,20 @@ export default function LocationCard({
     triggerClose();
   };
 
+  const isFav = isFavorite(activeLoc);
+
+  const handleToggleFav = (e) => {
+    e?.stopPropagation();
+    if (!activeLoc) return;
+    const { isFav: newFav } = toggleFavorite(activeLoc);
+    if (onToast) {
+      onToast({
+        message: newFav ? 'Added to Favourites' : 'Removed from Favourites',
+        type: newFav ? 'success' : 'info'
+      });
+    }
+  };
+
   // Category Theme
   const getCatMeta = () => {
     switch (cat) {
@@ -238,14 +255,27 @@ export default function LocationCard({
               <div className="card-top-spacer" />
             )}
 
-            <button 
-              className="card-universal-close-btn" 
-              onClick={triggerClose} 
-              title="Close card"
-              aria-label="Close"
-            >
-              <X size={15} />
-            </button>
+            <div className="card-top-actions-right">
+              {mode === 'preview' && (
+                <button 
+                  className={`card-top-fav-btn ${isFav ? 'is-fav' : ''}`}
+                  onClick={handleToggleFav}
+                  title={isFav ? "Remove from Favourites" : "Save to Favourites"}
+                  aria-label="Toggle Favourite"
+                >
+                  <Heart size={16} fill={isFav ? "#e11d48" : "none"} color={isFav ? "#e11d48" : "currentColor"} />
+                </button>
+              )}
+
+              <button 
+                className="card-universal-close-btn" 
+                onClick={triggerClose} 
+                title="Close card"
+                aria-label="Close"
+              >
+                <X size={15} />
+              </button>
+            </div>
           </div>
 
           {/* =========================================================
@@ -330,6 +360,15 @@ export default function LocationCard({
                     <Car size={17} />
                   </button>
                 )}
+
+                <button 
+                  className={`btn-action-icon btn-fav-action ${isFav ? 'is-fav' : ''}`}
+                  onClick={handleToggleFav} 
+                  title={isFav ? "Remove from Favourites" : "Save to Favourites"}
+                  aria-label="Toggle Favourite"
+                >
+                  <Heart size={17} fill={isFav ? "#e11d48" : "none"} color={isFav ? "#e11d48" : "currentColor"} />
+                </button>
 
                 <button 
                   className="btn-action-icon" 

@@ -1,0 +1,301 @@
+/* ==========================================================================
+   Map Type Visual Switcher (Google / Apple Maps Sheet Architecture)
+   ========================================================================== */
+
+:root {
+  --map-switcher-spring: linear(0, 0.0104, 0.0391, 0.0826, 0.1374, 0.2008, 0.2699, 0.3425, 0.4166, 0.4903,
+      0.5623, 0.6313, 0.6966, 0.7573, 0.813, 0.8633, 0.9082, 0.9476, 0.9817,
+      1.0105, 1.0344, 1.0537, 1.0688, 1.08, 1.0878, 1.0925, 1.0946, 1.0944,
+      1.0924, 1.0888, 1.084, 1.0783, 1.0719, 1.0652, 1.0582, 1.0512, 1.0443,
+      1.0376, 1.0312, 1.0253, 1.0198, 1.0149, 1.0104, 1.0064, 1.003, 1.0001,
+      0.9976, 0.9956, 0.994, 0.9928, 0.9919, 0.9914, 0.9911, 0.991, 0.9911,
+      0.9914, 0.9918, 0.9923, 0.9929, 0.9936, 0.9942, 0.9949, 0.9955, 0.9962,
+      0.9968, 0.9974, 0.9979, 0.9984, 0.9988, 0.9992, 0.9996, 0.9999, 1.0001,
+      1.0003, 1.0005, 1.0006, 1.0007, 1.0008, 1.0008, 1.0009, 1.0008, 1.0008,
+      1.0008, 1.0007, 1.0007, 1.0006, 1.0006, 1.0005, 1.0004, 1.0004, 1.0003,
+      1.0003, 1.0002, 1.0002, 1.0001, 1.0001, 1.0001, 1, 1, 1, 1);
+}
+
+.map-style-switcher-wrapper {
+  position: relative;
+  display: flex;
+}
+
+.map-style-toggle-btn {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
+  color: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+}
+
+.map-style-toggle-btn:hover {
+  background: #ffffff;
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.map-style-toggle-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+}
+
+.map-style-toggle-btn:active {
+  transform: scale(0.94);
+}
+
+/* Modal Portal Container */
+.map-type-modal-portal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 99999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Ambient Dim Backdrop */
+.map-type-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  animation: backdropFadeIn 0.28s ease forwards;
+  pointer-events: auto;
+}
+
+@keyframes backdropFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Bottom Sheet / Floating Island */
+.map-type-sheet {
+  position: relative;
+  width: calc(100% - 2rem);
+  max-width: 380px;
+  margin: 0 auto calc(1rem + env(safe-area-inset-bottom, 0.5rem)) auto;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+  padding: 1.1rem 1.25rem 1.25rem;
+  box-shadow:
+    0 24px 60px -12px rgba(0, 0, 0, 0.25),
+    0 4px 16px rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+  animation: mapTypeSheetUp 0.45s var(--map-switcher-spring) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes mapTypeSheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.map-type-drag-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  margin: -0.2rem auto 0.75rem auto;
+}
+
+.map-type-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.map-type-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.map-type-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #09090b;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.map-type-subtitle {
+  font-size: 0.72rem;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.map-type-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.map-type-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+/* 2x2 Grid of visual preview thumbnails */
+.map-type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.map-type-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 16px;
+  transition: transform 0.3s var(--map-switcher-spring);
+}
+
+.map-type-thumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  box-shadow: none;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  background: #f1f5f9;
+}
+
+.map-thumb-vector {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.map-type-card:hover .map-thumb-vector {
+  transform: scale(1.04);
+}
+
+.map-type-card:hover .map-type-thumbnail {
+  border-color: rgba(0, 0, 0, 0.22);
+  box-shadow: none;
+}
+
+.map-type-card.selected .map-type-thumbnail {
+  border-color: #81a0e5;
+  border-width: 2.5px;
+  box-shadow: none;
+}
+
+/* Selected Blue Check Badge */
+.map-type-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  animation: checkPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes checkPopIn {
+  from {
+    transform: scale(0);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+.map-type-label-group {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.map-type-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #09090b;
+  transition: color 0.15s ease;
+  letter-spacing: -0.01em;
+}
+
+.map-type-card.selected .map-type-name {
+  color: #2563eb;
+  font-weight: 800;
+}
+
+.map-type-sub {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #a1a1aa;
+}
+
+/* Desktop & Tablet Optimization (Bottom Right Floating Island) */
+@media (min-width: 768px) {
+  .map-type-modal-portal {
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 1.5rem;
+  }
+
+  .map-type-sheet {
+    margin: 0;
+    max-width: 360px;
+  }
+}

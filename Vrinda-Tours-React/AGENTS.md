@@ -40,3 +40,29 @@ you are expert UI UX designer and frontend developer
 
 Luxury Editorial Design Standard: "Avoid progress bars, oversized badges, or dashboard-style meters on consumer luxury landing pages. Prefer minimalist capsule buttons with integrated subtle count chips and micro-interactions."
 
+be less eleborated but impactfull everywhere
+
+expand or hide and show should be bouncie and morphing please
+suddenness looks unprofessional and unpolished like linear(0, 0.0114, 0.0427, 0.0898, 0.149, 0.2169, 0.2906, 0.3673, 0.445, 0.5216, 0.5958, 0.6663, 0.7321, 0.7926, 0.8474, 0.8962, 0.9389, 0.9758, 1.0069, 1.0325, 1.053, 1.0689, 1.0805, 1.0884, 1.093, 1.0947, 1.0941, 1.0915, 1.0873, 1.0819, 1.0756, 1.0687, 1.0614, 1.0541, 1.0468, 1.0397, 1.0329, 1.0266, 1.0208, 1.0155, 1.0107, 1.0066, 1.003, 0.9999, 0.9974, 0.9953, 0.9937, 0.9926, 0.9917, 0.9913, 0.991, 0.9911, 0.9913, 0.9916, 0.9921, 0.9927, 0.9934, 0.994, 0.9947, 0.9954, 0.9961, 0.9968, 0.9974, 0.9979, 0.9984, 0.9989, 0.9993, 0.9997, 1, 1.0002, 1.0004, 1.0006, 1.0007, 1.0008, 1.0008, 1.0008, 1.0008, 1.0008, 1.0008, 1.0008, 1.0007, 1.0006, 1.0006, 1.0005, 1.0004, 1.0004, 1.0003, 1.0003, 1.0002, 1.0002, 1.0001, 1.0001, 1, 1, 1, 1, 0.9999, 0.9999, 0.9999, 0.9999, 1)
+
+[RULE: Layout-First Morphing]:
+
+All dynamic UI panels (drawers, sheets, pills) must default to CSS Grid 0fr ➔ 1fr spring interpolation rather than instant unmounting to guarantee fluid transitions on every mobile viewport.
+[RULE: Defensive Micro-Typography]:
+
+Text elements must always have explicit truncation fallbacks (min-width: 0, overflow: hidden, text-overflow: ellipsis, and sensible line wrapping) so no label ever clips awkwardly on small screens.
+[RULE: Strict Battery & GPU Guard]:
+
+Pause or throttle continuous SVG dash/spin animations when navigation is idle or cards are hidden to conserve battery on mobile devices.
+
+bars like nav-hud-card their hiding and showing should not be instant or flickked feel
+they show be visible with suttle animations
+of ease in/out, and it should feel like morphing smoothly without any instant appearance or disappearance.
+
+like there should be no suddenness.
+
+try to use less hardcoded and more dynamic approach for things
+not only that but make it more responsive and optimized for mobile and desktop both.
+
+you can even use css variables to make it more dynamic and optimized.
+

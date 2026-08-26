@@ -41,6 +41,7 @@ export const locations = [
 
 export const CATEGORIES = [
   { key: 'all', label: 'All Sites', icon: 'Compass' },
+  { key: 'favourites', label: 'Favourites', icon: 'Heart' },
   { key: 'Temple', label: 'Temples', icon: 'Landmark' },
   { key: 'Holy Site', label: 'Holy Sites', icon: 'Sparkles' },
   { key: 'Town', label: 'Towns', icon: 'Home' },

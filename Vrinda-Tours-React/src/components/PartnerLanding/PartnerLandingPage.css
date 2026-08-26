@@ -1205,14 +1205,14 @@
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
 }
 
-/* Active Card State (Expanded Royal Blue Featured Card) */
+/* Active Card State (Ultra Light Blueish Luxury Featured Card) */
 .tp-journey-card.tp-j-active {
   flex: 1.4;
   min-width: 330px;
-  max-width: 405px;
-  background-color: var(--tp-flight-blue);
-  border: 1.5px solid var(--tp-flight-blue);
-  box-shadow: 0 20px 48px rgba(37, 99, 235, 0.28);
+  max-width: 415px;
+  background: linear-gradient(155deg, #f0f7ff 0%, #e0f2fe 50%, #dbeafe 100%);
+  border: 1.5px solid #bfdbfe;
+  box-shadow: 0 20px 48px rgba(37, 99, 235, 0.15), 0 4px 16px rgba(37, 99, 235, 0.08);
 }
 
 /* Persistent Synchronized Inactive View Layer */
@@ -1227,13 +1227,15 @@
   box-sizing: border-box;
   opacity: 1;
   pointer-events: auto;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(1);
   z-index: 1;
 }
 
 .tp-journey-card.tp-j-active .tp-j-inactive-view {
   opacity: 0;
   pointer-events: none;
+  transform: scale(0.94);
 }
 
 .tp-j-inactive-icon-wrap {
@@ -1246,6 +1248,11 @@
   align-items: center;
   justify-content: center;
   color: var(--tp-flight-blue);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tp-journey-card.tp-j-inactive:hover .tp-j-inactive-icon-wrap {
+  transform: scale(1.08);
 }
 
 .tp-j-inactive-title {
@@ -1273,13 +1280,15 @@
   box-sizing: border-box;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.95);
   z-index: 2;
 }
 
 .tp-journey-card.tp-j-active .tp-j-active-view {
   opacity: 1;
   pointer-events: auto;
+  transform: scale(1);
 }
 
 .tp-j-top-row {
@@ -1290,36 +1299,48 @@
 }
 
 .tp-j-glass-badge {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(191, 219, 254, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #1d4ed8;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Organic Cutout Semicircle Window */
+.tp-journey-card.tp-j-active:hover .tp-j-glass-badge {
+  transform: rotate(12deg) scale(1.05);
+}
+
+/* Organic Cutout Semicircle Window - Enlarged Luxury Scale */
 .tp-j-photo-window {
-  width: 150px;
-  height: 150px;
-  border-radius: 0 26px 0 130px;
+  width: 190px;
+  height: 190px;
+  border-radius: 0 28px 0 150px;
   overflow: hidden;
   margin-top: -1.8rem;
   margin-right: -1.8rem;
   background: #e0f2fe;
-  box-shadow: -4px 6px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: -6px 8px 24px rgba(37, 99, 235, 0.14);
+  border-bottom: 2.5px solid rgba(255, 255, 255, 0.9);
+  border-left: 2.5px solid rgba(255, 255, 255, 0.9);
 }
 
 .tp-j-cutout-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tp-journey-card.tp-j-active:hover .tp-j-cutout-img {
+  transform: scale(1.06);
 }
 
 .tp-j-body {
@@ -1332,38 +1353,39 @@
 .tp-j-active-title {
   font-size: 1.5rem;
   font-weight: 900;
-  color: #ffffff;
+  color: #0f172a;
   margin: 0;
   line-height: 1.2;
 }
 
 .tp-j-active-desc {
-  font-size: 0.86rem;
+  font-size: 0.88rem;
   line-height: 1.55;
-  color: rgba(255, 255, 255, 0.9);
+  color: #334155;
   margin: 0;
 }
 
 .tp-j-learn-more-btn {
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: #1d4ed8;
   font-size: 0.84rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   margin-top: 0.4rem;
   font-family: inherit;
-  transition: opacity 0.15s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .tp-j-learn-more-btn:hover {
-  opacity: 0.85;
+  color: #1e40af;
+  transform: translateX(4px);
 }
 
 /* Dots Indicator */
@@ -1436,10 +1458,10 @@
 
   /* Center Active Card (Always Centered) */
   .tp-journey-card.tp-j-active {
-    flex: 0 0 220px;
-    width: 220px;
-    min-width: 210px;
-    max-width: 235px;
+    flex: 0 0 225px;
+    width: 225px;
+    min-width: 215px;
+    max-width: 240px;
     height: 395px;
     border-radius: 26px;
     padding: 1.25rem 1.1rem 1.4rem;
@@ -1448,7 +1470,9 @@
     flex-direction: column;
     justify-content: space-between;
     z-index: 2;
-    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.25);
+    background: linear-gradient(155deg, #f0f7ff 0%, #e0f2fe 50%, #dbeafe 100%);
+    border: 1.5px solid #bfdbfe;
+    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.16);
   }
 
   .tp-journey-card.tp-j-active .tp-j-active-view {
@@ -1465,17 +1489,27 @@
   }
 
   .tp-j-photo-window {
-    width: 105px;
-    height: 105px;
-    border-radius: 0 24px 0 90px;
+    width: 125px;
+    height: 125px;
+    border-radius: 0 24px 0 100px;
     margin-top: -1.25rem;
     margin-right: -1.1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+    border-left: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: -4px 6px 16px rgba(37, 99, 235, 0.12);
     flex-shrink: 0;
   }
 
   .tp-j-glass-badge {
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(191, 219, 254, 0.85);
+    color: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
   }
 
   .tp-j-body {
@@ -1491,6 +1525,7 @@
     font-size: 1.25rem;
     font-weight: 900;
     line-height: 1.22;
+    color: #0f172a;
     word-break: normal;
     overflow-wrap: break-word;
   }
@@ -1500,11 +1535,13 @@
     line-height: 1.48;
     word-break: normal;
     overflow-wrap: break-word;
-    color: rgba(255, 255, 255, 0.92);
+    color: #334155;
   }
 
   .tp-j-learn-more-btn {
     font-size: 0.75rem;
+    color: #1d4ed8;
+    font-weight: 800;
     margin-top: 0.2rem;
   }
 

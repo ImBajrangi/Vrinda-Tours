@@ -5,7 +5,7 @@
 .category-track {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   overflow-x: auto;
   scrollbar-width: none;
   width: 100%;
@@ -19,26 +19,27 @@
 
 .pill {
   flex-shrink: 0;
-  height: 30px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.38rem;
   padding: 0 0.85rem;
-  background: #f4f4f5;
+  background: #f8fafc;
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: #52525b;
+  color: #475569;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
-  border: 1px solid transparent;
+  border: 1px solid #e2e8f0;
   user-select: none;
 }
 
 .pill:hover:not(.active) {
-  background: #e4e4e7;
-  color: #09090b;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
 }
 
 .pill:active {
@@ -46,20 +47,20 @@
 }
 
 .pill.active {
-  background: #09090b;
+  background: #0f172a;
   color: #ffffff;
-  border-color: #09090b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border-color: #0f172a;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.16);
 }
 
 .pill-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 50%;
   flex-shrink: 0;
   transition: background 0.15s ease;
 }
@@ -67,13 +68,62 @@
 .pill-icon svg {
   width: 11px;
   height: 11px;
-  color: #52525b;
+  color: #475569;
 }
 
 .pill.active .pill-icon {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .pill.active .pill-icon svg {
+  color: #ffffff;
+}
+
+/* Favourites Pill Specific Soft Luxury Styling */
+.pill.pill-favourites {
+  border-color: #ffe4e6;
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.pill.pill-favourites .pill-icon.fav-icon {
+  background: rgba(225, 29, 72, 0.1);
+}
+
+.pill.pill-favourites:hover:not(.active) {
+  background: #ffe4e6;
+  border-color: #fecdd3;
+  color: #be123c;
+}
+
+.pill.pill-favourites.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.16);
+}
+
+.pill.pill-favourites.active .pill-icon.fav-icon {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.pill-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e11d48;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  margin-left: 2px;
+  transition: all 0.2s ease;
+}
+
+.pill.pill-favourites.active .pill-count-badge {
+  background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
 }

@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { 
   Search, User, Car, X, ArrowLeft, Landmark, Sparkles, BedDouble, 
-  UtensilsCrossed, Home, Info, ArrowUpRight, TrendingUp, Briefcase 
+  UtensilsCrossed, Home, Info, ArrowUpRight, TrendingUp, Briefcase, Heart 
 } from 'lucide-react';
 import { locations } from '../../data/locations';
 import CategoryPills from '../CategoryPills/CategoryPills';
+import { useFavorites } from '../../hooks/useFavorites';
 import './Header.css';
 
 export default function Header({ 
@@ -14,13 +15,15 @@ export default function Header({
   activeFilter,
   onFilterChange,
   onAdminOpen,
-  onSearchFocusChange
+  onSearchFocusChange,
+  isNavigating = false
 }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const { favorites, isFavorite, favoritesCount } = useFavorites();
 
   useEffect(() => {
     if (onSearchFocusChange) {
@@ -28,9 +31,15 @@ export default function Header({
     }
   }, [isFocused, onSearchFocusChange]);
 
-  // Filtered search results or popular recommendations
+  // Filtered search results or popular recommendations with favourites prioritized
   const searchResults = useMemo(() => {
     if (!query.trim()) {
+      // If user has favorites, put favorite items at the top of recommendations
+      if (favorites.length > 0) {
+        const favLocs = locations.filter((l) => favorites.includes(l.name));
+        const otherLocs = locations.filter((l) => !favorites.includes(l.name));
+        return [...favLocs, ...otherLocs].slice(0, 6);
+      }
       // Top trending pilgrim destinations as default suggestions
       return locations.slice(0, 6);
     }
@@ -40,7 +49,7 @@ export default function Header({
              l.category.toLowerCase().includes(q) ||
              (l.description && l.description.toLowerCase().includes(q))
     ).slice(0, 8);
-  }, [query]);
+  }, [query, favorites]);
 
   // Handle keyboard navigation for accessibility
   const handleKeyDown = (e) => {
@@ -224,13 +233,14 @@ export default function Header({
         )}
       </div>
 
-      {/* Category Tray - Visible in resting mode */}
-      {!isFocused && (
+      {/* Category Tray - Visible in resting mode (hidden during active turn-by-turn navigation) */}
+      {!isFocused && !isNavigating && (
         <div className="header-category-tray">
           <CategoryPills 
             activeFilter={activeFilter} 
             onFilterChange={onFilterChange} 
             onAdminOpen={onAdminOpen}
+            favoritesCount={favoritesCount}
           />
         </div>
       )}
@@ -247,6 +257,11 @@ export default function Header({
           <div className="search-results-header">
             {query.trim() ? (
               <span>Matching Destinations ({searchResults.length})</span>
+            ) : favorites.length > 0 ? (
+              <div className="sr-header-trending">
+                <Heart size={13} fill="#e11d48" color="#e11d48" />
+                <span>Your Favourites & Trending Places</span>
+              </div>
             ) : (
               <div className="sr-header-trending">
                 <TrendingUp size={13} color="#71717a" />
@@ -266,6 +281,7 @@ export default function Header({
                 const meta = getCategoryMeta(loc.category);
                 const IconComponent = meta.Icon;
                 const isSelected = selectedIndex === idx;
+                const isItemFav = isFavorite(loc.name);
 
                 return (
                   <div 
@@ -287,9 +303,16 @@ export default function Header({
                     <div className="sr-text">
                       <div className="sr-name-row">
                         <h4>{loc.name}</h4>
-                        {loc.rating && (
-                          <span className="sr-rating">★ {loc.rating}</span>
-                        )}
+                        <div className="sr-badges-row">
+                          {isItemFav && (
+                            <span className="sr-fav-badge" title="In your favourites">
+                              <Heart size={10} fill="#e11d48" color="#e11d48" />
+                            </span>
+                          )}
+                          {loc.rating && (
+                            <span className="sr-rating">★ {loc.rating}</span>
+                          )}
+                        </div>
                       </div>
                       <div className="sr-meta-row">
                         <span className="sr-category-pill">{loc.category}</span>

@@ -103,8 +103,17 @@
   transform: scale(0.92);
 }
 
+.map-controls-cluster.capsule-visible {
+  bottom: calc(4.8rem + env(safe-area-inset-bottom, 0.5rem));
+}
+
 .map-controls-cluster.card-visible {
-  bottom: calc(18.5rem + env(safe-area-inset-bottom, 0.5rem));
+  bottom: calc(19.8rem + env(safe-area-inset-bottom, 0.5rem) - var(--card-drag-offset, 0px));
+}
+
+/* Zero-Lag 120fps Instantaneous Tracking during Active Drag */
+body.sheet-dragging .map-controls-cluster {
+  transition: none !important;
 }
 
 /* Integrated Zoom Capsule */
@@ -221,6 +230,7 @@
     right: 1.5rem;
   }
 
+  .map-controls-cluster.capsule-visible,
   .map-controls-cluster.card-visible {
     bottom: 1.5rem;
     right: 1.5rem;

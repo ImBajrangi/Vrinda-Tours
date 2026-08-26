@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Navigation } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
@@ -10,8 +10,13 @@ import HotelBooking from './components/BookingSheets/HotelBooking';
 import RestaurantBooking from './components/BookingSheets/RestaurantBooking';
 import { useFirebaseDrivers } from './hooks/useFirebaseDrivers';
 import { useFirebaseLocations } from './hooks/useFirebaseLocations';
+import { useFavorites } from './hooks/useFavorites';
+import { fetchNavigationRoute, openExternalGoogleMaps } from './utils/navigationService';
 import RideSheet from './components/BookingSheets/RideSheet';
 import RideStatusBanner from './components/UI/RideStatusBanner';
+import FavoritesListSheet from './components/UI/FavoritesListSheet';
+import NavigationBanner from './components/UI/NavigationBanner';
+import MapStyleSwitcher from './components/UI/MapStyleSwitcher';
 import DriversPanel from './components/Admin/DriversPanel';
 import AdminPanel from './components/Admin/AdminPanel';
 import PartnerHubModal from './components/PartnerHub/PartnerHubModal';
@@ -27,6 +32,9 @@ import AnnouncementBanner from './components/UI/AnnouncementBanner';
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [activeLocation, setActiveLocation] = useState(null);
+  const [activeRoute, setActiveRoute] = useState(null);
+  const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const [mapStyle, setMapStyle] = useState(() => localStorage.getItem('vrinda_map_style') || 'carto');
   const [hotelBooking, setHotelBooking] = useState(null);
   const [restaurantBooking, setRestaurantBooking] = useState(null);
   const [rideRequest, setRideRequest] = useState(null); // { destination: loc }
@@ -41,6 +49,11 @@ export default function App() {
   const { position, loading, requestLocation } = useGeolocation();
   const { drivers, firebaseReady } = useFirebaseDrivers();
   const { locations, loading: locationsLoading } = useFirebaseLocations();
+  const { favorites, removeFavorite } = useFavorites();
+
+  const favoriteLocations = useMemo(() => {
+    return locations.filter((loc) => favorites.includes(loc.name));
+  }, [locations, favorites]);
 
   // Listen to passenger active ride status updates in real-time
   useEffect(() => {
@@ -55,7 +68,7 @@ export default function App() {
         } else {
           // Ride completed or cancelled by driver
           if (activeRide.status === 'arrived' || activeRide.status === 'accepted') {
-            setToast({ message: 'Ride completed! Thank you for choosing Vrinda Tours.', type: 'success' });
+            setToast({ message: 'Ride completed', type: 'success' });
           }
           setActiveRide(null);
         }
@@ -106,7 +119,7 @@ export default function App() {
 
       await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
       setActiveRide({ driver, status: 'requested' });
-      setToast({ message: `Ride request sent to ${driver.name}`, type: 'success' });
+      setToast({ message: 'Ride requested', type: 'success' });
     } catch (err) {
       console.error('Ride request error:', err);
       setToast({ message: 'Ride request failed', type: 'error' });
@@ -118,18 +131,32 @@ export default function App() {
       try {
         await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
         setActiveRide(null);
-        setToast({ message: 'Ride Cancelled', type: 'error' });
+        setToast({ message: 'Ride cancelled', type: 'error' });
       } catch (err) {
         console.error('Cancel ride error:', err);
       }
     }
   }, [activeRide]);
 
-  const handleDirections = useCallback((loc) => {
-    if (position) {
-      window.open(`https://www.google.com/maps/dir/?api=1&origin=${position.lat},${position.lng}&destination=${loc.lat},${loc.lng}`, '_blank');
+  const handleDirections = useCallback(async (loc) => {
+    setActiveLocation(null);
+    const origin = position || { lat: 27.646, lng: 77.377 }; // user position or Braj center
+    
+    setToast({ message: 'Calculating route...', type: 'info' });
+    const routeData = await fetchNavigationRoute(origin, loc);
+
+    if (routeData && routeData.coordinates && routeData.coordinates.length > 0) {
+      setActiveRoute({
+        ...routeData,
+        destName: loc.name,
+        destination: loc,
+        origin,
+      });
+      setToast({ message: 'Route ready', type: 'success' });
     } else {
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`, '_blank');
+      // Platform in-app route not available -> redirect directly to Google Maps
+      setToast({ message: 'Opening Google Maps...', type: 'info' });
+      openExternalGoogleMaps(origin, loc);
     }
   }, [position]);
 
@@ -172,6 +199,8 @@ export default function App() {
         activeFilter={activeFilter}
         userPosition={position}
         activeLocation={activeLocation}
+        activeRoute={activeRoute}
+        mapStyle={mapStyle}
         onSelectLocation={handleSelectLocation}
       />
 
@@ -183,7 +212,23 @@ export default function App() {
         onFilterChange={handleFilterChange}
         onAdminOpen={() => setAdminVisible(true)}
         onSearchFocusChange={setIsSearchActive}
+        isNavigating={Boolean(activeRoute)}
       />
+
+      {activeRoute && !partnerLandingVisible && (
+        <NavigationBanner
+          route={activeRoute}
+          userPosition={position}
+          isCardVisible={Boolean(activeLocation)}
+          onExpandedChange={setIsNavExpanded}
+          onExit={() => {
+            setActiveRoute(null);
+            setIsNavExpanded(false);
+          }}
+          onOpenExternal={() => openExternalGoogleMaps(activeRoute.origin, activeRoute.destination)}
+          onSelectPlace={handleSelectLocation}
+        />
+      )}
 
       <LocationCard
         location={!isSearchActive && !activeRide && !rideRequest ? activeLocation : null}
@@ -192,7 +237,22 @@ export default function App() {
         onRequestRide={handleRequestRide}
         onClose={() => setActiveLocation(null)}
         onDirections={handleDirections}
+        onToast={setToast}
       />
+
+      {activeFilter === 'favourites' && !activeLocation && !isSearchActive && !activeRide && !rideRequest && !hotelBooking && !restaurantBooking && !driversVisible && !adminVisible && !driverPortalVisible && !partnerLandingVisible && (
+        <FavoritesListSheet
+          favoriteLocations={favoriteLocations}
+          userPosition={position}
+          onSelectLocation={handleSelectLocation}
+          onRemoveFavorite={(loc) => {
+            removeFavorite(loc);
+            setToast({ message: `Removed ${loc.name} from Favourites`, type: 'info' });
+          }}
+          onExploreAll={() => setActiveFilter('all')}
+          onClose={() => setActiveFilter('all')}
+        />
+      )}
 
       {hotelBooking && (
         <HotelBooking location={hotelBooking} onClose={() => setHotelBooking(null)} />
@@ -262,7 +322,19 @@ export default function App() {
       )}
 
       {/* Map Controls Cluster (Cornered when space is available + Smart Glide) */}
-      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest ? 'card-visible' : ''} ${hotelBooking || restaurantBooking || driverPortalVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
+      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest || (activeRoute && isNavExpanded) || (activeFilter === 'favourites' && !partnerLandingVisible) ? 'card-visible' : (activeRoute && !isNavExpanded) ? 'capsule-visible' : ''} ${hotelBooking || restaurantBooking || driverPortalVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
+        <MapStyleSwitcher
+          activeStyle={mapStyle}
+          onStyleChange={(newStyle) => {
+            setMapStyle(newStyle);
+            try {
+              localStorage.setItem('vrinda_map_style', newStyle);
+            } catch (e) {}
+            const label = newStyle === 'carto' ? 'Default' : newStyle === 'google' ? 'Roadmap' : newStyle === 'satellite' ? 'Satellite' : 'Terrain';
+            setToast({ message: label, type: 'info' });
+          }}
+        />
+
         <div className="zoom-controls">
           <button className="zoom-btn zoom-in" onClick={() => window.__vtMap?.zoomIn()} title="Zoom In">+</button>
           <div className="zoom-divider" />

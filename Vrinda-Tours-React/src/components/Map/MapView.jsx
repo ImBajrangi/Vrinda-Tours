@@ -1,6 +1,8 @@
 import { useEffect, useRef, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet.markercluster';
+import { useFavorites } from '../../hooks/useFavorites';
+import { prefetchBrajMapRegion } from '../../utils/offlineMapPreloader';
 import './MapView.css';
 
 const MARKER_BASE = '/marker/';
@@ -53,24 +55,41 @@ function createIcon(category, isActive = false, isPlaying = false) {
   });
 }
 
-export default function MapView({ locations, drivers = [], activeFilter, userPosition, activeLocation, onSelectLocation }) {
+export default function MapView({ 
+  locations, 
+  drivers = [], 
+  activeFilter, 
+  userPosition, 
+  activeLocation, 
+  activeRoute, 
+  mapStyle = 'carto',
+  onSelectLocation 
+}) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const clusterRef = useRef(null);
+  const activeTileLayerRef = useRef(null);
   const markersRef = useRef([]);
   const driverMarkersRef = useRef({}); // { driverId: { marker, status, lat, lng } }
   const userMarkerRef = useRef(null);
   const activeMarkerRef = useRef(null);
+  const routeLayerRef = useRef(null);
   const onSelectLocationRef = useRef(onSelectLocation);
+  const { favorites } = useFavorites();
 
   useEffect(() => {
     onSelectLocationRef.current = onSelectLocation;
   }, [onSelectLocation]);
 
   const filteredLocations = useMemo(() => {
-    const raw = (activeFilter === 'all' || activeFilter === '__drivers__')
-      ? locations
-      : locations.filter((l) => l.category === activeFilter);
+    let raw = [];
+    if (activeFilter === 'favourites') {
+      raw = locations.filter((l) => favorites.includes(l.name));
+    } else if (activeFilter === 'all' || activeFilter === '__drivers__') {
+      raw = locations;
+    } else {
+      raw = locations.filter((l) => l.category === activeFilter);
+    }
 
     const uniqueMap = new Map();
     raw.forEach((loc) => {
@@ -79,15 +98,23 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       }
     });
     return Array.from(uniqueMap.values());
-  }, [locations, activeFilter]);
+  }, [locations, activeFilter, favorites]);
 
 
   // Initialize map once
   useEffect(() => {
-    if (mapInstanceRef.current) return;
+    if (mapInstanceRef.current || !mapRef.current) return;
+
+    // Reset container leaflet ID to prevent StrictMode re-mount collision
+    if (mapRef.current._leaflet_id) {
+      mapRef.current._leaflet_id = null;
+    }
+
     const map = L.map(mapRef.current, {
       center: [27.64, 77.38],
       zoom: 13,
+      minZoom: 2,
+      maxZoom: 20,
       zoomControl: false,
       attributionControl: false,
       zoomAnimation: true,
@@ -97,33 +124,111 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       easeLinearity: 0.2,
     });
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      maxZoom: 20,
-      minZoom: 2,
-    }).addTo(map);
-
     const cluster = L.markerClusterGroup({
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
-      spiderfyOnMaxZoom: true,
+      spiderfyOnMaxZoom: false,
+      spiderLegPolylineOptions: { weight: 0, opacity: 0 },
       removeOutsideVisibleBounds: true,
       animate: true,
-      disableClusteringAtZoom: 18,
-      maxClusterRadius: 60,
+      maxClusterRadius: 55,
       animateAddingMarkers: true
     });
 
-
     map.addLayer(cluster);
-
 
     mapInstanceRef.current = map;
     clusterRef.current = cluster;
 
-    return () => { map.remove(); mapInstanceRef.current = null; };
+    // Warm up Braj Mandal region tiles in offline cache during idle time
+    const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || 'cb1_25xx_1_ef24909b63d9228a6de7508f';
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => prefetchBrajMapRegion(cartoKey));
+    } else {
+      setTimeout(() => prefetchBrajMapRegion(cartoKey), 2500);
+    }
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+      if (mapRef.current) {
+        mapRef.current._leaflet_id = null;
+      }
+    };
   }, []);
 
-  // Update location markers ONLY when filteredLocations changes
+  // Dynamically switch basemap tile layers (CARTO default, Google, Satellite, OSM backup)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    if (activeTileLayerRef.current) {
+      map.removeLayer(activeTileLayerRef.current);
+      activeTileLayerRef.current = null;
+    }
+
+    const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || 'cb1_25xx_1_ef24909b63d9228a6de7508f';
+    const googleKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyBv0aMdC-Esw0-y63bcCu_JCxfiNqxzOhk';
+
+    let tileLayer;
+
+    if (mapStyle === 'google') {
+      // Google Maps Roadmap
+      tileLayer = L.tileLayer(
+        `https://mt{s}.google.com/vt/lyrs=m&apistyle=s.t:33|p.v:off|s.t:3|p.v:off|s.t:2|p.v:off&x={x}&y={y}&z={z}&key=${googleKey}`,
+        {
+          maxZoom: 20,
+          minZoom: 2,
+          subdomains: ['0', '1', '2', '3'],
+          attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>',
+        }
+      );
+    } else if (mapStyle === 'satellite') {
+      // Google Satellite / Hybrid
+      tileLayer = L.tileLayer(
+        `https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}&key=${googleKey}`,
+        {
+          maxZoom: 20,
+          minZoom: 2,
+          subdomains: ['0', '1', '2', '3'],
+          attribution: '&copy; <a href="https://maps.google.com">Google Earth</a>',
+        }
+      );
+    } else if (mapStyle === 'osm') {
+      // OpenStreetMap HOT
+      tileLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+        {
+          maxZoom: 19,
+          minZoom: 2,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }
+      );
+    } else {
+      // Primary Default: CARTO Voyager
+      tileLayer = L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        {
+          maxZoom: 20,
+          minZoom: 2,
+          subdomains: 'abcd',
+          attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }
+      );
+    }
+
+    tileLayer.on('tileerror', (error) => {
+      console.warn('Map tile error, fallback to OSM HOT:', error);
+    });
+
+  tileLayer.addTo(map);
+    tileLayer.bringToBack();
+    activeTileLayerRef.current = tileLayer;
+  }, [mapStyle]);
+
+  // Update location markers when filteredLocations OR activeRoute changes
   useEffect(() => {
     const cluster = clusterRef.current;
     if (!cluster) return;
@@ -131,10 +236,32 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     cluster.clearLayers();
     markersRef.current = [];
 
+    const activeDestName = (activeRoute?.destName || '').toLowerCase().trim();
+
     filteredLocations.forEach((loc) => {
+      // Exclude destination location from cluster when navigating to avoid cluster-badge swallowing and duplicate ghost markers
+      if (activeRoute && loc.name.toLowerCase().trim() === activeDestName) {
+        return;
+      }
+
       const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false, true) });
       marker._locData = loc;
       marker.on('click', () => onSelectLocationRef.current?.(loc));
+      
+      // Interactive on-hover POI info tag
+      marker.bindTooltip(
+        `<div class="map-poi-hover-tag">
+           <span class="poi-tag-title">${loc.name}</span>
+         </div>`,
+        {
+          direction: 'top',
+          offset: [0, -38],
+          className: 'map-poi-tooltip-custom',
+          opacity: 1,
+          sticky: false,
+        }
+      );
+
       cluster.addLayer(marker);
       markersRef.current.push(marker);
 
@@ -142,7 +269,7 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
         marker.setIcon(createIcon(loc.category, false, false));
       }, 2500);
     });
-  }, [filteredLocations]);
+  }, [filteredLocations, activeRoute]);
 
   // Highlight active location marker
   useEffect(() => {
@@ -168,6 +295,150 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
       activeMarkerRef.current = null;
     }
   }, [activeLocation]);
+
+  // Draw in-app navigation route polyline directly on the platform map
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // Remove previous route layer
+    if (routeLayerRef.current) {
+      map.removeLayer(routeLayerRef.current);
+      routeLayerRef.current = null;
+    }
+
+    if (activeRoute && activeRoute.coordinates && activeRoute.coordinates.length > 0) {
+      const group = L.featureGroup();
+
+      // 1. Subtle soft halo casing for contrast on any map style
+      const haloCasing = L.polyline(activeRoute.coordinates, {
+        color: '#ffffff',
+        weight: 7,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round',
+      });
+
+      // 2. Core Google royal-blue navigation highway path
+      const coreHighway = L.polyline(activeRoute.coordinates, {
+        color: '#2563eb',
+        weight: 4.5,
+        opacity: 1,
+        lineCap: 'round',
+        lineJoin: 'round',
+        className: 'core-highway-line',
+      });
+
+      haloCasing.addTo(group);
+      coreHighway.addTo(group);
+
+// Generate smooth parabolic arc curve between two lat/lng coordinates
+function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
+  const [lat0, lng0] = p0;
+  const [lat1, lng1] = p1;
+  const dLat = lat1 - lat0;
+  const dLng = lng1 - lng0;
+  
+  // Perpendicular offset for parabolic arc height
+  const midLat = (lat0 + lat1) / 2 - dLng * bend;
+  const midLng = (lng0 + lng1) / 2 + dLat * bend;
+
+  const points = [];
+  for (let i = 0; i <= numPoints; i++) {
+    const t = i / numPoints;
+    const inv = 1 - t;
+    // Quadratic Bezier interpolation
+    const lat = inv * inv * lat0 + 2 * inv * t * midLat + t * t * lat1;
+    const lng = inv * inv * lng0 + 2 * inv * t * midLng + t * t * lng1;
+    points.push([lat, lng]);
+  }
+  return points;
+}
+
+      // 3. Start Origin Dot & Off-road connector parabolic arc (Uber/Google Maps style)
+      if (activeRoute.origin?.lat && activeRoute.origin?.lng) {
+        const originDot = L.circleMarker([activeRoute.origin.lat, activeRoute.origin.lng], {
+          radius: 6,
+          color: '#ffffff',
+          weight: 2.5,
+          fillColor: '#2563eb',
+          fillOpacity: 1,
+        });
+        originDot.bindTooltip('Your Start Location', { direction: 'top', offset: [0, -8] });
+        originDot.addTo(group);
+
+        const firstCoord = activeRoute.coordinates[0];
+        const startDist = Math.hypot(firstCoord[0] - activeRoute.origin.lat, firstCoord[1] - activeRoute.origin.lng);
+        if (startDist > 0.0001) {
+          const arcPoints = generateParabolicArc([activeRoute.origin.lat, activeRoute.origin.lng], firstCoord);
+          const startConnector = L.polyline(arcPoints, {
+            color: '#2563eb',
+            weight: 3,
+            dashArray: '5, 8',
+            opacity: 0.9,
+            className: 'uber-walking-connector',
+            lineCap: 'round',
+          });
+          startConnector.addTo(group);
+        }
+      }
+
+      // 4. Standalone Unclustered Destination Marker & Drop-off walking parabolic connector
+      if (activeRoute.destination?.lat && activeRoute.destination?.lng) {
+        const destLoc = filteredLocations.find((l) => l.name === activeRoute.destName) || {
+          name: activeRoute.destName,
+          category: 'Temple',
+          lat: activeRoute.destination.lat,
+          lng: activeRoute.destination.lng,
+        };
+        const destMarker = L.marker([activeRoute.destination.lat, activeRoute.destination.lng], {
+          icon: createIcon(destLoc.category || 'Temple', true, false),
+          zIndexOffset: 8000,
+        });
+        destMarker.bindTooltip(
+          `<div class="dest-map-tooltip"><span>${activeRoute.destName}</span></div>`,
+          { permanent: false, direction: 'top', className: 'dest-permanent-label', offset: [0, -44] }
+        );
+        // Show briefly on route activation for quick orientation, then allow hover/tap
+        destMarker.openTooltip();
+        setTimeout(() => {
+          if (destMarker.isTooltipOpen()) {
+            destMarker.closeTooltip();
+          }
+        }, 3200);
+        destMarker.on('click', () => onSelectLocationRef.current?.(destLoc));
+        destMarker.addTo(group);
+
+        // Uber-style parabolic dotted walking line connecting road drop-off point to exact marker pin
+        const lastCoord = activeRoute.coordinates[activeRoute.coordinates.length - 1];
+        const endDist = Math.hypot(lastCoord[0] - activeRoute.destination.lat, lastCoord[1] - activeRoute.destination.lng);
+        if (endDist > 0.0001) {
+          const arcPoints = generateParabolicArc(lastCoord, [activeRoute.destination.lat, activeRoute.destination.lng]);
+          const endConnector = L.polyline(arcPoints, {
+            color: '#2563eb',
+            weight: 3,
+            dashArray: '5, 8',
+            opacity: 0.9,
+            className: 'uber-walking-connector',
+            lineCap: 'round',
+          });
+          endConnector.bindTooltip('Walking to pin', { sticky: true, className: 'route-interactive-tooltip' });
+          endConnector.addTo(group);
+        }
+      }
+
+      group.addTo(map);
+      routeLayerRef.current = group;
+
+      // Fit map view to the full route with comfortable padding
+      map.fitBounds(group.getBounds(), {
+        paddingTopLeft: [90, 90],
+        paddingBottomRight: [90, 180],
+        maxZoom: 16,
+        animate: true,
+      });
+    }
+  }, [activeRoute]);
 
   // Update user location marker using user-marker-crop.gif with remove-bg SVG filter
   useEffect(() => {
@@ -298,5 +569,5 @@ export default function MapView({ locations, drivers = [], activeFilter, userPos
     return () => { delete window.__vtMap; };
   }, []);
 
-  return <div ref={mapRef} id="map" />;
+  return <div ref={mapRef} id="map" className={`map-style-${mapStyle}`} />;
 }

@@ -342,6 +342,23 @@
   line-height: 1.2;
 }
 
+.sr-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.sr-fav-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffe4e6;
+}
+
 .sr-rating {
   font-size: 0.72rem;
   font-weight: 700;

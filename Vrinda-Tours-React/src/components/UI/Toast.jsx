@@ -18,6 +18,10 @@ export default function Toast({ message, type = 'error', onDismiss }) {
 
   if (!message) return null;
   const Icon = type === 'success' ? CheckCircle2 : AlertCircle;
+  const cleanMessage = String(message)
+    .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 
   return (
     <div 
@@ -28,7 +32,7 @@ export default function Toast({ message, type = 'error', onDismiss }) {
       <div className="toast-icon-badge">
         <Icon size={16} />
       </div>
-      <span className="toast-message">{message}</span>
+      <span className="toast-message">{cleanMessage}</span>
     </div>
   );
 }

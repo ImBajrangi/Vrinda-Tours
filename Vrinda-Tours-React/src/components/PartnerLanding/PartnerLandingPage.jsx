@@ -386,10 +386,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         id: `fav_${itemId}_${Date.now()}`,
         icon: <Heart size={18} fill={isFav ? 'none' : '#ef4444'} color="#ef4444" />,
         highlight: !isFav,
-        title: isFav ? 'Removed from Favourites' : 'Saved to Favourites ❤️',
+        title: isFav ? 'Removed from Favourites' : 'Added to Favourites',
         desc: isFav
-          ? `"${itemTitle || 'Sacred Yatra'}" was removed from your saved list.`
-          : `"${itemTitle || 'Sacred Yatra'}" is now bookmarked in your favourites.`,
+          ? `Removed from your saved list.`
+          : `Saved to your favourites.`,
         ctaText: isFav ? 'Undo' : 'View All',
         onCta: () => {
           if (isFav) {
