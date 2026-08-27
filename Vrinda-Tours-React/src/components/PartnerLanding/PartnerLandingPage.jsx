@@ -75,7 +75,7 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
 
   return (
     <div className="tp-modal-overlay tp-tpkg-overlay" onClick={onClose}>
-      <div className="tp-modal-card tp-tpkg-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="tp-tpkg-modal" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="tp-tpkg-header">
           <div className="tp-tpkg-header-info">

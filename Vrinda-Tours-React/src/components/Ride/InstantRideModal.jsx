@@ -3,7 +3,7 @@ import {
   X, Navigation, Clock, ShieldCheck, Phone, Star, ArrowRight, 
   CheckCircle2, Zap, Tag, ChevronRight, User, Shield, 
   HeartHandshake, CreditCard, Banknote, Sparkles, Check, Copy, ChevronDown,
-  ArrowUpDown, Search, MapPin
+  ArrowUpDown, Search, MapPin, Share2, MessageSquare
 } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
@@ -172,6 +172,39 @@ const QUICK_DESTINATIONS = [
   { name: 'Nidhivan Sacred Grove', lat: 27.582500, lng: 77.701800, tag: 'Vrindavan' }
 ];
 
+const BRAJ_YATRA_TIPS = [
+  {
+    icon: '🛕',
+    title: 'Bankey Bihari Darshan Tip',
+    text: 'Mandir curtains open & close periodically to break intense eye contact (Trance Darshan). Free footwear cloakrooms are outside Gate 2 & 3.'
+  },
+  {
+    icon: '🌸',
+    title: 'Nidhivan Sacred Grove',
+    text: 'Holy Tulsi pairs here are revered as Gopis of the transcendental Maharaas. The grove remains peaceful and quiet before dusk.'
+  },
+  {
+    icon: '🛺',
+    title: 'Temple Alley Mobility',
+    text: 'Pilgrim E-Rickshaws have exclusive permit access to enter historic Loi Bazaar and narrow temple alleys where four-wheelers are prohibited.'
+  },
+  {
+    icon: '🕉️',
+    title: 'Govardhan 21 km Parikrama',
+    text: 'Giriraj Parikrama passes through sacred Radha Kund, Shyam Kund, Daan Ghati and Jatipura Mukharbind with zero steep elevation.'
+  },
+  {
+    icon: '✨',
+    title: 'Prem Mandir Evening Aarti',
+    text: 'The grand white Italian marble temple features a synchronized musical light & fountain display every evening at 7:00 PM.'
+  },
+  {
+    icon: '🚩',
+    title: 'Barsana Radha Rani Palace',
+    text: 'Perched on Bhanugarh Hill with sweeping sunset vistas over Braj. Lift/stairs access available from the main bus stand.'
+  }
+];
+
 export default function InstantRideModal({
   destination,
   userPosition,
@@ -202,6 +235,11 @@ export default function InstantRideModal({
   const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
   const [pickingTarget, setPickingTarget] = useState('destination'); // 'pickup' | 'destination'
   const [locationSearchQuery, setLocationSearchQuery] = useState('');
+
+  // Radar Interactive & Yatra Tips State
+  const [activeTipIndex, setActiveTipIndex] = useState(0);
+  const [landmarkNote, setLandmarkNote] = useState('');
+  const [isAddingLandmarkNote, setIsAddingLandmarkNote] = useState(false);
 
   // Sync external destination updates
   useEffect(() => {
@@ -249,6 +287,19 @@ export default function InstantRideModal({
       .sort((a, b) => a._distance - b._distance);
   }, [drivers, pickupLocation.lat, pickupLocation.lng]);
 
+  // Real-time available drivers around user's location
+  const radarDrivers = useMemo(() => {
+    return (availableDrivers || []).slice(0, 4).map((d, index) => {
+      const angle = (index * 115 + 40) % 360;
+      const radiusPercent = Math.min(84, Math.max(55, Math.round((d._distance || 0.8) * 35 + 50)));
+      return {
+        ...d,
+        angle,
+        radiusPercent
+      };
+    });
+  }, [availableDrivers]);
+
   // Nearest driver distance for live ETA
   const nearestDriverDist = availableDrivers[0]?._distance || 1.2;
   const getDynamicTierEta = useCallback((tier) => {
@@ -273,9 +324,15 @@ export default function InstantRideModal({
   const [searchTimer, setSearchTimer] = useState(45);
   const [searchStepText, setSearchStepText] = useState('Connecting with verified Braj drivers...');
   const [matchedCandidate, setMatchedCandidate] = useState(null);
-  const [userRating, setUserRating] = useState(5);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [selectedCompliments, setSelectedCompliments] = useState([]);
+  const [feedbackTarget, setFeedbackTarget] = useState('driver'); // 'driver' | 'platform'
+  const [driverRating, setDriverRating] = useState(5);
+  const [driverHoverRating, setDriverHoverRating] = useState(0);
+  const [driverCompliments, setDriverCompliments] = useState(['🙏 Polite & Devoted', '✨ Clean Rickshaw']);
+  const [driverNote, setDriverNote] = useState('');
+  const [platformRating, setPlatformRating] = useState(5);
+  const [platformHoverRating, setPlatformHoverRating] = useState(0);
+  const [platformTags, setPlatformTags] = useState(['⚡ Fast Matching', '🗺️ Accurate Map']);
+  const [platformNote, setPlatformNote] = useState('');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [copiedOtp, setCopiedOtp] = useState(false);
 
@@ -289,6 +346,17 @@ export default function InstantRideModal({
     const rawFare = Math.round(selectedTier.baseFare + (tripDistanceKm * selectedTier.perKmRate));
     return Math.max(rawFare - appliedDiscount, 20);
   }, [selectedTier, tripDistanceKm, appliedDiscount]);
+
+  // Auto-rotate Braj tips during searching radar
+  useEffect(() => {
+    let tipInterval;
+    if (stage === 'SEARCHING_RADAR') {
+      tipInterval = setInterval(() => {
+        setActiveTipIndex(prev => (prev + 1) % BRAJ_YATRA_TIPS.length);
+      }, 4200);
+    }
+    return () => clearInterval(tipInterval);
+  }, [stage]);
 
   // Sync state if activeRide prop changes externally
   useEffect(() => {
@@ -309,38 +377,12 @@ export default function InstantRideModal({
         setSearchTimer(prev => {
           if (prev <= 1) {
             clearInterval(interval);
-            const bestDriver = availableDrivers[0] || {
-              id: 'drv_demo_vrinda',
-              name: 'Shyam Sundar Sharma',
-              phone: '+91 98765 43210',
-              vehicleType: 'Pilgrim E-Rickshaw',
-              vehicleNo: 'UP-85-BV-1008',
-              rating: 4.9,
-              photo: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80'
-            };
-            setMatchedCandidate(bestDriver);
-            onRequestRide(bestDriver, {
-              tier: selectedTierId,
-              fare: currentFare,
-              paymentMethod,
-              safetyPin,
-              pickupName: pickupLocation.name,
-              pickupLat: pickupLocation.lat,
-              pickupLng: pickupLocation.lng,
-              destName: destLocation.name,
-              destLat: destLocation.lat,
-              destLng: destLocation.lng,
-              distanceKm: tripDistanceKm
-            });
-            setStage('TRIP_ACTIVE');
             return 0;
           }
-          
           if (prev === 40) setSearchStepText(`Checking drivers near ${destLocation?.name || 'Vrindavan'}...`);
           if (prev === 28) setSearchStepText('Locking upfront fare with zero surge...');
           if (prev === 16) setSearchStepText('Securing your 4-digit Safety PIN...');
           if (prev === 5) setSearchStepText('Finalizing dispatch & driver arrival...');
-
           return prev - 1;
         });
       }, 1000);
@@ -349,7 +391,38 @@ export default function InstantRideModal({
       setSearchStepText('Connecting with verified Braj drivers...');
     }
     return () => clearInterval(interval);
-  }, [stage, availableDrivers, onRequestRide, selectedTierId, paymentMethod, safetyPin, destLocation?.name, pickupLocation, tripDistanceKm, currentFare]);
+  }, [stage, destLocation?.name]);
+
+  // When searching timer finishes, safely transition to active trip
+  useEffect(() => {
+    if (stage === 'SEARCHING_RADAR' && searchTimer === 0) {
+      const bestDriver = availableDrivers[0] || {
+        id: 'drv_demo_vrinda',
+        name: 'Shyam Sundar Sharma',
+        phone: '+91 98765 43210',
+        vehicleType: selectedTier.name,
+        vehicleNo: 'UP-85-BV-1008',
+        rating: 4.9
+      };
+      setMatchedCandidate(bestDriver);
+      if (onRequestRide) {
+        onRequestRide(bestDriver, {
+          tier: selectedTierId,
+          fare: currentFare,
+          paymentMethod,
+          safetyPin,
+          pickupName: pickupLocation.name,
+          pickupLat: pickupLocation.lat,
+          pickupLng: pickupLocation.lng,
+          destName: destLocation.name,
+          destLat: destLocation.lat,
+          destLng: destLocation.lng,
+          distanceKm: tripDistanceKm
+        });
+      }
+      setStage('TRIP_ACTIVE');
+    }
+  }, [stage, searchTimer, availableDrivers, onRequestRide, selectedTierId, currentFare, paymentMethod, safetyPin, pickupLocation, destLocation, tripDistanceKm, selectedTier.name]);
 
   // Combined searchable locations list for real-time picker
   const allSearchableLocations = useMemo(() => {
@@ -471,17 +544,48 @@ export default function InstantRideModal({
 
   const activeDriver = activeRide?.driver || matchedCandidate || availableDrivers[0];
 
-  const COMPLIMENT_TAGS = [
-    '✨ Sacred Lore Storyteller',
-    '🛺 Smooth & Safe Drive',
+  const [copiedShareLink, setCopiedShareLink] = useState(false);
+  const handleShareTrip = () => {
+    const trackingUrl = `${window.location.origin}?trackRide=${activeRide?.id || 'live'}&pin=${safetyPin}`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Track My Live Braj Yatra Ride',
+        text: `Hare Krishna! Track my live ride with ${activeDriver?.name || 'Sarathi'} (${destLocation.name}).`,
+        url: trackingUrl
+      }).catch(() => {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(trackingUrl);
+      setCopiedShareLink(true);
+      setTimeout(() => setCopiedShareLink(false), 2500);
+    }
+  };
+
+  const DRIVER_COMPLIMENTS = [
     '🙏 Polite & Devoted',
-    '⭐ Clean Rickshaw',
-    '⚡ Super Fast Arrival',
-    '🚩 Great Braj Guide'
+    '🚗 Smooth & Safe Drive',
+    '✨ Clean Rickshaw',
+    '⚡ Quick Arrival',
+    '🛕 Great Temple Guide',
+    '🎵 Sacred Atmosphere'
   ];
 
-  const toggleCompliment = (tag) => {
-    setSelectedCompliments(prev => 
+  const PLATFORM_TAGS = [
+    '⚡ Instant Cab Matching',
+    '🗺️ Accurate Map & Tracking',
+    '💰 Transparent Fair Pricing',
+    '🛡️ High Safety Standards',
+    '📱 Smooth & Easy App',
+    '🌟 Authentic Pilgrimage Service'
+  ];
+
+  const toggleDriverCompliment = (tag) => {
+    setDriverCompliments(prev => 
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+    );
+  };
+
+  const togglePlatformTag = (tag) => {
+    setPlatformTags(prev => 
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
@@ -566,7 +670,7 @@ export default function InstantRideModal({
               <span className="ubr-quick-label">Temples:</span>
               <div className="ubr-quick-chips-scroll">
                 {QUICK_DESTINATIONS.map((qd, idx) => {
-                  const isCur = destLocation?.name?.toLowerCase().includes(qd.name.toLowerCase().split(' ')[0]);
+                  const isCur = destLocation?.name === qd.name || (destLocation?.lat === qd.lat && destLocation?.lng === qd.lng);
                   return (
                     <button
                       key={idx}
@@ -708,7 +812,7 @@ export default function InstantRideModal({
                       onClick={() => { setPaymentMethod('yatra_points'); setIsPaymentSheetOpen(false); }}
                     >
                       <Sparkles size={18} />
-                      <div>
+              <div>
                         <strong>Yatra Points</strong>
                         <span>Redeem divine blessing coins</span>
                       </div>
@@ -765,15 +869,54 @@ export default function InstantRideModal({
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* STAGE 2: UBER RADAR SEARCHING SCREEN                         */}
+        {/* STAGE 2: CLEAN MINIMALIST RADAR SEARCHING                     */}
         {/* ------------------------------------------------------------- */}
         {stage === 'SEARCHING_RADAR' && (
-          <div className="ubr-radar-stage">
-            <div className="ubr-radar-visual">
+          <div className="ubr-radar-stage-clean">
+            {/* 1. Hero Pulse Visual with Concentric Ripple Waves & Real Driver Avatars */}
+            <div className="ubr-radar-visual-clean">
+              {/* Concentric Expanding Ripple Waves */}
               <div className="ubr-radar-wave wave-1" />
               <div className="ubr-radar-wave wave-2" />
               <div className="ubr-radar-wave wave-3" />
-              <div className="ubr-radar-center-pod">
+
+              {/* Range Rings */}
+              <div className="ubr-radar-grid-rings">
+                <div className="ubr-radar-ring ring-1" />
+                <div className="ubr-radar-ring ring-2" />
+                <div className="ubr-radar-ring ring-3" />
+              </div>
+
+              {/* Real Nearby Driver Profile Avatars / Illustrations */}
+              {radarDrivers.map((driver) => {
+                const rad = (driver.angle * Math.PI) / 180;
+                const r = (54 * (driver.radiusPercent || 70)) / 100;
+                const x = 70 + r * Math.cos(rad) - 13; // 26px avatar pod / 2 = 13px
+                const y = 70 + r * Math.sin(rad) - 13;
+                const avatarSrc = driver.avatar || driver.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(driver.name || 'Driver')}&backgroundColor=e0f2fe`;
+
+                return (
+                  <div
+                    key={driver.id || driver.name}
+                    className="ubr-radar-driver-pod"
+                    style={{ left: `${x}px`, top: `${y}px` }}
+                    title={`${driver.name} (${driver._distanceText || 'Nearby'})`}
+                  >
+                    <img
+                      src={avatarSrc}
+                      alt={driver.name}
+                      className="ubr-radar-driver-img"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(driver.name || 'Driver')}&backgroundColor=e0f2fe`;
+                      }}
+                    />
+                    <span className="ubr-radar-driver-pulse" />
+                  </div>
+                );
+              })}
+
+              {/* Central Floating Vehicle Pod */}
+              <div className="ubr-radar-hero-pod">
                 {(() => {
                   const IconComp = selectedTier.iconComponent;
                   return <IconComp />;
@@ -781,165 +924,219 @@ export default function InstantRideModal({
               </div>
             </div>
 
-            <div className="ubr-radar-content">
-              <h3 className="ubr-radar-title">Looking for nearby rides</h3>
-              <p className="ubr-radar-subtitle">{searchStepText}</p>
+            {/* 2. Focused Status Headline & Real-Time Dynamic Subtitle */}
+            <div className="ubr-radar-clean-content">
+              <h3 className="ubr-radar-clean-title">Looking for nearby rides</h3>
+              <p className="ubr-radar-clean-subtitle">{searchStepText}</p>
               
-              <div className="ubr-radar-timer">
-                <Clock size={13} className="ubr-radar-clock" />
+              <div className="ubr-radar-clean-timer">
+                <Clock size={13} />
                 <span>Matching in {searchTimer}s</span>
-              </div>
-
-              <div className="ubr-guarantee-chips">
-                <div className="ubr-guarantee-item">
-                  <ShieldCheck size={14} color="#0f172a" />
-                  <span>Verified Driver</span>
-                </div>
-                <div className="ubr-guarantee-item">
-                  <Zap size={14} color="#0f172a" />
-                  <span>Locked Fare ₹{currentFare}</span>
-                </div>
-                <div className="ubr-guarantee-item">
-                  <Shield size={14} color="#0f172a" />
-                  <span>Safety OTP</span>
-                </div>
               </div>
             </div>
 
-            <button className="ubr-cancel-search-btn" onClick={handleCancel}>
+            {/* 3. Clean 1-Line Minimalist Trip Summary */}
+            <div className="ubr-radar-clean-summary">
+              <span className="ubr-rcs-fare">₹{currentFare} Locked</span>
+              <span className="ubr-rcs-dot">•</span>
+              <span className="ubr-rcs-dist">{formatDistance(tripDistanceKm)}</span>
+              <span className="ubr-rcs-dot">•</span>
+              <span className="ubr-rcs-surge">Zero Surge</span>
+            </div>
+
+            {/* 4. Cancel Action */}
+            <button className="ubr-radar-clean-cancel-btn" onClick={handleCancel}>
               Cancel Request
             </button>
           </div>
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* STAGE 3: ACTIVE TRIP & DRIVER TRACKING                      */}
+        {/* STAGE 3: ACTIVE TRIP & DRIVER TRACKING (LUXURY EXECUTIVE)   */}
         {/* ------------------------------------------------------------- */}
         {stage === 'TRIP_ACTIVE' && (
-          <div className="ubr-active-stage">
+          <div className="ubr-active-stage-pro">
             {/* Status Banner */}
-            <div className="ubr-active-banner">
-              <div className="ubr-banner-info">
-                <div className="ubr-active-pulse" />
-                <div>
-                  <strong className="ubr-banner-title">
-                    {activeRide?.status === 'arrived' 
-                      ? 'Driver has arrived' 
+            <div className="ubr-active-banner-pro">
+              <div className="ubr-active-status-col">
+                <div className="ubr-live-tag">
+                  <span className="ubr-pulse-dot-emerald" />
+                  <span className="ubr-live-text">
+                    {activeRide?.status === 'driver_arrived' 
+                      ? 'Driver Arrived at Pickup' 
                       : activeRide?.status === 'in_progress' 
-                      ? 'En route to destination' 
+                      ? 'Trip in Progress' 
                       : 'Driver on the way'}
-                  </strong>
-                  <p className="ubr-banner-sub">
-                    {activeRide?.status === 'arrived' 
-                      ? 'Meet driver at pickup point' 
-                      : activeRide?.status === 'in_progress' 
-                      ? `Heading to ${destination?.name || 'Destination'}` 
-                      : 'Arriving in 2-3 mins'}
-                  </p>
+                  </span>
                 </div>
+                <p className="ubr-active-eta-text">
+                  {activeRide?.status === 'driver_arrived' 
+                    ? 'Meet driver at pickup point' 
+                    : activeRide?.status === 'in_progress' 
+                    ? `Heading to ${destLocation?.name || 'Destination'}` 
+                    : 'Arriving in 2-3 mins (0.8 km away)'}
+                </p>
               </div>
 
-              {/* Safety OTP */}
+              {/* Safety OTP Badge with Copied Feedback */}
               <div 
-                className="ubr-otp-badge" 
+                className={`ubr-otp-badge-pro ${copiedOtp ? 'copied' : ''}`}
                 onClick={copyPinToClipboard}
-                title="Click to copy Safety PIN"
+                title="Tap to copy 4-digit Safety PIN"
               >
-                <div className="ubr-otp-tag">PIN</div>
-                <strong className="ubr-otp-val">{safetyPin}</strong>
+                <div className="ubr-otp-tag-row">
+                  <Shield size={10} />
+                  <span>SAFETY PIN</span>
+                </div>
+                <strong className="ubr-otp-val-pro">
+                  {copiedOtp ? 'COPIED!' : safetyPin}
+                </strong>
               </div>
             </div>
 
-            {/* Driver Profile */}
+            {/* Driver Profile Card with 2-Tier Hierarchy (Never Cramped) */}
             {activeDriver && (
-              <div className="ubr-driver-card">
-                <img
-                  src={activeDriver.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeDriver.name}&backgroundColor=f1f5f9`}
-                  alt={activeDriver.name}
-                  className="ubr-driver-img"
-                />
+              <div className="ubr-driver-card-pro">
+                {/* Tier 1: Driver Identity & Vehicle Info */}
+                <div className="ubr-driver-card-top-row">
+                  <div className="ubr-driver-avatar-wrap">
+                    <img
+                      src={activeDriver.avatar || activeDriver.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeDriver.name || 'Sarathi')}&backgroundColor=e0f2fe&mouth=smile,twinkle&eyes=happy,default&eyebrows=default&top=shortFlat,shortCurly,shortWaved,theCaesar&facialHairProbability=40`}
+                      alt={activeDriver.name}
+                      className="ubr-driver-img-pro"
+                      onError={(e) => {
+                        e.currentTarget.src = `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(activeDriver.name || 'Sarathi')}&backgroundColor=e0f2fe`;
+                      }}
+                    />
+                    <span className="ubr-driver-online-badge" />
+                  </div>
 
-                <div className="ubr-driver-info">
-                  <div className="ubr-driver-title-row">
+                  <div className="ubr-driver-identity-col">
                     <strong className="ubr-driver-name">{activeDriver.name}</strong>
-                    <span className="ubr-driver-verified">
-                      <CheckCircle2 size={11} /> Verified
-                    </span>
+                    <div className="ubr-driver-meta-subrow">
+                      <span className="ubr-driver-verified-pro">
+                        <CheckCircle2 size={11} /> Verified
+                      </span>
+                      <div className="ubr-driver-stars-pro">
+                        <Star size={12} fill="#f59e0b" color="#f59e0b" />
+                        <strong>{activeDriver.rating || '4.9'}</strong>
+                        <span>({activeDriver.reviewsCount || '1.2k'})</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="ubr-driver-plate-row">
-                    <span className="ubr-plate-pill">{activeDriver.vehicleNo || 'UP-85-BV-1008'}</span>
-                    <span className="ubr-veh-name">{activeDriver.vehicleType || selectedTier.name}</span>
-                  </div>
-                  <div className="ubr-driver-stars">
-                    <Star size={12} fill="#0f172a" color="#0f172a" />
-                    <strong>{activeDriver.rating || '4.9'}</strong>
-                    <span>(1,200+ yatras)</span>
+
+                  <div className="ubr-driver-vehicle-col">
+                    <span className="ubr-plate-pill-pro">{activeDriver.vehicleNo || 'UP-85-BV-1008'}</span>
+                    <span className="ubr-veh-name-pro">{activeDriver.vehicleType || selectedTier.name}</span>
                   </div>
                 </div>
 
-                {activeDriver.phone && (
+                {/* Tier 2: Dedicated Ergonomic Communication Bar */}
+                <div className="ubr-driver-card-actions-row">
+                  {activeDriver.phone ? (
+                    <button
+                      type="button"
+                      className="ubr-driver-call-btn-pro"
+                      onClick={() => window.open(`tel:${activeDriver.phone}`)}
+                      title={`Call ${activeDriver.name}`}
+                      aria-label={`Call driver ${activeDriver.name}`}
+                    >
+                      <Phone size={15} />
+                      <span>Call Driver</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="ubr-driver-call-btn-pro"
+                      onClick={() => window.open('tel:+919876543210')}
+                      title="Call Sarathi"
+                    >
+                      <Phone size={15} />
+                      <span>Call Driver</span>
+                    </button>
+                  )}
                   <button
-                    className="ubr-driver-call-btn"
-                    onClick={() => window.open(`tel:${activeDriver.phone}`)}
-                    title={`Call ${activeDriver.name}`}
-                    aria-label={`Call driver ${activeDriver.name}`}
+                    type="button"
+                    className="ubr-driver-chat-btn-pro"
+                    onClick={() => window.open(`https://wa.me/?text=Hare%20Krishna%2C%20I%20am%20waiting%20at%20${encodeURIComponent(pickupLocation.name)}`)}
+                    title="Message driver on WhatsApp"
                   >
-                    <Phone size={18} />
+                    <MessageSquare size={15} />
+                    <span>WhatsApp Chat</span>
                   </button>
-                )}
+                </div>
               </div>
             )}
 
-            {/* Fare Summary Matrix */}
-            <div className="ubr-summary-row">
-              <div className="ubr-summary-col">
-                <span className="ubr-sum-label">TRIP FARE</span>
-                <strong className="ubr-sum-val">₹{currentFare}</strong>
+            {/* If user added a landmark note */}
+            {landmarkNote && (
+              <div className="ubr-driver-note-pill">
+                <MapPin size={12} color="#047857" />
+                <span>Pickup Landmark: <strong>"{landmarkNote}"</strong></span>
               </div>
-              <div className="ubr-summary-col">
-                <span className="ubr-sum-label">PAYMENT</span>
-                <strong className="ubr-sum-val">{getPaymentLabel()}</strong>
+            )}
+
+            {/* Streamlined Clean Trip Summary Capsule */}
+            <div className="ubr-trip-details-capsule">
+              <div className="ubr-trip-detail-item">
+                <span className="ubr-td-label">TRIP FARE</span>
+                <strong className="ubr-td-val">₹{currentFare}</strong>
               </div>
-              <div className="ubr-summary-col">
-                <span className="ubr-sum-label">DISTANCE</span>
-                <strong className="ubr-sum-val">{formatDistance(tripDistanceKm)}</strong>
+              <span className="ubr-td-divider" />
+              <div className="ubr-trip-detail-item">
+                <span className="ubr-td-label">PAYMENT</span>
+                <strong className="ubr-td-val">{getPaymentLabel()}</strong>
+              </div>
+              <span className="ubr-td-divider" />
+              <div className="ubr-trip-detail-item">
+                <span className="ubr-td-label">DISTANCE</span>
+                <strong className="ubr-td-val">{formatDistance(tripDistanceKm)}</strong>
+              </div>
+              <span className="ubr-td-divider" />
+              <div className="ubr-trip-detail-item">
+                <span className="ubr-td-label">SURGE</span>
+                <strong className="ubr-td-val green">0% Free</strong>
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="ubr-active-actions">
-              <button className="ubr-sos-action-btn" onClick={() => window.open('tel:112')}>
-                <Shield size={14} /> Police SOS
+            {/* Safety & Action Controls */}
+            <div className="ubr-active-actions-pro">
+              <button className="ubr-sos-action-btn-pro" onClick={() => window.open('tel:112')} title="Emergency Dial 112">
+                <Shield size={14} /> Police SOS 112
               </button>
-              <button className="ubr-cancel-action-btn" onClick={handleCancel}>
-                Cancel Ride
+              <button className="ubr-share-action-btn-pro" onClick={handleShareTrip} title="Share live ride tracking link">
+                <Share2 size={14} /> {copiedShareLink ? 'Link Copied!' : 'Share Live Ride'}
+              </button>
+              <button className="ubr-cancel-action-btn-pro" onClick={handleCancel}>
+                Cancel
               </button>
             </div>
           </div>
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* STAGE 4: TRIP COMPLETED & RATING                            */}
+        {/* STAGE 4: TRIP COMPLETED & DUAL FEEDBACK (DRIVER & PLATFORM)   */}
         {/* ------------------------------------------------------------- */}
         {stage === 'TRIP_COMPLETED' && (
           <div className="ubr-completed-stage">
             <div className="ubr-complete-icon-wrap">
-              <CheckCircle2 size={44} color="#0f172a" />
+              <CheckCircle2 size={38} color="#059669" />
             </div>
-            <h3 className="ubr-complete-title">Trip Completed</h3>
-            <p className="ubr-complete-sub">You arrived safely at {destination?.name || 'Destination'}</p>
+            <h3 className="ubr-complete-title">Trip Completed!</h3>
+            <p className="ubr-complete-sub">You arrived safely at {destLocation?.name || destination?.name || 'Sacred Destination'}</p>
 
+            {/* Compact Receipt Card */}
             <div className="ubr-receipt-box">
               <div className="ubr-receipt-line">
                 <span>Trip Fare</span>
                 <strong>₹{currentFare}</strong>
               </div>
               <div className="ubr-receipt-line">
-                <span>Distance</span>
+                <span>Distance & Route</span>
                 <span>{formatDistance(tripDistanceKm)}</span>
               </div>
               <div className="ubr-receipt-line">
-                <span>Payment</span>
+                <span>Payment Method</span>
                 <span>{getPaymentLabel()}</span>
               </div>
               <div className="ubr-receipt-line total">
@@ -949,44 +1146,155 @@ export default function InstantRideModal({
             </div>
 
             {!feedbackSubmitted ? (
-              <div className="ubr-rating-container">
-                <span className="ubr-rate-prompt">Rate your trip with {activeDriver?.name || 'Driver'}</span>
-                <div className="ubr-stars-box">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const isFilled = (hoverRating || userRating) >= star;
-                    return (
-                      <button
-                        key={star}
-                        type="button"
-                        className="ubr-star-touch"
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setUserRating(star)}
-                      >
-                        <Star 
-                          size={28} 
-                          fill={isFilled ? '#0f172a' : 'none'} 
-                          color={isFilled ? '#0f172a' : '#cbd5e1'} 
-                        />
-                      </button>
-                    );
-                  })}
+              <div className="ubr-feedback-pro-card">
+                {/* Dual Feedback Target Tabs */}
+                <div className="ubr-feedback-target-tabs">
+                  <button
+                    type="button"
+                    className={`ubr-fb-tab-btn ${feedbackTarget === 'driver' ? 'active' : ''}`}
+                    onClick={() => setFeedbackTarget('driver')}
+                  >
+                    <span>🛺 Rate Driver (Sarathi)</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`ubr-fb-tab-btn ${feedbackTarget === 'platform' ? 'active' : ''}`}
+                    onClick={() => setFeedbackTarget('platform')}
+                  >
+                    <span>📱 Rate Platform (App)</span>
+                  </button>
                 </div>
 
-                <div className="ubr-compliments-cloud">
-                  {COMPLIMENT_TAGS.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      className={`ubr-tag-pill ${selectedCompliments.includes(tag) ? 'active' : ''}`}
-                      onClick={() => toggleCompliment(tag)}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
+                {feedbackTarget === 'driver' ? (
+                  <div className="ubr-fb-content-pane">
+                    <div className="ubr-fb-target-header">
+                      <div className="ubr-fb-avatar-wrap">
+                        <img
+                          src={activeDriver?.avatar || activeDriver?.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeDriver?.name || 'Sarathi')}&backgroundColor=e0f2fe&mouth=smile,twinkle&eyes=happy,default&eyebrows=default&top=shortFlat,shortCurly,shortWaved,theCaesar`}
+                          alt={activeDriver?.name}
+                          className="ubr-fb-avatar-img"
+                        />
+                      </div>
+                      <div className="ubr-fb-target-info">
+                        <strong className="ubr-fb-driver-name">{activeDriver?.name || 'Brajwasi Sarathi'}</strong>
+                        <span className="ubr-fb-driver-meta">{activeDriver?.vehicleType || selectedTier.name} • {activeDriver?.vehicleNo || 'UP-85-BV-1008'}</span>
+                      </div>
+                    </div>
+
+                    <div className="ubr-stars-row">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isFilled = (driverHoverRating || driverRating) >= star;
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            className="ubr-star-touch-btn"
+                            onMouseEnter={() => setDriverHoverRating(star)}
+                            onMouseLeave={() => setDriverHoverRating(0)}
+                            onClick={() => setDriverRating(star)}
+                            aria-label={`Rate driver ${star} stars`}
+                          >
+                            <Star
+                              size={28}
+                              fill={isFilled ? '#f59e0b' : 'none'}
+                              color={isFilled ? '#f59e0b' : '#cbd5e1'}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="ubr-star-label-hint">
+                      {driverRating === 5 ? '✨ Extraordinary Sarathi' : driverRating === 4 ? 'Great Yatra' : driverRating === 3 ? 'Good Service' : driverRating === 2 ? 'Fair Service' : 'Needs Improvement'}
+                    </span>
+
+                    <div className="ubr-compliments-cloud">
+                      {DRIVER_COMPLIMENTS.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`ubr-tag-pill ${driverCompliments.includes(tag) ? 'active' : ''}`}
+                          onClick={() => toggleDriverCompliment(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="ubr-fb-note-wrap">
+                      <input
+                        type="text"
+                        className="ubr-fb-note-input"
+                        placeholder={`Leave a note of blessing or feedback for ${activeDriver?.name || 'driver'}...`}
+                        value={driverNote}
+                        onChange={(e) => setDriverNote(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="ubr-fb-content-pane">
+                    <div className="ubr-fb-target-header">
+                      <div className="ubr-fb-platform-icon">
+                        <Sparkles size={20} color="#047857" />
+                      </div>
+                      <div className="ubr-fb-target-info">
+                        <strong className="ubr-fb-driver-name">Vrinda Tours Experience</strong>
+                        <span className="ubr-fb-driver-meta">Fast, transparent & spiritual pilgrimage mobility</span>
+                      </div>
+                    </div>
+
+                    <div className="ubr-stars-row">
+                      {[1, 2, 3, 4, 5].map((star) => {
+                        const isFilled = (platformHoverRating || platformRating) >= star;
+                        return (
+                          <button
+                            key={star}
+                            type="button"
+                            className="ubr-star-touch-btn"
+                            onMouseEnter={() => setPlatformHoverRating(star)}
+                            onMouseLeave={() => setPlatformHoverRating(0)}
+                            onClick={() => setPlatformRating(star)}
+                            aria-label={`Rate platform ${star} stars`}
+                          >
+                            <Star
+                              size={28}
+                              fill={isFilled ? '#f59e0b' : 'none'}
+                              color={isFilled ? '#f59e0b' : '#cbd5e1'}
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="ubr-star-label-hint">
+                      {platformRating === 5 ? '✨ Seamless Pilgrimage Service' : platformRating === 4 ? 'Very Good App' : platformRating === 3 ? 'Good Experience' : platformRating === 2 ? 'Needs Polish' : 'Poor Experience'}
+                    </span>
+
+                    <div className="ubr-compliments-cloud">
+                      {PLATFORM_TAGS.map((tag) => (
+                        <button
+                          key={tag}
+                          type="button"
+                          className={`ubr-tag-pill ${platformTags.includes(tag) ? 'active' : ''}`}
+                          onClick={() => togglePlatformTag(tag)}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="ubr-fb-note-wrap">
+                      <input
+                        type="text"
+                        className="ubr-fb-note-input"
+                        placeholder="How can we improve the Vrinda Tours pilgrimage app?..."
+                        value={platformNote}
+                        onChange={(e) => setPlatformNote(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <button
+                  type="button"
                   className="ubr-submit-rate-btn"
                   onClick={() => setFeedbackSubmitted(true)}
                 >
@@ -994,13 +1302,14 @@ export default function InstantRideModal({
                 </button>
               </div>
             ) : (
-              <div className="ubr-feedback-success">
-                <HeartHandshake size={24} color="#0f172a" />
-                <p>Thank you! Your feedback helps keep Braj yatras safe and joyous.</p>
+              <div className="ubr-feedback-success-card">
+                <HeartHandshake size={34} color="#059669" />
+                <strong className="ubr-fb-success-title">Radhe Radhe! 🙏</strong>
+                <p className="ubr-fb-success-sub">Your feedback has been recorded. It helps keep Braj yatras safe, transparent, and joyous for every devotee.</p>
               </div>
             )}
 
-            <button className="ubr-back-map-btn" onClick={triggerClose}>
+            <button type="button" className="ubr-back-map-btn" onClick={triggerClose}>
               Back to Map
             </button>
           </div>
