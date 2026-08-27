@@ -3515,12 +3515,17 @@
 }
 
 @keyframes tpDropdownIn {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(-8px) scale(0.96);
+    transform: translateY(-10px) scale(0.92);
   }
 
-  to {
+  68% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.018);
+  }
+
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
@@ -6497,13 +6502,18 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  animation: tpCardPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpCardPop 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 @keyframes tpCardPop {
   0% {
     opacity: 0;
-    transform: scale(0.92) translateY(16px);
+    transform: scale(0.9) translateY(20px);
+  }
+
+  68% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-2px);
   }
 
   100% {
@@ -6874,16 +6884,21 @@
   flex-direction: column;
   overflow: hidden;
   padding: 0;
-  animation: tpModalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpModalScaleIn 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 @keyframes tpModalScaleIn {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.95) translateY(12px);
+    transform: scale(0.92) translateY(18px);
   }
 
-  to {
+  68% {
+    opacity: 1;
+    transform: scale(1.018) translateY(-2px);
+  }
+
+  100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
@@ -7641,16 +7656,21 @@
   display: flex;
   flex-direction: column;
   padding: 0;
-  animation: tpSpotlightPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tpSpotlightPop 0.35s cubic-bezier(0.34, 1.45, 0.64, 1);
 }
 
 @keyframes tpSpotlightPop {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.96) translateY(-8px);
+    transform: scale(0.92) translateY(-12px);
   }
 
-  to {
+  68% {
+    opacity: 1;
+    transform: scale(1.018) translateY(2px);
+  }
+
+  100% {
     opacity: 1;
     transform: scale(1) translateY(0);
   }

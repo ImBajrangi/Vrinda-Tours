@@ -58,14 +58,19 @@
 }
 
 @keyframes headerCardFadeDown {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-12px) scale(0.94);
   }
 
-  to {
+  68% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(2px) scale(1.015);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -253,13 +258,17 @@
 }
 
 @keyframes searchPanelFadeIn {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(0.96);
   }
-  to {
+  70% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(1px) scale(1.008);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 

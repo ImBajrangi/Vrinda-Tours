@@ -1840,11 +1840,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
               type="button"
               className="tp-btn-nav-search tp-desktop-auth"
               onClick={() => setIsOmniSearchOpen(true)}
-              title="Quick Search Dhams, Trips & Services (⌘K)"
+              title="Search Dhams, Trips & Services"
             >
               <Search size={14} className="tp-nav-search-icon" />
               <span className="tp-nav-search-text">Search Brij...</span>
-              <kbd className="tp-nav-search-kbd">⌘K</kbd>
             </button>
 
             {/* User Profile / Auth Action (Desktop) */}
@@ -2484,7 +2483,6 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                   <span className="tp-hsb-text">Search sacred dhams, yatra plans, VIP passes, GPS map...</span>
                 </div>
                 <div className="tp-hsb-right">
-                  <span className="tp-hsb-shortcut">⌘K</span>
                   <button
                     type="button"
                     className="tp-hsb-btn"

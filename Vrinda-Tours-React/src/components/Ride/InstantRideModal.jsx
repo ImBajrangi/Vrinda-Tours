@@ -279,6 +279,17 @@ export default function InstantRideModal({
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [copiedOtp, setCopiedOtp] = useState(false);
 
+  // Selected Tier object
+  const selectedTier = useMemo(() => {
+    return VEHICLE_TIERS.find(t => t.id === selectedTierId) || VEHICLE_TIERS[0];
+  }, [selectedTierId]);
+
+  // Calculate Dynamic Fare
+  const currentFare = useMemo(() => {
+    const rawFare = Math.round(selectedTier.baseFare + (tripDistanceKm * selectedTier.perKmRate));
+    return Math.max(rawFare - appliedDiscount, 20);
+  }, [selectedTier, tripDistanceKm, appliedDiscount]);
+
   // Sync state if activeRide prop changes externally
   useEffect(() => {
     if (activeRide?.status) {
@@ -339,17 +350,6 @@ export default function InstantRideModal({
     }
     return () => clearInterval(interval);
   }, [stage, availableDrivers, onRequestRide, selectedTierId, paymentMethod, safetyPin, destLocation?.name, pickupLocation, tripDistanceKm, currentFare]);
-
-  // Selected Tier object
-  const selectedTier = useMemo(() => {
-    return VEHICLE_TIERS.find(t => t.id === selectedTierId) || VEHICLE_TIERS[0];
-  }, [selectedTierId]);
-
-  // Calculate Dynamic Fare
-  const currentFare = useMemo(() => {
-    const rawFare = Math.round(selectedTier.baseFare + (tripDistanceKm * selectedTier.perKmRate));
-    return Math.max(rawFare - appliedDiscount, 20);
-  }, [selectedTier, tripDistanceKm, appliedDiscount]);
 
   // Combined searchable locations list for real-time picker
   const allSearchableLocations = useMemo(() => {
