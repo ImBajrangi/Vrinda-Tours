@@ -1,0 +1,1109 @@
+/* ==========================================================================
+   MINIMALIST LUXURY RIDE SELECTION SYSTEM (UBER / APPLE DESIGN STANDARD)
+   - Zero visual noise
+   - Clean vector assets
+   - High-contrast typography & tabular pricing
+   - Sticky docked booking bar
+   ========================================================================== */
+
+/* Overlay */
+.ubr-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ubr-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Bottom Sheet / Floating Modal */
+.ubr-sheet {
+  position: fixed;
+  z-index: 9999;
+  background: #ffffff;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  
+  /* Desktop / Tablet Modal Centered */
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(var(--drag-y, 0px));
+  width: 100%;
+  max-width: 460px;
+  max-height: min(680px, calc(100vh - 48px));
+  border-radius: 24px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ubr-sheet.dragging {
+  transition: none !important;
+}
+
+/* Mobile Screen */
+@media (max-width: 640px) {
+  .ubr-sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    max-height: 88vh;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(var(--drag-y, 0px));
+  }
+}
+
+/* Grab Handle */
+.ubr-handle-wrapper {
+  padding: 10px 0 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.ubr-handle {
+  width: 36px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 999px;
+}
+
+/* Main Layout */
+.ubr-stage-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 1. Route Summary Header (Uber / Apple Maps Timeline Capsule) */
+.ubr-header {
+  padding: 8px 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.ubr-route-capsule {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.ubr-timeline-svg {
+  width: 14px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.ubr-route-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ubr-route-stop {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.ubr-stop-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.ubr-stop-name.destination {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ubr-route-divider-line {
+  height: 1px;
+  background: #e2e8f0;
+  width: 100%;
+}
+
+.ubr-route-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
+  letter-spacing: -0.01em;
+}
+
+.ubr-metric-arrow {
+  color: #059669;
+  transform: rotate(45deg);
+}
+
+.ubr-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.ubr-close-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+/* 2. Scrollable Body */
+.ubr-scroll-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+}
+
+.ubr-section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.ubr-section-title {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.06em;
+}
+
+.ubr-fleet-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+.ubr-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+/* Vehicle Tier List */
+.ubr-tier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ubr-tier-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1.5px solid #f1f5f9;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.ubr-tier-item:hover {
+  background: #fafafa;
+  border-color: #e2e8f0;
+}
+
+.ubr-tier-item.selected {
+  background: #ffffff;
+  border-color: #0f172a;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.ubr-tier-visual {
+  width: 52px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ubr-veh-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ubr-tier-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ubr-tier-primary-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ubr-tier-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.ubr-tier-seats {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.ubr-badge-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #0f172a;
+  background: #e2e8f0;
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.ubr-tier-secondary-line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ubr-eta-text {
+  font-weight: 600;
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.ubr-bullet {
+  color: #cbd5e1;
+}
+
+.ubr-tagline-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ubr-tier-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.ubr-final-price {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ubr-original-strike {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 600;
+}
+
+/* Inline Promo & Payment Popups */
+.ubr-inline-promo-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: ubrFadeIn 0.2s ease;
+}
+
+.ubr-promo-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.ubr-inline-input {
+  flex: 1;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  outline: none;
+  font-weight: 600;
+}
+
+.ubr-inline-input:focus {
+  border-color: #0f172a;
+}
+
+.ubr-inline-apply-btn {
+  padding: 0 14px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ubr-quick-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ubr-mini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+
+.ubr-mini-chip:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.ubr-promo-err {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.ubr-inline-payment-picker {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: ubrFadeIn 0.2s ease;
+}
+
+.ubr-picker-title {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.ubr-picker-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ubr-picker-opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.ubr-picker-opt:hover {
+  border-color: #cbd5e1;
+}
+
+.ubr-picker-opt.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.ubr-picker-opt div {
+  display: flex;
+  flex-direction: column;
+}
+
+.ubr-picker-opt strong {
+  font-size: 0.78rem;
+}
+
+.ubr-picker-opt span {
+  font-size: 0.65rem;
+  opacity: 0.8;
+}
+
+/* 3. Docked Luxury Action Bar (Sticky Footer) */
+.ubr-dock-footer {
+  padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ubr-dock-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ubr-dock-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ubr-dock-trigger-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.ubr-dock-trigger-btn.promo-applied {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #047857;
+}
+
+.ubr-sub-icon {
+  color: #64748b;
+}
+
+.ubr-dock-trigger-btn.promo-applied .ubr-sub-icon {
+  color: #047857;
+}
+
+.ubr-chevron-icon {
+  color: #94a3b8;
+}
+
+/* Uber-Style Solid Primary CTA Button */
+.ubr-uber-primary-btn {
+  width: 100%;
+  height: 52px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+  transition: background-color 0.18s ease, transform 0.12s ease;
+}
+
+.ubr-uber-primary-btn:hover {
+  background: #1e293b;
+}
+
+.ubr-uber-primary-btn:active {
+  transform: scale(0.985);
+}
+
+.ubr-btn-main-label {
+  letter-spacing: -0.01em;
+}
+
+.ubr-btn-fare-tag {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   STAGE 2: RADAR SEARCHING
+   -------------------------------------------------------------------------- */
+
+.ubr-radar-stage {
+  padding: 32px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.ubr-radar-visual {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.ubr-radar-center-pod {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+}
+
+.ubr-radar-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid #0f172a;
+  opacity: 0;
+  animation: ubrWavePing 2.2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.ubr-radar-wave.wave-1 { animation-delay: 0s; }
+.ubr-radar-wave.wave-2 { animation-delay: 0.7s; }
+.ubr-radar-wave.wave-3 { animation-delay: 1.4s; }
+
+@keyframes ubrWavePing {
+  0% { transform: scale(0.4); opacity: 0.7; }
+  80% { opacity: 0.2; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.ubr-radar-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ubr-radar-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ubr-radar-subtitle {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+  min-height: 20px;
+}
+
+.ubr-radar-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+.ubr-guarantee-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.ubr-guarantee-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.ubr-cancel-search-btn {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ubr-cancel-search-btn:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* --------------------------------------------------------------------------
+   STAGE 3: ACTIVE TRIP
+   -------------------------------------------------------------------------- */
+
+.ubr-active-stage {
+  padding: 14px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ubr-active-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #0f172a;
+  border-radius: 16px;
+  color: #ffffff;
+}
+
+.ubr-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ubr-active-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+}
+
+.ubr-banner-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: block;
+}
+
+.ubr-banner-sub {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.ubr-otp-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ubr-otp-tag {
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: 0.05em;
+}
+
+.ubr-otp-val {
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.ubr-driver-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.ubr-driver-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.ubr-driver-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ubr-driver-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ubr-driver-name {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ubr-driver-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+.ubr-driver-plate-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ubr-plate-pill {
+  font-weight: 800;
+  color: #0f172a;
+  background: #e2e8f0;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.ubr-driver-stars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  color: #0f172a;
+  margin-top: 1px;
+}
+
+.ubr-driver-stars span {
+  color: #94a3b8;
+}
+
+.ubr-driver-call-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #0f172a;
+  border: none;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ubr-summary-row {
+  display: flex;
+  gap: 6px;
+}
+
+.ubr-summary-col {
+  flex: 1;
+  padding: 8px 10px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ubr-sum-label {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.ubr-sum-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ubr-active-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ubr-sos-action-btn {
+  flex: 1;
+  padding: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.ubr-cancel-action-btn {
+  flex: 1;
+  padding: 10px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   STAGE 4: COMPLETED
+   -------------------------------------------------------------------------- */
+
+.ubr-completed-stage {
+  padding: 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.ubr-complete-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ubr-complete-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.ubr-complete-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.ubr-receipt-box {
+  width: 100%;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.ubr-receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: #475569;
+}
+
+.ubr-receipt-line.total {
+  padding-top: 6px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ubr-rating-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ubr-rate-prompt {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ubr-stars-box {
+  display: flex;
+  gap: 6px;
+}
+
+.ubr-star-touch {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.ubr-compliments-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+}
+
+.ubr-tag-pill {
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+
+.ubr-tag-pill.active {
+  background: #0f172a;
+  border-color: #0f172a;
+  color: #ffffff;
+}
+
+.ubr-submit-rate-btn {
+  width: 100%;
+  padding: 10px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.ubr-feedback-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.ubr-back-map-btn {
+  width: 100%;
+  padding: 12px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+@keyframes ubrFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

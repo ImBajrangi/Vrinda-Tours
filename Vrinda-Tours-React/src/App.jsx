@@ -23,7 +23,7 @@ import AnnouncementBanner from './components/UI/AnnouncementBanner';
 // Lazy-loaded on-demand portals & modals for instant initial load (<100ms)
 const HotelBooking = lazy(() => import('./components/BookingSheets/HotelBooking'));
 const RestaurantBooking = lazy(() => import('./components/BookingSheets/RestaurantBooking'));
-const RideSheet = lazy(() => import('./components/BookingSheets/RideSheet'));
+const InstantRideModal = lazy(() => import('./components/Ride/InstantRideModal'));
 const FavoritesListSheet = lazy(() => import('./components/UI/FavoritesListSheet'));
 const DriversPanel = lazy(() => import('./components/Admin/DriversPanel'));
 const AdminDashboardPage = lazy(() => import('./components/Admin/AdminDashboardPage'));
@@ -45,7 +45,7 @@ export default function App() {
   const [hotelBooking, setHotelBooking] = useState(null);
   const [restaurantBooking, setRestaurantBooking] = useState(null);
   const [rideRequest, setRideRequest] = useState(null); // { destination: loc }
-  const [activeRide, setActiveRide] = useState(null); // { driver, status }
+  const [activeRide, setActiveRide] = useState(null); // { driver, status, rideData }
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
   const [helpCenterVisible, setHelpCenterVisible] = useState(false);
@@ -163,8 +163,8 @@ export default function App() {
           return;
         }
 
-        // Direct Dining & Bhojnalaya: ?partner=restaurant or ?join=dining or #dining
-        if (joinParam === 'restaurant' || joinParam === 'dining' || joinParam === 'food' || joinParam === 'bhojnalaya' || hash.includes('restaurant') || hash.includes('dining')) {
+        // Direct Restaurant / Dining Desk: ?partner=restaurant or ?join=restaurant or #restaurant
+        if (joinParam === 'restaurant' || joinParam === 'dining' || joinParam === 'food' || joinParam === 'prasadam' || hash.includes('restaurant')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
           setHotelLandingVisible(false);
@@ -173,75 +173,68 @@ export default function App() {
           return;
         }
 
-        // Direct Yatra Agency & Parikrama: ?partner=agency or ?join=agency or #agency
-        if (joinParam === 'agency' || joinParam === 'yatra' || joinParam === 'tour' || joinParam === 'guide' || hash.includes('agency') || hash.includes('yatra')) {
+        // Direct Agency Desk: ?partner=agency or ?join=agency or #agency
+        if (joinParam === 'agency' || joinParam === 'travel' || joinParam === 'partner' || hash.includes('agency')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
           setHotelLandingVisible(false);
-          setRestaurantLandingVisible(false);
           setAgencyLandingVisible(true);
           return;
         }
 
-        // Direct Help Centre / Support: ?portal=help or #help or #support
-        if (portalParam === 'help' || portalParam === 'support' || hash === '#help' || hash === '#support' || hash === '#contact') {
+        // Direct Help Center: ?page=help or #help
+        if (joinParam === 'help' || hash.includes('help')) {
           setHelpCenterVisible(true);
           return;
         }
-
-        // Direct Landing section hash jump (e.g. #faq, #benefits, #vehicles, #territories)
-        if (['#faq', '#benefits', '#territories', '#vehicles', '#properties', '#categories', '#packages', '#how-it-works', '#reviews'].some(s => hash.startsWith(s))) {
-          setPartnerLandingVisible(false);
-          setDriverLandingVisible(true);
-          return;
-        }
-      } catch (e) {
-        console.warn('URL deep-linking parse error:', e);
+      } catch (err) {
+        console.warn('Deep link route parsing error:', err);
       }
     };
 
     handleDeepLinkRouting();
-    window.addEventListener('hashchange', handleDeepLinkRouting);
     window.addEventListener('popstate', handleDeepLinkRouting);
-
-    const handleGlobalKeyDown = (e) => {
-      // Shortcut: Cmd+Shift+A (Mac) or Ctrl+Shift+A (Windows/Linux)
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
-        e.preventDefault();
-        setAdminVisible(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleGlobalKeyDown);
-
+    window.addEventListener('hashchange', handleDeepLinkRouting);
     return () => {
-      window.removeEventListener('hashchange', handleDeepLinkRouting);
       window.removeEventListener('popstate', handleDeepLinkRouting);
-      window.removeEventListener('keydown', handleGlobalKeyDown);
+      window.removeEventListener('hashchange', handleDeepLinkRouting);
     };
   }, []);
 
-  // Listen to passenger active ride status updates in real-time
+  // Real-time synchronization for active ride with Driver Companion App
   useEffect(() => {
-    if (!activeRide?.driver?.id) return;
+    if (!activeRide?.driver?.id || activeRide.driver.id === 'drv_demo_vrinda') return;
 
-    const driverRef = doc(firestore, 'drivers', activeRide.driver.id);
-    const unsub = onSnapshot(driverRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
+    const unsub = onSnapshot(doc(firestore, 'drivers', activeRide.driver.id), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
         if (data.currentRide) {
-          setActiveRide(prev => prev ? { ...prev, status: data.currentRide.status } : null);
-        } else {
-          // Ride completed or cancelled by driver
-          if (activeRide.status === 'arrived' || activeRide.status === 'accepted') {
-            setToast({ message: 'Ride completed', type: 'success' });
-          }
-          setActiveRide(null);
+          setActiveRide(prev => prev ? { 
+            ...prev, 
+            status: data.currentRide.status || prev.status, 
+            rideData: data.currentRide 
+          } : null);
         }
       }
+    }, (err) => {
+      console.warn('Realtime ride tracking snapshot error:', err);
     });
 
     return () => unsub();
   }, [activeRide?.driver?.id]);
+
+  // Sync back to Partner Hub on hash update
+  useEffect(() => {
+    const handlePartnerHubHash = () => {
+      if (window.location.hash === '#partner-hub' || window.location.hash === '#hub') {
+        const storedId = sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id');
+        const storedRole = sessionStorage.getItem('vt_partner_role') || 'driver';
+        handleOpenPartnerDashboard(storedId, storedRole);
+      }
+    };
+    window.addEventListener('hashchange', handlePartnerHubHash);
+    return () => window.removeEventListener('hashchange', handlePartnerHubHash);
+  }, [handleOpenPartnerDashboard]);
 
   const handleFilterChange = useCallback((key) => {
     if (key === '__drivers__') {
@@ -269,39 +262,47 @@ export default function App() {
     setRideRequest({ destination: loc });
   }, []);
 
-  const handleRequestRide = useCallback(async (driver) => {
-    setRideRequest(null);
+  const handleRequestRide = useCallback(async (driver, extraDetails = {}) => {
     try {
+      const destinationLoc = rideRequest?.destination || activeLocation;
       const rideData = {
         pickupLat: position?.lat || 27.646,
         pickupLng: position?.lng || 77.377,
-        pickupName: position ? 'Your Current GPS Location' : 'Barsana Center',
-        destName: activeLocation?.name || 'Pilgrim Destination',
-        destLat: activeLocation?.lat || 27.646,
-        destLng: activeLocation?.lng || 77.377,
+        pickupName: position ? 'Your Current GPS Location' : 'Braj Mandal Center',
+        destName: destinationLoc?.name || 'Pilgrim Destination',
+        destLat: destinationLoc?.lat || 27.646,
+        destLng: destinationLoc?.lng || 77.377,
         status: 'requested',
+        tier: extraDetails.tier || 'erickshaw',
+        fare: extraDetails.fare || 50,
+        paymentMethod: extraDetails.paymentMethod || 'cash_upi',
+        safetyPin: extraDetails.safetyPin || Math.floor(1000 + Math.random() * 9000).toString(),
         timestamp: Date.now()
       };
 
-      await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
-      setActiveRide({ driver, status: 'requested' });
-      setToast({ message: 'Ride requested', type: 'success' });
+      if (driver?.id && driver.id !== 'drv_demo_vrinda') {
+        await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
+      }
+      setActiveRide({ driver, status: 'requested', rideData });
+      setToast({ message: `Instant ride request sent to ${driver.name || 'driver'}!`, type: 'success' });
     } catch (err) {
       console.error('Ride request error:', err);
-      setToast({ message: 'Ride request failed', type: 'error' });
+      setActiveRide({ driver, status: 'requested' });
+      setToast({ message: 'Ride requested with local driver', type: 'info' });
     }
-  }, [position, activeLocation]);
+  }, [position, activeLocation, rideRequest]);
 
   const handleCancelRide = useCallback(async () => {
-    if (activeRide?.driver) {
+    if (activeRide?.driver?.id && activeRide.driver.id !== 'drv_demo_vrinda') {
       try {
         await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
-        setActiveRide(null);
-        setToast({ message: 'Ride cancelled', type: 'error' });
       } catch (err) {
         console.error('Cancel ride error:', err);
       }
     }
+    setActiveRide(null);
+    setRideRequest(null);
+    setToast({ message: 'Ride cancelled', type: 'error' });
   }, [activeRide]);
 
   const handleDirections = useCallback(async (loc) => {
@@ -404,6 +405,7 @@ export default function App() {
         userPosition={position}
         drivers={drivers}
         onRequestRide={handleRequestRide}
+        onBookRide={handleBookRide}
         onClose={() => setActiveLocation(null)}
         onDirections={handleDirections}
         onToast={setToast}
@@ -432,13 +434,20 @@ export default function App() {
           <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
         )}
 
-        {rideRequest && (
-          <RideSheet
-            destination={rideRequest.destination}
-            drivers={drivers}
+        {(rideRequest || activeRide) && (
+          <InstantRideModal
+            destination={rideRequest?.destination || activeLocation}
             userPosition={position}
-            onSelectDriver={handleRequestRide}
-            onClose={() => setRideRequest(null)}
+            drivers={drivers}
+            activeRide={activeRide}
+            onRequestRide={handleRequestRide}
+            onCancelRide={handleCancelRide}
+            onClose={() => {
+              setRideRequest(null);
+              if (activeRide?.status === 'completed') {
+                setActiveRide(null);
+              }
+            }}
           />
         )}
 

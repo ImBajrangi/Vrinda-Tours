@@ -16,6 +16,7 @@ export default function LocationCard({
   userPosition, 
   drivers = [],
   onRequestRide,
+  onBookRide,
   onClose, 
   onDirections,
   onToast
@@ -314,17 +315,17 @@ export default function LocationCard({
                     <span>Book Stay</span>
                   </button>
                 ) : (
-                  <button className="btn-action-primary" onClick={() => setMode('ride')}>
+                  <button className="btn-action-primary" onClick={() => onBookRide ? onBookRide(activeLoc) : setMode('ride')}>
                     <Car size={17} strokeWidth={2.2} className="btn-primary-icon" />
-                    <span>Book Ride</span>
+                    <span>Book Instant Ride</span>
                   </button>
                 )}
 
                 {(showHotel || showRestaurant) && (
                   <button 
                     className="btn-action-icon" 
-                    onClick={() => setMode('ride')} 
-                    title="Book Ride to Venue"
+                    onClick={() => onBookRide ? onBookRide(activeLoc) : setMode('ride')} 
+                    title="Book Instant Ride to Venue"
                   >
                     <Car size={17} />
                   </button>

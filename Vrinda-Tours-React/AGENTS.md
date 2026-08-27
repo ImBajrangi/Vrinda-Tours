@@ -79,3 +79,7 @@ For single-page applications with custom scroll containers (.dmd-main-body), alw
 When creating administrative and internal portals, always render them as standalone full-page views rather than modal overlays for better data density and mobile accessibility.
 Ensure all administrative dashboards include a dedicated 'View Live Website' quick action in the sidebar.
 
+Avoid using system emojis for core product iconography; use crisp, branded SVG vector illustrations for a luxury SaaS/app feel
+
+Limit vehicle and item cards to a maximum of 2 clean information hierarchy lines to prevent cognitive overload.
+

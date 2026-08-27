@@ -35,10 +35,13 @@ import {
   setCachedData
 } from '../../data/landingData';
 import { supabase } from '../../config/supabase';
-import { shareWebPPicture, getOptimizedWebPUrl } from '../../utils/imageOptimizer';
-import { validatePhoneNumber } from '../../utils/phoneValidator';
 import { syncPilgrimToSupabase, getPilgrimReferralStats, REFERRAL_CATEGORIES, shareLinkWithFallback } from '../../services/referralService';
 import { getOrCreateThreadId, sendSupportMessage } from '../../services/messagingService';
+import { useFirebaseDrivers } from '../../hooks/useFirebaseDrivers';
+import { useGeolocation } from '../../hooks/useGeolocation';
+import { doc, updateDoc, deleteField } from 'firebase/firestore';
+import { firestore } from '../../config/firebase';
+import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
 import './PartnerLandingPage.css';
 
@@ -473,11 +476,13 @@ function OmniSearchModal({
             }}
           />
           {query && (
-            <button className="tp-search-clear-btn" onClick={() => setQuery('')} aria-label="Clear">
-              <X size={16} />
+            <button type="button" className="tp-search-clear-btn" onClick={() => setQuery('')} aria-label="Clear input">
+              <X size={14} />
             </button>
           )}
-          <kbd className="tp-search-esc-hint" onClick={onClose}>ESC</kbd>
+          <button type="button" className="tp-search-close-btn" onClick={onClose} aria-label="Close search" title="Close">
+            <X size={18} />
+          </button>
         </div>
 
         {/* Filter Pills */}
@@ -487,44 +492,44 @@ function OmniSearchModal({
             className={`tp-search-pill ${activeFilter === 'all' ? 'active' : ''}`}
             onClick={() => { setActiveFilter('all'); setSelectedIndex(0); }}
           >
-            All Results ({searchResults.length})
+            All ({searchResults.length})
           </button>
           <button
             type="button"
             className={`tp-search-pill ${activeFilter === 'package' ? 'active' : ''}`}
             onClick={() => { setActiveFilter('package'); setSelectedIndex(0); }}
           >
-            ✨ Yatra Packages
+            Yatra Packages
           </button>
           <button
             type="button"
             className={`tp-search-pill ${activeFilter === 'place' ? 'active' : ''}`}
             onClick={() => { setActiveFilter('place'); setSelectedIndex(0); }}
           >
-            🛕 Sacred Dhams
+            Sacred Dhams
           </button>
           <button
             type="button"
             className={`tp-search-pill ${activeFilter === 'service' ? 'active' : ''}`}
             onClick={() => { setActiveFilter('service'); setSelectedIndex(0); }}
           >
-            ⚡ Software Tools
+            Services & Tools
           </button>
           <button
             type="button"
             className={`tp-search-pill ${activeFilter === 'darshan' ? 'active' : ''}`}
             onClick={() => { setActiveFilter('darshan'); setSelectedIndex(0); }}
           >
-            🖼️ Darshans
+            Live Darshans
           </button>
         </div>
 
         {/* Quick Suggestion Tags (Only shown when query is empty) */}
         {!query && (
           <div className="tp-search-trending-bar">
-            <span className="tp-search-trending-label">Trending:</span>
+            <span className="tp-search-trending-label">SUGGESTIONS</span>
             <div className="tp-search-trending-tags">
-              {['Bankey Bihari VIP', 'Govardhan Parikrama', 'Live GPS Map', 'Barsana Yatra', 'Radha Raman Darshan', 'Admin Console', 'Referral 500 Pts'].map((tag, idx) => (
+              {['Bankey Bihari VIP', 'Govardhan Parikrama', 'Live GPS Map', 'Barsana Yatra', 'Radha Raman', 'Referral Rewards'].map((tag, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -545,13 +550,44 @@ function OmniSearchModal({
         <div className="tp-search-results-list">
           {searchResults.length === 0 ? (
             <div className="tp-search-empty-state">
-              <Compass size={32} />
+              <Compass size={28} />
               <h4>No matches found for "{query}"</h4>
               <p>Try searching for "Vrindavan", "VIP Pass", "Parikrama", or "GPS Map".</p>
             </div>
           ) : (
             searchResults.map((item, idx) => {
               const isSelected = idx === selectedIndex;
+              
+              // Standardized price formatter
+              const priceData = (() => {
+                if (!item.price && !item.numericPrice) return null;
+                let p = item.price || '';
+                let u = item.priceUnit || '';
+                if (item.numericPrice) {
+                  p = `₹${item.numericPrice.toLocaleString('en-IN')}`;
+                } else if (typeof p === 'string') {
+                  if (p.toLowerCase().includes('2.5k')) p = '₹2,500';
+                  else if (p.toLowerCase().includes('3.5k')) p = '₹3,500';
+                  else if (p.toLowerCase().includes('7.9k') || p.includes('7,999')) p = '₹7,999';
+                  else if (p.includes('2,499') || p.includes('2499')) p = '₹2,499';
+                  else if (p.includes('1,899') || p.includes('1899')) p = '₹1,899';
+                  else if (p.includes('2,199') || p.includes('2199')) p = '₹2,199';
+                  else if (!p.startsWith('₹') && !isNaN(Number(p.replace(/[^0-9]/g, '')))) {
+                    const num = Number(p.replace(/[^0-9]/g, ''));
+                    if (num > 0) p = `₹${num.toLocaleString('en-IN')}`;
+                  }
+                }
+                if (u) {
+                  u = u.replace(/^[\/\-\s]+/, '').trim();
+                  if (u.toLowerCase() === 'pax') u = 'person';
+                  if (u.toLowerCase() === 'day') u = 'day';
+                  u = `/${u}`;
+                } else if (p && !p.includes('/')) {
+                  u = '/person';
+                }
+                return { price: p, unit: u };
+              })();
+
               return (
                 <div
                   key={`${item.resultType}-${item.id || idx}`}
@@ -559,7 +595,7 @@ function OmniSearchModal({
                   onClick={() => handleSelectResult(item)}
                   onMouseEnter={() => setSelectedIndex(idx)}
                 >
-                  {/* Thumbnail / Icon */}
+                  {/* Thumbnail / Icon Pod */}
                   <div className="tp-search-item-thumb">
                     {item.image ? (
                       <img src={item.image} alt={item.title} className="tp-search-thumb-img" loading="lazy" />
@@ -583,10 +619,10 @@ function OmniSearchModal({
                     <div className="tp-search-item-top">
                       <span className="tp-search-item-title">{item.title}</span>
                       <span className={`tp-search-type-badge tp-badge-${item.resultType}`}>
-                        {item.resultType === 'package' && 'Yatra Package'}
-                        {item.resultType === 'place' && 'Sacred Dham'}
+                        {item.resultType === 'package' && 'Package'}
+                        {item.resultType === 'place' && 'Dham'}
                         {item.resultType === 'service' && (item.badge || 'Tool')}
-                        {item.resultType === 'darshan' && 'Darshan 4K'}
+                        {item.resultType === 'darshan' && 'Darshan'}
                       </span>
                     </div>
                     <p className="tp-search-item-sub">
@@ -596,13 +632,13 @@ function OmniSearchModal({
 
                   {/* Price or Action Arrow */}
                   <div className="tp-search-item-action">
-                    {item.price && (
+                    {priceData && (
                       <span className="tp-search-item-price">
-                        <strong>{item.price}</strong>
-                        <small>{item.priceUnit || ''}</small>
+                        <strong>{priceData.price}</strong>
+                        <small>{priceData.unit}</small>
                       </span>
                     )}
-                    <ArrowRight size={15} className="tp-search-arrow" />
+                    <ArrowRight size={14} className="tp-search-arrow" />
                   </div>
                 </div>
               );
@@ -613,11 +649,11 @@ function OmniSearchModal({
         {/* Search Modal Footer */}
         <div className="tp-search-modal-footer">
           <div className="tp-search-footer-hint">
-            <span>Use <kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
-            <span><kbd>↵</kbd> to select</span>
-            <span><kbd>ESC</kbd> to close</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+            <span><kbd>↵</kbd> select</span>
+            <span><kbd>esc</kbd> close</span>
           </div>
-          <span className="tp-search-footer-brand">Vrinda Vihar Search</span>
+          <span className="tp-search-footer-brand">Vrinda Search</span>
         </div>
       </div>
     </div>
@@ -804,6 +840,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
   const [gallerySearch, setGallerySearch] = useState('');
   const [lightboxItem, setLightboxItem] = useState(null);
   const [stripeModalItem, setStripeModalItem] = useState(null);
+
+  // Uber-Grade Instant Rider State
+  const [isInstantRideModalOpen, setIsInstantRideModalOpen] = useState(false);
+  const [activeRide, setActiveRide] = useState(null);
+  const { drivers } = useFirebaseDrivers();
+  const { position } = useGeolocation();
 
   // Progressive Reveal / "Show More" Pagination Controls
   const INITIAL_GALLERY_LIMIT = 8;
@@ -2011,6 +2053,17 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
               </button>
             )}
 
+            {/* Instant Ride Button (Uber-Grade Pilgrim E-Rickshaw & Cab) */}
+            <button
+              type="button"
+              className="tp-btn-instant-ride"
+              onClick={() => setIsInstantRideModalOpen(true)}
+              title="Book Instant Pilgrim E-Rickshaw, Auto or Cab"
+            >
+              <Car size={15} />
+              <span>Instant Ride</span>
+            </button>
+
             {/* Book Trip Button */}
             <button
               className="tp-btn-dark-pill"
@@ -2166,78 +2219,60 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                 </div>
               )}
 
-              {/* 2. Main Navigation Links (Vrindopnishad List Style) */}
+              {/* 2. Main Navigation Links (Curated Essential Sections) */}
               <div className="tp-mobile-nav-block">
-                <div className="tp-mobile-section-label">PILGRIMAGE SECTIONS</div>
+                <div className="tp-mobile-section-label">PILGRIMAGE SERVICES</div>
                 <div className="tp-mobile-nav-list">
-                  <button
-                    type="button"
-                    className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-search-item"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsOmniSearchOpen(true);
-                    }}
-                  >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#2563eb', fontWeight: '700' }}>
-                      <Search size={18} />
-                      <span>Search All Dhams & Services</span>
-                    </span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
-                  </button>
-                  <a
-                    href="#about"
-                    className="tp-mobile-nav-item"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span>About Vrinda</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
-                  </a>
                   <a
                     href="#popular"
                     className="tp-mobile-nav-item"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span>Sacred Dhams & Trails</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    <div className="tp-nav-item-content">
+                      <div className="tp-nav-item-icon-box" style={{ background: '#ecfdf5', color: '#059669' }}>
+                        <Compass size={18} />
+                      </div>
+                      <div className="tp-nav-item-text">
+                        <span className="tp-nav-item-title">Sacred Dhams & Live Map</span>
+                        <span className="tp-nav-item-sub">Interactive GPS pilgrimage navigation</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
+
                   <a
                     href="#explore"
                     className="tp-mobile-nav-item"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span>Brij Tour Packages</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    <div className="tp-nav-item-content">
+                      <div className="tp-nav-item-icon-box" style={{ background: '#e0e7ff', color: '#4338ca' }}>
+                        <Calendar size={18} />
+                      </div>
+                      <div className="tp-nav-item-text">
+                        <span className="tp-nav-item-title">Brij Tour Packages</span>
+                        <span className="tp-nav-item-sub">VIP Darshan, Parikrama & Yatra Cabs</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
+
                   <a
                     href="#gallery"
                     className="tp-mobile-nav-item"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span>Divine Darshan Gallery</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    <div className="tp-nav-item-content">
+                      <div className="tp-nav-item-icon-box" style={{ background: '#fdf4ff', color: '#a21caf' }}>
+                        <ImageIcon size={18} />
+                      </div>
+                      <div className="tp-nav-item-text">
+                        <span className="tp-nav-item-title">Divine Darshan Gallery</span>
+                        <span className="tp-nav-item-sub">4K live deity darshan & archives</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
-                  <a
-                    href="#initiatives"
-                    className="tp-mobile-nav-item"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span>Pilgrim Journal & Stories</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
-                  </a>
-                  <button
-                    type="button"
-                    className="tp-mobile-nav-item tp-mobile-nav-item-btn"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      handleOpenReferralProgram();
-                    }}
-                  >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Gift size={16} color="#ec4899" />
-                      <span>Refer Pilgrims (Earn 500 Pts)</span>
-                    </span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
-                  </button>
 
                   {onOpenPartnerHub && (
                     <button
@@ -2248,34 +2283,57 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                         onOpenPartnerHub();
                       }}
                     >
-                      <span>Partner & Driver Hub</span>
-                      <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#fffbeb', color: '#d97706' }}>
+                          <Building2 size={18} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">Partner & Driver Hub</span>
+                          <span className="tp-nav-item-sub">E-Rickshaw, stay & travel desk</span>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                     </button>
                   )}
-                  {onOpenAdmin && (
-                    <button
-                      type="button"
-                      className="tp-mobile-nav-item tp-mobile-nav-item-btn"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        onOpenAdmin();
-                      }}
-                    >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Lock size={16} color="#2563eb" />
-                        <span>Admin Console</span>
-                      </span>
-                      <ArrowRight size={18} className="tp-mobile-nav-arrow" />
-                    </button>
-                  )}
+
                   <a
                     href="#contact"
                     className="tp-mobile-nav-item"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <span>Contact & Support</span>
-                    <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    <div className="tp-nav-item-content">
+                      <div className="tp-nav-item-icon-box" style={{ background: '#f0fdfa', color: '#0d9488' }}>
+                        <Headphones size={18} />
+                      </div>
+                      <div className="tp-nav-item-text">
+                        <span className="tp-nav-item-title">Contact & Support</span>
+                        <span className="tp-nav-item-sub">24x7 WhatsApp helpline</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
+
+                  {onOpenAdmin && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-nav-admin-item"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        onOpenAdmin();
+                      }}
+                    >
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#f1f5f9', color: '#64748b' }}>
+                          <Lock size={16} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">Admin Console</span>
+                          <span className="tp-nav-item-sub">Secure management command</span>
+                        </div>
+                      </div>
+                      <span className="tp-admin-discreet-tag">Staff</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -4501,6 +4559,56 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
         <Headphones size={16} />
         <span className="hc-launcher-label">Help Centre</span>
       </button>
+
+      {/* UBER-GRADE INSTANT RIDE BOOKING MODAL */}
+      {isInstantRideModalOpen && (
+        <InstantRideModal
+          destination={{ name: 'Shri Bankey Bihari Ji Mandir', lat: 27.5815, lng: 77.7005 }}
+          userPosition={position}
+          drivers={drivers}
+          activeRide={activeRide}
+          onRequestRide={async (driver, extraDetails = {}) => {
+            try {
+              const rideData = {
+                pickupLat: position?.lat || 27.646,
+                pickupLng: position?.lng || 77.377,
+                pickupName: position ? 'Your Current GPS Location' : 'Braj Mandal Center',
+                destName: 'Shri Bankey Bihari Ji Mandir, Vrindavan',
+                destLat: 27.5815,
+                destLng: 77.7005,
+                status: 'requested',
+                tier: extraDetails.tier || 'erickshaw',
+                fare: extraDetails.fare || 50,
+                paymentMethod: extraDetails.paymentMethod || 'cash_upi',
+                safetyPin: extraDetails.safetyPin || '4821',
+                timestamp: Date.now()
+              };
+              if (driver?.id && driver.id !== 'drv_demo_vrinda') {
+                await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
+              }
+              setActiveRide({ driver, status: 'requested', rideData });
+            } catch (err) {
+              console.warn('Ride request error:', err);
+              setActiveRide({ driver, status: 'requested' });
+            }
+          }}
+          onCancelRide={async () => {
+            if (activeRide?.driver?.id && activeRide.driver.id !== 'drv_demo_vrinda') {
+              try {
+                await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
+              } catch (err) {}
+            }
+            setActiveRide(null);
+            setIsInstantRideModalOpen(false);
+          }}
+          onClose={() => {
+            setIsInstantRideModalOpen(false);
+            if (activeRide?.status === 'completed') {
+              setActiveRide(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
