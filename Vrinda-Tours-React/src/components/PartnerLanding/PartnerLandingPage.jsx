@@ -843,6 +843,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
 
   // Uber-Grade Instant Rider State
   const [isInstantRideModalOpen, setIsInstantRideModalOpen] = useState(false);
+  const [rideDestination, setRideDestination] = useState({ name: 'Shri Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103 });
   const [activeRide, setActiveRide] = useState(null);
   const { drivers } = useFirebaseDrivers();
   const { position } = useGeolocation();
@@ -4563,24 +4564,26 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
       {/* UBER-GRADE INSTANT RIDE BOOKING MODAL */}
       {isInstantRideModalOpen && (
         <InstantRideModal
-          destination={{ name: 'Shri Bankey Bihari Ji Mandir', lat: 27.5815, lng: 77.7005 }}
+          destination={rideDestination}
+          onSelectDestination={setRideDestination}
           userPosition={position}
           drivers={drivers}
           activeRide={activeRide}
           onRequestRide={async (driver, extraDetails = {}) => {
             try {
               const rideData = {
-                pickupLat: position?.lat || 27.646,
-                pickupLng: position?.lng || 77.377,
-                pickupName: position ? 'Your Current GPS Location' : 'Braj Mandal Center',
-                destName: 'Shri Bankey Bihari Ji Mandir, Vrindavan',
-                destLat: 27.5815,
-                destLng: 77.7005,
+                pickupLat: extraDetails.pickupLat || position?.lat || 27.646,
+                pickupLng: extraDetails.pickupLng || position?.lng || 77.377,
+                pickupName: extraDetails.pickupName || (position ? 'Your Current GPS Location' : 'Braj Mandal Center'),
+                destName: extraDetails.destName || rideDestination?.name || 'Shri Bankey Bihari Mandir',
+                destLat: extraDetails.destLat || rideDestination?.lat || 27.580456,
+                destLng: extraDetails.destLng || rideDestination?.lng || 77.701103,
                 status: 'requested',
                 tier: extraDetails.tier || 'erickshaw',
-                fare: extraDetails.fare || 50,
+                fare: extraDetails.fare || 40,
                 paymentMethod: extraDetails.paymentMethod || 'cash_upi',
                 safetyPin: extraDetails.safetyPin || '4821',
+                distanceKm: extraDetails.distanceKm || 1.2,
                 timestamp: Date.now()
               };
               if (driver?.id && driver.id !== 'drv_demo_vrinda') {

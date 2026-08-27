@@ -2,10 +2,13 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
   X, Navigation, Clock, ShieldCheck, Phone, Star, ArrowRight, 
   CheckCircle2, Zap, Tag, ChevronRight, User, Shield, 
-  HeartHandshake, CreditCard, Banknote, Sparkles, Check, Copy, ChevronDown
+  HeartHandshake, CreditCard, Banknote, Sparkles, Check, Copy, ChevronDown,
+  ArrowUpDown, Search, MapPin
 } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { locations } from '../../data/locations';
+import { BRAJ_TOWNS } from '../../data/brajTowns';
 import './InstantRideModal.css';
 
 /* ==========================================================================
@@ -91,7 +94,7 @@ function RouteTimelineSvg() {
       <circle cx="7" cy="7" r="5" stroke="#10b981" strokeWidth="1.5" strokeOpacity="0.25" />
       <circle cx="7" cy="7" r="3.5" fill="#10b981" />
 
-      {/* Continuous Connecting Line (seamlessly connects from circle to square with zero gap) */}
+      {/* Continuous Connecting Line */}
       <line x1="7" y1="12" x2="7" y2="30" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="2.5 2.5" />
 
       {/* Destination Deep Slate Square */}
@@ -158,6 +161,17 @@ const POPULAR_COUPONS = [
   { code: 'YATRA50', discount: 50, label: '₹50 OFF' }
 ];
 
+const QUICK_DESTINATIONS = [
+  { name: 'Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103, tag: 'Vrindavan' },
+  { name: 'Prem Mandir', lat: 27.572000, lng: 77.672000, tag: 'Vrindavan' },
+  { name: 'Shri Radha Rani Temple', lat: 27.650261, lng: 77.373287, tag: 'Barsana' },
+  { name: 'Radha Kund & Shyam Kund', lat: 27.525500, lng: 77.495000, tag: 'Govardhan' },
+  { name: 'Krishna Janmabhoomi', lat: 27.505000, lng: 77.682000, tag: 'Mathura' },
+  { name: 'Shri Radha Raman Mandir', lat: 27.584321, lng: 77.704512, tag: 'Vrindavan' },
+  { name: 'Govardhan Daan Ghati', lat: 27.498000, lng: 77.465000, tag: 'Govardhan' },
+  { name: 'Nidhivan Sacred Grove', lat: 27.582500, lng: 77.701800, tag: 'Vrindavan' }
+];
+
 export default function InstantRideModal({
   destination,
   userPosition,
@@ -169,23 +183,62 @@ export default function InstantRideModal({
 }) {
   const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
 
-  // 1. Coordinates & Distance Calculation
-  const pickupLat = userPosition?.lat || 27.646;
-  const pickupLng = userPosition?.lng || 77.377;
-  const destLat = destination?.lat || 27.646;
-  const destLng = destination?.lng || 77.377;
+  // 1. Dynamic Real-time Pickup & Destination State
+  const [pickupLocation, setPickupLocation] = useState(() => {
+    if (userPosition?.lat && userPosition?.lng) {
+      return { name: 'Current GPS Location', lat: userPosition.lat, lng: userPosition.lng, isGps: true };
+    }
+    return { name: 'Vrindavan Railway Station', lat: 27.5755, lng: 77.6948, isGps: false };
+  });
 
+  const [destLocation, setDestLocation] = useState(() => {
+    if (destination?.lat && destination?.lng) {
+      return destination;
+    }
+    return { name: 'Shri Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103 };
+  });
+
+  // Location search modal / popover state
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
+  const [pickingTarget, setPickingTarget] = useState('destination'); // 'pickup' | 'destination'
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+
+  // Sync external destination updates
+  useEffect(() => {
+    if (destination?.lat && destination?.lng) {
+      setDestLocation(destination);
+    }
+  }, [destination]);
+
+  // Sync real-time browser GPS location
+  useEffect(() => {
+    if (userPosition?.lat && userPosition?.lng) {
+      setPickupLocation(prev => {
+        if (prev.isGps || prev.name.includes('GPS')) {
+          return { name: 'Current GPS Location', lat: userPosition.lat, lng: userPosition.lng, isGps: true };
+        }
+        return prev;
+      });
+    }
+  }, [userPosition?.lat, userPosition?.lng]);
+
+  // Real-time trip distance calculation
   const tripDistanceKm = useMemo(() => {
-    const d = calculateDistance(pickupLat, pickupLng, destLat, destLng);
+    const d = calculateDistance(
+      pickupLocation.lat,
+      pickupLocation.lng,
+      destLocation.lat,
+      destLocation.lng
+    );
     return Math.max(d, 0.8);
-  }, [pickupLat, pickupLng, destLat, destLng]);
+  }, [pickupLocation.lat, pickupLocation.lng, destLocation.lat, destLocation.lng]);
 
-  // 2. Active Available Drivers Count & Sorting
+  // 2. Active Available Drivers Count & Sorting from Firebase
   const availableDrivers = useMemo(() => {
     return (drivers || [])
       .filter(d => (d.status === 'available' || !d.status) && d.location?.lat)
       .map(d => {
-        const dist = calculateDistance(pickupLat, pickupLng, d.location.lat, d.location.lng);
+        const dist = calculateDistance(pickupLocation.lat, pickupLocation.lng, d.location.lat, d.location.lng);
         return {
           ...d,
           _distance: dist,
@@ -194,7 +247,13 @@ export default function InstantRideModal({
         };
       })
       .sort((a, b) => a._distance - b._distance);
-  }, [drivers, pickupLat, pickupLng]);
+  }, [drivers, pickupLocation.lat, pickupLocation.lng]);
+
+  // Nearest driver distance for live ETA
+  const nearestDriverDist = availableDrivers[0]?._distance || 1.2;
+  const getDynamicTierEta = useCallback((tier) => {
+    return Math.max(1, Math.round(nearestDriverDist * 2.2 + tier.baseEtaMins));
+  }, [nearestDriverDist]);
 
   // 3. UI Flow Stages: 'SELECT_TIER' | 'SEARCHING_RADAR' | 'TRIP_ACTIVE' | 'TRIP_COMPLETED'
   const [stage, setStage] = useState(() => {
@@ -203,7 +262,7 @@ export default function InstantRideModal({
   });
 
   const [selectedTierId, setSelectedTierId] = useState('erickshaw');
-  const [paymentMethod, setPaymentMethod] = useState('cash_upi'); // 'cash_upi' | 'card_stripe' | 'yatra_points'
+  const [paymentMethod, setPaymentMethod] = useState('cash_upi');
   const [isPaymentSheetOpen, setIsPaymentSheetOpen] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [promoCode, setPromoCode] = useState('');
@@ -253,13 +312,20 @@ export default function InstantRideModal({
               tier: selectedTierId,
               fare: currentFare,
               paymentMethod,
-              safetyPin
+              safetyPin,
+              pickupName: pickupLocation.name,
+              pickupLat: pickupLocation.lat,
+              pickupLng: pickupLocation.lng,
+              destName: destLocation.name,
+              destLat: destLocation.lat,
+              destLng: destLocation.lng,
+              distanceKm: tripDistanceKm
             });
             setStage('TRIP_ACTIVE');
             return 0;
           }
           
-          if (prev === 40) setSearchStepText(`Checking drivers near ${destination?.name || 'Vrindavan'}...`);
+          if (prev === 40) setSearchStepText(`Checking drivers near ${destLocation?.name || 'Vrindavan'}...`);
           if (prev === 28) setSearchStepText('Locking upfront fare with zero surge...');
           if (prev === 16) setSearchStepText('Securing your 4-digit Safety PIN...');
           if (prev === 5) setSearchStepText('Finalizing dispatch & driver arrival...');
@@ -272,7 +338,7 @@ export default function InstantRideModal({
       setSearchStepText('Connecting with verified Braj drivers...');
     }
     return () => clearInterval(interval);
-  }, [stage, availableDrivers, onRequestRide, selectedTierId, paymentMethod, safetyPin, destination?.name]);
+  }, [stage, availableDrivers, onRequestRide, selectedTierId, paymentMethod, safetyPin, destLocation?.name, pickupLocation, tripDistanceKm, currentFare]);
 
   // Selected Tier object
   const selectedTier = useMemo(() => {
@@ -284,6 +350,43 @@ export default function InstantRideModal({
     const rawFare = Math.round(selectedTier.baseFare + (tripDistanceKm * selectedTier.perKmRate));
     return Math.max(rawFare - appliedDiscount, 20);
   }, [selectedTier, tripDistanceKm, appliedDiscount]);
+
+  // Combined searchable locations list for real-time picker
+  const allSearchableLocations = useMemo(() => {
+    const standardPickups = [
+      { name: 'Current GPS Location', lat: userPosition?.lat || 27.646, lng: userPosition?.lng || 77.377, category: 'GPS Live' },
+      { name: 'Vrindavan Railway Station', lat: 27.5755, lng: 77.6948, category: 'Station' },
+      { name: 'Mathura Junction Railway Station', lat: 27.4924, lng: 77.6737, category: 'Station' },
+      { name: 'Chhatikara Road Entrance (NH-19)', lat: 27.5785, lng: 77.6592, category: 'Entry' },
+      { name: 'Barsana Main Bus Stand', lat: 27.6445, lng: 77.3735, category: 'Station' },
+      { name: 'Govardhan Daan Ghati Stand', lat: 27.4985, lng: 77.4645, category: 'Station' }
+    ];
+
+    const mappedLocations = (locations || []).map(l => ({
+      name: l.name,
+      lat: l.lat,
+      lng: l.lng,
+      category: l.category || 'Sacred Site'
+    }));
+
+    const mappedTowns = (BRAJ_TOWNS || []).map(t => ({
+      name: `${t.name} Town Center`,
+      lat: t.center?.[0] || 27.5818,
+      lng: t.center?.[1] || 77.7010,
+      category: 'Town'
+    }));
+
+    return [...standardPickups, ...mappedLocations, ...mappedTowns];
+  }, [userPosition?.lat, userPosition?.lng]);
+
+  const filteredPickerLocations = useMemo(() => {
+    if (!locationSearchQuery.trim()) return allSearchableLocations.slice(0, 16);
+    const q = locationSearchQuery.toLowerCase();
+    return allSearchableLocations.filter(loc => 
+      loc.name.toLowerCase().includes(q) || 
+      loc.category.toLowerCase().includes(q)
+    );
+  }, [allSearchableLocations, locationSearchQuery]);
 
   // Handle Promo Code Apply
   const handleApplyPromo = (overrideCode) => {
@@ -327,6 +430,37 @@ export default function InstantRideModal({
     } else {
       triggerClose();
     }
+  };
+
+  const handleSwapLocations = (e) => {
+    e.stopPropagation();
+    const temp = pickupLocation;
+    setPickupLocation(destLocation);
+    setDestLocation(temp);
+  };
+
+  const handleOpenPicker = (target) => {
+    setPickingTarget(target);
+    setLocationSearchQuery('');
+    setIsLocationPickerOpen(true);
+  };
+
+  const handleSelectLocationFromPicker = (loc) => {
+    if (pickingTarget === 'pickup') {
+      setPickupLocation({
+        name: loc.name,
+        lat: loc.lat,
+        lng: loc.lng,
+        isGps: loc.category === 'GPS Live'
+      });
+    } else {
+      setDestLocation({
+        name: loc.name,
+        lat: loc.lat,
+        lng: loc.lng
+      });
+    }
+    setIsLocationPickerOpen(false);
   };
 
   const copyPinToClipboard = () => {
@@ -377,22 +511,43 @@ export default function InstantRideModal({
         {stage === 'SELECT_TIER' && (
           <div className="ubr-stage-layout">
             
-            {/* Header: Minimalist Integrated Timeline Route Capsule */}
+            {/* Header: Interactive Real-Time Route Capsule */}
             <div className="ubr-header">
               <div className="ubr-route-capsule">
                 {/* Left: Continuous Connected Vector Route Timeline */}
                 <RouteTimelineSvg />
 
-                {/* Center: Clean Location Names */}
+                {/* Center: Interactive Location Names */}
                 <div className="ubr-route-info">
-                  <div className="ubr-route-stop">
-                    <span className="ubr-stop-name">{userPosition ? 'Current GPS Location' : 'Braj Mandal Center'}</span>
+                  <div 
+                    className="ubr-route-stop clickable" 
+                    onClick={() => handleOpenPicker('pickup')}
+                    title="Click to change pickup location"
+                  >
+                    <span className="ubr-stop-name">{pickupLocation?.name || 'Current GPS Location'}</span>
+                    <span className="ubr-stop-edit-hint">Change</span>
                   </div>
                   <div className="ubr-route-divider-line" />
-                  <div className="ubr-route-stop">
-                    <strong className="ubr-stop-name destination">{destination?.name || 'Vrindavan Sacred Site'}</strong>
+                  <div 
+                    className="ubr-route-stop clickable" 
+                    onClick={() => handleOpenPicker('destination')}
+                    title="Click to change destination temple"
+                  >
+                    <strong className="ubr-stop-name destination">{destLocation?.name || 'Select Temple'}</strong>
+                    <span className="ubr-stop-edit-hint">Change</span>
                   </div>
                 </div>
+
+                {/* Swap Button */}
+                <button 
+                  type="button" 
+                  className="ubr-route-swap-btn"
+                  onClick={handleSwapLocations}
+                  title="Reverse pickup & destination"
+                  aria-label="Reverse route"
+                >
+                  <ArrowUpDown size={14} />
+                </button>
 
                 {/* Right: Crisp Distance Badge */}
                 <div className="ubr-route-metric">
@@ -406,13 +561,33 @@ export default function InstantRideModal({
               </button>
             </div>
 
+            {/* Quick Braj Temples Horizontal Scrollbar */}
+            <div className="ubr-quick-temples-row">
+              <span className="ubr-quick-label">Temples:</span>
+              <div className="ubr-quick-chips-scroll">
+                {QUICK_DESTINATIONS.map((qd, idx) => {
+                  const isCur = destLocation?.name?.toLowerCase().includes(qd.name.toLowerCase().split(' ')[0]);
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      className={`ubr-quick-chip ${isCur ? 'active' : ''}`}
+                      onClick={() => setDestLocation(qd)}
+                    >
+                      {qd.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Scrollable Vehicle Tier List */}
             <div className="ubr-scroll-body">
               <div className="ubr-section-heading-row">
                 <span className="ubr-section-title">CHOOSE A RIDE</span>
                 <span className="ubr-fleet-status">
                   <span className="ubr-live-dot" />
-                  {availableDrivers.length > 0 ? `${availableDrivers.length} nearby` : 'Available now'}
+                  {availableDrivers.length > 0 ? `${availableDrivers.length} drivers nearby` : 'Live Fleet Online'}
                 </span>
               </div>
 
@@ -421,7 +596,8 @@ export default function InstantRideModal({
                   const isSelected = selectedTierId === tier.id;
                   const rawTierFare = Math.round(tier.baseFare + (tripDistanceKm * tier.perKmRate));
                   const estimatedFare = Math.max(rawTierFare - appliedDiscount, 20);
-                  const etaText = `${tier.baseEtaMins + 1} mins`;
+                  const dynamicEta = getDynamicTierEta(tier);
+                  const etaText = `${dynamicEta} mins away`;
                   const IconComp = tier.iconComponent;
 
                   return (
@@ -448,7 +624,7 @@ export default function InstantRideModal({
                           )}
                         </div>
                         <div className="ubr-tier-secondary-line">
-                          <span className="ubr-eta-text">{etaText} away</span>
+                          <span className="ubr-eta-text">{etaText}</span>
                           <span className="ubr-bullet">•</span>
                           <span className="ubr-tagline-text">{tier.tagline}</span>
                         </div>
@@ -827,6 +1003,78 @@ export default function InstantRideModal({
             <button className="ubr-back-map-btn" onClick={triggerClose}>
               Back to Map
             </button>
+          </div>
+        )}
+
+        {/* Real-Time Location Search & Selector Drawer */}
+        {isLocationPickerOpen && (
+          <div className="ubr-location-picker-modal">
+            <div className="ubr-loc-picker-header">
+              <div className="ubr-loc-picker-title">
+                <MapPin size={16} color="#0f172a" />
+                <span>Select {pickingTarget === 'pickup' ? 'Pickup Point' : 'Sacred Destination'}</span>
+              </div>
+              <button 
+                type="button" 
+                className="ubr-loc-picker-close" 
+                onClick={() => setIsLocationPickerOpen(false)}
+                title="Close picker"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="ubr-loc-search-box">
+              <Search size={15} color="#94a3b8" />
+              <input
+                type="text"
+                className="ubr-loc-search-input"
+                placeholder={`Search ${pickingTarget === 'pickup' ? 'stations, gates...' : 'temples, kunds, ashrams...'}`}
+                value={locationSearchQuery}
+                onChange={(e) => setLocationSearchQuery(e.target.value)}
+                autoFocus
+              />
+              {locationSearchQuery && (
+                <button 
+                  type="button" 
+                  className="ubr-loc-clear-btn"
+                  onClick={() => setLocationSearchQuery('')}
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+
+            <div className="ubr-loc-results-list">
+              {filteredPickerLocations.map((loc, idx) => {
+                const distFromUser = calculateDistance(
+                  userPosition?.lat || 27.646,
+                  userPosition?.lng || 77.377,
+                  loc.lat,
+                  loc.lng
+                );
+                return (
+                  <div
+                    key={idx}
+                    className="ubr-loc-result-item"
+                    onClick={() => handleSelectLocationFromPicker(loc)}
+                  >
+                    <div className="ubr-loc-icon-pill">
+                      <MapPin size={14} />
+                    </div>
+                    <div className="ubr-loc-info">
+                      <div className="ubr-loc-name">{loc.name}</div>
+                      <div className="ubr-loc-sub">
+                        <span className="ubr-loc-badge">{loc.category}</span>
+                        <span className="ubr-loc-bullet">•</span>
+                        <span>{formatDistance(distFromUser)}</span>
+                      </div>
+                    </div>
+                    <ChevronRight size={15} color="#94a3b8" />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
