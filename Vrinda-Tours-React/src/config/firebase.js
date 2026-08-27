@@ -28,10 +28,18 @@ export const auth = getAuth(app);
 let db;
 try {
   db = initializeFirestore(app, {
-    experimentalForceLongPolling: true
+    experimentalForceLongPolling: true,
+    useFetchStreams: false
   });
 } catch (e) {
-  db = getFirestore(app);
+  try {
+    db = initializeFirestore(app, {
+      experimentalAutoDetectLongPolling: true,
+      useFetchStreams: false
+    });
+  } catch (err2) {
+    db = getFirestore(app);
+  }
 }
 export const firestore = db;
 

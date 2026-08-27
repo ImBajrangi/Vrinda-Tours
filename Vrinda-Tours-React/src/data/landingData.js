@@ -160,12 +160,13 @@ export const popularPlaces = [
 export const tripPackages = [
   {
     id: 'pkg_vrindavan_express',
-    title: 'Bankey Bihari & Divine Vrindavan Darshan',
-    tagline: 'VIP Darshan • Nidhivan • Prem Mandir Light Show',
+    title: 'Bankey Bihari & Vrindavan Darshan',
+    tagline: 'VIP Darshan • Nidhivan • Prem Mandir',
     location: 'Vrindavan Dham',
     category: '1-day',
-    badge: '⭐ Most Popular',
-    duration: '1 Day (8-10 Hours)',
+    badge: '⭐ Popular',
+    duration: '1 Day',
+    keyTag: 'VIP Passes & Cab Included',
     price: '₹2,499',
     originalPrice: '₹3,200',
     priceUnit: '/person',
@@ -177,9 +178,7 @@ export const tripPackages = [
     highlights: [
       'VIP Priority Darshan at Shri Bankey Bihari Ji',
       'Guided walkthrough of mystical Nidhivan & Seva Kunj',
-      'Illuminated evening darshan & light show at Prem Mandir',
-      'Air-conditioned private E-Rickshaw / Cab transfers',
-      'Satvik Braj Prashadi breakfast included'
+      'Illuminated evening darshan & light show at Prem Mandir'
     ],
     features: ['E-Rickshaw/Cab', 'VIP Passes', 'Local Guide', 'Prasadam'],
     pointsReward: 350,
@@ -187,12 +186,13 @@ export const tripPackages = [
   },
   {
     id: 'pkg_barsana_nandgaon',
-    title: 'Barsana Shriji & Nandgaon Royal Leela Yatra',
+    title: 'Barsana Shriji & Nandgaon Yatra',
     tagline: 'Radha Rani Temple • Mor Kuti • Nand Bhawan',
     location: 'Barsana & Nandgaon',
     category: '1-day',
-    badge: '🦚 Devotee Favorite',
-    duration: '1 Day (7-9 Hours)',
+    badge: '🦚 Best Seller',
+    duration: '1 Day',
+    keyTag: 'Ropeway Assist & AC Cab',
     price: '₹3,499',
     originalPrice: '₹4,500',
     priceUnit: '/person',
@@ -204,9 +204,7 @@ export const tripPackages = [
     highlights: [
       'Hilltop Darshan at Shri Radha Rani (Laadli Ji) Temple',
       'Ropeway / Stairway assistance for senior pilgrims',
-      'Scenic visit to Mor Kuti, Maan Mandir & Prem Sarovar',
-      'Nand Bhawan & Pavan Sarovar Parikrama in Nandgaon',
-      'Private sanitized Cab with Brajwasi Storyteller'
+      'Scenic visit to Mor Kuti, Maan Mandir & Prem Sarovar'
     ],
     features: ['AC Cab Transfer', 'Ropeway Assist', 'Brij Storyteller', 'Prasadam'],
     pointsReward: 450,
@@ -214,12 +212,13 @@ export const tripPackages = [
   },
   {
     id: 'pkg_govardhan_parikrama',
-    title: 'Sacred Govardhan Parikrama & Radha Kund Yatra',
+    title: 'Govardhan & Radha Kund Parikrama',
     tagline: '21km Parikrama • Mansi Ganga • Daan Ghati',
     location: 'Govardhan Dham',
     category: 'parikrama',
-    badge: '🏔️ Spiritual Bliss',
-    duration: '1-2 Days (Flexible)',
+    badge: '🏔️ Parikrama',
+    duration: '1-2 Days',
+    keyTag: 'Silent Eco E-Cart & Guide',
     price: '₹1,899',
     originalPrice: '₹2,500',
     priceUnit: '/person',
@@ -231,9 +230,7 @@ export const tripPackages = [
     highlights: [
       'Full 21 km Giriraj Parikrama via silent Eco E-Cart or on foot',
       'Sacred holy dip & aarti at Radha Kund & Shyam Kund',
-      'Historic photo-stop at exquisite Kusum Sarovar Chhatris',
-      'Shri Giriraj Daan Ghati Ji Milk Abhishek seva assistance',
-      'Cold water, hydration packs & footwear custody managed'
+      'Historic photo-stop at exquisite Kusum Sarovar Chhatris'
     ],
     features: ['Eco E-Cart', 'Abhishek Seva', 'Radha Kund Dip', 'Hydration Pack'],
     pointsReward: 250,
@@ -241,26 +238,25 @@ export const tripPackages = [
   },
   {
     id: 'pkg_heritage_temples',
-    title: 'Old Vrindavan Heritage & Self-Manifested Deities',
-    tagline: 'Radha Raman • Radha Vallabh • Gopeshwar Mahadev',
-    location: 'Old Vrindavan Heritage',
+    title: 'Old Vrindavan Heritage Temples',
+    tagline: 'Radha Raman • Radha Vallabh • Gopeshwar',
+    location: 'Old Vrindavan',
     category: '1-day',
-    badge: '🕉️ Heritage Special',
-    duration: '1 Day (6-8 Hours)',
+    badge: '🕉️ Heritage',
+    duration: '1 Day',
+    keyTag: 'Riverboat Aarti & Heritage Walk',
     price: '₹2,199',
     originalPrice: '₹2,800',
     priceUnit: '/person',
     numericPrice: 2199,
     rating: 5.0,
     reviewsCount: 295,
-    image: '/vrinda-vihar/radha-raman-ji-1.webp',
+    image: '/vrinda-vihar/radha-raman-ji-smile.webp',
     description: 'An intimate pilgrimage exploring ancient Goswami temples: Shri Radha Raman Ji, Shri Radha Vallabh Ji, Gopeshwar Mahadev, and historic Yamuna Keshi Ghat Sandhya Aarti.',
     highlights: [
       'Divine Darshan & Charnamrit of Self-Manifested Radha Raman Ji',
       'Samadhi sthals of Six Goswamis and heritage alleys',
-      'Shri Radha Vallabh Ji Shringar darshan walkthrough',
-      'Mesmerizing Yamuna Riverboat Aarti at sunset at Keshi Ghat',
-      'Exclusive Brajwasi Prasad distribution'
+      'Mesmerizing Yamuna Riverboat Aarti at sunset at Keshi Ghat'
     ],
     features: ['Riverboat Aarti', 'Goswami Temples', 'VIP Charnamrit', 'Local Guide'],
     pointsReward: 300,
@@ -268,12 +264,13 @@ export const tripPackages = [
   },
   {
     id: 'pkg_complete_84kos',
-    title: 'Complete 84 Kos Brij Mahayatra All-Inclusive',
-    tagline: '3 Days / 2 Nights • All Dhams • AC Stay & Meals',
-    location: 'Entire Brij Dham Circuit',
+    title: '84 Kos Complete Brij Mahayatra',
+    tagline: 'All 5 Dhams • AC Stay • Satvik Meals',
+    location: 'All Brij Dhams',
     category: 'multi-day',
-    badge: '👑 Ultimate Experience',
-    duration: '3 Days / 2 Nights',
+    badge: '👑 All-Inclusive',
+    duration: '3D / 2N',
+    keyTag: 'AC Luxury Stay & All Meals',
     price: '₹7,999',
     originalPrice: '₹10,500',
     priceUnit: '/person',
@@ -285,9 +282,7 @@ export const tripPackages = [
     highlights: [
       'All Dhams covered: Mathura, Vrindavan, Govardhan, Barsana, Gokul',
       '2 Nights Luxury Ashram / 3-Star AC Hotel Stay included',
-      'All satvik meals (Breakfast, Lunch, Dinner) curated by Brij chefs',
-      'Dedicated AC Tempo Traveller / Innova throughout the tour',
-      'Personal Brajwasi Acharya Guide for all leela sthalis'
+      'All satvik meals (Breakfast, Lunch, Dinner) curated by Brij chefs'
     ],
     features: ['3-Star AC Stay', 'All Satvik Meals', 'Dedicated Innova', 'All VIP Passes'],
     pointsReward: 1200,

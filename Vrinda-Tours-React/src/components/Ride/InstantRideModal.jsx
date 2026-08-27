@@ -9,6 +9,13 @@ import { calculateDistance, formatDistance, calculateETA } from '../../utils/dis
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import { locations } from '../../data/locations';
 import { BRAJ_TOWNS } from '../../data/brajTowns';
+import { 
+  createRideRequest, 
+  subscribeToRideRequest, 
+  getPersistedLocalRide, 
+  cancelRideRequest,
+  persistLocalRide 
+} from '../../services/rideService';
 import './InstantRideModal.css';
 
 /* ==========================================================================
@@ -306,8 +313,20 @@ export default function InstantRideModal({
     return Math.max(1, Math.round(nearestDriverDist * 2.2 + tier.baseEtaMins));
   }, [nearestDriverDist]);
 
+  // Active Ride Request ID for persistent sync
+  const [activeRideReqId, setActiveRideReqId] = useState(() => {
+    const saved = getPersistedLocalRide();
+    return saved?.id || null;
+  });
+
   // 3. UI Flow Stages: 'SELECT_TIER' | 'SEARCHING_RADAR' | 'TRIP_ACTIVE' | 'TRIP_COMPLETED'
   const [stage, setStage] = useState(() => {
+    const saved = getPersistedLocalRide();
+    if (saved) {
+      if (saved.status === 'searching' || saved.status === 'requested') return 'SEARCHING_RADAR';
+      if (saved.status === 'accepted' || saved.status === 'driver_arrived' || saved.status === 'in_progress') return 'TRIP_ACTIVE';
+      if (saved.status === 'completed') return 'TRIP_COMPLETED';
+    }
     if (activeRide?.status && activeRide.status !== 'completed') return 'TRIP_ACTIVE';
     return 'SELECT_TIER';
   });
@@ -323,7 +342,10 @@ export default function InstantRideModal({
   const [safetyPin] = useState(() => Math.floor(1000 + Math.random() * 9000).toString());
   const [searchTimer, setSearchTimer] = useState(45);
   const [searchStepText, setSearchStepText] = useState('Connecting with verified Braj drivers...');
-  const [matchedCandidate, setMatchedCandidate] = useState(null);
+  const [matchedCandidate, setMatchedCandidate] = useState(() => {
+    const saved = getPersistedLocalRide();
+    return saved?.driver || null;
+  });
   const [feedbackTarget, setFeedbackTarget] = useState('driver'); // 'driver' | 'platform'
   const [driverRating, setDriverRating] = useState(5);
   const [driverHoverRating, setDriverHoverRating] = useState(0);
@@ -335,6 +357,28 @@ export default function InstantRideModal({
   const [platformNote, setPlatformNote] = useState('');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [copiedOtp, setCopiedOtp] = useState(false);
+
+  // Real-time backend ride request listener
+  useEffect(() => {
+    if (!activeRideReqId) return;
+
+    const unsub = subscribeToRideRequest(activeRideReqId, (updated) => {
+      if (!updated) return;
+      if (updated.status === 'accepted' || updated.status === 'driver_arrived' || updated.status === 'in_progress') {
+        if (updated.driver) {
+          setMatchedCandidate(updated.driver);
+        }
+        setStage('TRIP_ACTIVE');
+      } else if (updated.status === 'completed') {
+        setStage('TRIP_COMPLETED');
+      } else if (updated.status === 'cancelled') {
+        setStage('SELECT_TIER');
+        setActiveRideReqId(null);
+      }
+    });
+
+    return () => unsub();
+  }, [activeRideReqId]);
 
   // Selected Tier object
   const selectedTier = useMemo(() => {
@@ -393,7 +437,7 @@ export default function InstantRideModal({
     return () => clearInterval(interval);
   }, [stage, destLocation?.name]);
 
-  // When searching timer finishes, safely transition to active trip
+  // When searching timer finishes, fallback transition to active trip
   useEffect(() => {
     if (stage === 'SEARCHING_RADAR' && searchTimer === 0) {
       const bestDriver = availableDrivers[0] || {
@@ -487,16 +531,47 @@ export default function InstantRideModal({
     }
   };
 
-  const handleStartInstantBooking = () => {
+  const handleStartInstantBooking = async () => {
     setStage('SEARCHING_RADAR');
     setSearchTimer(45);
+
+    try {
+      const rideReq = await createRideRequest({
+        pickupName: pickupLocation.name,
+        pickupLat: pickupLocation.lat,
+        pickupLng: pickupLocation.lng,
+        destName: destLocation.name,
+        destLat: destLocation.lat,
+        destLng: destLocation.lng,
+        tier: selectedTier.id,
+        tierName: selectedTier.name,
+        fare: currentFare,
+        paymentMethod,
+        safetyPin,
+        landmarkNote
+      });
+
+      if (rideReq?.id) {
+        setActiveRideReqId(rideReq.id);
+      }
+    } catch (err) {
+      console.warn('[InstantRideModal] Error creating ride request:', err);
+    }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     if (stage === 'SEARCHING_RADAR') {
+      if (activeRideReqId) {
+        await cancelRideRequest(activeRideReqId);
+        setActiveRideReqId(null);
+      }
       setStage('SELECT_TIER');
     } else if (stage === 'TRIP_ACTIVE') {
       if (window.confirm('Are you sure you want to cancel your ride request?')) {
+        if (activeRideReqId) {
+          await cancelRideRequest(activeRideReqId, activeDriver?.id);
+          setActiveRideReqId(null);
+        }
         onCancelRide?.();
         setStage('SELECT_TIER');
       }

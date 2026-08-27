@@ -17,6 +17,21 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Gracefully handle browser-level WebChannel/Fetch CORS stream notices
+if (typeof window !== 'undefined') {
+  window.addEventListener('unhandledrejection', (event) => {
+    const msg = String(event?.reason?.message || event?.reason || '');
+    if (
+      msg.includes('firestore.googleapis.com') ||
+      msg.includes('access control checks') ||
+      msg.includes('Fetch API cannot load')
+    ) {
+      event.preventDefault();
+      console.warn('[Vrinda Vihar] Network stream warning caught gracefully:', msg);
+    }
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />

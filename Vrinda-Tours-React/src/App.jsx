@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
-import { Navigation } from 'lucide-react';
+import { Navigation, ChevronRight } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
 import MapView from './components/Map/MapView';
 import Header from './components/Header/Header';
+import { getPersistedLocalRide, subscribeToRideRequest } from './services/rideService';
 import CategoryPills from './components/CategoryPills/CategoryPills';
 import LocationCard from './components/LocationCard/LocationCard';
 import { useFirebaseDrivers } from './hooks/useFirebaseDrivers';
@@ -60,6 +61,50 @@ export default function App() {
   const [partnerLandingVisible, setPartnerLandingVisible] = useState(true);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [toast, setToast] = useState(null);
+  const [persistedRide, setPersistedRide] = useState(() => getPersistedLocalRide());
+
+  // Listen to background ride events & storage changes
+  useEffect(() => {
+    const handleStorageUpdate = (e) => {
+      const current = getPersistedLocalRide();
+      setPersistedRide(current);
+    };
+
+    window.addEventListener('vt:ride-updated', handleStorageUpdate);
+    window.addEventListener('storage', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('vt:ride-updated', handleStorageUpdate);
+      window.removeEventListener('storage', handleStorageUpdate);
+    };
+  }, []);
+
+  // Real-time listener for current persisted ride document
+  useEffect(() => {
+    if (!persistedRide?.id) return;
+
+    const unsub = subscribeToRideRequest(persistedRide.id, (updated) => {
+      if (!updated) {
+        setPersistedRide(null);
+        return;
+      }
+      setPersistedRide(updated);
+      
+      if (updated.status === 'accepted' && updated.driver) {
+        setToast({
+          message: `🎉 Sarathi Assigned! ${updated.driver.name} is on the way (${updated.driver.vehicleNo || 'E-Rickshaw'})`,
+          type: 'success'
+        });
+      } else if (updated.status === 'driver_arrived') {
+        setToast({
+          message: '🛺 Sarathi has arrived at your pickup point!',
+          type: 'success'
+        });
+      }
+    });
+
+    return () => unsub();
+  }, [persistedRide?.id]);
 
   const handleOpenPartnerDashboard = useCallback((id, role) => {
     setDriverLandingVisible(false);
@@ -434,6 +479,37 @@ export default function App() {
           <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
         )}
 
+        {/* Persistent Live Ride Floating Activity Pill (Minimizable Dynamic Island) */}
+        {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !rideRequest && !activeRide && (
+          <div 
+            className="vt-floating-live-ride-pill"
+            onClick={() => setRideRequest({ destination: { name: persistedRide.destName, lat: persistedRide.destLat, lng: persistedRide.destLng } })}
+            title="Tap to view live ride status & driver details"
+          >
+            <div className="vt-flr-pulse-wrap">
+              <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
+            </div>
+            <div className="vt-flr-info">
+              <strong className="vt-flr-title">
+                {persistedRide.status === 'searching' || persistedRide.status === 'requested'
+                  ? 'Searching for Sarathi...' 
+                  : persistedRide.status === 'driver_arrived' 
+                  ? 'Driver Arrived at Pickup!' 
+                  : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`}
+              </strong>
+              <span className="vt-flr-sub">
+                {persistedRide.status === 'searching' || persistedRide.status === 'requested'
+                  ? `To ${persistedRide.destName || 'Destination'} • Tap to view` 
+                  : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`}
+              </span>
+            </div>
+            <div className="vt-flr-action-badge">
+              <span>View Live</span>
+              <ChevronRight size={14} />
+            </div>
+          </div>
+        )}
+
         {(rideRequest || activeRide) && (
           <InstantRideModal
             destination={rideRequest?.destination || activeLocation}
@@ -552,6 +628,11 @@ export default function App() {
           <PartnerLandingPage
             onClose={() => setPartnerLandingVisible(false)}
             onOpenPartnerHub={(role) => handleOpenPartnerDashboard(null, role)}
+            onOpenDriverPortal={() => { setPartnerLandingVisible(false); setDriverPortalVisible(true); }}
+            onOpenDriverPage={() => { setPartnerLandingVisible(false); setDriverLandingVisible(true); }}
+            onOpenHotelPage={() => { setPartnerLandingVisible(false); setHotelLandingVisible(true); }}
+            onOpenRestaurantPage={() => { setPartnerLandingVisible(false); setRestaurantLandingVisible(true); }}
+            onOpenAgencyPage={() => { setPartnerLandingVisible(false); setAgencyLandingVisible(true); }}
             onOpenAdmin={() => setAdminVisible(true)}
             onOpenHelpCenter={() => setHelpCenterVisible(true)}
           />

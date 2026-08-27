@@ -7,6 +7,13 @@ import { collection, getDocs, doc, updateDoc, deleteField, onSnapshot } from 'fi
 import { firestore } from '../../config/firebase';
 import { calculateDistance } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { 
+  subscribeToAvailableRides, 
+  acceptRideByDriver, 
+  skipRideByDriver, 
+  markDriverArrived, 
+  completeRide 
+} from '../../services/rideService';
 import './DriverPortalModal.css';
 
 export default function DriverPortalModal({ onClose, onOpenLanding, drivers = [] }) {
@@ -26,6 +33,24 @@ export default function DriverPortalModal({ onClose, onOpenLanding, drivers = []
   const [onlineStartTime, setOnlineStartTime] = useState(null);
   const [onlineHoursText, setOnlineHoursText] = useState('0.0h');
   const [ridesCompletedToday, setRidesCompletedToday] = useState(0);
+  const [nearbyRequests, setNearbyRequests] = useState([]);
+
+  // Subscribe to nearby available rides when driver is online
+  useEffect(() => {
+    if (!isOnline) {
+      setNearbyRequests([]);
+      return;
+    }
+
+    const unsub = subscribeToAvailableRides(
+      driverData?.location || { lat: 27.5804, lng: 77.7011 },
+      (rides) => {
+        setNearbyRequests(rides);
+      }
+    );
+
+    return () => unsub();
+  }, [isOnline, driverData?.location]);
 
   const filteredDrivers = useMemo(() => {
     if (!driverSearch.trim()) return drivers;
@@ -242,6 +267,30 @@ export default function DriverPortalModal({ onClose, onOpenLanding, drivers = []
   };
 
   // 9. Ride Action Handlers
+  const handleAcceptNearbyRide = async (rideReq) => {
+    if (!driverData) return;
+    try {
+      const accepted = await acceptRideByDriver(rideReq.id, {
+        id: driverId || driverData.id,
+        name: driverData.name || 'Sarathi',
+        phone: driverData.phone || '+91 98765 43210',
+        vehicleNo: driverData.vehicleNo || 'UP-85-BV-1008',
+        vehicleType: driverData.vehicleType || 'Pilgrim E-Rickshaw',
+        rating: driverData.rating || '4.9',
+        photo: driverData.photo || ''
+      });
+      setCurrentRide(accepted);
+      setNearbyRequests(prev => prev.filter(r => r.id !== rideReq.id));
+    } catch (err) {
+      console.error('Error accepting nearby ride:', err);
+    }
+  };
+
+  const handleSkipNearbyRide = (rideReq) => {
+    skipRideByDriver(rideReq.id);
+    setNearbyRequests(prev => prev.filter(r => r.id !== rideReq.id));
+  };
+
   const handleAcceptRide = async () => {
     if (!driverId) return;
     try {
@@ -269,9 +318,14 @@ export default function DriverPortalModal({ onClose, onOpenLanding, drivers = []
   const handleMarkArrived = async () => {
     if (!driverId) return;
     try {
-      await updateDoc(doc(firestore, 'drivers', driverId), {
-        'currentRide.status': 'arrived'
-      });
+      if (currentRide?.id) {
+        await markDriverArrived(currentRide.id, driverId);
+      } else {
+        await updateDoc(doc(firestore, 'drivers', driverId), {
+          'currentRide.status': 'driver_arrived'
+        });
+      }
+      setCurrentRide(prev => ({ ...prev, status: 'driver_arrived' }));
     } catch (err) {
       console.error('Error marking arrived:', err);
     }
@@ -281,10 +335,15 @@ export default function DriverPortalModal({ onClose, onOpenLanding, drivers = []
     if (!driverId) return;
     try {
       setRidesCompletedToday(prev => prev + 1);
-      await updateDoc(doc(firestore, 'drivers', driverId), {
-        status: 'available',
-        currentRide: deleteField()
-      });
+      if (currentRide?.id) {
+        await completeRide(currentRide.id, driverId);
+      } else {
+        await updateDoc(doc(firestore, 'drivers', driverId), {
+          status: 'available',
+          currentRide: deleteField()
+        });
+      }
+      setCurrentRide(null);
     } catch (err) {
       console.error('Error completing ride:', err);
     }
@@ -558,6 +617,86 @@ export default function DriverPortalModal({ onClose, onOpenLanding, drivers = []
                     Cancel
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Live Nearby Pilgrim Ride Requests Feed */}
+            {isOnline && !currentRide && (
+              <div className="dp-nearby-feed-section">
+                <div className="dp-feed-header">
+                  <div className="dp-feed-title-row">
+                    <span className="dp-live-pulse-dot" />
+                    <h4>Nearby Pilgrim Requests</h4>
+                  </div>
+                  <span className="dp-feed-count-badge">
+                    {nearbyRequests.length} {nearbyRequests.length === 1 ? 'request' : 'requests'}
+                  </span>
+                </div>
+
+                {nearbyRequests.length === 0 ? (
+                  <div className="dp-feed-empty-state">
+                    <div className="dp-radar-scan-anim" />
+                    <p>Radar scanning for pilgrims in Vrindavan...</p>
+                    <span>Pilgrim ride requests will appear here with instant upfront fare</span>
+                  </div>
+                ) : (
+                  <div className="dp-feed-cards-list">
+                    {nearbyRequests.map((req) => (
+                      <div key={req.id} className="dp-request-live-card">
+                        <div className="dp-req-card-top">
+                          <div className="dp-req-tier-pill">
+                            <span>🛺 {req.tierName || 'Pilgrim E-Rickshaw'}</span>
+                            <span className="dp-req-dist-tag">• {req._distText || '0.8 km'}</span>
+                          </div>
+                          <strong className="dp-req-fare-val">₹{req.fare}</strong>
+                        </div>
+
+                        <div className="dp-req-route-box">
+                          <div className="dp-req-route-point">
+                            <span className="dp-r-dot green" />
+                            <div className="dp-r-text">
+                              <small>PICKUP</small>
+                              <strong>{req.pickupName}</strong>
+                            </div>
+                          </div>
+                          <div className="dp-req-route-point">
+                            <span className="dp-r-dot dark" />
+                            <div className="dp-r-text">
+                              <small>DROP</small>
+                              <strong>{req.destName}</strong>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="dp-req-footer-meta">
+                          <span className="dp-req-pay-mode">💵 {req.paymentMethod === 'cash_upi' ? 'Cash / UPI' : 'Online'}</span>
+                          {req.landmarkNote && (
+                            <span className="dp-req-landmark">📍 "{req.landmarkNote}"</span>
+                          )}
+                        </div>
+
+                        <div className="dp-req-action-buttons">
+                          <button 
+                            type="button" 
+                            className="dp-btn-skip-req" 
+                            onClick={() => handleSkipNearbyRide(req)}
+                            title="Skip this ride"
+                          >
+                            Skip
+                          </button>
+                          <button 
+                            type="button" 
+                            className="dp-btn-accept-req" 
+                            onClick={() => handleAcceptNearbyRide(req)}
+                            title="Accept & Start Yatra"
+                          >
+                            <Zap size={14} /> Accept Ride (₹{req.fare})
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

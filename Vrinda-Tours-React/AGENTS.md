@@ -83,3 +83,6 @@ Avoid using system emojis for core product iconography; use crisp, branded SVG v
 
 Limit vehicle and item cards to a maximum of 2 clean information hierarchy lines to prevent cognitive overload.
 
+use supabase database properly professionally 
+because we have to handle it in real world
+

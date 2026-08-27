@@ -112,3 +112,129 @@ input, select, textarea {
   font-family: inherit;
   outline: none;
 }
+
+/* ==========================================================================
+   Persistent Floating Live Ride Activity Capsule (Dynamic Island)
+   ========================================================================== */
+
+.vt-floating-live-ride-pill {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9990;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #090d16;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  max-width: 92vw;
+  width: auto;
+  min-width: 290px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: vtPillSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.vt-floating-live-ride-pill:hover {
+  background: #0f172a;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+@keyframes vtPillSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.vt-flr-pulse-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vt-flr-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.vt-flr-dot.amber {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+  animation: vtDotPulseAmber 1.6s infinite ease-in-out;
+}
+
+.vt-flr-dot.emerald {
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  animation: vtDotPulseEmerald 1.6s infinite ease-in-out;
+}
+
+@keyframes vtDotPulseAmber {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+@keyframes vtDotPulseEmerald {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.vt-flr-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vt-flr-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-flr-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vt-flr-action-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #34d399;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.vt-floating-live-ride-pill:hover .vt-flr-action-badge {
+  background: rgba(52, 211, 153, 0.2);
+}

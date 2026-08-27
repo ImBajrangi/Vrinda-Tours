@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
-  Compass, Calendar, Users, MapPin, Search, Star,
+  Compass, Calendar, Clock, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
   X, Menu, Plane, Building2, Bus, Car, Mail, Send, ChevronRight, ChevronDown,
   Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
@@ -35,12 +35,13 @@ import {
   setCachedData
 } from '../../data/landingData';
 import { supabase } from '../../config/supabase';
-import { syncPilgrimToSupabase, getPilgrimReferralStats, REFERRAL_CATEGORIES, shareLinkWithFallback } from '../../services/referralService';
+import { syncPilgrimToSupabase, updateUserRoleInSupabase, getPilgrimReferralStats, REFERRAL_CATEGORIES, shareLinkWithFallback } from '../../services/referralService';
 import { getOrCreateThreadId, sendSupportMessage } from '../../services/messagingService';
 import { useFirebaseDrivers } from '../../hooks/useFirebaseDrivers';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { doc, updateDoc, deleteField } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
+import { getPersistedLocalRide, subscribeToRideRequest } from '../../services/rideService';
 import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
 import './PartnerLandingPage.css';
@@ -146,62 +147,50 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
             </div>
           ) : (
             filteredPackages.map((pkg) => (
-              <div key={pkg.id} className="tp-tpkg-card">
+              <div key={pkg.id} className="tp-tpkg-card" onClick={() => onSelectPackage(pkg)}>
                 {/* Card Image Banner */}
                 <div className="tp-tpkg-card-cover">
                   <img src={pkg.image} alt={pkg.title} className="tp-tpkg-img" loading="lazy" />
                   <div className="tp-tpkg-cover-gradient" />
                   <span className="tp-tpkg-badge-top">{pkg.badge}</span>
-                  <span className="tp-tpkg-duration-pill">
-                    <Calendar size={12} />
-                    <span>{pkg.duration}</span>
-                  </span>
                 </div>
 
                 {/* Card Content */}
                 <div className="tp-tpkg-card-body">
+                  {/* Row 1: Location & Star Rating */}
                   <div className="tp-tpkg-meta-row">
                     <span className="tp-tpkg-location">
-                      <MapPin size={13} />
+                      <MapPin size={11} />
                       <span>{pkg.location}</span>
                     </span>
-                    <span className="tp-tpkg-rating">
-                      <Star size={13} fill="#fbbf24" color="#fbbf24" />
+                    <span className="tp-tpkg-rating-pill">
+                      <Star size={10} fill="#f59e0b" color="#f59e0b" />
                       <strong>{pkg.rating}</strong>
-                      <small>({pkg.reviewsCount})</small>
                     </span>
                   </div>
 
+                  {/* Row 2: Title */}
                   <h3 className="tp-tpkg-card-title">{pkg.title}</h3>
-                  <p className="tp-tpkg-tagline">{pkg.tagline}</p>
-                  <p className="tp-tpkg-desc">{pkg.description}</p>
 
-                  {/* Highlights List */}
+                  {/* Row 3: Key Features (High Impact, Minimalist) */}
+                  <div className="tp-tpkg-inclusions-row">
+                    <span className="tp-tpkg-duration-chip">
+                      <Clock size={10} />
+                      <span>{pkg.duration}</span>
+                    </span>
+                    <span className="tp-tpkg-keytag-chip">{pkg.keyTag || pkg.tagline}</span>
+                  </div>
+
+                  {/* Highlights List - Top 2 Key Inclusions (Visible on Desktop) */}
                   <div className="tp-tpkg-highlights">
-                    <div className="tp-tpkg-hl-title">Highlights Included:</div>
                     <ul className="tp-tpkg-hl-list">
-                      {(pkg.highlights || []).map((hl, idx) => (
+                      {(pkg.highlights || []).slice(0, 2).map((hl, idx) => (
                         <li key={idx} className="tp-tpkg-hl-item">
-                          <CheckCircle2 size={13} className="tp-tpkg-check" />
+                          <CheckCircle2 size={12} className="tp-tpkg-check" />
                           <span>{hl}</span>
                         </li>
                       ))}
                     </ul>
-                  </div>
-
-                  {/* Included Feature Chips */}
-                  <div className="tp-tpkg-features">
-                    {(pkg.features || []).map((feat, idx) => (
-                      <span key={idx} className="tp-tpkg-feat-chip">
-                        {feat}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Feasibility Note */}
-                  <div className="tp-tpkg-feasibility">
-                    <Sparkles size={12} className="tp-tpkg-sparkle" />
-                    <span>{pkg.feasibility}</span>
                   </div>
 
                   {/* Pricing & Booking CTA Footer */}
@@ -215,19 +204,19 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                         <strong>{pkg.price}</strong>
                         <small>{pkg.priceUnit}</small>
                       </div>
-                      <div className="tp-tpkg-points-reward">
-                        <Gift size={11} />
-                        <span>+{pkg.pointsReward} Brij Points</span>
-                      </div>
                     </div>
 
                     <button
                       type="button"
                       className="tp-tpkg-select-btn"
-                      onClick={() => onSelectPackage(pkg)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectPackage(pkg);
+                      }}
+                      aria-label={`Book ${pkg.title}`}
                     >
-                      <span>Book Package</span>
-                      <ArrowRight size={15} />
+                      <span>Select</span>
+                      <ArrowRight size={13} />
                     </button>
                   </div>
                 </div>
@@ -254,6 +243,213 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
             <Phone size={16} className="tp-tpkg-g-icon" />
             <span>24/7 Pilgrimage Support</span>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Role Taxonomy & Authority Configuration
+export const ROLE_CONFIGS = {
+  admin: {
+    id: 'admin',
+    label: 'Super Admin',
+    shortLabel: 'Admin',
+    tag: '👑 Super Admin',
+    badgeClass: 'tp-role-admin',
+    icon: '👑',
+    authority: 'Full Platform Authority & Financials',
+    color: '#d97706',
+    accentBg: '#fffbeb',
+    borderColor: '#fde68a',
+    description: 'System Administrator & Operations Manager with database, partner audit, and financial Stripe GMV control.'
+  },
+  driver: {
+    id: 'driver',
+    label: 'Sarathi Driver Partner',
+    shortLabel: 'Sarathi Driver',
+    tag: '🛺 Sarathi Driver',
+    badgeClass: 'tp-role-driver',
+    icon: '🛺',
+    authority: 'Driver Companion & Ride Dispatch Desk',
+    color: '#036b4aff',
+    accentBg: '#ecfdf5',
+    borderColor: '#a7f3d0',
+    description: 'Verified Brij E-Rickshaw & Fleet Driver with real-time GPS ride dispatch, passenger tracking, and daily trip earnings.'
+  },
+  restaurant: {
+    id: 'restaurant',
+    label: 'Restaurant Partner / Owner',
+    shortLabel: 'Restaurant Owner',
+    tag: '🍲 Restaurant Owner',
+    badgeClass: 'tp-role-restaurant',
+    icon: '🍲',
+    authority: 'Dining Partner Desk & Table Bookings',
+    color: '#ea580c',
+    accentBg: '#fff7ed',
+    borderColor: '#fed7aa',
+    description: 'Brij food outlet, thali house, or sweet shop owner managing table reservations and devotee prasadam orders.'
+  },
+  restaurant_staff: {
+    id: 'restaurant_staff',
+    label: 'Restaurant Staff / Kitchen',
+    shortLabel: 'Dining Staff',
+    tag: '👨‍🍳 Restaurant Staff',
+    badgeClass: 'tp-role-restaurant-staff',
+    icon: '👨‍🍳',
+    authority: 'Order Fulfillment & Kitchen Queue',
+    color: '#c2410c',
+    accentBg: '#ffedd5',
+    borderColor: '#fdba74',
+    description: 'Kitchen & dining service staff executing real-time prasadam orders and table check-ins.'
+  },
+  hotel: {
+    id: 'hotel',
+    label: 'Hotel & Ashram Stay Owner',
+    shortLabel: 'Hotel Owner',
+    tag: '🛏️ Hotel Partner',
+    badgeClass: 'tp-role-hotel',
+    icon: '🛏️',
+    authority: 'Ashram Stay Desk & Room Inventory',
+    color: '#2563eb',
+    accentBg: '#eff6ff',
+    borderColor: '#bfdbfe',
+    description: 'Ashram, dharamshala, or hotel operator managing room inventory, pilgrim check-ins, and tariffs.'
+  },
+  hotel_staff: {
+    id: 'hotel_staff',
+    label: 'Ashram / Hotel Desk Staff',
+    shortLabel: 'Stay Staff',
+    tag: '🏨 Ashram Desk Staff',
+    badgeClass: 'tp-role-hotel-staff',
+    icon: '🏨',
+    authority: 'Front Desk & Guest Verification',
+    color: '#1d4ed8',
+    accentBg: '#dbeafe',
+    borderColor: '#93c5fd',
+    description: 'Front desk operations staff verifying devotee vouchers and managing room availability.'
+  },
+  agency: {
+    id: 'agency',
+    label: 'Tour Agency & Yatra Guide',
+    shortLabel: 'Tour Agency',
+    tag: '🚩 Tour Agency Partner',
+    badgeClass: 'tp-role-agency',
+    icon: '🚩',
+    authority: 'Yatra Itineraries & Group Bookings',
+    color: '#7c3aed',
+    accentBg: '#f5f3ff',
+    borderColor: '#ddd6fe',
+    description: 'Licensed tour agency or local Brajwasi guide offering customized parikrama, temple tours, and yatra packages.'
+  },
+  pilgrim: {
+    id: 'pilgrim',
+    label: 'Devotee Pilgrim',
+    shortLabel: 'Devotee',
+    tag: '🙏 Devotee Pilgrim',
+    badgeClass: 'tp-role-pilgrim',
+    icon: '🙏',
+    authority: 'Devotee Services, Bookings & Rewards',
+    color: '#0d9488',
+    accentBg: '#f0fdfa',
+    borderColor: '#99f6e4',
+    description: 'Devotee traveler accessing live sacred map, Darshan gallery, yatra bookings, and referral rewards.'
+  }
+};
+
+export const resolveUserRole = (user) => {
+  if (!user) return 'pilgrim';
+  const email = (user.email || '').toLowerCase();
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (email && (adminEmails.includes(email) || email.endsWith('@vrindatours.com'))) {
+    return 'admin';
+  }
+  try {
+    const savedRole = localStorage.getItem('vt_user_role');
+    if (savedRole && ROLE_CONFIGS[savedRole]) return savedRole;
+  } catch { }
+  if (user.role && ROLE_CONFIGS[user.role]) return user.role;
+  if (user.category && ROLE_CONFIGS[user.category]) return user.category;
+  return 'pilgrim';
+};
+
+// Interactive Role & Authority Configuration Modal
+function RoleAuthorityModal({ isOpen, onClose, activeRole, onSelectRole }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="tp-modal-overlay" onClick={onClose}>
+      <div className="tp-modal-card tp-role-modal-card" onClick={(e) => e.stopPropagation()}>
+        <div className="tp-role-modal-header">
+          <div className="tp-role-modal-header-text">
+            <div className="tp-role-modal-eyebrow">
+              <ShieldCheck size={14} /> USER CATEGORY & AUTHORITY MATRIX
+            </div>
+            <h3>Account Profile Tag & Authority</h3>
+            <p>Your active category tag configures your platform authority, dashboard access, and available service portals.</p>
+          </div>
+          <button type="button" className="tp-modal-close-btn" onClick={onClose} aria-label="Close modal">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="tp-role-modal-body">
+          <div className="tp-role-grid">
+            {Object.values(ROLE_CONFIGS).map((cfg) => {
+              const isSelected = activeRole === cfg.id;
+              return (
+                <div
+                  key={cfg.id}
+                  className={`tp-role-card ${isSelected ? 'is-active' : ''} ${cfg.badgeClass}`}
+                  onClick={() => {
+                    onSelectRole(cfg.id);
+                    onClose();
+                  }}
+                >
+                  <div className="tp-role-card-top">
+                    <div className="tp-role-card-badge" style={{ color: cfg.color, background: cfg.accentBg, borderColor: cfg.borderColor }}>
+                      <span className="tp-role-icon">{cfg.icon}</span>
+                      <span className="tp-role-tag-title">{cfg.tag}</span>
+                    </div>
+                    {isSelected && (
+                      <span className="tp-role-active-indicator">
+                        <CheckCircle2 size={16} /> Active Tag
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="tp-role-card-name">{cfg.label}</h4>
+                  <p className="tp-role-card-desc">{cfg.description}</p>
+                  <div className="tp-role-card-authority">
+                    <ShieldCheck size={13} style={{ color: cfg.color }} />
+                    <span>{cfg.authority}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className={`tp-btn-select-role ${isSelected ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectRole(cfg.id);
+                      onClose();
+                    }}
+                  >
+                    {isSelected ? 'Currently Active' : `Switch to ${cfg.shortLabel}`}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="tp-role-modal-footer">
+          <div className="tp-role-footer-info">
+            <span>🔒 Role switching dynamically adapts navigation authority and workspace portals in real-time.</span>
+          </div>
+          <button type="button" className="tp-btn-role-done" onClick={onClose}>
+            Done
+          </button>
         </div>
       </div>
     </div>
@@ -557,7 +753,7 @@ function OmniSearchModal({
           ) : (
             searchResults.map((item, idx) => {
               const isSelected = idx === selectedIndex;
-              
+
               // Standardized price formatter
               const priceData = (() => {
                 if (!item.price && !item.numericPrice) return null;
@@ -796,7 +992,17 @@ function PartnerJourneySection({ onSelectItem }) {
   );
 }
 
-export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAdmin, onOpenHelpCenter }) {
+export default function PartnerLandingPage({
+  onClose,
+  onOpenPartnerHub,
+  onOpenDriverPortal,
+  onOpenDriverPage,
+  onOpenHotelPage,
+  onOpenRestaurantPage,
+  onOpenAgencyPage,
+  onOpenAdmin,
+  onOpenHelpCenter
+}) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
   const currentHero = heroSteps.find(h => h.step === activeStep) || heroSteps[0];
@@ -845,8 +1051,40 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
   const [isInstantRideModalOpen, setIsInstantRideModalOpen] = useState(false);
   const [rideDestination, setRideDestination] = useState({ name: 'Shri Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103 });
   const [activeRide, setActiveRide] = useState(null);
+  const [persistedRide, setPersistedRide] = useState(() => getPersistedLocalRide());
   const { drivers } = useFirebaseDrivers();
   const { position } = useGeolocation();
+
+  // Listen to background ride events & storage changes
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      const current = getPersistedLocalRide();
+      setPersistedRide(current);
+    };
+
+    window.addEventListener('vt:ride-updated', handleStorageUpdate);
+    window.addEventListener('storage', handleStorageUpdate);
+
+    return () => {
+      window.removeEventListener('vt:ride-updated', handleStorageUpdate);
+      window.removeEventListener('storage', handleStorageUpdate);
+    };
+  }, []);
+
+  // Real-time listener for current persisted ride document
+  useEffect(() => {
+    if (!persistedRide?.id) return;
+
+    const unsub = subscribeToRideRequest(persistedRide.id, (updated) => {
+      if (!updated) {
+        setPersistedRide(null);
+        return;
+      }
+      setPersistedRide(updated);
+    });
+
+    return () => unsub();
+  }, [persistedRide?.id]);
 
   // Progressive Reveal / "Show More" Pagination Controls
   const INITIAL_GALLERY_LIMIT = 8;
@@ -974,6 +1212,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
   // Modals & Interactive States
   const [selectedItem, setSelectedItem] = useState(null);
   const [isTripPackagesModalOpen, setIsTripPackagesModalOpen] = useState(false);
+  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
   const [activePopularCardId, setActivePopularCardId] = useState(null);
   const [activeGalleryCardId, setActiveGalleryCardId] = useState(null);
@@ -1040,6 +1279,36 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
     }
     return cached;
   });
+
+  // Active Category Tag & Dynamic Role State
+  const activeUserRole = useMemo(() => {
+    return resolveUserRole(currentUser);
+  }, [currentUser]);
+  const activeRoleConfig = ROLE_CONFIGS[activeUserRole] || ROLE_CONFIGS.pilgrim;
+
+  const handleSwitchRole = async (newRoleKey) => {
+    if (!ROLE_CONFIGS[newRoleKey]) return;
+    try {
+      localStorage.setItem('vt_user_role', newRoleKey);
+    } catch {}
+    if (currentUser) {
+      const updated = { ...currentUser, role: newRoleKey, category: newRoleKey };
+      setCurrentUser(updated);
+      setCachedData('traveler_user', updated);
+
+      // Persist & synchronize role directly to Supabase Auth & profiles table
+      try {
+        await updateUserRoleInSupabase(updated, newRoleKey);
+      } catch (err) {
+        console.warn('Failed to update role in Supabase:', err);
+      }
+    }
+    setFloatingToast({
+      type: 'success',
+      message: `Profile Tag set to ${ROLE_CONFIGS[newRoleKey].tag} • ${ROLE_CONFIGS[newRoleKey].authority}`
+    });
+  };
+
   const [signupStep, setSignupStep] = useState(1); // 1: Email & Pass, 2: Name, 3: Phone
   const [authNameInput, setAuthNameInput] = useState('');
   const [authEmailInput, setAuthEmailInput] = useState('');
@@ -1221,6 +1490,19 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
     const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
     const cached = getCachedData('traveler_user', null);
     const existingPhone = (cached && (cached.uid === u.id || cached.email === email) && cached.phone) ? cached.phone : (meta.phone || '');
+    
+    // Resolve Category/Role Tag
+    const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
+      .split(',')
+      .map(e => e.trim().toLowerCase())
+      .filter(Boolean);
+    const isAdmin = email && (adminEmails.includes(email.toLowerCase()) || email.toLowerCase().endsWith('@vrindatours.com'));
+    let assignedRole = meta.role || meta.category || (cached && cached.role) || (isAdmin ? 'admin' : 'pilgrim');
+    try {
+      const storedRole = localStorage.getItem('vt_user_role');
+      if (storedRole && ROLE_CONFIGS[storedRole]) assignedRole = storedRole;
+    } catch {}
+
     return {
       uid: u.id,
       name,
@@ -1228,6 +1510,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
       phone: existingPhone,
       avatar,
       initials,
+      role: assignedRole,
+      category: assignedRole,
       authProvider: u.app_metadata?.provider || 'password',
       memberId: `VRD-${u.id.slice(0, 5).toUpperCase()}`,
       isAnonymous: false
@@ -1419,7 +1703,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
       setBookingName(newUser.name);
       setBookingEmail(newUser.email);
       if (phone) setBookingPhone(phone);
-      
+
       // Async Supabase Sync
       syncPilgrimToSupabase(newUser, refCodeEntered).catch(console.error);
 
@@ -1606,6 +1890,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
   // Guest mode — local-only state (Supabase free tier does not support anonymous auth)
   const handleGuestAuth = () => {
     const guestId = `guest_${Date.now()}`;
+    const guestRole = localStorage.getItem('vt_user_role') || 'pilgrim';
     const guestUser = {
       uid: guestId,
       name: 'Guest Traveler',
@@ -1613,6 +1898,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
       phone: '',
       avatar: `https://api.dicebear.com/7.x/initials/svg?seed=Guest&backgroundColor=0b0f19&textColor=ffffff`,
       initials: 'GT',
+      role: guestRole,
+      category: guestRole,
       authProvider: 'anonymous',
       memberId: `VRD-${guestId.slice(-5).toUpperCase()}`,
       isAnonymous: true,
@@ -1853,7 +2140,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                   type="button"
                   className={`tp-nav-user-pill ${isProfileMenuOpen ? 'active' : ''}`}
                   onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                  title="Account Profile & Settings"
+                  title={`Account: ${currentUser.name} (${activeRoleConfig.tag})`}
                 >
                   <img
                     src={currentUser.avatar}
@@ -1866,6 +2153,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                     }}
                   />
                   <span className="tp-nav-user-name">{getDisplayName(currentUser.name)}</span>
+                  <span
+                    className={`tp-nav-role-mini-tag ${activeRoleConfig.badgeClass}`}
+                    style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg, borderColor: activeRoleConfig.borderColor }}
+                  >
+                    {activeRoleConfig.icon} {activeRoleConfig.shortLabel}
+                  </span>
                   <ChevronDown size={14} className={`tp-nav-user-chevron ${isProfileMenuOpen ? 'open' : ''}`} />
                 </button>
 
@@ -1883,11 +2176,62 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                         }}
                       />
                       <div className="tp-profile-dropdown-user-info">
-                        <h4 className="tp-profile-dropdown-name">{currentUser.name}</h4>
-                        <p className="tp-profile-dropdown-email">{currentUser.email || 'Guest Traveler'}</p>
-                        <span className="tp-profile-dropdown-badge">
-                          <Sparkles size={10} /> {currentUser.authProvider === 'google' ? 'Google Account' : currentUser.isAnonymous ? 'Guest Pass' : 'Verified Member'}
-                        </span>
+                        <div className="tp-profile-name-row">
+                          <h4 className="tp-profile-dropdown-name">{currentUser.name}</h4>
+                        </div>
+                        <p className="tp-profile-dropdown-email">{currentUser.email || 'Guest Pilgrim'}</p>
+
+                        {/* Prominent Role & Category Tag */}
+                        <div className="tp-profile-tag-cluster">
+                          <span
+                            className={`tp-role-tag ${activeRoleConfig.badgeClass}`}
+                            style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg, borderColor: activeRoleConfig.borderColor }}
+                          >
+                            {activeRoleConfig.tag}
+                          </span>
+                          <span className="tp-profile-dropdown-badge">
+                            <Sparkles size={10} /> {currentUser.authProvider === 'google' ? 'Google' : currentUser.isAnonymous ? 'Guest' : 'Verified'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Role & Authority Workspace Strip */}
+                    <div className="tp-role-quick-strip">
+                      <div className="tp-role-strip-header">
+                        <div className="tp-role-strip-title">
+                          <ShieldCheck size={13} style={{ color: activeRoleConfig.color }} />
+                          <span>Authority: <strong>{activeRoleConfig.shortLabel}</strong></span>
+                        </div>
+                        <button
+                          type="button"
+                          className="tp-btn-switch-role-link"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            setIsRoleModalOpen(true);
+                          }}
+                        >
+                          All Tags ({Object.keys(ROLE_CONFIGS).length})
+                        </button>
+                      </div>
+
+                      <div className="tp-role-quick-pills">
+                        {['pilgrim', 'driver', 'restaurant', 'hotel', 'agency', 'admin'].map((rk) => {
+                          const cfg = ROLE_CONFIGS[rk];
+                          const isCurrent = activeUserRole === rk;
+                          return (
+                            <button
+                              key={rk}
+                              type="button"
+                              className={`tp-role-quick-pill ${isCurrent ? 'active' : ''}`}
+                              onClick={() => handleSwitchRole(rk)}
+                              title={cfg.label}
+                            >
+                              <span>{cfg.icon}</span>
+                              <small>{cfg.shortLabel}</small>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -1956,7 +2300,161 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
 
                     <div className="tp-profile-dropdown-divider" />
 
+                    {/* DYNAMIC ROLE-BASED ACTIONS ACCORDING TO USER TAG & AUTHORITY */}
                     <div className="tp-profile-dropdown-menu">
+                      {/* 1. ADMIN AUTHORIZED ACTIONS */}
+                      {activeUserRole === 'admin' && (
+                        <>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item tp-profile-highlight-item admin"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenAdmin) onOpenAdmin();
+                            }}
+                          >
+                            <Lock size={15} color="#d97706" />
+                            <span>👑 Platform Admin Console</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenPartnerHub) onOpenPartnerHub();
+                            }}
+                          >
+                            <Building2 size={15} />
+                            <span>👥 Partner Verification Center</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onClose) onClose();
+                            }}
+                          >
+                            <MapPin size={15} />
+                            <span>🗺️ Sacred Map & POI Overseer</span>
+                          </button>
+                        </>
+                      )}
+
+                      {/* 2. DRIVER AUTHORIZED ACTIONS */}
+                      {activeUserRole === 'driver' && (
+                        <>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item tp-profile-highlight-item driver"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenDriverPortal) onOpenDriverPortal();
+                              else if (onOpenPartnerHub) onOpenPartnerHub('driver');
+                            }}
+                          >
+                            <Car size={15} color="#059669" />
+                            <span>🛺 Open Sarathi Driver Portal</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenDriverPage) onOpenDriverPage();
+                            }}
+                          >
+                            <Compass size={15} />
+                            <span>📍 Driver Companion & Fleet Desk</span>
+                          </button>
+                        </>
+                      )}
+
+                      {/* 3. RESTAURANT / DINING AUTHORIZED ACTIONS */}
+                      {(activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff') && (
+                        <>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item tp-profile-highlight-item restaurant"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenPartnerHub) onOpenPartnerHub('restaurant');
+                            }}
+                          >
+                            <UtensilsCrossed size={15} color="#ea580c" />
+                            <span>🍲 Restaurant Partner Desk</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenRestaurantPage) onOpenRestaurantPage();
+                            }}
+                          >
+                            <Compass size={15} />
+                            <span>🍛 Brij Dining & Food Directory</span>
+                          </button>
+                        </>
+                      )}
+
+                      {/* 4. HOTEL / STAY AUTHORIZED ACTIONS */}
+                      {(activeUserRole === 'hotel' || activeUserRole === 'hotel_staff') && (
+                        <>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item tp-profile-highlight-item hotel"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenPartnerHub) onOpenPartnerHub('hotel');
+                            }}
+                          >
+                            <Building2 size={15} color="#2563eb" />
+                            <span>🛏️ Hotel & Ashram Stay Desk</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenHotelPage) onOpenHotelPage();
+                            }}
+                          >
+                            <Compass size={15} />
+                            <span>🏨 Ashram & Stay Directory</span>
+                          </button>
+                        </>
+                      )}
+
+                      {/* 5. TOUR AGENCY AUTHORIZED ACTIONS */}
+                      {activeUserRole === 'agency' && (
+                        <>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item tp-profile-highlight-item agency"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenPartnerHub) onOpenPartnerHub('agency');
+                            }}
+                          >
+                            <Compass size={15} color="#7c3aed" />
+                            <span>🚩 Tour Agency & Guide Desk</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="tp-profile-dropdown-item"
+                            onClick={() => {
+                              setIsProfileMenuOpen(false);
+                              if (onOpenAgencyPage) onOpenAgencyPage();
+                            }}
+                          >
+                            <Calendar size={15} />
+                            <span>🗺️ Brij Yatra Packages</span>
+                          </button>
+                        </>
+                      )}
+
+                      {/* UNIVERSAL DEVOTEE PILGRIM SERVICES */}
                       <button
                         type="button"
                         className="tp-profile-dropdown-item"
@@ -2003,22 +2501,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                         }}
                       >
                         <Building2 size={15} />
-                        <span>Partner & Driver Hub</span>
+                        <span>Partner Hub & Register</span>
                       </button>
-
-                      {onOpenAdmin && (
-                        <button
-                          type="button"
-                          className="tp-profile-dropdown-item tp-profile-dropdown-admin-item"
-                          onClick={() => {
-                            setIsProfileMenuOpen(false);
-                            onOpenAdmin();
-                          }}
-                        >
-                          <Lock size={15} color="#2563eb" />
-                          <span>Admin Console</span>
-                        </button>
-                      )}
                     </div>
 
                     <div className="tp-profile-dropdown-divider" />
@@ -2157,9 +2641,16 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                     <div className="tp-mobile-profile-info">
                       <h4 className="tp-mobile-profile-name">{currentUser.name}</h4>
                       <p className="tp-mobile-profile-email">{currentUser.email || 'Guest Pilgrim'}</p>
-                      <span className="tp-mobile-profile-badge">
-                        <Sparkles size={11} /> {currentUser.authProvider === 'google' ? 'Google Account' : currentUser.isAnonymous ? 'Guest Pass' : 'Verified Member'}
-                      </span>
+
+                      {/* Prominent Category Tag Badge on Mobile */}
+                      <div className="tp-mobile-tag-row">
+                        <span
+                          className={`tp-role-tag ${activeRoleConfig.badgeClass}`}
+                          style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg, borderColor: activeRoleConfig.borderColor }}
+                        >
+                          {activeRoleConfig.tag}
+                        </span>
+                      </div>
                     </div>
 
                     <button
@@ -2174,6 +2665,43 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                     >
                       <LogOut size={15} />
                     </button>
+                  </div>
+
+                  {/* Role & Authority Switcher Strip on Mobile */}
+                  <div className="tp-mobile-role-strip">
+                    <div className="tp-mobile-role-header">
+                      <div className="tp-mobile-role-left">
+                        <ShieldCheck size={13} style={{ color: activeRoleConfig.color }} />
+                        <span>AUTHORITY: <strong>{activeRoleConfig.shortLabel}</strong></span>
+                      </div>
+                      <button
+                        type="button"
+                        className="tp-btn-mobile-all-roles"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setIsRoleModalOpen(true);
+                        }}
+                      >
+                        All Tags ({Object.keys(ROLE_CONFIGS).length})
+                      </button>
+                    </div>
+                    <div className="tp-mobile-role-pills">
+                      {['pilgrim', 'driver', 'restaurant', 'hotel', 'agency', 'admin'].map((rk) => {
+                        const cfg = ROLE_CONFIGS[rk];
+                        const isCurrent = activeUserRole === rk;
+                        return (
+                          <button
+                            key={rk}
+                            type="button"
+                            className={`tp-mobile-role-pill ${isCurrent ? 'active' : ''}`}
+                            onClick={() => handleSwitchRole(rk)}
+                          >
+                            <span>{cfg.icon}</span>
+                            <small>{cfg.shortLabel}</small>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {!currentUser.phone ? (
@@ -2219,10 +2747,159 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                 </div>
               )}
 
-              {/* 2. Main Navigation Links (Curated Essential Sections) */}
+              {/* 2. Main Navigation Links (Dynamically Adapts to Active Category & Authority) */}
               <div className="tp-mobile-nav-block">
-                <div className="tp-mobile-section-label">PILGRIMAGE SERVICES</div>
+                <div className="tp-mobile-section-label">
+                  {activeUserRole === 'admin'
+                    ? '👑 ADMIN OPERATIONS & DIRECTORY'
+                    : activeUserRole === 'driver'
+                      ? '🛺 SARATHI FLEET & DISPATCH'
+                      : activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff'
+                        ? '🍲 DINING & PRASADAM DESK'
+                        : activeUserRole === 'hotel' || activeUserRole === 'hotel_staff'
+                          ? '🛏️ ASHRAM & HOTEL STAY DESK'
+                          : activeUserRole === 'agency'
+                            ? '🚩 TOUR GUIDE & YATRA DESK'
+                            : 'PILGRIMAGE SERVICES'}
+                </div>
+
                 <div className="tp-mobile-nav-list">
+                  {/* ROLE SPECIFIC PRIORITY ACTIONS */}
+                  {activeUserRole === 'admin' && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-highlight-item"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (onOpenAdmin) onOpenAdmin();
+                      }}
+                    >
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#fffbeb', color: '#d97706' }}>
+                          <Lock size={18} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">👑 Platform Admin Console</span>
+                          <span className="tp-nav-item-sub">Superuser control, financials & audits</span>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+
+                  {activeUserRole === 'driver' && (
+                    <>
+                      <button
+                        type="button"
+                        className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-highlight-item"
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          if (onOpenDriverPortal) onOpenDriverPortal();
+                          else if (onOpenPartnerHub) onOpenPartnerHub('driver');
+                        }}
+                      >
+                        <div className="tp-nav-item-content">
+                          <div className="tp-nav-item-icon-box" style={{ background: '#ecfdf5', color: '#059669' }}>
+                            <Car size={18} />
+                          </div>
+                          <div className="tp-nav-item-text">
+                            <span className="tp-nav-item-title">🛺 Sarathi Driver Companion</span>
+                            <span className="tp-nav-item-sub">Live dispatch queue & trip fares</span>
+                          </div>
+                        </div>
+                        <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                      </button>
+
+                      {onOpenDriverPage && (
+                        <button
+                          type="button"
+                          className="tp-mobile-nav-item tp-mobile-nav-item-btn"
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            onOpenDriverPage();
+                          }}
+                        >
+                          <div className="tp-nav-item-content">
+                            <div className="tp-nav-item-icon-box" style={{ background: '#f0fdf4', color: '#16a34a' }}>
+                              <Compass size={18} />
+                            </div>
+                            <div className="tp-nav-item-text">
+                              <span className="tp-nav-item-title">Driver Fleet Landing</span>
+                              <span className="tp-nav-item-sub">Sarathi benefits & EV registration</span>
+                            </div>
+                          </div>
+                          <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  {(activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff') && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-highlight-item"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (onOpenPartnerHub) onOpenPartnerHub('restaurant');
+                      }}
+                    >
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                          <UtensilsCrossed size={18} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">🍲 Restaurant Partner Desk</span>
+                          <span className="tp-nav-item-sub">Table reservations & prasadam orders</span>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+
+                  {(activeUserRole === 'hotel' || activeUserRole === 'hotel_staff') && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-highlight-item"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (onOpenPartnerHub) onOpenPartnerHub('hotel');
+                      }}
+                    >
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                          <Building2 size={18} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">🛏️ Hotel & Ashram Stay Desk</span>
+                          <span className="tp-nav-item-sub">Room bookings & guest check-ins</span>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+
+                  {activeUserRole === 'agency' && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-mobile-highlight-item"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        if (onOpenPartnerHub) onOpenPartnerHub('agency');
+                      }}
+                    >
+                      <div className="tp-nav-item-content">
+                        <div className="tp-nav-item-icon-box" style={{ background: '#f5f3ff', color: '#7c3aed' }}>
+                          <Compass size={18} />
+                        </div>
+                        <div className="tp-nav-item-text">
+                          <span className="tp-nav-item-title">🚩 Tour Agency & Guide Desk</span>
+                          <span className="tp-nav-item-sub">Group yatra bookings & itineraries</span>
+                        </div>
+                      </div>
+                      <ChevronRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+
                   <a
                     href="#popular"
                     className="tp-mobile-nav-item"
@@ -2312,44 +2989,85 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                     </div>
                     <ChevronRight size={18} className="tp-mobile-nav-arrow" />
                   </a>
-
-                  {onOpenAdmin && (
-                    <button
-                      type="button"
-                      className="tp-mobile-nav-item tp-mobile-nav-item-btn tp-nav-admin-item"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        onOpenAdmin();
-                      }}
-                    >
-                      <div className="tp-nav-item-content">
-                        <div className="tp-nav-item-icon-box" style={{ background: '#f1f5f9', color: '#64748b' }}>
-                          <Lock size={16} />
-                        </div>
-                        <div className="tp-nav-item-text">
-                          <span className="tp-nav-item-title">Admin Console</span>
-                          <span className="tp-nav-item-sub">Secure management command</span>
-                        </div>
-                      </div>
-                      <span className="tp-admin-discreet-tag">Staff</span>
-                    </button>
-                  )}
                 </div>
               </div>
 
-              {/* 3. Action Buttons Suite (Max 2 Buttons) */}
+              {/* 3. Action Buttons Suite (Dynamically Tailored by Role) */}
               <div className="tp-mobile-cta-suite">
-                <button
-                  type="button"
-                  className="tp-btn-mobile-primary-action"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    setIsTripPackagesModalOpen(true);
-                  }}
-                >
-                  <Calendar size={16} />
-                  <span>Book Yatra Package</span>
-                </button>
+                {activeUserRole === 'driver' ? (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action driver"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (onOpenDriverPortal) onOpenDriverPortal();
+                      else if (onOpenPartnerHub) onOpenPartnerHub('driver');
+                    }}
+                  >
+                    <Car size={16} />
+                    <span>🛺 Open Driver Companion</span>
+                  </button>
+                ) : activeUserRole === 'admin' ? (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action admin"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (onOpenAdmin) onOpenAdmin();
+                    }}
+                  >
+                    <Lock size={16} />
+                    <span>👑 Open Admin Suite</span>
+                  </button>
+                ) : activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff' ? (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action restaurant"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (onOpenPartnerHub) onOpenPartnerHub('restaurant');
+                    }}
+                  >
+                    <UtensilsCrossed size={16} />
+                    <span>🍲 Restaurant Partner Desk</span>
+                  </button>
+                ) : activeUserRole === 'hotel' || activeUserRole === 'hotel_staff' ? (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action hotel"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (onOpenPartnerHub) onOpenPartnerHub('hotel');
+                    }}
+                  >
+                    <Building2 size={16} />
+                    <span>🛏️ Hotel & Stay Desk</span>
+                  </button>
+                ) : activeUserRole === 'agency' ? (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action agency"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (onOpenPartnerHub) onOpenPartnerHub('agency');
+                    }}
+                  >
+                    <Compass size={16} />
+                    <span>🚩 Tour Guide Desk</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="tp-btn-mobile-primary-action"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsTripPackagesModalOpen(true);
+                    }}
+                  >
+                    <Calendar size={16} />
+                    <span>Book Yatra Package</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -3355,6 +4073,14 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
         isOpen={isTripPackagesModalOpen}
         onClose={() => setIsTripPackagesModalOpen(false)}
         onSelectPackage={handleSelectTripPackage}
+      />
+
+      {/* Interactive Role & Category Authority Configuration Modal */}
+      <RoleAuthorityModal
+        isOpen={isRoleModalOpen}
+        onClose={() => setIsRoleModalOpen(false)}
+        activeRole={activeUserRole}
+        onSelectRole={handleSwitchRole}
       />
 
       {selectedItem && (
@@ -4559,6 +5285,42 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
         <span className="hc-launcher-label">Help Centre</span>
       </button>
 
+      {/* Persistent Live Ride Floating Activity Pill (Minimizable Dynamic Island) */}
+      {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !isInstantRideModalOpen && (
+        <div
+          className="vt-floating-live-ride-pill"
+          onClick={() => {
+            if (persistedRide.destName) {
+              setRideDestination({ name: persistedRide.destName, lat: persistedRide.destLat, lng: persistedRide.destLng });
+            }
+            setIsInstantRideModalOpen(true);
+          }}
+          title="Tap to view live ride status & driver details"
+        >
+          <div className="vt-flr-pulse-wrap">
+            <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
+          </div>
+          <div className="vt-flr-info">
+            <strong className="vt-flr-title">
+              {persistedRide.status === 'searching' || persistedRide.status === 'requested'
+                ? 'Searching for Sarathi...'
+                : persistedRide.status === 'driver_arrived'
+                  ? 'Driver Arrived at Pickup!'
+                  : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`}
+            </strong>
+            <span className="vt-flr-sub">
+              {persistedRide.status === 'searching' || persistedRide.status === 'requested'
+                ? `To ${persistedRide.destName || 'Destination'} • Tap to view`
+                : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`}
+            </span>
+          </div>
+          <div className="vt-flr-action-badge">
+            <span>View Live</span>
+            <ChevronRight size={14} />
+          </div>
+        </div>
+      )}
+
       {/* UBER-GRADE INSTANT RIDE BOOKING MODAL */}
       {isInstantRideModalOpen && (
         <InstantRideModal
@@ -4597,7 +5359,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
             if (activeRide?.driver?.id && activeRide.driver.id !== 'drv_demo_vrinda') {
               try {
                 await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
-              } catch (err) {}
+              } catch (err) { }
             }
             setActiveRide(null);
             setIsInstantRideModalOpen(false);

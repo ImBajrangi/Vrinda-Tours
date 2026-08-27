@@ -32,6 +32,8 @@ export async function syncPilgrimToSupabase(user, enteredReferralCode = '') {
     email: user.email || '',
     phone: user.phone || '',
     avatar_url: user.avatar || '',
+    role: user.role || 'pilgrim',
+    category: user.category || 'pilgrim',
     referral_code: refCode,
     referred_by: cleanReferredBy || null,
     reward_points: user.rewardPoints || (cleanReferredBy ? 500 : 0),
@@ -83,6 +85,48 @@ export async function syncPilgrimToSupabase(user, enteredReferralCode = '') {
       referralCode: refCode,
       rewardPoints: profilePayload.reward_points
     };
+  }
+}
+
+/**
+ * Update user role and category tag directly in Supabase (Auth user_metadata and profiles table)
+ */
+export async function updateUserRoleInSupabase(user, newRoleKey) {
+  if (!user || !newRoleKey) return { success: false, error: 'User or role missing' };
+
+  try {
+    // 1. Update Supabase Auth user_metadata if user is authenticated via Supabase
+    if (!user.isAnonymous && user.uid) {
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            role: newRoleKey,
+            category: newRoleKey
+          }
+        });
+      } catch (authErr) {
+        console.warn('[ReferralService] Supabase auth updateUser notice:', authErr?.message);
+      }
+
+      // 2. Update profiles table in Supabase
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          role: newRoleKey,
+          category: newRoleKey,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.uid);
+
+      if (profileError) {
+        console.warn('[ReferralService] Supabase profile role update notice:', profileError.message);
+      }
+    }
+
+    return { success: true, role: newRoleKey };
+  } catch (err) {
+    console.warn('[ReferralService] Update role error in Supabase:', err);
+    return { success: false, error: err.message };
   }
 }
 

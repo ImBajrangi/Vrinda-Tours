@@ -57,19 +57,32 @@ create trigger tr_partner_category_lock
 before update on public.partners
 for each row execute function public.enforce_partner_category_lock();
 
--- 3. RIDE REQUESTS TABLE (Driver Dispatches)
+-- 3. RIDE REQUESTS TABLE (Driver Dispatches & Real-time Pilgrim Rides)
 create table if not exists public.ride_requests (
     id text primary key,
     passenger_name text not null,
-    passenger_phone text not null,
+    passenger_phone text default '',
     pickup_location text not null,
     drop_location text not null,
-    distance text,
-    fare text,
-    status text default 'pending' check (status in ('pending', 'accepted', 'completed', 'cancelled')),
+    distance text default '1.2 km',
+    fare text default '₹50',
+    status text default 'pending',
     driver_id text references public.partners(id) on delete set null,
-    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+    safety_pin text,
+    tier text default 'erickshaw',
+    payment_method text default 'cash_upi',
+    landmark_note text,
+    metadata jsonb default '{}'::jsonb,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+alter table public.ride_requests add column if not exists safety_pin text;
+alter table public.ride_requests add column if not exists tier text default 'erickshaw';
+alter table public.ride_requests add column if not exists payment_method text default 'cash_upi';
+alter table public.ride_requests add column if not exists landmark_note text;
+alter table public.ride_requests add column if not exists metadata jsonb default '{}'::jsonb;
+alter table public.ride_requests add column if not exists updated_at timestamp with time zone default timezone('utc'::text, now());
 
 -- 4. TABLE RESERVATIONS TABLE (Restaurant / Dining)
 create table if not exists public.table_reservations (
@@ -173,6 +186,60 @@ create table if not exists public.agency_registrations (
     updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 10. IN-APP HELP CENTRE & SUPPORT MESSAGES TABLE
+create table if not exists public.support_messages (
+    id text primary key,
+    thread_id text not null,
+    sender text not null check (sender in ('user', 'admin', 'system')),
+    text text not null,
+    sender_name text default 'Devotee Pilgrim',
+    sender_email text,
+    sender_phone text,
+    category text default 'general',
+    metadata jsonb default '{}'::jsonb,
+    is_read boolean default false,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 11. PILGRIMS & DEVOTEE REFERRAL PROFILES TABLE
+create table if not exists public.pilgrims (
+    id text primary key,
+    full_name text not null,
+    email text,
+    phone text,
+    referral_code text unique,
+    referred_by text,
+    yatra_coins integer default 100,
+    metadata jsonb default '{}'::jsonb,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 12. REFERRAL ACTIVITY LOGS TABLE
+create table if not exists public.referral_logs (
+    id text primary key,
+    referrer_code text not null,
+    referred_user_id text,
+    category text default 'pilgrim',
+    coins_rewarded integer default 50,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 13. TRANSACTIONS & STRIPE PAYMENTS LOGS TABLE
+create table if not exists public.payments (
+    id text primary key,
+    session_id text,
+    amount numeric(10,2) not null,
+    currency text default 'inr',
+    status text default 'pending',
+    customer_email text,
+    customer_name text,
+    item_type text,
+    item_id text,
+    metadata jsonb default '{}'::jsonb,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES — Safely Re-creatable (Drop then Create)
 -- ==============================================================================
@@ -185,14 +252,13 @@ alter table public.driver_registrations enable row level security;
 alter table public.hotel_registrations enable row level security;
 alter table public.restaurant_registrations enable row level security;
 alter table public.agency_registrations enable row level security;
+alter table public.support_messages enable row level security;
+alter table public.pilgrims enable row level security;
+alter table public.referral_logs enable row level security;
+alter table public.payments enable row level security;
 
 -- Drop existing policies first to prevent 42710 "policy already exists" errors
-drop policy if exists "Allow anon select on partners" on public.partners;
-drop policy if exists "Allow anon insert on partners" on public.partners;
-drop policy if exists "Allow anon update on partners" on public.partners;
-drop policy if exists "Allow anon delete on partners" on public.partners;
 drop policy if exists "Allow anon all on partners" on public.partners;
-
 drop policy if exists "Allow anon all on ride_requests" on public.ride_requests;
 drop policy if exists "Allow anon all on table_reservations" on public.table_reservations;
 drop policy if exists "Allow anon all on room_bookings" on public.room_bookings;
@@ -200,13 +266,13 @@ drop policy if exists "Allow anon all on driver_registrations" on public.driver_
 drop policy if exists "Allow anon all on hotel_registrations" on public.hotel_registrations;
 drop policy if exists "Allow anon all on restaurant_registrations" on public.restaurant_registrations;
 drop policy if exists "Allow anon all on agency_registrations" on public.agency_registrations;
+drop policy if exists "Allow anon all on support_messages" on public.support_messages;
+drop policy if exists "Allow anon all on pilgrims" on public.pilgrims;
+drop policy if exists "Allow anon all on referral_logs" on public.referral_logs;
+drop policy if exists "Allow anon all on payments" on public.payments;
 
--- Re-create clean policies for public / anonymous app client
-create policy "Allow anon select on partners" on public.partners for select using (true);
-create policy "Allow anon insert on partners" on public.partners for insert with check (true);
-create policy "Allow anon update on partners" on public.partners for update using (true) with check (true);
-create policy "Allow anon delete on partners" on public.partners for delete using (true);
-
+-- Re-create clean policies for public app client
+create policy "Allow anon all on partners" on public.partners for all using (true) with check (true);
 create policy "Allow anon all on ride_requests" on public.ride_requests for all using (true) with check (true);
 create policy "Allow anon all on table_reservations" on public.table_reservations for all using (true) with check (true);
 create policy "Allow anon all on room_bookings" on public.room_bookings for all using (true) with check (true);
@@ -214,6 +280,10 @@ create policy "Allow anon all on driver_registrations" on public.driver_registra
 create policy "Allow anon all on hotel_registrations" on public.hotel_registrations for all using (true) with check (true);
 create policy "Allow anon all on restaurant_registrations" on public.restaurant_registrations for all using (true) with check (true);
 create policy "Allow anon all on agency_registrations" on public.agency_registrations for all using (true) with check (true);
+create policy "Allow anon all on support_messages" on public.support_messages for all using (true) with check (true);
+create policy "Allow anon all on pilgrims" on public.pilgrims for all using (true) with check (true);
+create policy "Allow anon all on referral_logs" on public.referral_logs for all using (true) with check (true);
+create policy "Allow anon all on payments" on public.payments for all using (true) with check (true);
 
 -- Grant schema permissions to anonymous and authenticated users
 grant all on public.partners to anon, authenticated;
@@ -224,23 +294,13 @@ grant all on public.driver_registrations to anon, authenticated;
 grant all on public.hotel_registrations to anon, authenticated;
 grant all on public.restaurant_registrations to anon, authenticated;
 grant all on public.agency_registrations to anon, authenticated;
+grant all on public.support_messages to anon, authenticated;
+grant all on public.pilgrims to anon, authenticated;
+grant all on public.referral_logs to anon, authenticated;
+grant all on public.payments to anon, authenticated;
 
 -- ==============================================================================
--- SEED DATA (Initial Verified Brij Partners)
--- ==============================================================================
-
-insert into public.partners (id, name, phone, category, role_details, rating, status, verified, photo_url)
-values 
-('d_1', 'Shri Daasi', '+919876543201', 'driver', '🛺 E-Rickshaw • UP-85 VT 2026', 4.9, 'Available', true, 'https://api.dicebear.com/7.x/avataaars/svg?seed=ShriDaasi&backgroundColor=f1f5f9'),
-('d_2', 'Radhe', '+919876543202', 'driver', '🛺 E-Rickshaw • UP-85', 4.9, 'Available', true, 'https://api.dicebear.com/7.x/avataaars/svg?seed=Radhe&backgroundColor=f1f5f9'),
-('r_1', 'Brijwasin Dining', '+919876543230', 'restaurant', '🍽️ Sattvic Bhojanalaya', 4.8, 'Open', true, 'https://images.unsplash.com/photo-1517248135467-4c7ed9d8c47c?w=400'),
-('r_2', 'Govinda''s Kitchen', '+919876543220', 'restaurant', '🍽️ Pure Sattvic Thali', 4.7, 'Open', true, 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400'),
-('h_1', 'Radha Krishna Dham', '+919876543210', 'hotel', '🏨 Temple Guesthouse', 4.9, '4 Rooms', true, 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400'),
-('h_2', 'Vrinda Heritage Stay', '+919876543213', 'hotel', '🏨 Heritage Haveli', 4.8, '2 Suites', true, 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400')
-on conflict (id) do nothing;
-
--- ==============================================================================
--- 10. REALTIME REPLICATION CONFIGURATION
+-- 14. REALTIME REPLICATION CONFIGURATION
 -- ==============================================================================
 alter table public.partners replica identity full;
 alter table public.ride_requests replica identity full;
@@ -250,6 +310,10 @@ alter table public.driver_registrations replica identity full;
 alter table public.hotel_registrations replica identity full;
 alter table public.restaurant_registrations replica identity full;
 alter table public.agency_registrations replica identity full;
+alter table public.support_messages replica identity full;
+alter table public.pilgrims replica identity full;
+alter table public.referral_logs replica identity full;
+alter table public.payments replica identity full;
 
 do $$
 begin
@@ -277,7 +341,15 @@ begin
   if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'agency_registrations') then
     alter publication supabase_realtime add table public.agency_registrations;
   end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'support_messages') then
+    alter publication supabase_realtime add table public.support_messages;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'pilgrims') then
+    alter publication supabase_realtime add table public.pilgrims;
+  end if;
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and tablename = 'payments') then
+    alter publication supabase_realtime add table public.payments;
+  end if;
 exception when others then
   null;
 end $$;
-
