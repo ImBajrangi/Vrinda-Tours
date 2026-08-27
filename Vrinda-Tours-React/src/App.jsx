@@ -87,6 +87,106 @@ export default function App() {
     return locations.filter((loc) => favorites.includes(loc.name));
   }, [locations, favorites]);
 
+  // Deep Link Routing for direct sharing of registration & portal sections
+  useEffect(() => {
+    const handleDeepLinkRouting = () => {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hash = (window.location.hash || '').toLowerCase();
+        const joinParam = (searchParams.get('join') || searchParams.get('partner') || searchParams.get('page') || searchParams.get('role') || '').toLowerCase();
+        const portalParam = (searchParams.get('portal') || '').toLowerCase();
+        const appParam = (searchParams.get('app') || '').toLowerCase();
+
+        // Capture and persist referral code across all category landing links
+        const refParam = (searchParams.get('ref') || searchParams.get('referral') || searchParams.get('referrer') || searchParams.get('invite') || searchParams.get('code') || '').trim();
+        if (refParam) {
+          try {
+            localStorage.setItem('vrinda_referrer_code', refParam.toUpperCase());
+          } catch {}
+        }
+
+        // Direct User App Map link: ?app=user or #map or #user
+        if (appParam === 'user' || hash === '#map' || hash === '#user' || hash === '#app') {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(false);
+          setHotelLandingVisible(false);
+          setRestaurantLandingVisible(false);
+          setAgencyLandingVisible(false);
+          setPartnerHubVisible(false);
+          return;
+        }
+
+        // Direct Partner Hub Dashboard: ?portal=partner or ?partner=hub or #hub or #partner-hub
+        if (portalParam === 'partner' || portalParam === 'hub' || joinParam === 'hub' || hash.includes('hub')) {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(false);
+          setHotelLandingVisible(false);
+          setRestaurantLandingVisible(false);
+          setAgencyLandingVisible(false);
+          setPartnerHubVisible(true);
+          return;
+        }
+
+        // Direct Driver Registration / Landing: ?partner=driver or ?join=driver or #driver
+        if (joinParam === 'driver' || joinParam === 'drivers' || joinParam === 'cab' || joinParam === 'auto' || joinParam === 'rickshaw' || hash.includes('driver')) {
+          setPartnerLandingVisible(false);
+          setHotelLandingVisible(false);
+          setRestaurantLandingVisible(false);
+          setAgencyLandingVisible(false);
+          setDriverLandingVisible(true);
+          return;
+        }
+
+        // Direct Hotel & Stay Desk: ?partner=hotel or ?join=hotel or #hotel
+        if (joinParam === 'hotel' || joinParam === 'stay' || joinParam === 'ashram' || joinParam === 'room' || hash.includes('hotel') || hash.includes('stay')) {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(false);
+          setRestaurantLandingVisible(false);
+          setAgencyLandingVisible(false);
+          setHotelLandingVisible(true);
+          return;
+        }
+
+        // Direct Dining & Bhojnalaya: ?partner=restaurant or ?join=dining or #dining
+        if (joinParam === 'restaurant' || joinParam === 'dining' || joinParam === 'food' || joinParam === 'bhojnalaya' || hash.includes('restaurant') || hash.includes('dining')) {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(false);
+          setHotelLandingVisible(false);
+          setAgencyLandingVisible(false);
+          setRestaurantLandingVisible(true);
+          return;
+        }
+
+        // Direct Yatra Agency & Parikrama: ?partner=agency or ?join=agency or #agency
+        if (joinParam === 'agency' || joinParam === 'yatra' || joinParam === 'tour' || joinParam === 'guide' || hash.includes('agency') || hash.includes('yatra')) {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(false);
+          setHotelLandingVisible(false);
+          setRestaurantLandingVisible(false);
+          setAgencyLandingVisible(true);
+          return;
+        }
+
+        // Direct Landing section hash jump (e.g. #faq, #benefits, #vehicles, #territories)
+        if (['#faq', '#benefits', '#territories', '#vehicles', '#properties', '#categories', '#packages', '#how-it-works', '#reviews'].some(s => hash.startsWith(s))) {
+          setPartnerLandingVisible(false);
+          setDriverLandingVisible(true);
+          return;
+        }
+      } catch (e) {
+        console.warn('URL deep-linking parse error:', e);
+      }
+    };
+
+    handleDeepLinkRouting();
+    window.addEventListener('hashchange', handleDeepLinkRouting);
+    window.addEventListener('popstate', handleDeepLinkRouting);
+    return () => {
+      window.removeEventListener('hashchange', handleDeepLinkRouting);
+      window.removeEventListener('popstate', handleDeepLinkRouting);
+    };
+  }, []);
+
   // Listen to passenger active ride status updates in real-time
   useEffect(() => {
     if (!activeRide?.driver?.id) return;

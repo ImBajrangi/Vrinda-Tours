@@ -21,26 +21,8 @@ export default function RestaurantPortalTab({ partner, onLogout }) {
     lassi: false
   });
 
-  const [reservations, setReservations] = useState([
-    {
-      id: 'res_1',
-      guest: 'Rameshwar Ji & Family',
-      phone: '+919876543230',
-      time: 'Today 7:30 PM',
-      guests: '4 Pilgrims',
-      notes: 'Pure Sattvic — No Onion/Garlic • Family Corner',
-      status: 'pending'
-    },
-    {
-      id: 'res_2',
-      guest: 'Priya Narayanan',
-      phone: '+919876543231',
-      time: 'Today 8:15 PM',
-      guests: '2 Pilgrims',
-      notes: 'Window View • Special 56 Bhog Request',
-      status: 'confirmed'
-    }
-  ]);
+  // Live reservations — populated via Supabase realtime, no hardcoded demos
+  const [reservations, setReservations] = useState([]);
 
   const toggleSpecial = (key) => {
     setSpecials(prev => ({ ...prev, [key]: !prev[key] }));
@@ -160,7 +142,13 @@ export default function RestaurantPortalTab({ partner, onLogout }) {
       </div>
 
       <div className="ph-cards-list">
-        {reservations.map(res => (
+        {reservations.length === 0 ? (
+          <div className="ph-empty-state">
+            <Utensils size={28} style={{ opacity: 0.25 }} />
+            <p>No reservations yet</p>
+            <span>Pilgrim dining requests will appear here in realtime</span>
+          </div>
+        ) : reservations.map(res => (
           <div key={res.id} className="ph-order-card">
             <div className="ph-order-top">
               <span className="ph-order-guest">{res.guest}</span>

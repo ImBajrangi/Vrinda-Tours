@@ -6,7 +6,8 @@ import {
   Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
-  Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift
+  Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
+  Check, Copy, UtensilsCrossed
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -36,7 +37,7 @@ import {
 import { supabase } from '../../config/supabase';
 import { shareWebPPicture, getOptimizedWebPUrl } from '../../utils/imageOptimizer';
 import { validatePhoneNumber } from '../../utils/phoneValidator';
-import { syncPilgrimToSupabase, getPilgrimReferralStats } from '../../services/referralService';
+import { syncPilgrimToSupabase, getPilgrimReferralStats, REFERRAL_CATEGORIES, shareLinkWithFallback } from '../../services/referralService';
 import './PartnerLandingPage.css';
 
 // Interactive Trip Packages Selector Modal
@@ -995,7 +996,9 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [floatingToast, setFloatingToast] = useState(null);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
-  const [copiedReferral, setCopiedReferral] = useState(false);
+  const [selectedRefCategory, setSelectedRefCategory] = useState('pilgrim');
+  const [copiedRefTarget, setCopiedRefTarget] = useState('');
+  const [showAllRefLinks, setShowAllRefLinks] = useState(false);
   const [authReferralInput, setAuthReferralInput] = useState(() => {
     try {
       return localStorage.getItem('vrinda_referrer_code') || '';
@@ -4035,12 +4038,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
         </div>
       )}
 
-      {/* Pilgrim Referral & Rewards Modal */}
+      {/* Pilgrim Referral & Category Direct Share Modal */}
       {isReferralModalOpen && (
         <div className="tp-auth-modal-overlay" onClick={() => setIsReferralModalOpen(false)}>
           <div
             className="tp-auth-modal-card"
-            style={{ maxWidth: '440px' }}
+            style={{ maxWidth: '490px', width: '94%' }}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -4052,10 +4055,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   <Gift size={20} color="#ec4899" />
                 </div>
                 <div>
-                  <h3 id="referral-modal-title" className="tp-auth-modal-title" style={{ fontSize: '1.1rem', margin: 0 }}>
-                    Pilgrim Referral Program
+                  <h3 id="referral-modal-title" className="tp-auth-modal-title" style={{ fontSize: '1.08rem', margin: 0 }}>
+                    Referral &amp; Direct Share Engine
                   </h3>
-                  <span style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 800 }}>✨ Earn 500 Brij Points</span>
+                  <span style={{ fontSize: '0.74rem', color: '#10b981', fontWeight: 800 }}>✨ Earn 500 Brij Points • 0% Commission Partners</span>
                 </div>
               </div>
               <button
@@ -4074,10 +4077,10 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   <Gift size={26} color="#ec4899" />
                 </div>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.4rem 0' }}>
-                  Register to Unlock Your Referral Code
+                  Register to Unlock Your Direct Referral Code
                 </h3>
                 <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, margin: '0 0 1.3rem 0' }}>
-                  Create your free pilgrim profile in 30 seconds to generate your personal invite link, share with friends & family, and earn <strong>500 Brij Reward Points</strong> per referral!
+                  Create your free pilgrim profile in 30 seconds to generate your personal invite links for Drivers, Hotels, Dining &amp; Devotees and earn <strong>500 Brij Reward Points</strong> per referral!
                 </p>
                 <button
                   type="button"
@@ -4100,95 +4103,201 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                   Maybe Later
                 </button>
               </div>
-            ) : (
-              <div className="tp-auth-modal-body" style={{ marginTop: '1rem' }}>
-                <p style={{ fontSize: '0.84rem', color: '#52525b', lineHeight: 1.5, margin: '0 0 1.2rem 0' }}>
-                  Invite your spiritual family and friends to Vrinda Vihar. When they take their first e-rickshaw ride or hotel stay, <strong>both of you earn 500 Brij Reward Points</strong> and unlock <strong>15% OFF</strong> on divine stays!
-                </p>
+            ) : (() => {
+              const myRefCode = currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`;
+              const activeCategoryConfig = REFERRAL_CATEGORIES.find(c => c.id === selectedRefCategory) || REFERRAL_CATEGORIES[0];
+              const activeLink = activeCategoryConfig.getLink(myRefCode);
+              const activeMsg = activeCategoryConfig.whatsappMsg(myRefCode);
 
-                {/* Referral Code Box */}
-                <div style={{ background: '#fafafa', border: '1.5px dashed #cbd5e1', borderRadius: '16px', padding: '1rem', marginBottom: '1.2rem', textAlign: 'center' }}>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '4px' }}>
-                    Your Unique Pilgrim Invite Code
-                  </span>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#09090b', letterSpacing: '0.08em', fontFamily: 'monospace', margin: '4px 0 6px 0' }}>
-                    {currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`}
+              const handleCopyCategoryLink = (cat) => {
+                const link = cat.getLink(myRefCode);
+                navigator.clipboard?.writeText(link);
+                setCopiedRefTarget(cat.id);
+                setTimeout(() => setCopiedRefTarget(''), 2200);
+              };
+
+              const handleDeviceShare = async () => {
+                await shareLinkWithFallback({
+                  title: activeCategoryConfig.title,
+                  text: activeMsg,
+                  url: activeLink
+                });
+                setCopiedRefTarget(activeCategoryConfig.id);
+                setTimeout(() => setCopiedRefTarget(''), 2200);
+              };
+
+              return (
+                <div className="tp-auth-modal-body" style={{ marginTop: '0.8rem' }}>
+                  {/* Referral Code Box & Live Stats */}
+                  <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '0.8rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                        Your Unique Referral Code
+                      </span>
+                      <span style={{ fontSize: '1.25rem', fontWeight: 900, color: '#09090b', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                        {myRefCode}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, color: '#047857' }}>
+                        🌟 {referralStats.totalPoints || currentUser.rewardPoints || 0} Pts
+                      </div>
+                      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '3px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, color: '#1d4ed8' }}>
+                        👥 {referralStats.totalReferrals || 0} Joined
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Live Supabase Stats */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', margin: '6px 0 10px 0', flexWrap: 'wrap' }}>
-                    <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 9px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 800, color: '#047857' }}>
-                      🌟 {referralStats.totalPoints || currentUser.rewardPoints || 0} Brij Points
-                    </div>
-                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '3px 9px', borderRadius: '999px', fontSize: '0.74rem', fontWeight: 800, color: '#1d4ed8' }}>
-                      👥 {referralStats.totalReferrals || 0} Devotees Joined
+                  {/* Category Selection Tabs */}
+                  <div style={{ marginBottom: '6px' }}>
+                    <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '6px' }}>
+                      Select Category to Share:
+                    </label>
+                    <div className="tp-ref-category-nav">
+                      {REFERRAL_CATEGORIES.map((cat) => {
+                        const isSelected = selectedRefCategory === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            className={`tp-ref-cat-pill ${isSelected ? 'active' : ''}`}
+                            onClick={() => setSelectedRefCategory(cat.id)}
+                          >
+                            <span>{cat.icon}</span>
+                            <span>{cat.label}</span>
+                            <span className="tp-ref-cat-badge">{cat.badge}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const code = currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`;
-                      const link = `${window.location.origin}/?ref=${code}`;
-                      navigator.clipboard?.writeText(link);
-                      setCopiedReferral(true);
-                      setTimeout(() => setCopiedReferral(false), 2500);
-                    }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '6px 14px',
-                      borderRadius: '999px',
-                      background: copiedReferral ? '#16a34a' : '#18181b',
-                      color: '#ffffff',
-                      fontSize: '0.78rem',
-                      fontWeight: 800,
-                      border: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                  >
-                    <Share2 size={13} />
-                    <span>{copiedReferral ? '✓ Link Copied to Clipboard!' : 'Copy Referral Link'}</span>
-                  </button>
-                </div>
+                  {/* Active Category Direct Share Card */}
+                  <div className="tp-ref-card">
+                    <div className="tp-ref-card-header">
+                      <div className="tp-ref-card-title">
+                        <span>{activeCategoryConfig.icon}</span>
+                        <span>{activeCategoryConfig.title}</span>
+                      </div>
+                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#059669', background: '#ecfdf5', padding: '2px 8px', borderRadius: '999px', border: '1px solid #a7f3d0' }}>
+                        {activeCategoryConfig.badge}
+                      </span>
+                    </div>
 
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                      `Radhe Radhe! 🙏 Use my invite link on Vrinda Vihar to get 500 Brij Reward Points and 15% OFF on verified stays & E-Rickshaw rides across Vrindavan, Mathura & Barsana:\n\n${window.location.origin}/?ref=${currentUser.referralCode || `VRINDA-${(currentUser.uid || currentUser.id || currentUser.email || 'DEVOTE').replace(/[^a-zA-Z0-9]/g, '').slice(-5).toUpperCase()}`}`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '0.85rem',
-                      background: '#25D366',
-                      color: '#ffffff',
-                      borderRadius: '999px',
-                      fontWeight: 800,
-                      fontSize: '0.88rem',
-                      textDecoration: 'none',
-                      boxShadow: '0 4px 14px rgba(37, 211, 102, 0.3)'
-                    }}
-                  >
-                    <Send size={15} />
-                    <span>Share Invite via WhatsApp</span>
-                  </a>
+                    <p className="tp-ref-card-desc">
+                      {activeCategoryConfig.desc}
+                    </p>
+
+                    {/* Direct Shareable Link Box */}
+                    <div className="tp-ref-link-box">
+                      <span className="tp-ref-link-text">
+                        {activeLink}
+                      </span>
+                      <button
+                        type="button"
+                        className={`tp-ref-copy-btn ${copiedRefTarget === activeCategoryConfig.id ? 'copied' : ''}`}
+                        onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
+                        title="Copy direct shareable URL"
+                      >
+                        {copiedRefTarget === activeCategoryConfig.id ? <Check size={13} /> : <Copy size={13} />}
+                        <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied!' : 'Copy Link'}</span>
+                      </button>
+                    </div>
+
+                    {/* Action Buttons: WhatsApp & Device Share */}
+                    <div className="tp-ref-actions-row">
+                      <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(activeMsg)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tp-ref-action-btn-whatsapp"
+                      >
+                        <Send size={14} />
+                        <span>Share on WhatsApp</span>
+                      </a>
+
+                      <button
+                        type="button"
+                        className="tp-ref-action-btn-share"
+                        onClick={handleDeviceShare}
+                      >
+                        <Share2 size={14} />
+                        <span>Share via Any App</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Toggle: View All Category Direct Links */}
+                  <div className="tp-ref-direct-list-wrap">
+                    <div className="tp-ref-direct-list-title">
+                      <span>Direct Links for All Categories</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowAllRefLinks(prev => !prev)}
+                        style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontSize: '0.74rem', fontWeight: 800, cursor: 'pointer' }}
+                      >
+                        {showAllRefLinks ? 'Hide List ▲' : 'Show All (6 Links) ▼'}
+                      </button>
+                    </div>
+
+                    {showAllRefLinks && (
+                      <div>
+                        {REFERRAL_CATEGORIES.map((cat) => {
+                          const catLink = cat.getLink(myRefCode);
+                          const isCopied = copiedRefTarget === `list_${cat.id}`;
+                          return (
+                            <div key={cat.id} className="tp-ref-direct-item">
+                              <div className="tp-ref-direct-item-left">
+                                <span>{cat.icon}</span>
+                                <div>
+                                  <div style={{ lineHeight: 1.2 }}>{cat.label}</div>
+                                  <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                                    {cat.path}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="tp-ref-direct-item-right">
+                                <button
+                                  type="button"
+                                  className={`tp-ref-icon-btn ${isCopied ? 'copied' : ''}`}
+                                  onClick={() => {
+                                    navigator.clipboard?.writeText(catLink);
+                                    setCopiedRefTarget(`list_${cat.id}`);
+                                    setTimeout(() => setCopiedRefTarget(''), 2000);
+                                  }}
+                                  title={`Copy ${cat.label} direct share link`}
+                                >
+                                  {isCopied ? <Check size={13} /> : <Copy size={13} />}
+                                </button>
+                                <a
+                                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="tp-ref-icon-btn"
+                                  title={`Share ${cat.label} on WhatsApp`}
+                                  style={{ background: '#ecfdf5', color: '#059669', borderColor: '#a7f3d0' }}
+                                >
+                                  <Send size={13} />
+                                </a>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     type="button"
                     onClick={() => setIsReferralModalOpen(false)}
                     style={{
-                      padding: '0.75rem',
+                      width: '100%',
+                      padding: '0.7rem',
+                      marginTop: '0.8rem',
                       background: 'transparent',
                       border: 'none',
-                      color: '#71717a',
+                      color: '#64748b',
                       fontWeight: 700,
                       fontSize: '0.82rem',
                       cursor: 'pointer'
@@ -4197,8 +4306,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     Close
                   </button>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       )}

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Car, Shield, CheckCircle2, ChevronRight, ChevronDown, Phone, User, 
   MapPin, Navigation, ArrowRight, X, Sparkles, 
   Clock, TrendingUp, Check, ShieldCheck, AlertCircle, LogIn, HeartHandshake,
   Zap, ArrowUpRight, ArrowLeft, CheckSquare, Award, BadgePercent, Sparkle,
-  Mail, Lock, Eye, EyeOff, Compass, Building2, UtensilsCrossed
+  Mail, Lock, Eye, EyeOff, Compass, Building2, UtensilsCrossed, Share2, Copy
 } from 'lucide-react';
 import { collection, addDoc } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
@@ -205,6 +205,76 @@ export default function DriverLandingPage({
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
+
+  const [copiedPageShare, setCopiedPageShare] = useState(false);
+
+  const handleShareCurrentPage = async () => {
+    const refCode = localStorage.getItem('vrinda_referrer_code') || '';
+    const shareUrl = `${window.location.origin}/?join=driver&mode=register${refCode ? `&ref=${refCode}` : ''}`;
+    const shareText = `Radhe Radhe! 🛺 Join Vrinda Vihar as a Driver Partner (E-Rickshaw, Auto, Cab) with 0% Commission Forever:\n\n${shareUrl}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Driver Partner Registration - Vrinda Vihar', text: shareText, url: shareUrl });
+        setCopiedPageShare(true);
+        setTimeout(() => setCopiedPageShare(false), 2000);
+        return;
+      } catch (e) {}
+    }
+    
+    navigator.clipboard?.writeText(shareUrl);
+    setCopiedPageShare(true);
+    setTimeout(() => setCopiedPageShare(false), 2000);
+  };
+
+  const scrollToSection = useCallback((sectionId) => {
+    setActiveView('landing');
+    setShowLoginModal(false);
+    setTimeout(() => {
+      if (mainBodyRef.current) {
+        const targetEl = mainBodyRef.current.querySelector(`#${sectionId}`);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }, 60);
+  }, []);
+
+  // URL Deep-Linking for direct Registration Wizard, Login Modal, or Section Anchor (#faq, #benefits, etc.)
+  useEffect(() => {
+    const handleUrlState = () => {
+      try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const hash = (window.location.hash || '').toLowerCase();
+        const mode = (searchParams.get('mode') || searchParams.get('view') || searchParams.get('action') || '').toLowerCase();
+
+        if (mode === 'register' || mode === 'wizard' || mode === 'join' || hash.includes('register') || hash.includes('wizard')) {
+          setActiveView('wizard');
+          setCurrentStep(1);
+          setShowLoginModal(false);
+          return;
+        } 
+        
+        if (mode === 'login' || mode === 'signin' || hash.includes('login') || hash.includes('signin')) {
+          setShowLoginModal(true);
+          return;
+        }
+
+        const sectionId = hash.replace(/^#/, '');
+        if (sectionId && sectionId !== 'driver' && sectionId !== 'drivers' && sectionId !== 'landing') {
+          scrollToSection(sectionId);
+        }
+      } catch (e) {}
+    };
+
+    handleUrlState();
+    window.addEventListener('hashchange', handleUrlState);
+    window.addEventListener('popstate', handleUrlState);
+    return () => {
+      window.removeEventListener('hashchange', handleUrlState);
+      window.removeEventListener('popstate', handleUrlState);
+    };
+  }, [scrollToSection]);
 
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
@@ -739,35 +809,35 @@ export default function DriverLandingPage({
             <button 
               type="button" 
               className={`dmd-nav-link ${activeView === 'landing' ? 'active' : ''}`}
-              onClick={() => setActiveView('landing')}
+              onClick={() => { setActiveView('landing'); if (mainBodyRef.current) mainBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               Overview
             </button>
             <a 
               href="#vehicles" 
               className="dmd-nav-link"
-              onClick={() => setActiveView('landing')}
+              onClick={(e) => { e.preventDefault(); scrollToSection('vehicles'); }}
             >
               Fleet &amp; Vehicles
             </a>
             <a 
               href="#benefits" 
               className="dmd-nav-link"
-              onClick={() => setActiveView('landing')}
+              onClick={(e) => { e.preventDefault(); scrollToSection('benefits'); }}
             >
               Benefits
             </a>
             <a 
               href="#territories" 
               className="dmd-nav-link"
-              onClick={() => setActiveView('landing')}
+              onClick={(e) => { e.preventDefault(); scrollToSection('territories'); }}
             >
               Territories
             </a>
             <a 
               href="#faq" 
               className="dmd-nav-link"
-              onClick={() => setActiveView('landing')}
+              onClick={(e) => { e.preventDefault(); scrollToSection('faq'); }}
             >
               FAQ
             </a>
@@ -785,26 +855,38 @@ export default function DriverLandingPage({
           <div className="dmd-nav-right">
             <button 
               type="button" 
-              className="dmd-btn-user-link" 
-              onClick={onClose}
-              title="Go to Devotee / User Landing Page"
+              className="dmd-nav-btn-icon" 
+              onClick={handleShareCurrentPage}
+              title="Share Driver Registration link"
+              aria-label="Share Registration link"
+              style={copiedPageShare ? { background: '#ecfdf5', color: '#059669', borderColor: '#a7f3d0' } : {}}
             >
-              <Compass size={14} />
-              <span>User App</span>
+              {copiedPageShare ? <Check size={15} /> : <Share2 size={15} />}
+              <span className="dmd-btn-text-desktop">{copiedPageShare ? 'Copied!' : 'Share'}</span>
             </button>
             <button 
               type="button" 
-              className="dmd-btn-secondary"
+              className="dmd-nav-btn-icon" 
+              onClick={onClose}
+              title="Go to Devotee / User Landing Page"
+              aria-label="Pilgrim User App"
+            >
+              <Compass size={15} />
+              <span className="dmd-btn-text-desktop">User App</span>
+            </button>
+            <button 
+              type="button" 
+              className="dmd-btn-signin"
               onClick={() => setShowLoginModal(true)}
             >
               Sign In
             </button>
             <button 
               type="button" 
-              className="dmd-btn-primary"
+              className="dmd-btn-primary dmd-btn-register-cta"
               onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
             >
-              Pre-Register Free →
+              <span>Pre-Register Free →</span>
             </button>
           </div>
 
@@ -1057,6 +1139,7 @@ export default function DriverLandingPage({
                           <label className="dmd-label">Plate / Registration No.</label>
                           <div className="dmd-hsrp-plate-wrap">
                             <div className="dmd-hsrp-ind-strip">
+                              <div className="dmd-hsrp-chakra" />
                               <span>IND</span>
                             </div>
                             <input 

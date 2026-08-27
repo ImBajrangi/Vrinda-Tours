@@ -28,7 +28,7 @@ export const auth = getAuth(app);
 let db;
 try {
   db = initializeFirestore(app, {
-    experimentalAutoDetectLongPolling: true
+    experimentalForceLongPolling: true
   });
 } catch (e) {
   db = getFirestore(app);

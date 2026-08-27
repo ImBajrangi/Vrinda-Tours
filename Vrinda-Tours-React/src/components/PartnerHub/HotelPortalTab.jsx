@@ -21,28 +21,8 @@ export default function HotelPortalTab({ partner, onLogout }) {
     suite: { available: 1, total: 2 }
   });
 
-  const [bookings, setBookings] = useState([
-    {
-      id: 'bk_1',
-      guest: 'Sunil Verma & Family',
-      phone: '+919876543210',
-      dates: 'Aug 25 - Aug 27 (2 Nights)',
-      roomType: 'Deluxe AC Room',
-      guests: '3 Pilgrims',
-      notes: 'Ground Floor Preferred • Senior Citizens',
-      status: 'pending'
-    },
-    {
-      id: 'bk_2',
-      guest: 'Ananya Deshmukh',
-      phone: '+919876543211',
-      dates: 'Aug 26 - Aug 28 (2 Nights)',
-      roomType: 'Heritage Suite',
-      guests: '2 Pilgrims',
-      notes: 'Early Check-In at 10 AM',
-      status: 'confirmed'
-    }
-  ]);
+  // Live booking requests — populated via Supabase realtime, no hardcoded demos
+  const [bookings, setBookings] = useState([]);
 
   const confirmBooking = (id) => {
     setBookings(prev => prev.map(b => b.id === id ? { ...b, status: 'confirmed' } : b));
@@ -168,7 +148,13 @@ export default function HotelPortalTab({ partner, onLogout }) {
       </div>
 
       <div className="ph-cards-list">
-        {bookings.map(bk => (
+        {bookings.length === 0 ? (
+          <div className="ph-empty-state">
+            <Bed size={28} style={{ opacity: 0.25 }} />
+            <p>No booking requests yet</p>
+            <span>Pilgrim stay requests will appear here in realtime</span>
+          </div>
+        ) : bookings.map(bk => (
           <div key={bk.id} className="ph-order-card">
             <div className="ph-order-top">
               <span className="ph-order-guest">{bk.guest}</span>

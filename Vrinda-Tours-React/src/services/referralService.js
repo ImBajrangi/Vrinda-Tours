@@ -121,3 +121,108 @@ export async function getPilgrimReferralStats(user) {
     };
   }
 }
+
+/**
+ * Category-specific Direct Shareable URLs & Content Definitions
+ */
+export const REFERRAL_CATEGORIES = [
+  {
+    id: 'pilgrim',
+    label: 'Pilgrim App',
+    icon: '🙏',
+    badge: '500 Points',
+    title: 'Pilgrim Navigation & Temple Darshan',
+    desc: 'Share with family & friends for live temple navigation, darshan timings & 500 Brij Points.',
+    path: '/?app=user',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?app=user${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🙏 Join Vrinda Vihar to explore divine temples, get 500 Brij Reward Points & 15% OFF on verified stays & e-rickshaw rides in Vrindavan:\n\n${origin}/?app=user${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  },
+  {
+    id: 'driver',
+    label: 'Driver Partner',
+    icon: '🛺',
+    badge: '0% Comm',
+    title: 'E-Rickshaw, Auto & Cab Partner',
+    desc: 'Invite local drivers to earn up to ₹1,90,000/mo with 0% commission & direct pilgrim bookings.',
+    path: '/?join=driver&mode=register',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?join=driver&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🛺 Register as a Verified Driver Partner on Vrinda Vihar. 0% Commission Forever & earn up to ₹1,90,000/mo across Vrindavan & Mathura. Register directly here:\n\n${origin}/?join=driver&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  },
+  {
+    id: 'hotel',
+    label: 'Hotel & Ashram',
+    icon: '🏨',
+    badge: '0% Comm',
+    title: 'Hotel, Ashram & Stay Desk',
+    desc: 'Invite hotel & ashram owners to list rooms with 0% commission and instant payouts.',
+    path: '/?join=hotel&mode=register',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?join=hotel&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🏨 List your Hotel, Ashram or Dharamshala on Vrinda Vihar Stay Desk with 0% listing fee & direct pilgrim bookings in Vrindavan. Join here:\n\n${origin}/?join=hotel&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  },
+  {
+    id: 'dining',
+    label: 'Dining & Sweets',
+    icon: '🍽️',
+    badge: 'Sattvic',
+    title: 'Bhojnalaya & Sattvic Dining',
+    desc: 'Invite restaurant & sweet shop owners to list pure sattvic food for pilgrims.',
+    path: '/?join=dining&mode=register',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?join=dining&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🍽️ Partner your Bhojnalaya, Restaurant or Sweets shop on Vrinda Vihar for 100% pure sattvic food lovers across Braj Dham. Register here:\n\n${origin}/?join=dining&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  },
+  {
+    id: 'agency',
+    label: 'Yatra Agency',
+    icon: '🚩',
+    badge: '84 Kos',
+    title: 'Yatra & Parikrama Operator',
+    desc: 'Invite travel agencies & tour guides for 84 Kos Parikrama and VIP group packages.',
+    path: '/?join=agency&mode=register',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?join=agency&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🚩 Register your Yatra Agency or 84 Kos Parikrama Tour Operator on Vrinda Vihar for verified devotee groups. Register here:\n\n${origin}/?join=agency&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  },
+  {
+    id: 'hub',
+    label: 'Partner Hub',
+    icon: '🏢',
+    badge: 'Portal',
+    title: 'Partner Operations Dashboard',
+    desc: 'Direct link to the unified B2B partner management and operations portal.',
+    path: '/?portal=partner',
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `${origin}/?portal=partner${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+      `Radhe Radhe! 🏢 Access the Vrinda Vihar Unified Partner Portal for bookings, operations and fleet tracking:\n\n${origin}/?portal=partner${code ? `&ref=${encodeURIComponent(code)}` : ''}`
+  }
+];
+
+/**
+ * Universal Native Web Share / Clipboard Copy with fallback
+ */
+export async function shareLinkWithFallback({ title, text, url }) {
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title, text, url });
+      return { success: true, method: 'native' };
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        return { success: false, method: 'cancelled' };
+      }
+    }
+  }
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    await navigator.clipboard.writeText(url || text);
+    return { success: true, method: 'clipboard' };
+  }
+  return { success: false, method: 'none' };
+}

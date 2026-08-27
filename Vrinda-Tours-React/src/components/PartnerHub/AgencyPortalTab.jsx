@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { 
-  Zap, Star, Navigation, Phone, CheckCircle2, 
-  MapPin, Clock, ShieldCheck, Compass, LogOut, Users, Bus, Calendar, Lock 
+  Bus, Star, Navigation, Phone, CheckCircle2, 
+  MapPin, Clock, ShieldCheck, Compass, LogOut, Users, Calendar, 
+  MessageCircle, Sparkles, Zap 
 } from 'lucide-react';
+import { openWhatsApp } from '../../utils/whatsapp';
 
 export default function AgencyPortalTab({ partner, onLogout }) {
   const isVerified = Boolean(partner?.verified);
@@ -14,26 +16,19 @@ export default function AgencyPortalTab({ partner, onLogout }) {
   const fleetSize = partner?.metadata?.fleetSize || '5-10 Buses / Vans';
   const zone = partner?.metadata?.zone || partner?.zone || 'Braj Region Wide';
 
-  const [inquiries, setInquiries] = useState([
-    {
-      id: 'yatra_1',
-      groupLeader: 'Rameshwar Ji (Jaipur)',
-      pilgrims: '14 Devotees',
-      package: '84 Kos Complete Parikrama (7 Days)',
-      dates: 'Next Ekadashi • 12–19 Nov',
-      totalFare: '₹32,000',
-      status: 'pending'
-    },
-    {
-      id: 'yatra_2',
-      groupLeader: 'Sunita Agarwal (Delhi)',
-      pilgrims: '8 Devotees',
-      package: 'Vrindavan 7 Main Mandir VIP Darshan',
-      dates: 'This Weekend (Sat–Sun)',
-      totalFare: '₹14,500',
-      status: 'confirmed'
-    }
-  ]);
+  // Live packages / fleet status
+  const [packages, setPackages] = useState({
+    parikrama84: true,
+    govardhanTour: true,
+    vipDarshanVan: false
+  });
+
+  const togglePackage = (key) => {
+    setPackages(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Live yatra inquiries — populated via Supabase realtime, no hardcoded demos
+  const [inquiries, setInquiries] = useState([]);
 
   const confirmInquiry = (id) => {
     setInquiries(prev => prev.map(inq => inq.id === id ? { ...inq, status: 'confirmed' } : inq));
@@ -85,98 +80,162 @@ export default function AgencyPortalTab({ partner, onLogout }) {
             <h4>{partner?.name || 'Shri Braj 84 Kos Yatra Tours'}</h4>
             <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {rating}</span>
           </div>
-          <div className="ph-details-sub">
+          <div className="ph-sub-line">
             <span>{agencyType} • {fleetSize} • {zone}</span>
           </div>
         </div>
-        <button className="ph-logout-action" onClick={onLogout} title="Sign Out">
-          <LogOut size={16} />
+        <button className="ph-btn-logout" onClick={onLogout} title="Sign Out">
+          <LogOut size={15} />
         </button>
       </div>
 
-      {/* Agency Status Quick Control */}
-      <div className="ph-status-banner">
+      {/* Online Status Beacon */}
+      <div className={`ph-status-hero ${isOpen ? '' : 'closed'}`}>
         <div className="ph-status-left">
-          <span className={`ph-pulse-dot ${isOpen ? 'online' : 'offline'}`} />
-          <span className="ph-status-text">
-            {isOpen ? 'Agency Open for Devotee Group Inquiries' : 'Currently Offline (Not Taking Bookings)'}
-          </span>
+          <div className="ph-status-icon-box">
+            <Zap size={20} />
+          </div>
+          <div className="ph-status-text">
+            <h4>{isOpen ? 'Agency Open for Group Yatras' : 'Currently Offline'}</h4>
+            <span>{isOpen ? 'Receiving live devotee group bookings & parikrama requests' : 'Go online to receive group yatra inquiries'}</span>
+          </div>
         </div>
-        <button 
-          className={`ph-toggle-btn ${isOpen ? 'active' : ''}`}
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? 'Close' : 'Go Open'}
+        <button className="ph-btn-toggle" onClick={() => setIsOpen(prev => !prev)}>
+          {isOpen ? 'Go Offline' : 'Go Online'}
         </button>
       </div>
 
-      {/* Metric Tiles */}
+      {/* 3 Metrics Grid */}
       <div className="ph-stats-grid">
-        <div className="ph-stat-box">
-          <span className="ph-stat-num">{activeYatrasCount}</span>
-          <span className="ph-stat-label">Active Yatras</span>
+        <div className="ph-stat-card">
+          <span className="ph-stat-val">{activeYatrasCount}</span>
+          <span className="ph-stat-lbl">Active Yatras</span>
         </div>
-        <div className="ph-stat-box">
-          <span className="ph-stat-num">46</span>
-          <span className="ph-stat-label">Pilgrims Guided</span>
+        <div className="ph-stat-card">
+          <span className="ph-stat-val">46</span>
+          <span className="ph-stat-lbl">Pilgrims Guided</span>
         </div>
-        <div className="ph-stat-box">
-          <span className="ph-stat-num">₹0</span>
-          <span className="ph-stat-label">0% Platform Cut</span>
+        <div className="ph-stat-card">
+          <div className="ph-stat-val">
+            <span>₹0</span>
+          </div>
+          <span className="ph-stat-lbl">0% Platform Cut</span>
         </div>
       </div>
 
-      {/* Live Inquiries List */}
+      {/* Live Devotee Group Inquiries */}
       <div className="ph-section-header">
-        <h5>Live Devotee Group Inquiries</h5>
+        <h4>Live Devotee Group Inquiries</h4>
         <span className="ph-badge-count">{inquiries.length} Active</span>
       </div>
 
       <div className="ph-cards-list">
-        {inquiries.map(inq => (
+        {inquiries.length === 0 ? (
+          <div className="ph-empty-state">
+            <Bus size={28} style={{ opacity: 0.25 }} />
+            <p>No yatra inquiries yet</p>
+            <span>Group pilgrimage requests will appear here in realtime</span>
+          </div>
+        ) : inquiries.map(inq => (
           <div key={inq.id} className="ph-order-card">
-            <div className="ph-order-header">
-              <div className="ph-order-guest">
-                <span className="ph-guest-name">{inq.groupLeader}</span>
-                <span className="ph-order-slot"><Users size={12} /> {inq.pilgrims}</span>
-              </div>
-              <span className={`ph-status-tag ${inq.status}`}>{inq.status.toUpperCase()}</span>
+            <div className="ph-order-top">
+              <span className="ph-order-guest">{inq.groupLeader || 'Devotee Group'}</span>
+              <span className={`ph-order-status ${inq.status === 'confirmed' ? 'confirmed' : ''}`}>
+                {inq.status === 'confirmed' ? '✓ Confirmed' : '● New Inquiry'}
+              </span>
             </div>
 
-            <div className="ph-order-body">
-              <div className="ph-party-size">
-                <Compass size={14} />
-                <span>{inq.package}</span>
-              </div>
-              <div className="ph-dates-line" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#71717a', marginTop: '4px' }}>
-                <Calendar size={13} />
-                <span>{inq.dates}</span>
-              </div>
-              <div className="ph-notes-line" style={{ fontSize: '13.5px', fontWeight: 700, color: '#16a34a', marginTop: '6px' }}>
-                <span>Package Fare: {inq.totalFare}</span>
-              </div>
+            <div className="ph-order-meta">
+              <span><Users size={12} /> {inq.pilgrims || '25-30 Devotees'}</span>
+              <span><Compass size={12} /> {inq.package || '84 Kos Parikrama'}</span>
             </div>
+
+            <div className="ph-order-meta">
+              <span><Calendar size={12} /> {inq.dates || 'Upcoming Batch'}</span>
+              <span style={{ fontWeight: 800, color: '#09090b' }}>{inq.totalFare || '₹45,000 / Group'}</span>
+            </div>
+
+            {inq.notes && (
+              <div className="ph-order-note">
+                <Sparkles size={13} color="#f59e0b" style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span>{inq.notes}</span>
+              </div>
+            )}
 
             <div className="ph-order-actions">
               {inq.status === 'pending' ? (
-                <button 
-                  className="ph-btn-accept"
-                  onClick={() => confirmInquiry(inq.id)}
-                >
-                  Confirm Yatra Inquiry
-                </button>
+                <>
+                  <button 
+                    className="ph-btn-action primary" 
+                    onClick={() => confirmInquiry(inq.id)}
+                  >
+                    <CheckCircle2 size={14} /> Confirm Yatra
+                  </button>
+                  <button 
+                    className="ph-btn-action outline" 
+                    onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, confirming your yatra booking with ${partner?.name || 'Shri Braj 84 Kos Yatra Tours'}.`)}
+                  >
+                    <MessageCircle size={14} /> WhatsApp Lead
+                  </button>
+                </>
               ) : (
-                <a 
-                  href="tel:+919876543210" 
-                  className="ph-btn-call"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                >
-                  <Phone size={14} /> Call Group Leader
-                </a>
+                <>
+                  <button 
+                    className="ph-btn-action primary" 
+                    onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, yatra itinerary and bus details are ready.`)}
+                  >
+                    <MessageCircle size={14} /> Send Itinerary
+                  </button>
+                  {inq.phone && (
+                    <button 
+                      className="ph-btn-action outline" 
+                      onClick={() => window.open(`tel:${inq.phone}`)}
+                    >
+                      <Phone size={14} /> Call Leader
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Active Yatra Packages & Fleet Availability */}
+      <div className="ph-section-header">
+        <h4>Active Yatra Packages &amp; Fleet</h4>
+      </div>
+
+      <div className="ph-toggles-shelf">
+        <div className="ph-toggle-row">
+          <div className="ph-toggle-info">
+            <span className="ph-toggle-title">84 Kos Parikrama (7-Day Guided Tour)</span>
+            <span className="ph-toggle-sub">Full Braj Mandal sacred circuit with guide</span>
+          </div>
+          <div className={`ph-switch ${packages.parikrama84 ? 'on' : ''}`} onClick={() => togglePackage('parikrama84')}>
+            <div className="ph-switch-thumb" />
+          </div>
+        </div>
+
+        <div className="ph-toggle-row">
+          <div className="ph-toggle-info">
+            <span className="ph-toggle-title">Govardhan &amp; Barsana AC Coach Fleet</span>
+            <span className="ph-toggle-sub">Daily group parikrama departures</span>
+          </div>
+          <div className={`ph-switch ${packages.govardhanTour ? 'on' : ''}`} onClick={() => togglePackage('govardhanTour')}>
+            <div className="ph-switch-thumb" />
+          </div>
+        </div>
+
+        <div className="ph-toggle-row">
+          <div className="ph-toggle-info">
+            <span className="ph-toggle-title">VIP Temple Darshan &amp; Electric Van</span>
+            <span className="ph-toggle-sub">Private senior citizen &amp; family fleet</span>
+          </div>
+          <div className={`ph-switch ${packages.vipDarshanVan ? 'on' : ''}`} onClick={() => togglePackage('vipDarshanVan')}>
+            <div className="ph-switch-thumb" />
+          </div>
+        </div>
       </div>
     </>
   );

@@ -74,3 +74,5 @@ Asset Compression & WebP Rule:
 
 "All images used for thumbnails or cards should have lazy-loading attributes (loading='lazy') and explicit width/height dimensions to guarantee 100/100 Google Core Web Vitals (LCP & CLS)."
 
+For single-page applications with custom scroll containers (.dmd-main-body), always implement programmatic anchor scrolling listeners (hashchange & window.location.hash) so deep section links like #faq scroll reliably on page load and link clicks
+

@@ -43,11 +43,6 @@ export default function AnnouncementBanner() {
 
   return (
     <div className="announcement-banner">
-      <div className="banner-left-badge">
-        <span className="badge-pulse"></span>
-        <span className="badge-text">LIVE PILGRIM COMPANION</span>
-      </div>
-
       <div className="marquee-wrapper">
         <div className="marquee-track">
           {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((item, index) => (

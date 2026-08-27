@@ -15,29 +15,8 @@ export default function DriverPortalTab({ partner, onLogout }) {
   const vehicleNo = partner?.metadata?.vehicleNo || partner?.vehicleNo || 'UP-85 VT 2026';
   const zone = partner?.metadata?.zone || partner?.zone || 'Vrindavan Parikrama Marg';
 
-  // Simulated live ride requests for field preview
-  const [incomingRides, setIncomingRides] = useState([
-    {
-      id: 'ride_1',
-      passenger: 'Amit Sharma',
-      pickup: 'Barsana Shri Radharani Mandir Gate 1',
-      drop: 'Prem Sarovar Sacred Kund',
-      distance: '1.2 km',
-      eta: '3 mins',
-      fare: '₹80',
-      status: 'pending'
-    },
-    {
-      id: 'ride_2',
-      passenger: 'Meera Das',
-      pickup: 'Uchagram Lalita Sakhi Mandir',
-      drop: 'Brijwasin Dining',
-      distance: '2.1 km',
-      eta: '6 mins',
-      fare: '₹120',
-      status: 'pending'
-    }
-  ]);
+  // Live ride requests — populated via Supabase realtime, no hardcoded demos
+  const [incomingRides, setIncomingRides] = useState([]);
 
   const toggleOnline = () => {
     setIsOnline(prev => !prev);
@@ -143,7 +122,13 @@ export default function DriverPortalTab({ partner, onLogout }) {
       </div>
 
       <div className="ph-cards-list">
-        {incomingRides.map(ride => (
+        {incomingRides.length === 0 ? (
+          <div className="ph-empty-state">
+            <Car size={28} style={{ opacity: 0.25 }} />
+            <p>No ride requests yet</p>
+            <span>Go online to start receiving pilgrim dispatches</span>
+          </div>
+        ) : incomingRides.map(ride => (
           <div key={ride.id} className="ph-order-card">
             <div className="ph-order-top">
               <span className="ph-order-guest">{ride.passenger}</span>
@@ -163,7 +148,7 @@ export default function DriverPortalTab({ partner, onLogout }) {
 
             <div className="ph-order-actions">
               {ride.status === 'accepted' ? (
-                <button className="ph-btn-action primary" onClick={() => window.open(`tel:+919876543210`)}>
+                <button className="ph-btn-action primary" onClick={() => window.open(`tel:${ride.phone || ''}`)}>
                   <Phone size={14} /> Call Passenger
                 </button>
               ) : (
