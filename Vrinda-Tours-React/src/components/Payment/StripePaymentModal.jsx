@@ -10,6 +10,7 @@ import {
   createStripeCheckoutSession,
   processInAppPayment
 } from '../../services/stripeService';
+import { sendSupportMessage, getOrCreateThreadId } from '../../services/messagingService';
 import './StripePaymentModal.css';
 
 export default function StripePaymentModal({
@@ -136,9 +137,27 @@ export default function StripePaymentModal({
           total: totalAmount,
         }
       });
-
       if (result.success) {
         setSuccessReceipt(result.receipt);
+        
+        // Automatically link receipt to devotee live support thread
+        try {
+          const tId = getOrCreateThreadId({
+            name: cardName || customerInfo.name || 'Devotee',
+            phone: customerPhone || customerInfo.phone || '',
+            email: customerEmail || customerInfo.email || ''
+          });
+          sendSupportMessage({
+            threadId: tId,
+            sender: 'concierge_bot',
+            text: `💳 *Payment Verified via Stripe*\n• Package: ${item.title}\n• Transaction ID: ${result.receipt.transaction_id}\n• Amount: ${formatINR(result.receipt.amount)}\n• Status: Confirmed & Paid\n• Travel Dates: ${dates}\n• Party: ${guests}`,
+            senderName: cardName || customerInfo.name || 'Devotee',
+            senderEmail: customerEmail || customerInfo.email || '',
+            senderPhone: customerPhone || customerInfo.phone || '',
+            category: 'payment'
+          }).catch(() => {});
+        } catch {}
+
         if (onPaymentSuccess) {
           onPaymentSuccess(result.receipt);
         }
@@ -214,9 +233,9 @@ export default function StripePaymentModal({
 
         {/* Success Receipt State */}
         {successReceipt ? (
-          <div className="stp-success-body">
+          <div className="stp-success-view">
             <div className="stp-success-icon-wrap">
-              <CheckCircle2 size={56} className="stp-success-check-icon" />
+              <CheckCircle2 size={44} color="#059669" />
             </div>
             <h3 className="stp-success-title">Payment Succeeded!</h3>
             <p className="stp-success-subtitle">
@@ -253,23 +272,10 @@ export default function StripePaymentModal({
               <button
                 type="button"
                 className="stp-btn-primary-action"
-                onClick={() => {
-                  const message = encodeURIComponent(
-                    `*Vrinda Tours Booking Confirmation*\n\nPackage: ${item.title}\nTransaction ID: ${successReceipt.transaction_id}\nAmount: ${formatINR(successReceipt.amount)}\nGuest: ${successReceipt.customer_name}\nDates: ${dates}\nParty: ${guests}\n\nStatus: Confirmed via Stripe`
-                  );
-                  window.open(`https://wa.me/919876543210?text=${message}`, '_blank');
-                  onClose();
-                }}
-              >
-                <Phone size={15} />
-                <span>Receive Voucher on WhatsApp</span>
-              </button>
-              <button
-                type="button"
-                className="stp-btn-outline-action"
                 onClick={onClose}
               >
-                Done
+                <CheckCircle2 size={15} />
+                <span>Done • View Voucher</span>
               </button>
             </div>
           </div>

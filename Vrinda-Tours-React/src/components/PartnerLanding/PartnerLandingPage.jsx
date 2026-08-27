@@ -1257,7 +1257,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
           icon: <Phone size={18} />,
           highlight: true,
           title: 'Complete Your Profile',
-          desc: 'Add your WhatsApp number to receive booking confirmations & driver arrival alerts.',
+          desc: 'Add your mobile number to receive live booking confirmations & driver arrival alerts.',
           ctaText: 'Add Phone Number',
           onCta: () => {
             setPendingGoogleUser(currentUser);
@@ -1860,7 +1860,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                           <div className="tp-profile-progress-fill" style={{ width: '60%' }} />
                         </div>
                         <p className="tp-profile-incomplete-desc">
-                          Add WhatsApp for live GPS & booking vouchers.
+                          Add mobile number for live GPS & booking vouchers.
                         </p>
                         <button
                           type="button"
@@ -1874,7 +1874,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                           }}
                         >
                           <Phone size={12} />
-                          <span>Add WhatsApp for Live GPS</span>
+                          <span>Add Phone for Live GPS</span>
                         </button>
                       </div>
                     ) : currentUser.isAnonymous ? (
@@ -2136,7 +2136,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                       }}
                     >
                       <Phone size={13} />
-                      <span>Add WhatsApp for Live GPS</span>
+                      <span>Add Phone for Live GPS</span>
                       <ArrowRight size={13} className="tp-strip-arrow" />
                     </button>
                   ) : (
@@ -2148,9 +2148,9 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                 </div>
               ) : (
                 <div className="tp-mobile-guest-card">
-                  <div className="tp-mobile-guest-text">
-                    <h4>Jay Radhe, Dost! 🙏</h4>
-                    <p>Sign in to sync bookings, live GPS & member discounts.</p>
+                  <div className="tp-mobile-guest-left">
+                    <User size={16} />
+                    <span>Browsing as Guest Pilgrim</span>
                   </div>
                   <button
                     type="button"
@@ -2161,8 +2161,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                       setIsAuthModalOpen(true);
                     }}
                   >
-                    <LogIn size={15} />
-                    <span>Register</span>
+                    <span>Sign In</span>
                   </button>
                 </div>
               )}
@@ -3384,8 +3383,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                   <div className="tp-success-icon-wrap">
                     <CheckCircle2 size={42} className="tp-success-icon" />
                   </div>
-                  <h4>Reservation Confirmed!</h4>
-                  <p>Opening WhatsApp to connect with your dedicated Vrinda Vihar travel concierge...</p>
+                  <h4>Reservation Inquiry Dispatched!</h4>
+                  <p>Connecting to your Vrinda Vihar Help Centre live concierge...</p>
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} className="tp-auth-ios-form">
@@ -3676,7 +3675,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                   </span>
 
                   <p className="tp-auth-ios-subtitle" style={{ marginTop: '0.4rem' }}>
-                    Please provide your WhatsApp / Phone number to receive instant booking vouchers and live trip updates.
+                    Please provide your mobile number to receive instant booking vouchers and live trip updates.
                   </p>
                 </div>
               ) : authMode === 'signup' ? (
@@ -3687,12 +3686,12 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAd
                   <h2 className="tp-auth-ios-title">
                     {signupStep === 1 && 'Create Account'}
                     {signupStep === 2 && "What's Your Name?"}
-                    {signupStep === 3 && 'WhatsApp & Contact'}
+                    {signupStep === 3 && 'Mobile & Contact'}
                   </h2>
                   <p className="tp-auth-ios-subtitle">
                     {signupStep === 1 && 'Step 1 of 3: Enter your login email & password'}
                     {signupStep === 2 && 'Step 2 of 3: Enter your full legal name for reservations'}
-                    {signupStep === 3 && 'Step 3 of 3: Add your number for instant WhatsApp concierge sync'}
+                    {signupStep === 3 && 'Step 3 of 3: Add your mobile number for live concierge sync'}
                   </p>
                   <div className="tp-auth-progress-bars">
                     <span className={`tp-auth-prog-seg ${signupStep >= 1 ? 'active' : ''}`} />
