@@ -1482,10 +1482,12 @@ export const footerNavigation = {
     {
       title: 'Yatra Support',
       links: [
-        { label: 'Darshan FAQs', href: '#contact' },
-        { label: '24/7 Brij Concierge', href: '#contact' },
+        { label: 'Help Centre & Live Chat', href: '#help' },
+        { label: 'Darshan FAQs', href: '#help' },
+        { label: '24/7 Brij Concierge', href: '#help' },
         { label: 'Booking Terms', href: '#terms' },
-        { label: 'Privacy Policy', href: '#privacy' }
+        { label: 'Privacy Policy', href: '#privacy' },
+        { label: 'Admin Console', href: '#admin' }
       ]
     }
   ],

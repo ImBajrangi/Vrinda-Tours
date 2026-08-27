@@ -7,7 +7,7 @@ import {
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
   Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
-  Check, Copy, UtensilsCrossed
+  Check, Copy, UtensilsCrossed, Headphones, MessageSquare
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -38,6 +38,8 @@ import { supabase } from '../../config/supabase';
 import { shareWebPPicture, getOptimizedWebPUrl } from '../../utils/imageOptimizer';
 import { validatePhoneNumber } from '../../utils/phoneValidator';
 import { syncPilgrimToSupabase, getPilgrimReferralStats, REFERRAL_CATEGORIES, shareLinkWithFallback } from '../../services/referralService';
+import { getOrCreateThreadId, sendSupportMessage } from '../../services/messagingService';
+import StripePaymentModal from '../Payment/StripePaymentModal';
 import './PartnerLandingPage.css';
 
 // Interactive Trip Packages Selector Modal
@@ -319,6 +321,15 @@ const softwareServices = [
     badge: 'Member Pass',
     icon: 'user',
     actionType: 'auth'
+  },
+  {
+    id: 'srv_admin_console',
+    title: 'Admin Operations & Fleet Management Console',
+    subtitle: 'Manage drivers, locations, bookings, partner verifications & platform announcements',
+    category: 'service',
+    badge: 'Admin Console',
+    icon: 'shield',
+    actionType: 'admin'
   }
 ];
 
@@ -513,7 +524,7 @@ function OmniSearchModal({
           <div className="tp-search-trending-bar">
             <span className="tp-search-trending-label">Trending:</span>
             <div className="tp-search-trending-tags">
-              {['Bankey Bihari VIP', 'Govardhan Parikrama', 'Live GPS Map', 'Barsana Yatra', 'Radha Raman Darshan', 'Referral 500 Pts'].map((tag, idx) => (
+              {['Bankey Bihari VIP', 'Govardhan Parikrama', 'Live GPS Map', 'Barsana Yatra', 'Radha Raman Darshan', 'Admin Console', 'Referral 500 Pts'].map((tag, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -561,6 +572,8 @@ function OmniSearchModal({
                         {item.icon === 'building' && <Building2 size={18} />}
                         {item.icon === 'image' && <ImageIcon size={18} />}
                         {item.icon === 'user' && <User size={18} />}
+                        {item.icon === 'shield' && <ShieldCheck size={18} />}
+                        {item.icon === 'lock' && <Lock size={18} />}
                       </div>
                     )}
                   </div>
@@ -747,7 +760,7 @@ function PartnerJourneySection({ onSelectItem }) {
   );
 }
 
-export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
+export default function PartnerLandingPage({ onClose, onOpenPartnerHub, onOpenAdmin, onOpenHelpCenter }) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
   const currentHero = heroSteps.find(h => h.step === activeStep) || heroSteps[0];
@@ -790,6 +803,7 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
   const [galleryCategory, setGalleryCategory] = useState(() => getCachedData('gallery_cat', 'All Darshans'));
   const [gallerySearch, setGallerySearch] = useState('');
   const [lightboxItem, setLightboxItem] = useState(null);
+  const [stripeModalItem, setStripeModalItem] = useState(null);
 
   // Progressive Reveal / "Show More" Pagination Controls
   const INITIAL_GALLERY_LIMIT = 8;
@@ -1700,19 +1714,45 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
     }
 
     setBookingSuccess(true);
-    setTimeout(() => {
-      const message = encodeURIComponent(
-        `Hello! I would like to confirm booking for *${selectedItem?.title || destination}*.\nGuest: ${finalName}\nEmail: ${finalEmail}\nPhone: ${finalPhone}\nDates: ${checkInDate} to ${checkOutDate}\nParty: ${roomsGuests}`
-      );
-      window.open(`https://wa.me/919876543210?text=${message}`, '_blank');
+    setTimeout(async () => {
+      const inquiryText = `Radhe Radhe! I would like to reserve *${selectedItem?.title || destination}*.\n• Dates: ${checkInDate} to ${checkOutDate}\n• Devotee: ${finalName}\n• Mobile: ${finalPhone}\n• Email: ${finalEmail}\n• Party: ${roomsGuests}`;
+
+      try {
+        const tId = getOrCreateThreadId({ name: finalName, phone: finalPhone, email: finalEmail });
+        await sendSupportMessage({
+          threadId: tId,
+          sender: 'user',
+          text: inquiryText,
+          senderName: finalName,
+          senderEmail: finalEmail,
+          senderPhone: finalPhone,
+          category: 'booking'
+        });
+      } catch (err) {
+        console.warn('Booking inquiry save error:', err);
+      }
+
       setSelectedItem(null);
       setBookingSuccess(false);
+
+      if (onOpenHelpCenter) {
+        onOpenHelpCenter();
+      }
+
+      setFloatingToast({
+        id: `book_${Date.now()}`,
+        title: 'Booking Inquiry Connected',
+        desc: 'Vrinda Vihar Help Centre concierge is ready in live chat.',
+        highlight: true
+      });
+      setTimeout(() => setFloatingToast(null), 5000);
+
       if (!currentUser) {
         setBookingName('');
         setBookingEmail('');
         setBookingPhone('');
       }
-    }, 1200);
+    }, 600);
   };
 
   const handleNewsletterSubmit = (e) => {
@@ -1923,6 +1963,20 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                         <Building2 size={15} />
                         <span>Partner & Driver Hub</span>
                       </button>
+
+                      {onOpenAdmin && (
+                        <button
+                          type="button"
+                          className="tp-profile-dropdown-item tp-profile-dropdown-admin-item"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            onOpenAdmin();
+                          }}
+                        >
+                          <Lock size={15} color="#2563eb" />
+                          <span>Admin Console</span>
+                        </button>
+                      )}
                     </div>
 
                     <div className="tp-profile-dropdown-divider" />
@@ -2196,6 +2250,22 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                       }}
                     >
                       <span>Partner & Driver Hub</span>
+                      <ArrowRight size={18} className="tp-mobile-nav-arrow" />
+                    </button>
+                  )}
+                  {onOpenAdmin && (
+                    <button
+                      type="button"
+                      className="tp-mobile-nav-item tp-mobile-nav-item-btn"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        onOpenAdmin();
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Lock size={16} color="#2563eb" />
+                        <span>Admin Console</span>
+                      </span>
                       <ArrowRight size={18} className="tp-mobile-nav-arrow" />
                     </button>
                   )}
@@ -3114,7 +3184,28 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                 <ul className="tp-footer-links">
                   {col.links.map((link, lIdx) => (
                     <li key={lIdx}>
-                      <a href={link.href}>{link.label}</a>
+                      {link.href === '#admin' ? (
+                        <button
+                          type="button"
+                          className="tp-footer-admin-btn"
+                          onClick={() => {
+                            if (onOpenAdmin) onOpenAdmin();
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            font: 'inherit',
+                            color: 'inherit',
+                            cursor: 'pointer',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {link.label}
+                        </button>
+                      ) : (
+                        <a href={link.href}>{link.label}</a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -3190,6 +3281,8 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             handleOpenReferralProgram();
           } else if (srv.actionType === 'partner_hub') {
             if (onOpenPartnerHub) onOpenPartnerHub();
+          } else if (srv.actionType === 'admin') {
+            if (onOpenAdmin) onOpenAdmin();
           } else if (srv.actionType === 'scroll_gallery') {
             const el = document.getElementById('gallery');
             el?.scrollIntoView({ behavior: 'smooth' });
@@ -3361,25 +3454,39 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
                     />
                   </div>
 
-                  <div className="tp-modal-cta-row">
-                    <button type="submit" className="tp-btn-auth-primary-green">
-                      <span>Reserve on WhatsApp</span>
-                      <ArrowRight size={16} className="tp-modal-btn-arrow" />
-                    </button>
+                  <div className="tp-modal-payment-cta-stack">
                     <button
                       type="button"
-                      className={`tp-btn-modal-heart-circle ${favoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
-                      onClick={() => toggleFavorite(selectedItem?.id, selectedItem?.title)}
-                      title={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
-                      aria-label={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                      className="tp-btn-auth-primary-stripe"
+                      onClick={() => {
+                        setStripeModalItem(selectedItem);
+                      }}
                     >
-                      <Heart
-                        size={18}
-                        fill={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
-                        color={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
-                        className={favoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
-                      />
+                      <CreditCard size={17} />
+                      <span>Pay Online via Stripe</span>
                     </button>
+
+                    <div className="tp-modal-cta-row">
+                      <button type="submit" className="tp-btn-auth-secondary-wa">
+                        <Headphones size={15} />
+                        <span>Reserve via Help Centre</span>
+                        <ArrowRight size={14} className="tp-modal-btn-arrow" />
+                      </button>
+                      <button
+                        type="button"
+                        className={`tp-btn-modal-heart-circle ${favoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
+                        onClick={() => toggleFavorite(selectedItem?.id, selectedItem?.title)}
+                        title={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                        aria-label={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                      >
+                        <Heart
+                          size={18}
+                          fill={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
+                          color={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
+                          className={favoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Subtle Professional Trust Perks */}
@@ -3399,6 +3506,32 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Stripe Payment Gateway Modal */}
+      {stripeModalItem && (
+        <StripePaymentModal
+          isOpen={Boolean(stripeModalItem)}
+          onClose={() => setStripeModalItem(null)}
+          item={stripeModalItem}
+          dates={formatTripDates(checkInDate, checkOutDate)}
+          guests={roomsGuests ? roomsGuests.replace('1 Room, ', '') : '2 Guests'}
+          customerInfo={{
+            name: bookingName || currentUser?.name || '',
+            email: bookingEmail || currentUser?.email || '',
+            phone: bookingPhone || currentUser?.phone || '',
+          }}
+          onPaymentSuccess={(receipt) => {
+            setSelectedItem(null);
+            setFloatingToast({
+              id: `pay_${Date.now()}`,
+              title: 'Payment Succeeded (Stripe)',
+              desc: `Transaction ${receipt.transaction_id.slice(0, 16)}... verified!`,
+              highlight: true
+            });
+            setTimeout(() => setFloatingToast(null), 5000);
+          }}
+        />
       )}
 
       {/* Video Virtual Tour Modal */}
@@ -4354,6 +4487,21 @@ export default function PartnerLandingPage({ onClose, onOpenPartnerHub }) {
           </button>
         </aside>
       )}
+
+      {/* Floating Vrinda Vihar Help Centre Live Widget Launcher */}
+      <button
+        type="button"
+        className="hc-floating-launcher"
+        onClick={() => {
+          if (onOpenHelpCenter) onOpenHelpCenter();
+        }}
+        title="Chat with Vrinda Vihar Help Centre"
+        aria-label="Open Help Centre"
+      >
+        <span className="hc-launcher-indicator" />
+        <Headphones size={16} />
+        <span className="hc-launcher-label">Help Centre</span>
+      </button>
     </div>
   );
 }

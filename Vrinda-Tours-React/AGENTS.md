@@ -76,3 +76,6 @@ Asset Compression & WebP Rule:
 
 For single-page applications with custom scroll containers (.dmd-main-body), always implement programmatic anchor scrolling listeners (hashchange & window.location.hash) so deep section links like #faq scroll reliably on page load and link clicks
 
+When creating administrative and internal portals, always render them as standalone full-page views rather than modal overlays for better data density and mobile accessibility.
+Ensure all administrative dashboards include a dedicated 'View Live Website' quick action in the sidebar.
+

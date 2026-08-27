@@ -1,11 +1,14 @@
 import { useState, useMemo } from 'react';
-import { X, MessageCircle, Phone, BedDouble, Star, Calendar, Users, ShieldCheck, Check } from 'lucide-react';
+import { X, MessageCircle, Phone, BedDouble, Star, Calendar, Users, ShieldCheck, Check, CreditCard, Headphones } from 'lucide-react';
 import { openWhatsApp, generateHotelMessage } from '../../utils/whatsapp';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { getOrCreateThreadId, sendSupportMessage } from '../../services/messagingService';
+import StripePaymentModal from '../Payment/StripePaymentModal';
 import './BookingSheets.css';
 
 export default function HotelBooking({ location, onClose }) {
   const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
+  const [showStripeModal, setShowStripeModal] = useState(false);
 
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const tomorrowStr = useMemo(() => {
@@ -55,6 +58,16 @@ export default function HotelBooking({ location, onClose }) {
   };
 
   const handleBook = () => {
+    try {
+      const tId = getOrCreateThreadId();
+      sendSupportMessage({
+        threadId: tId,
+        sender: 'user',
+        text: `Radhe Radhe! I would like to book a stay at *${location.name}* (${roomType}).\n• Check-in: ${checkin}\n• Check-out: ${checkout}\n• Guests: ${guests}`,
+        category: 'hotel'
+      });
+    } catch {}
+
     const msg = generateHotelMessage(location, checkin, checkout, guests, roomType);
     openWhatsApp(location.phone, msg);
     triggerClose();
@@ -220,23 +233,56 @@ export default function HotelBooking({ location, onClose }) {
             </div>
 
             {/* High-Impact Actions */}
-            <div className="booking-actions">
-              <button className="btn-whatsapp-luxury" onClick={handleBook}>
-                <MessageCircle size={18} />
-                <span>Book Stay via WhatsApp</span>
-                <span className="btn-badge-free">Direct Rate</span>
-              </button>
+            <div className="booking-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button 
-                className="btn-call-luxury" 
-                onClick={() => window.open(`tel:${location.phone}`)}
-                title="Direct Phone Call"
+                type="button"
+                className="btn-whatsapp-luxury" 
+                style={{ background: '#2563eb', color: '#ffffff', boxShadow: '0 4px 16px rgba(37,99,235,0.3)' }}
+                onClick={() => setShowStripeModal(true)}
               >
-                <Phone size={18} />
+                <CreditCard size={18} />
+                <span>Pay Online with Stripe</span>
+                <span className="btn-badge-free" style={{ background: '#dbeafe', color: '#1d4ed8' }}>Instant Voucher</span>
               </button>
+              <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                <button className="btn-whatsapp-luxury" style={{ flex: 1 }} onClick={handleBook}>
+                  <MessageCircle size={18} />
+                  <span>Reserve via WhatsApp</span>
+                  <span className="btn-badge-free">Direct Rate</span>
+                </button>
+                <button 
+                  className="btn-call-luxury" 
+                  onClick={() => window.open(`tel:${location.phone}`)}
+                  title="Direct Phone Call"
+                >
+                  <Phone size={18} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {showStripeModal && (
+        <StripePaymentModal
+          isOpen={showStripeModal}
+          onClose={() => setShowStripeModal(false)}
+          item={{
+            id: location.id || location.name,
+            title: `${location.name} (${roomType})`,
+            price: priceMap[roomType] || location.priceRange?.split('-')[0]?.trim() || '₹1,500',
+            priceUnit: '/night',
+            image: location.image,
+            category: 'Hotel / Ashram Stay'
+          }}
+          dates={`${checkin} to ${checkout}`}
+          guests={`${guests} Guests`}
+          onPaymentSuccess={() => {
+            setShowStripeModal(false);
+            triggerClose();
+          }}
+        />
+      )}
     </>
   );
 }

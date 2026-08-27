@@ -26,7 +26,7 @@ const RestaurantBooking = lazy(() => import('./components/BookingSheets/Restaura
 const RideSheet = lazy(() => import('./components/BookingSheets/RideSheet'));
 const FavoritesListSheet = lazy(() => import('./components/UI/FavoritesListSheet'));
 const DriversPanel = lazy(() => import('./components/Admin/DriversPanel'));
-const AdminPanel = lazy(() => import('./components/Admin/AdminPanel'));
+const AdminDashboardPage = lazy(() => import('./components/Admin/AdminDashboardPage'));
 const DriverPortalModal = lazy(() => import('./components/Driver/DriverPortalModal'));
 const DriverLandingPage = lazy(() => import('./components/Driver/DriverLandingPage'));
 const HotelLandingPage = lazy(() => import('./components/Hotel/HotelLandingPage'));
@@ -34,6 +34,7 @@ const RestaurantLandingPage = lazy(() => import('./components/Restaurant/Restaur
 const AgencyLandingPage = lazy(() => import('./components/Agency/AgencyLandingPage'));
 const PartnerHubModal = lazy(() => import('./components/PartnerHub/PartnerHubModal'));
 const PartnerLandingPage = lazy(() => import('./components/PartnerLanding/PartnerLandingPage'));
+const HelpCenterModal = lazy(() => import('./components/HelpCenter/HelpCenterModal'));
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -47,6 +48,7 @@ export default function App() {
   const [activeRide, setActiveRide] = useState(null); // { driver, status }
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
+  const [helpCenterVisible, setHelpCenterVisible] = useState(false);
   const [driverPortalVisible, setDriverPortalVisible] = useState(false);
   const [partnerHubVisible, setPartnerHubVisible] = useState(false);
   const [activePartnerId, setActivePartnerId] = useState(() => sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id'));
@@ -87,6 +89,14 @@ export default function App() {
     return locations.filter((loc) => favorites.includes(loc.name));
   }, [locations, favorites]);
 
+  const handleCloseAdmin = useCallback(() => {
+    setAdminVisible(false);
+    setPartnerLandingVisible(true);
+    if (window.location.hash.includes('admin') || window.location.search.includes('admin')) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
   // Deep Link Routing for direct sharing of registration & portal sections
   useEffect(() => {
     const handleDeepLinkRouting = () => {
@@ -103,6 +113,12 @@ export default function App() {
           try {
             localStorage.setItem('vrinda_referrer_code', refParam.toUpperCase());
           } catch {}
+        }
+
+        // Direct Admin Console access: ?admin=true or ?portal=admin or #admin
+        if (hash === '#admin' || searchParams.get('admin') === 'true' || searchParams.get('admin') === '1' || portalParam === 'admin' || joinParam === 'admin') {
+          setAdminVisible(true);
+          return;
         }
 
         // Direct User App Map link: ?app=user or #map or #user
@@ -167,6 +183,12 @@ export default function App() {
           return;
         }
 
+        // Direct Help Centre / Support: ?portal=help or #help or #support
+        if (portalParam === 'help' || portalParam === 'support' || hash === '#help' || hash === '#support' || hash === '#contact') {
+          setHelpCenterVisible(true);
+          return;
+        }
+
         // Direct Landing section hash jump (e.g. #faq, #benefits, #vehicles, #territories)
         if (['#faq', '#benefits', '#territories', '#vehicles', '#properties', '#categories', '#packages', '#how-it-works', '#reviews'].some(s => hash.startsWith(s))) {
           setPartnerLandingVisible(false);
@@ -181,9 +203,20 @@ export default function App() {
     handleDeepLinkRouting();
     window.addEventListener('hashchange', handleDeepLinkRouting);
     window.addEventListener('popstate', handleDeepLinkRouting);
+
+    const handleGlobalKeyDown = (e) => {
+      // Shortcut: Cmd+Shift+A (Mac) or Ctrl+Shift+A (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'a' || e.key === 'A')) {
+        e.preventDefault();
+        setAdminVisible(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
     return () => {
       window.removeEventListener('hashchange', handleDeepLinkRouting);
       window.removeEventListener('popstate', handleDeepLinkRouting);
+      window.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, []);
 
@@ -426,12 +459,12 @@ export default function App() {
         )}
 
         {adminVisible && (
-          <AdminPanel
+          <AdminDashboardPage
             drivers={drivers}
             locations={locations}
             userPosition={position}
             onSelectLocation={handleSelectLocation}
-            onClose={() => setAdminVisible(false)}
+            onClose={handleCloseAdmin}
           />
         )}
 
@@ -510,6 +543,15 @@ export default function App() {
           <PartnerLandingPage
             onClose={() => setPartnerLandingVisible(false)}
             onOpenPartnerHub={(role) => handleOpenPartnerDashboard(null, role)}
+            onOpenAdmin={() => setAdminVisible(true)}
+            onOpenHelpCenter={() => setHelpCenterVisible(true)}
+          />
+        )}
+
+        {helpCenterVisible && (
+          <HelpCenterModal
+            isOpen={helpCenterVisible}
+            onClose={() => setHelpCenterVisible(false)}
           />
         )}
       </Suspense>
