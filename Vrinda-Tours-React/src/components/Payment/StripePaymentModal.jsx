@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X, ShieldCheck, Lock, CreditCard, Sparkles, CheckCircle2,
   ArrowRight, Download, Share2, Phone, AlertCircle, RefreshCw,
@@ -207,7 +208,9 @@ export default function StripePaymentModal({
     }
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div className="stp-overlay" onClick={onClose}>
       <div className="stp-modal-card" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -543,6 +546,7 @@ export default function StripePaymentModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Compass, Calendar, Clock, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
@@ -31,6 +32,8 @@ import {
   bookingTabs,
   vrindaViharGalleryCategories,
   vrindaViharGalleryData,
+  ROLE_CONFIGS,
+  resolveUserRole,
   getCachedData,
   setCachedData
 } from '../../data/landingData';
@@ -74,7 +77,9 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
     );
   });
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div className="tp-modal-overlay tp-tpkg-overlay" onClick={onClose}>
       <div className="tp-tpkg-modal" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
@@ -152,7 +157,6 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                 <div className="tp-tpkg-card-cover">
                   <img src={pkg.image} alt={pkg.title} className="tp-tpkg-img" loading="lazy" />
                   <div className="tp-tpkg-cover-gradient" />
-                  <span className="tp-tpkg-badge-top">{pkg.badge}</span>
                 </div>
 
                 {/* Card Content */}
@@ -245,142 +249,16 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
-// Role Taxonomy & Authority Configuration
-export const ROLE_CONFIGS = {
-  admin: {
-    id: 'admin',
-    label: 'Super Admin',
-    shortLabel: 'Admin',
-    tag: '👑 Super Admin',
-    badgeClass: 'tp-role-admin',
-    icon: '👑',
-    authority: 'Full Platform Authority & Financials',
-    color: '#d97706',
-    accentBg: '#fffbeb',
-    borderColor: '#fde68a',
-    description: 'System Administrator & Operations Manager with database, partner audit, and financial Stripe GMV control.'
-  },
-  driver: {
-    id: 'driver',
-    label: 'Sarathi Driver Partner',
-    shortLabel: 'Sarathi Driver',
-    tag: '🛺 Sarathi Driver',
-    badgeClass: 'tp-role-driver',
-    icon: '🛺',
-    authority: 'Driver Companion & Ride Dispatch Desk',
-    color: '#036b4aff',
-    accentBg: '#ecfdf5',
-    borderColor: '#a7f3d0',
-    description: 'Verified Brij E-Rickshaw & Fleet Driver with real-time GPS ride dispatch, passenger tracking, and daily trip earnings.'
-  },
-  restaurant: {
-    id: 'restaurant',
-    label: 'Restaurant Partner / Owner',
-    shortLabel: 'Restaurant Owner',
-    tag: '🍲 Restaurant Owner',
-    badgeClass: 'tp-role-restaurant',
-    icon: '🍲',
-    authority: 'Dining Partner Desk & Table Bookings',
-    color: '#ea580c',
-    accentBg: '#fff7ed',
-    borderColor: '#fed7aa',
-    description: 'Brij food outlet, thali house, or sweet shop owner managing table reservations and devotee prasadam orders.'
-  },
-  restaurant_staff: {
-    id: 'restaurant_staff',
-    label: 'Restaurant Staff / Kitchen',
-    shortLabel: 'Dining Staff',
-    tag: '👨‍🍳 Restaurant Staff',
-    badgeClass: 'tp-role-restaurant-staff',
-    icon: '👨‍🍳',
-    authority: 'Order Fulfillment & Kitchen Queue',
-    color: '#c2410c',
-    accentBg: '#ffedd5',
-    borderColor: '#fdba74',
-    description: 'Kitchen & dining service staff executing real-time prasadam orders and table check-ins.'
-  },
-  hotel: {
-    id: 'hotel',
-    label: 'Hotel & Ashram Stay Owner',
-    shortLabel: 'Hotel Owner',
-    tag: '🛏️ Hotel Partner',
-    badgeClass: 'tp-role-hotel',
-    icon: '🛏️',
-    authority: 'Ashram Stay Desk & Room Inventory',
-    color: '#2563eb',
-    accentBg: '#eff6ff',
-    borderColor: '#bfdbfe',
-    description: 'Ashram, dharamshala, or hotel operator managing room inventory, pilgrim check-ins, and tariffs.'
-  },
-  hotel_staff: {
-    id: 'hotel_staff',
-    label: 'Ashram / Hotel Desk Staff',
-    shortLabel: 'Stay Staff',
-    tag: '🏨 Ashram Desk Staff',
-    badgeClass: 'tp-role-hotel-staff',
-    icon: '🏨',
-    authority: 'Front Desk & Guest Verification',
-    color: '#1d4ed8',
-    accentBg: '#dbeafe',
-    borderColor: '#93c5fd',
-    description: 'Front desk operations staff verifying devotee vouchers and managing room availability.'
-  },
-  agency: {
-    id: 'agency',
-    label: 'Tour Agency & Yatra Guide',
-    shortLabel: 'Tour Agency',
-    tag: '🚩 Tour Agency Partner',
-    badgeClass: 'tp-role-agency',
-    icon: '🚩',
-    authority: 'Yatra Itineraries & Group Bookings',
-    color: '#7c3aed',
-    accentBg: '#f5f3ff',
-    borderColor: '#ddd6fe',
-    description: 'Licensed tour agency or local Brajwasi guide offering customized parikrama, temple tours, and yatra packages.'
-  },
-  pilgrim: {
-    id: 'pilgrim',
-    label: 'Devotee Pilgrim',
-    shortLabel: 'Devotee',
-    tag: '🙏 Devotee Pilgrim',
-    badgeClass: 'tp-role-pilgrim',
-    icon: '🙏',
-    authority: 'Devotee Services, Bookings & Rewards',
-    color: '#0d9488',
-    accentBg: '#f0fdfa',
-    borderColor: '#99f6e4',
-    description: 'Devotee traveler accessing live sacred map, Darshan gallery, yatra bookings, and referral rewards.'
-  }
-};
-
-export const resolveUserRole = (user) => {
-  if (!user) return 'pilgrim';
-  const email = (user.email || '').toLowerCase();
-  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
-    .split(',')
-    .map(e => e.trim().toLowerCase())
-    .filter(Boolean);
-  if (email && (adminEmails.includes(email) || email.endsWith('@vrindatours.com'))) {
-    return 'admin';
-  }
-  try {
-    const savedRole = localStorage.getItem('vt_user_role');
-    if (savedRole && ROLE_CONFIGS[savedRole]) return savedRole;
-  } catch { }
-  if (user.role && ROLE_CONFIGS[user.role]) return user.role;
-  if (user.category && ROLE_CONFIGS[user.category]) return user.category;
-  return 'pilgrim';
-};
-
 // Interactive Role & Authority Configuration Modal
 function RoleAuthorityModal({ isOpen, onClose, activeRole, onSelectRole }) {
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
-  return (
+  return createPortal(
     <div className="tp-modal-overlay" onClick={onClose}>
       <div className="tp-modal-card tp-role-modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="tp-role-modal-header">
@@ -452,7 +330,8 @@ function RoleAuthorityModal({ isOpen, onClose, activeRole, onSelectRole }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -650,7 +529,9 @@ function OmniSearchModal({
     }
   };
 
-  return (
+  if (!isOpen || typeof document === 'undefined') return null;
+
+  return createPortal(
     <div className="tp-modal-overlay tp-search-overlay" onClick={onClose}>
       <div
         className="tp-modal-card tp-omni-search-modal"
@@ -852,7 +733,8 @@ function OmniSearchModal({
           <span className="tp-search-footer-brand">Vrinda Search</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -1041,7 +923,8 @@ export default function PartnerLandingPage({
   const [activeCategory, setActiveCategory] = useState('Popular Destination');
   const [showAllDestinations, setShowAllDestinations] = useState(false);
 
-  // Vrinda Vihar Divine Darshan Gallery State
+  // Vrinda Vihar — Master Partner & Pilgrim Landing Page Component
+  // High Performance, Responsive, Native Mobile Bottom Sheet Docking Enabled
   const [galleryCategory, setGalleryCategory] = useState(() => getCachedData('gallery_cat', 'All Darshans'));
   const [gallerySearch, setGallerySearch] = useState('');
   const [lightboxItem, setLightboxItem] = useState(null);
@@ -1442,11 +1325,17 @@ export default function PartnerLandingPage({
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Saved / Favorited Yatras & Sacred Darshans
-  const [favoriteIds, setFavoriteIds] = useState(() => getCachedData('traveler_favorites', []));
+  const [favoriteIds, setFavoriteIds] = useState(() => {
+    const cached = getCachedData('traveler_favorites', []);
+    return Array.isArray(cached) ? cached : [];
+  });
+
+  const safeFavoriteIds = Array.isArray(favoriteIds) ? favoriteIds : [];
 
   const toggleFavorite = (itemId, itemTitle) => {
     if (!itemId) return;
-    setFavoriteIds((prev) => {
+    setFavoriteIds((prevRaw) => {
+      const prev = Array.isArray(prevRaw) ? prevRaw : [];
       const isFav = prev.includes(itemId);
       const updated = isFav ? prev.filter((id) => id !== itemId) : [...prev, itemId];
       setCachedData('traveler_favorites', updated);
@@ -1462,7 +1351,8 @@ export default function PartnerLandingPage({
         ctaText: isFav ? 'Undo' : 'View All',
         onCta: () => {
           if (isFav) {
-            setFavoriteIds((current) => {
+            setFavoriteIds((currentRaw) => {
+              const current = Array.isArray(currentRaw) ? currentRaw : [];
               const reAdded = [...current, itemId];
               setCachedData('traveler_favorites', reAdded);
               return reAdded;
@@ -1568,9 +1458,9 @@ export default function PartnerLandingPage({
           id: 'register_prompt',
           icon: <Sparkles size={18} />,
           highlight: true,
-          title: 'Unlock 15% Member Discount',
-          desc: 'Sign in or register your profile for instant booking vouchers & live GPS navigation.',
-          ctaText: 'Register',
+          title: 'Get 15% Off Your Yatra',
+          desc: 'Instant member vouchers & live GPS navigation.',
+          ctaText: 'Claim 15% Off',
           onCta: () => {
             setAuthMode('signup');
             setSignupStep(1);
@@ -1583,9 +1473,9 @@ export default function PartnerLandingPage({
           id: 'phone_prompt',
           icon: <Phone size={18} />,
           highlight: true,
-          title: 'Complete Your Profile',
-          desc: 'Add your mobile number to receive live booking confirmations & driver arrival alerts.',
-          ctaText: 'Add Phone Number',
+          title: 'Add Mobile Number',
+          desc: 'Receive live driver arrival alerts & trip updates.',
+          ctaText: 'Add Number',
           onCta: () => {
             setPendingGoogleUser(currentUser);
             setAuthPhoneInput(currentUser.phone || '');
@@ -1599,9 +1489,9 @@ export default function PartnerLandingPage({
           id: 'guest_prompt',
           icon: <UserCheck size={18} />,
           highlight: false,
-          title: 'Register Full Profile',
-          desc: 'You are browsing as Guest. Register to sync bookings and get pilgrim discounts.',
-          ctaText: 'Register Now',
+          title: 'Save Your Bookings',
+          desc: 'Sync yatra darshans across all your devices.',
+          ctaText: 'Create Account',
           onCta: () => {
             setAuthMode('signup');
             setSignupStep(1);
@@ -2336,7 +2226,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <MapPin size={15} />
-                            <span>🗺️ Sacred Map & POI Overseer</span>
+                            <span>Sacred Map &amp; POI Overseer</span>
                           </button>
                         </>
                       )}
@@ -2354,7 +2244,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Car size={15} color="#059669" />
-                            <span>🛺 Open Sarathi Driver Portal</span>
+                            <span>Open Sarathi Driver Portal</span>
                           </button>
                           <button
                             type="button"
@@ -2365,7 +2255,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Compass size={15} />
-                            <span>📍 Driver Companion & Fleet Desk</span>
+                            <span>Driver Companion &amp; Fleet Desk</span>
                           </button>
                         </>
                       )}
@@ -2382,7 +2272,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <UtensilsCrossed size={15} color="#ea580c" />
-                            <span>🍲 Restaurant Partner Desk</span>
+                            <span>Restaurant Partner Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2393,7 +2283,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Compass size={15} />
-                            <span>🍛 Brij Dining & Food Directory</span>
+                            <span>Brij Dining &amp; Food Directory</span>
                           </button>
                         </>
                       )}
@@ -2410,7 +2300,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Building2 size={15} color="#2563eb" />
-                            <span>🛏️ Hotel & Ashram Stay Desk</span>
+                            <span>Hotel &amp; Ashram Stay Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2421,7 +2311,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Compass size={15} />
-                            <span>🏨 Ashram & Stay Directory</span>
+                            <span>Ashram &amp; Stay Directory</span>
                           </button>
                         </>
                       )}
@@ -2438,7 +2328,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Compass size={15} color="#7c3aed" />
-                            <span>🚩 Tour Agency & Guide Desk</span>
+                            <span>Tour Agency &amp; Guide Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2449,7 +2339,7 @@ export default function PartnerLandingPage({
                             }}
                           >
                             <Calendar size={15} />
-                            <span>🗺️ Brij Yatra Packages</span>
+                            <span>Brij Yatra Packages</span>
                           </button>
                         </>
                       )}
@@ -2464,8 +2354,8 @@ export default function PartnerLandingPage({
                           el?.scrollIntoView({ behavior: 'smooth' });
                         }}
                       >
-                        <Heart size={15} fill={favoriteIds.length > 0 ? '#ef4444' : 'none'} color={favoriteIds.length > 0 ? '#ef4444' : 'currentColor'} />
-                        <span>Saved Favourites ({favoriteIds.length})</span>
+                        <Heart size={15} fill={safeFavoriteIds.length > 0 ? '#ef4444' : 'none'} color={safeFavoriteIds.length > 0 ? '#ef4444' : 'currentColor'} />
+                        <span>Saved Favourites ({safeFavoriteIds.length})</span>
                       </button>
 
                       <button
@@ -2545,7 +2435,8 @@ export default function PartnerLandingPage({
               title="Book Instant Pilgrim E-Rickshaw, Auto or Cab"
             >
               <Car size={15} />
-              <span>Instant Ride</span>
+              <span className="tp-btn-text-full">Instant Ride</span>
+              <span className="tp-btn-text-short">Ride</span>
             </button>
 
             {/* Book Trip Button */}
@@ -2555,7 +2446,8 @@ export default function PartnerLandingPage({
                 setIsTripPackagesModalOpen(true);
               }}
             >
-              Book Trip
+              <span className="tp-btn-text-full">Book Trip</span>
+              <span className="tp-btn-text-short">Book</span>
             </button>
 
             {/* Quick Live Pilgrim Map Switcher (Desktop) */}
@@ -2592,7 +2484,7 @@ export default function PartnerLandingPage({
       </header>
 
       {/* MOBILE FULL-SCREEN NAVIGATION DRAWER (Vrindopnishad Design) */}
-      {isMobileMenuOpen && (
+      {isMobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <div className="tp-mobile-drawer-overlay" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="tp-mobile-drawer" onClick={(e) => e.stopPropagation()}>
             {/* Top Header inside Mobile Drawer */}
@@ -2751,15 +2643,15 @@ export default function PartnerLandingPage({
               <div className="tp-mobile-nav-block">
                 <div className="tp-mobile-section-label">
                   {activeUserRole === 'admin'
-                    ? '👑 ADMIN OPERATIONS & DIRECTORY'
+                    ? 'ADMIN OPERATIONS & DIRECTORY'
                     : activeUserRole === 'driver'
-                      ? '🛺 SARATHI FLEET & DISPATCH'
+                      ? 'SARATHI FLEET & DISPATCH'
                       : activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff'
-                        ? '🍲 DINING & PRASADAM DESK'
+                        ? 'DINING & PRASADAM DESK'
                         : activeUserRole === 'hotel' || activeUserRole === 'hotel_staff'
-                          ? '🛏️ ASHRAM & HOTEL STAY DESK'
+                          ? 'ASHRAM & HOTEL STAY DESK'
                           : activeUserRole === 'agency'
-                            ? '🚩 TOUR GUIDE & YATRA DESK'
+                            ? 'TOUR GUIDE & YATRA DESK'
                             : 'PILGRIMAGE SERVICES'}
                 </div>
 
@@ -2779,8 +2671,8 @@ export default function PartnerLandingPage({
                           <Lock size={18} />
                         </div>
                         <div className="tp-nav-item-text">
-                          <span className="tp-nav-item-title">👑 Platform Admin Console</span>
-                          <span className="tp-nav-item-sub">Superuser control, financials & audits</span>
+                          <span className="tp-nav-item-title">Platform Admin Console</span>
+                          <span className="tp-nav-item-sub">Superuser control, financials &amp; audits</span>
                         </div>
                       </div>
                       <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -2803,8 +2695,8 @@ export default function PartnerLandingPage({
                             <Car size={18} />
                           </div>
                           <div className="tp-nav-item-text">
-                            <span className="tp-nav-item-title">🛺 Sarathi Driver Companion</span>
-                            <span className="tp-nav-item-sub">Live dispatch queue & trip fares</span>
+                            <span className="tp-nav-item-title">Sarathi Driver Companion</span>
+                            <span className="tp-nav-item-sub">Live dispatch queue &amp; trip fares</span>
                           </div>
                         </div>
                         <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -2825,7 +2717,7 @@ export default function PartnerLandingPage({
                             </div>
                             <div className="tp-nav-item-text">
                               <span className="tp-nav-item-title">Driver Fleet Landing</span>
-                              <span className="tp-nav-item-sub">Sarathi benefits & EV registration</span>
+                              <span className="tp-nav-item-sub">Sarathi benefits &amp; EV registration</span>
                             </div>
                           </div>
                           <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -2848,8 +2740,8 @@ export default function PartnerLandingPage({
                           <UtensilsCrossed size={18} />
                         </div>
                         <div className="tp-nav-item-text">
-                          <span className="tp-nav-item-title">🍲 Restaurant Partner Desk</span>
-                          <span className="tp-nav-item-sub">Table reservations & prasadam orders</span>
+                          <span className="tp-nav-item-title">Restaurant Partner Desk</span>
+                          <span className="tp-nav-item-sub">Table reservations &amp; prasadam orders</span>
                         </div>
                       </div>
                       <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -2870,8 +2762,8 @@ export default function PartnerLandingPage({
                           <Building2 size={18} />
                         </div>
                         <div className="tp-nav-item-text">
-                          <span className="tp-nav-item-title">🛏️ Hotel & Ashram Stay Desk</span>
-                          <span className="tp-nav-item-sub">Room bookings & guest check-ins</span>
+                          <span className="tp-nav-item-title">Hotel &amp; Ashram Stay Desk</span>
+                          <span className="tp-nav-item-sub">Room bookings &amp; guest check-ins</span>
                         </div>
                       </div>
                       <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -2892,8 +2784,8 @@ export default function PartnerLandingPage({
                           <Compass size={18} />
                         </div>
                         <div className="tp-nav-item-text">
-                          <span className="tp-nav-item-title">🚩 Tour Agency & Guide Desk</span>
-                          <span className="tp-nav-item-sub">Group yatra bookings & itineraries</span>
+                          <span className="tp-nav-item-title">Tour Agency &amp; Guide Desk</span>
+                          <span className="tp-nav-item-sub">Group yatra bookings &amp; itineraries</span>
                         </div>
                       </div>
                       <ChevronRight size={18} className="tp-mobile-nav-arrow" />
@@ -3108,7 +3000,8 @@ export default function PartnerLandingPage({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* 2. MASTER AVIATION HERO SECTION (Exact Reference Design) */}
@@ -3418,19 +3311,19 @@ export default function PartnerLandingPage({
 
                           <button
                             type="button"
-                            className={`tp-btn-card-heart-pill ${favoriteIds.includes(place.id) ? 'is-favorited' : ''}`}
+                            className={`tp-btn-card-heart-pill ${safeFavoriteIds.includes(place.id) ? 'is-favorited' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               toggleFavorite(place.id, place.title);
                             }}
-                            title={favoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
-                            aria-label={favoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
+                            title={safeFavoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
+                            aria-label={safeFavoriteIds.includes(place.id) ? "Remove from Favourites" : "Save to Favourites"}
                           >
                             <Heart
                               size={16}
-                              fill={favoriteIds.includes(place.id) ? '#ef4444' : 'none'}
-                              color={favoriteIds.includes(place.id) ? '#ef4444' : 'currentColor'}
-                              className={favoriteIds.includes(place.id) ? 'tp-heart-pop' : ''}
+                              fill={safeFavoriteIds.includes(place.id) ? '#ef4444' : 'none'}
+                              color={safeFavoriteIds.includes(place.id) ? '#ef4444' : 'currentColor'}
+                              className={safeFavoriteIds.includes(place.id) ? 'tp-heart-pop' : ''}
                             />
                           </button>
                         </div>
@@ -3709,19 +3602,19 @@ export default function PartnerLandingPage({
 
                               <button
                                 type="button"
-                                className={`tp-btn-card-heart-pill ${favoriteIds.includes(item.id) ? 'is-favorited' : ''}`}
+                                className={`tp-btn-card-heart-pill ${safeFavoriteIds.includes(item.id) ? 'is-favorited' : ''}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   toggleFavorite(item.id, item.title);
                                 }}
-                                title={favoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
-                                aria-label={favoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
+                                title={safeFavoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
+                                aria-label={safeFavoriteIds.includes(item.id) ? "Remove from Favourites" : "Save to Favourites"}
                               >
                                 <Heart
                                   size={16}
-                                  fill={favoriteIds.includes(item.id) ? '#ef4444' : 'none'}
-                                  color={favoriteIds.includes(item.id) ? '#ef4444' : 'currentColor'}
-                                  className={favoriteIds.includes(item.id) ? 'tp-heart-pop' : ''}
+                                  fill={safeFavoriteIds.includes(item.id) ? '#ef4444' : 'none'}
+                                  color={safeFavoriteIds.includes(item.id) ? '#ef4444' : 'currentColor'}
+                                  className={safeFavoriteIds.includes(item.id) ? 'tp-heart-pop' : ''}
                                 />
                               </button>
                             </div>
@@ -4083,7 +3976,7 @@ export default function PartnerLandingPage({
         onSelectRole={handleSwitchRole}
       />
 
-      {selectedItem && (
+      {selectedItem && typeof document !== 'undefined' && createPortal(
         <div className="tp-modal-overlay" onClick={() => setSelectedItem(null)}>
           <div className="tp-modal-card tp-booking-modal-card" onClick={(e) => e.stopPropagation()}>
 
@@ -4256,16 +4149,16 @@ export default function PartnerLandingPage({
                       </button>
                       <button
                         type="button"
-                        className={`tp-btn-modal-heart-circle ${favoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
+                        className={`tp-btn-modal-heart-circle ${safeFavoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
                         onClick={() => toggleFavorite(selectedItem?.id, selectedItem?.title)}
-                        title={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
-                        aria-label={favoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                        title={safeFavoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
+                        aria-label={safeFavoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
                       >
                         <Heart
                           size={18}
-                          fill={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
-                          color={favoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
-                          className={favoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
+                          fill={safeFavoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
+                          color={safeFavoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
+                          className={safeFavoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
                         />
                       </button>
                     </div>
@@ -4287,7 +4180,8 @@ export default function PartnerLandingPage({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Stripe Payment Gateway Modal */}
@@ -4317,7 +4211,7 @@ export default function PartnerLandingPage({
       )}
 
       {/* Video Virtual Tour Modal */}
-      {isVideoModalOpen && (
+      {isVideoModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="tp-modal-overlay" onClick={() => setIsVideoModalOpen(false)}>
           <div className="tp-video-modal-card" onClick={(e) => e.stopPropagation()}>
             <button className="tp-video-close" onClick={() => setIsVideoModalOpen(false)}>
@@ -4332,11 +4226,12 @@ export default function PartnerLandingPage({
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Filter Modal */}
-      {isFilterModalOpen && (
+      {isFilterModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="tp-modal-overlay" onClick={() => setIsFilterModalOpen(false)}>
           <div className="tp-modal-card tp-filter-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="tp-modal-header">
@@ -4406,11 +4301,12 @@ export default function PartnerLandingPage({
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* 11. iOS STYLE LUXURY AUTH & PROFILE LOGIN MODAL */}
-      {isAuthModalOpen && (
+      {isAuthModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="tp-modal-overlay" onClick={() => setIsAuthModalOpen(false)}>
           <div className="tp-modal-card tp-auth-ios-card" onClick={(e) => e.stopPropagation()}>
             <div className="tp-auth-ios-header">
@@ -4826,11 +4722,12 @@ export default function PartnerLandingPage({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* 12. VRINDA VIHAR MASTER CARD LIGHTBOX (MATCHING REFERENCE UI) */}
-      {lightboxItem && (
+      {lightboxItem && typeof document !== 'undefined' && createPortal(
         <div
           className="tp-lightbox-overlay"
           onClick={() => setLightboxItem(null)}
@@ -4934,27 +4831,28 @@ export default function PartnerLandingPage({
 
                   <button
                     type="button"
-                    className={`tp-btn-master-icon ${favoriteIds.includes(lightboxItem.id) ? 'is-favorited' : ''}`}
+                    className={`tp-btn-master-icon ${safeFavoriteIds.includes(lightboxItem.id) ? 'is-favorited' : ''}`}
                     onClick={() => toggleFavorite(lightboxItem.id, lightboxItem.title)}
-                    title={favoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
-                    aria-label={favoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
+                    title={safeFavoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
+                    aria-label={safeFavoriteIds.includes(lightboxItem.id) ? "Remove from Favourites" : "Save to Favourites"}
                   >
                     <Heart
                       size={18}
-                      fill={favoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'none'}
-                      color={favoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'currentColor'}
-                      className={favoriteIds.includes(lightboxItem.id) ? 'tp-heart-pop' : ''}
+                      fill={safeFavoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'none'}
+                      color={safeFavoriteIds.includes(lightboxItem.id) ? '#ef4444' : 'currentColor'}
+                      className={safeFavoriteIds.includes(lightboxItem.id) ? 'tp-heart-pop' : ''}
                     />
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Pilgrim Referral & Category Direct Share Modal */}
-      {isReferralModalOpen && (
+      {isReferralModalOpen && typeof document !== 'undefined' && createPortal(
         <div className="tp-auth-modal-overlay" onClick={() => setIsReferralModalOpen(false)}>
           <div
             className="tp-auth-modal-card"
@@ -5043,193 +4941,177 @@ export default function PartnerLandingPage({
 
               return (
                 <div className="tp-auth-modal-body" style={{ marginTop: '0.8rem' }}>
-                  {/* Referral Code Box & Live Stats */}
                   <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '0.8rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                    <div>
-                      <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
-                        Your Unique Referral Code
-                      </span>
-                      <span style={{ fontSize: '1.25rem', fontWeight: 900, color: '#09090b', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
-                        {myRefCode}
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '3px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, color: '#047857' }}>
-                        🌟 {referralStats.totalPoints || currentUser.rewardPoints || 0} Pts
-                      </div>
-                      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '3px 8px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: 800, color: '#1d4ed8' }}>
-                        👥 {referralStats.totalReferrals || 0} Joined
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Category Selection Tabs */}
-                  <div style={{ marginBottom: '6px' }}>
-                    <label style={{ fontSize: '0.72rem', fontWeight: 800, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '6px' }}>
-                      Select Category to Share:
-                    </label>
-                    <div className="tp-ref-category-nav">
-                      {REFERRAL_CATEGORIES.map((cat) => {
-                        const isSelected = selectedRefCategory === cat.id;
-                        return (
-                          <button
-                            key={cat.id}
-                            type="button"
-                            className={`tp-ref-cat-pill ${isSelected ? 'active' : ''}`}
-                            onClick={() => setSelectedRefCategory(cat.id)}
-                          >
-                            <span>{cat.icon}</span>
-                            <span>{cat.label}</span>
-                            <span className="tp-ref-cat-badge">{cat.badge}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Active Category Direct Share Card */}
-                  <div className="tp-ref-card">
-                    <div className="tp-ref-card-header">
-                      <div className="tp-ref-card-title">
-                        <span>{activeCategoryConfig.icon}</span>
-                        <span>{activeCategoryConfig.title}</span>
-                      </div>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#059669', background: '#ecfdf5', padding: '2px 8px', borderRadius: '999px', border: '1px solid #a7f3d0' }}>
-                        {activeCategoryConfig.badge}
-                      </span>
-                    </div>
-
-                    <p className="tp-ref-card-desc">
-                      {activeCategoryConfig.desc}
-                    </p>
-
-                    {/* Direct Shareable Link Box */}
-                    <div className="tp-ref-link-box">
-                      <span className="tp-ref-link-text">
-                        {activeLink}
-                      </span>
-                      <button
-                        type="button"
-                        className={`tp-ref-copy-btn ${copiedRefTarget === activeCategoryConfig.id ? 'copied' : ''}`}
-                        onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
-                        title="Copy direct shareable URL"
-                      >
-                        {copiedRefTarget === activeCategoryConfig.id ? <Check size={13} /> : <Copy size={13} />}
-                        <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied!' : 'Copy Link'}</span>
-                      </button>
-                    </div>
-
-                    {/* Action Buttons: WhatsApp & Device Share */}
-                    <div className="tp-ref-actions-row">
-                      <a
-                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(activeMsg)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="tp-ref-action-btn-whatsapp"
-                      >
-                        <Send size={14} />
-                        <span>Share on WhatsApp</span>
-                      </a>
-
-                      <button
-                        type="button"
-                        className="tp-ref-action-btn-share"
-                        onClick={handleDeviceShare}
-                      >
-                        <Share2 size={14} />
-                        <span>Share via Any App</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Toggle: View All Category Direct Links */}
-                  <div className="tp-ref-direct-list-wrap">
-                    <div className="tp-ref-direct-list-title">
-                      <span>Direct Links for All Categories</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowAllRefLinks(prev => !prev)}
-                        style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontSize: '0.74rem', fontWeight: 800, cursor: 'pointer' }}
-                      >
-                        {showAllRefLinks ? 'Hide List ▲' : 'Show All (6 Links) ▼'}
-                      </button>
-                    </div>
-
-                    {showAllRefLinks && (
-                      <div>
-                        {REFERRAL_CATEGORIES.map((cat) => {
-                          const catLink = cat.getLink(myRefCode);
-                          const isCopied = copiedRefTarget === `list_${cat.id}`;
-                          return (
-                            <div key={cat.id} className="tp-ref-direct-item">
-                              <div className="tp-ref-direct-item-left">
-                                <span>{cat.icon}</span>
-                                <div>
-                                  <div style={{ lineHeight: 1.2 }}>{cat.label}</div>
-                                  <span style={{ fontSize: '0.68rem', color: '#94a3b8', fontFamily: 'monospace' }}>
-                                    {cat.path}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="tp-ref-direct-item-right">
-                                <button
-                                  type="button"
-                                  className={`tp-ref-icon-btn ${isCopied ? 'copied' : ''}`}
-                                  onClick={() => {
-                                    navigator.clipboard?.writeText(catLink);
-                                    setCopiedRefTarget(`list_${cat.id}`);
-                                    setTimeout(() => setCopiedRefTarget(''), 2000);
-                                  }}
-                                  title={`Copy ${cat.label} direct share link`}
-                                >
-                                  {isCopied ? <Check size={13} /> : <Copy size={13} />}
-                                </button>
-                                <a
-                                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="tp-ref-icon-btn"
-                                  title={`Share ${cat.label} on WhatsApp`}
-                                  style={{ background: '#ecfdf5', color: '#059669', borderColor: '#a7f3d0' }}
-                                >
-                                  <Send size={13} />
-                                </a>
-                              </div>
+                            <div>
+                              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                                Your Referral Code
+                              </span>
+                              <span style={{ fontSize: '1.12rem', fontWeight: 900, color: '#0f172a', letterSpacing: '0.06em' }}>
+                                {myRefCode}
+                              </span>
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
+
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(myRefCode);
+                                  setCopiedRefTarget('CODE');
+                                  setTimeout(() => setCopiedRefTarget(''), 2200);
+                                }}
+                                style={{
+                                  background: '#ffffff',
+                                  border: '1px solid #cbd5e1',
+                                  borderRadius: '8px',
+                                  padding: '5px 9px',
+                                  fontSize: '0.74rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  color: '#334155'
+                                }}
+                              >
+                                {copiedRefTarget === 'CODE' ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                                <span>{copiedRefTarget === 'CODE' ? 'Copied' : 'Copy'}</span>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Category Selector Tabs */}
+                          <div className="tp-ref-category-tabs">
+                            {REFERRAL_CATEGORIES.map(cat => {
+                              const isSel = selectedRefCategory === cat.id;
+                              return (
+                                <button
+                                  key={cat.id}
+                                  type="button"
+                                  className={`tp-ref-tab-btn ${isSel ? 'active' : ''}`}
+                                  onClick={() => setSelectedRefCategory(cat.id)}
+                                >
+                                  <span>{cat.icon}</span>
+                                  <span>{cat.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {/* Active Selected Category Card */}
+                          <div className="tp-ref-preview-card">
+                            <div className="tp-ref-preview-header">
+                              <span className="tp-ref-target-badge">{activeCategoryConfig.targetBadge}</span>
+                              <h4 className="tp-ref-target-title">{activeCategoryConfig.title}</h4>
+                              <p className="tp-ref-target-desc">{activeCategoryConfig.desc}</p>
+                            </div>
+
+                            <div className="tp-ref-link-box">
+                              <input
+                                type="text"
+                                readOnly
+                                value={activeLink}
+                                className="tp-ref-link-input"
+                              />
+                              <button
+                                type="button"
+                                className="tp-ref-copy-btn"
+                                onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
+                              >
+                                {copiedRefTarget === activeCategoryConfig.id ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                                <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied' : 'Copy'}</span>
+                              </button>
+                            </div>
+
+                            <div className="tp-ref-actions-row">
+                              <a
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(activeMsg)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="tp-ref-action-btn-whatsapp"
+                              >
+                                <Send size={14} />
+                                <span>WhatsApp</span>
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Toggle: View All Category Direct Links */}
+                          <div className="tp-ref-direct-list-wrap">
+                            <div className="tp-ref-direct-list-title">
+                              <span>Direct Links for All Categories</span>
+                            </div>
+
+                            <div className="tp-ref-direct-list">
+                              {REFERRAL_CATEGORIES.map(cat => {
+                                const link = cat.getLink(myRefCode);
+                                const isCopied = copiedRefTarget === cat.id;
+                                return (
+                                  <div key={cat.id} className="tp-ref-direct-item">
+                                    <div className="tp-ref-direct-item-left">
+                                      <span className="tp-ref-direct-icon">{cat.icon}</span>
+                                      <div className="tp-ref-direct-info">
+                                        <strong>{cat.title}</strong>
+                                        <small>{link}</small>
+                                      </div>
+                                    </div>
+                                    <div className="tp-ref-direct-actions">
+                                      <button
+                                        type="button"
+                                        className="tp-ref-mini-btn"
+                                        onClick={() => handleCopyCategoryLink(cat)}
+                                        title="Copy Link"
+                                      >
+                                        {isCopied ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
+                                      </button>
+                                      <a
+                                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="tp-ref-mini-btn whatsapp"
+                                        title="Share on WhatsApp"
+                                      >
+                                        <Send size={13} />
+                                      </a>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => setIsReferralModalOpen(false)}
+                            style={{
+                              width: '100%',
+                              padding: '0.7rem',
+                              marginTop: '0.8rem',
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#64748b',
+                              fontWeight: 700,
+                              fontSize: '0.82rem',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            Close
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
+                </div>,
+                document.body
+              )}
 
-                  <button
-                    type="button"
-                    onClick={() => setIsReferralModalOpen(false)}
-                    style={{
-                      width: '100%',
-                      padding: '0.7rem',
-                      marginTop: '0.8rem',
-                      background: 'transparent',
-                      border: 'none',
-                      color: '#64748b',
-                      fontWeight: 700,
-                      fontSize: '0.82rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Close
-                  </button>
-                </div>
-              );
-            })()}
-          </div>
-        </div>
-      )}
-
-      {/* Floating Interactive Toast for Registration & Profile Completion Prompt */}
-      {floatingToast && (
-        <aside className="tp-floating-toast" role="status" aria-live="polite">
+      {/* Floating Interactive Toast for Registration & Profile Completion Prompt (Mounted via Portal to Screen Body) */}
+      {floatingToast && !selectedItem && !isTripPackagesModalOpen && !isRoleModalOpen && !isVideoModalOpen && !isFilterModalOpen && !isAuthModalOpen && !isMobileMenuOpen && !isInstantRideModalOpen && !stripeModalItem && !lightboxItem && !isReferralModalOpen && typeof document !== 'undefined' && createPortal(
+        <aside
+          className="tp-floating-toast"
+          role="status"
+          aria-live="polite"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className={`tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
             {floatingToast.icon}
           </div>
@@ -5240,14 +5122,22 @@ export default function PartnerLandingPage({
               <button
                 type="button"
                 className="tp-toast-cta"
-                onClick={floatingToast.onCta}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (typeof floatingToast.onCta === 'function') {
+                    floatingToast.onCta();
+                  }
+                }}
               >
                 {floatingToast.ctaText}
               </button>
               <button
                 type="button"
                 className="tp-toast-dismiss"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setFloatingToast(null);
                   sessionStorage.setItem('vrinda_toast_dismissed', 'true');
                 }}
@@ -5259,34 +5149,40 @@ export default function PartnerLandingPage({
           <button
             type="button"
             className="tp-toast-close-btn"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               setFloatingToast(null);
               sessionStorage.setItem('vrinda_toast_dismissed', 'true');
             }}
             aria-label="Close notification"
           >
-            <X size={15} />
+            <X size={16} />
           </button>
-        </aside>
+        </aside>,
+        document.body
       )}
 
-      {/* Floating Vrinda Vihar Help Centre Live Widget Launcher */}
-      <button
-        type="button"
-        className="hc-floating-launcher"
-        onClick={() => {
-          if (onOpenHelpCenter) onOpenHelpCenter();
-        }}
-        title="Chat with Vrinda Vihar Help Centre"
-        aria-label="Open Help Centre"
-      >
-        <span className="hc-launcher-indicator" />
-        <Headphones size={16} />
-        <span className="hc-launcher-label">Help Centre</span>
-      </button>
+      {/* Floating Vrinda Vihar Help Centre Live Widget Launcher (Hidden while toast is active) */}
+      {!floatingToast && typeof document !== 'undefined' && createPortal(
+        <button
+          type="button"
+          className="hc-floating-launcher"
+          onClick={() => {
+            if (onOpenHelpCenter) onOpenHelpCenter();
+          }}
+          title="Chat with Vrinda Vihar Help Centre"
+          aria-label="Open Help Centre"
+        >
+          <span className="hc-launcher-indicator" />
+          <Headphones size={16} />
+          <span className="hc-launcher-label">Help Centre</span>
+        </button>,
+        document.body
+      )}
 
-      {/* Persistent Live Ride Floating Activity Pill (Minimizable Dynamic Island) */}
-      {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !isInstantRideModalOpen && (
+      {/* Persistent Live Ride Floating Activity Pill (Mounted via Portal to Screen Body) */}
+      {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !isInstantRideModalOpen && typeof document !== 'undefined' && createPortal(
         <div
           className="vt-floating-live-ride-pill"
           onClick={() => {
@@ -5318,7 +5214,8 @@ export default function PartnerLandingPage({
             <span>View Live</span>
             <ChevronRight size={14} />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* UBER-GRADE INSTANT RIDE BOOKING MODAL */}

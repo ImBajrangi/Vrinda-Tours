@@ -55,8 +55,8 @@
     animation: marker-bounce-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     opacity: 0.85;
     transform: scale(0.9) translateZ(0);
-    will-change: transform, opacity;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .image-marker img {

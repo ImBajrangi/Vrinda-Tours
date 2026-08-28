@@ -56,6 +56,18 @@ export default function Header({
     ).slice(0, 8);
   }, [query, favorites]);
 
+  const itemRefs = useRef([]);
+
+  // Auto-scroll selected keyboard item into view
+  useEffect(() => {
+    if (selectedIndex >= 0 && itemRefs.current[selectedIndex]) {
+      itemRefs.current[selectedIndex].scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth'
+      });
+    }
+  }, [selectedIndex]);
+
   // Handle keyboard navigation for accessibility
   const handleKeyDown = (e) => {
     if (!isFocused) return;
@@ -298,6 +310,7 @@ export default function Header({
                 return (
                   <div 
                     key={loc.name} 
+                    ref={(el) => (itemRefs.current[idx] = el)}
                     className={`search-result-item ${isSelected ? 'selected' : ''}`}
                     role="option"
                     aria-selected={isSelected}

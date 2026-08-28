@@ -96,9 +96,11 @@ body,
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-touch-callout: none;
 }
 
-/* Base button reset */
+/* Base button reset with instant touch feedback */
 button {
   font-family: inherit;
   border: none;
@@ -106,6 +108,8 @@ button {
   cursor: pointer;
   outline: none;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
 }
 
 input, select, textarea {

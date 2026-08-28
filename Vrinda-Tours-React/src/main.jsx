@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import ErrorBoundary from './components/UI/ErrorBoundary';
 import './App.css';
 
 // Register Offline Map Tile Caching Service Worker
@@ -33,8 +34,8 @@ if (typeof window !== 'undefined') {
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <ErrorBoundary>
     <App />
-  </React.StrictMode>
+  </ErrorBoundary>
 );
 

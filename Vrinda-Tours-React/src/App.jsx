@@ -20,8 +20,10 @@ import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteFiel
 import { firestore } from './config/firebase';
 import { locations as initialData } from './data/locations';
 import AnnouncementBanner from './components/UI/AnnouncementBanner';
+import ErrorBoundary from './components/UI/ErrorBoundary';
+import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
 
-// Lazy-loaded on-demand portals & modals for instant initial load (<100ms)
+// Lazy-loaded secondary modals and partner portals on-demand
 const HotelBooking = lazy(() => import('./components/BookingSheets/HotelBooking'));
 const RestaurantBooking = lazy(() => import('./components/BookingSheets/RestaurantBooking'));
 const InstantRideModal = lazy(() => import('./components/Ride/InstantRideModal'));
@@ -34,7 +36,6 @@ const HotelLandingPage = lazy(() => import('./components/Hotel/HotelLandingPage'
 const RestaurantLandingPage = lazy(() => import('./components/Restaurant/RestaurantLandingPage'));
 const AgencyLandingPage = lazy(() => import('./components/Agency/AgencyLandingPage'));
 const PartnerHubModal = lazy(() => import('./components/PartnerHub/PartnerHubModal'));
-const PartnerLandingPage = lazy(() => import('./components/PartnerLanding/PartnerLandingPage'));
 const HelpCenterModal = lazy(() => import('./components/HelpCenter/HelpCenterModal'));
 
 export default function App() {
@@ -131,7 +132,8 @@ export default function App() {
   const { favorites, removeFavorite } = useFavorites();
 
   const favoriteLocations = useMemo(() => {
-    return locations.filter((loc) => favorites.includes(loc.name));
+    if (!Array.isArray(locations) || !Array.isArray(favorites)) return [];
+    return locations.filter((loc) => loc?.name && favorites.includes(loc.name));
   }, [locations, favorites]);
 
   const handleCloseAdmin = useCallback(() => {
@@ -625,17 +627,19 @@ export default function App() {
         )}
 
         {partnerLandingVisible && (
-          <PartnerLandingPage
-            onClose={() => setPartnerLandingVisible(false)}
-            onOpenPartnerHub={(role) => handleOpenPartnerDashboard(null, role)}
-            onOpenDriverPortal={() => { setPartnerLandingVisible(false); setDriverPortalVisible(true); }}
-            onOpenDriverPage={() => { setPartnerLandingVisible(false); setDriverLandingVisible(true); }}
-            onOpenHotelPage={() => { setPartnerLandingVisible(false); setHotelLandingVisible(true); }}
-            onOpenRestaurantPage={() => { setPartnerLandingVisible(false); setRestaurantLandingVisible(true); }}
-            onOpenAgencyPage={() => { setPartnerLandingVisible(false); setAgencyLandingVisible(true); }}
-            onOpenAdmin={() => setAdminVisible(true)}
-            onOpenHelpCenter={() => setHelpCenterVisible(true)}
-          />
+          <ErrorBoundary>
+            <PartnerLandingPage
+              onClose={() => setPartnerLandingVisible(false)}
+              onOpenPartnerHub={(role) => handleOpenPartnerDashboard(null, role)}
+              onOpenDriverPortal={() => { setPartnerLandingVisible(false); setDriverPortalVisible(true); }}
+              onOpenDriverPage={() => { setPartnerLandingVisible(false); setDriverLandingVisible(true); }}
+              onOpenHotelPage={() => { setPartnerLandingVisible(false); setHotelLandingVisible(true); }}
+              onOpenRestaurantPage={() => { setPartnerLandingVisible(false); setRestaurantLandingVisible(true); }}
+              onOpenAgencyPage={() => { setPartnerLandingVisible(false); setAgencyLandingVisible(true); }}
+              onOpenAdmin={() => setAdminVisible(true)}
+              onOpenHelpCenter={() => setHelpCenterVisible(true)}
+            />
+          </ErrorBoundary>
         )}
 
         {helpCenterVisible && (

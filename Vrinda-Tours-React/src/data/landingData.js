@@ -1,8 +1,14 @@
 // Cache helper for local client performance & persistence
 export const getCachedData = (key, fallback) => {
   try {
+    if (typeof window === 'undefined' || !window.localStorage) return fallback;
     const item = localStorage.getItem(`vt_tripco_${key}`);
-    return item ? JSON.parse(item) : fallback;
+    if (item === null || item === undefined || item === 'undefined' || item === 'null') return fallback;
+    const parsed = JSON.parse(item);
+    if (Array.isArray(fallback) && !Array.isArray(parsed)) return fallback;
+    if (typeof fallback === 'string' && typeof parsed !== 'string') return fallback;
+    if (parsed === null || parsed === undefined) return fallback;
+    return parsed;
   } catch {
     return fallback;
   }
@@ -1493,4 +1499,131 @@ export const footerNavigation = {
     { name: 'Pinterest', icon: 'Pinterest', href: 'https://www.pinterest.com/vrindopnishad' }
   ],
   copyright: '© 2026 Vrinda Vihar by Vrindopnishad. All rights reserved.'
+};
+
+// Role Taxonomy & Authority Configuration
+export const ROLE_CONFIGS = {
+  admin: {
+    id: 'admin',
+    label: 'Super Admin',
+    shortLabel: 'Admin',
+    tag: '👑 Super Admin',
+    badgeClass: 'tp-role-admin',
+    icon: '👑',
+    authority: 'Full Platform Authority & Financials',
+    color: '#d97706',
+    accentBg: '#fffbeb',
+    borderColor: '#fde68a',
+    description: 'System Administrator & Operations Manager with database, partner audit, and financial Stripe GMV control.'
+  },
+  driver: {
+    id: 'driver',
+    label: 'Sarathi Driver Partner',
+    shortLabel: 'Sarathi Driver',
+    tag: '🛺 Sarathi Driver',
+    badgeClass: 'tp-role-driver',
+    icon: '🛺',
+    authority: 'Driver Companion & Ride Dispatch Desk',
+    color: '#036b4aff',
+    accentBg: '#ecfdf5',
+    borderColor: '#a7f3d0',
+    description: 'Verified Brij E-Rickshaw & Fleet Driver with real-time GPS ride dispatch, passenger tracking, and daily trip earnings.'
+  },
+  restaurant: {
+    id: 'restaurant',
+    label: 'Restaurant Partner / Owner',
+    shortLabel: 'Restaurant Owner',
+    tag: '🍲 Restaurant Owner',
+    badgeClass: 'tp-role-restaurant',
+    icon: '🍲',
+    authority: 'Dining Partner Desk & Table Bookings',
+    color: '#ea580c',
+    accentBg: '#fff7ed',
+    borderColor: '#fed7aa',
+    description: 'Brij food outlet, thali house, or sweet shop owner managing table reservations and devotee prasadam orders.'
+  },
+  restaurant_staff: {
+    id: 'restaurant_staff',
+    label: 'Restaurant Staff / Kitchen',
+    shortLabel: 'Dining Staff',
+    tag: '👨‍🍳 Restaurant Staff',
+    badgeClass: 'tp-role-restaurant-staff',
+    icon: '👨‍🍳',
+    authority: 'Order Fulfillment & Kitchen Queue',
+    color: '#c2410c',
+    accentBg: '#ffedd5',
+    borderColor: '#fdba74',
+    description: 'Kitchen & dining service staff executing real-time prasadam orders and table check-ins.'
+  },
+  hotel: {
+    id: 'hotel',
+    label: 'Hotel & Ashram Stay Owner',
+    shortLabel: 'Hotel Owner',
+    tag: '🛏️ Hotel Partner',
+    badgeClass: 'tp-role-hotel',
+    icon: '🛏️',
+    authority: 'Ashram Stay Desk & Room Inventory',
+    color: '#2563eb',
+    accentBg: '#eff6ff',
+    borderColor: '#bfdbfe',
+    description: 'Ashram, dharamshala, or hotel operator managing room inventory, pilgrim check-ins, and tariffs.'
+  },
+  hotel_staff: {
+    id: 'hotel_staff',
+    label: 'Ashram / Hotel Desk Staff',
+    shortLabel: 'Stay Staff',
+    tag: '🏨 Ashram Desk Staff',
+    badgeClass: 'tp-role-hotel-staff',
+    icon: '🏨',
+    authority: 'Front Desk & Guest Verification',
+    color: '#1d4ed8',
+    accentBg: '#dbeafe',
+    borderColor: '#93c5fd',
+    description: 'Front desk operations staff verifying devotee vouchers and managing room availability.'
+  },
+  agency: {
+    id: 'agency',
+    label: 'Tour Agency & Yatra Guide',
+    shortLabel: 'Tour Agency',
+    tag: '🚩 Tour Agency Partner',
+    badgeClass: 'tp-role-agency',
+    icon: '🚩',
+    authority: 'Yatra Itineraries & Group Bookings',
+    color: '#7c3aed',
+    accentBg: '#f5f3ff',
+    borderColor: '#ddd6fe',
+    description: 'Licensed tour agency or local Brajwasi guide offering customized parikrama, temple tours, and yatra packages.'
+  },
+  pilgrim: {
+    id: 'pilgrim',
+    label: 'Devotee Pilgrim',
+    shortLabel: 'Devotee',
+    tag: '🙏 Devotee Pilgrim',
+    badgeClass: 'tp-role-pilgrim',
+    icon: '🙏',
+    authority: 'Devotee Services, Bookings & Rewards',
+    color: '#0d9488',
+    accentBg: '#f0fdfa',
+    borderColor: '#99f6e4',
+    description: 'Devotee traveler accessing live sacred map, Darshan gallery, yatra bookings, and referral rewards.'
+  }
+};
+
+export const resolveUserRole = (user) => {
+  if (!user) return 'pilgrim';
+  const email = (user.email || '').toLowerCase();
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
+    .split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (email && (adminEmails.includes(email) || email.endsWith('@vrindatours.com'))) {
+    return 'admin';
+  }
+  try {
+    const savedRole = localStorage.getItem('vt_user_role');
+    if (savedRole && ROLE_CONFIGS[savedRole]) return savedRole;
+  } catch { }
+  if (user.role && ROLE_CONFIGS[user.role]) return user.role;
+  if (user.category && ROLE_CONFIGS[user.category]) return user.category;
+  return 'pilgrim';
 };

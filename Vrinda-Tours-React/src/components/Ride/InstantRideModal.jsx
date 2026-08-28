@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, Navigation, Clock, ShieldCheck, Phone, Star, ArrowRight, 
   CheckCircle2, Zap, Tag, ChevronRight, User, Shield, 
   HeartHandshake, CreditCard, Banknote, Sparkles, Check, Copy, ChevronDown,
-  ArrowUpDown, Search, MapPin, Share2, MessageSquare
+  ArrowUpDown, Search, MapPin, Share2, MessageSquare, Landmark,
+  AlertCircle, UserCheck, Smartphone, Building, RefreshCw, Percent
 } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
@@ -671,7 +673,9 @@ export default function InstantRideModal({
     return 'Yatra Points';
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <>
       <div className="ubr-overlay visible" onClick={handleCancel} />
       
@@ -690,7 +694,24 @@ export default function InstantRideModal({
         {stage === 'SELECT_TIER' && (
           <div className="ubr-stage-layout">
             
-            {/* Header: Interactive Real-Time Route Capsule */}
+            {/* Top Navigation & Close Bar */}
+            <div className="ubr-top-nav-bar">
+              <div className="ubr-top-nav-brand">
+                <div className="ubr-top-brand-vector-wrap">
+                  <ErickshawSvg />
+                </div>
+                <div className="ubr-top-brand-titles">
+                  <h3 className="ubr-top-title">Book Brij Temple Ride</h3>
+                  <span className="ubr-top-subtitle">Zero walking • Direct entry to temple alleys</span>
+                </div>
+              </div>
+
+              <button className="ubr-close-btn" onClick={triggerClose} title="Close" aria-label="Close modal">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Header: Interactive Real-Time Route Capsule (Full Width) */}
             <div className="ubr-header">
               <div className="ubr-route-capsule">
                 {/* Left: Continuous Connected Vector Route Timeline */}
@@ -717,32 +738,28 @@ export default function InstantRideModal({
                   </div>
                 </div>
 
-                {/* Swap Button */}
-                <button 
-                  type="button" 
-                  className="ubr-route-swap-btn"
-                  onClick={handleSwapLocations}
-                  title="Reverse pickup & destination"
-                  aria-label="Reverse route"
-                >
-                  <ArrowUpDown size={14} />
-                </button>
+                {/* Right Action Stack: Swap Button & Distance Badge */}
+                <div className="ubr-route-actions-stack">
+                  <button 
+                    type="button" 
+                    className="ubr-route-swap-btn"
+                    onClick={handleSwapLocations}
+                    title="Reverse pickup & destination"
+                    aria-label="Reverse route"
+                  >
+                    <ArrowUpDown size={13} />
+                  </button>
 
-                {/* Right: Crisp Distance Badge */}
-                <div className="ubr-route-metric">
-                  <Navigation size={10} className="ubr-metric-arrow" />
-                  <span>{formatDistance(tripDistanceKm)}</span>
+                  <div className="ubr-route-metric">
+                    <Navigation size={10} className="ubr-metric-arrow" />
+                    <span>{formatDistance(tripDistanceKm)}</span>
+                  </div>
                 </div>
               </div>
-
-              <button className="ubr-close-btn" onClick={triggerClose} title="Close" aria-label="Close modal">
-                <X size={18} />
-              </button>
             </div>
 
             {/* Quick Braj Temples Horizontal Scrollbar */}
             <div className="ubr-quick-temples-row">
-              <span className="ubr-quick-label">Temples:</span>
               <div className="ubr-quick-chips-scroll">
                 {QUICK_DESTINATIONS.map((qd, idx) => {
                   const isCur = destLocation?.name === qd.name || (destLocation?.lat === qd.lat && destLocation?.lng === qd.lng);
@@ -753,7 +770,8 @@ export default function InstantRideModal({
                       className={`ubr-quick-chip ${isCur ? 'active' : ''}`}
                       onClick={() => setDestLocation(qd)}
                     >
-                      {qd.name}
+                      <Landmark size={13} className="ubr-chip-landmark-icon" />
+                      <span>{qd.name}</span>
                     </button>
                   );
                 })}
@@ -1462,6 +1480,7 @@ export default function InstantRideModal({
           </div>
         )}
       </div>
-    </>
+    </>,
+    document.body
   );
 }
