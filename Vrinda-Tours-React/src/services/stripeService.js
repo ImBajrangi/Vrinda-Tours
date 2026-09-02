@@ -178,20 +178,26 @@ export async function processInAppPayment({
  */
 export async function savePaymentRecord(paymentData) {
   try {
+    const pId = paymentData.id || paymentData.transaction_id || `txn_${Date.now()}`;
     const { data, error } = await supabase
       .from('payments')
       .insert([
         {
-          transaction_id: paymentData.transaction_id || paymentData.id,
+          id: pId,
+          session_id: paymentData.session_id || pId,
           amount: paymentData.amount,
-          currency: paymentData.currency || 'INR',
+          currency: (paymentData.currency || 'inr').toLowerCase(),
           status: paymentData.status || 'succeeded',
-          customer_name: paymentData.customer_name,
-          customer_email: paymentData.customer_email,
-          customer_phone: paymentData.customer_phone,
-          item_title: paymentData.item_title,
-          payment_method: paymentData.payment_method || 'stripe_card',
-          metadata: paymentData.metadata || {},
+          customer_name: paymentData.customer_name || '',
+          customer_email: paymentData.customer_email || '',
+          item_type: paymentData.item_type || 'yatra_booking',
+          item_id: paymentData.item_id || '',
+          metadata: {
+            item_title: paymentData.item_title || '',
+            customer_phone: paymentData.customer_phone || '',
+            payment_method: paymentData.payment_method || 'stripe_card',
+            ...(paymentData.metadata || {})
+          },
           created_at: paymentData.created_at || new Date().toISOString()
         }
       ]);

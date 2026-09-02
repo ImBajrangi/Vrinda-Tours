@@ -3050,6 +3050,7 @@
     opacity: 0;
     transform: translateY(100%);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -3953,8 +3954,6 @@
 
 .tp-toast-cta:hover,
 .tp-toast-cta:active {
-  background: #059669;
-  transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(5, 150, 105, 0.25);
 }
 
@@ -4175,62 +4174,157 @@
   border-color: #0b0f19;
 }
 
-/* Feather-light Seamless Login Prompt */
-.tp-modal-login-prompt {
+/* Feather-Light 1-Tap Google Quick Auth */
+.tp-modal-quick-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.tp-btn-google-one-tap {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  width: 100%;
+  height: 44px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
   border-radius: 999px;
-  padding: 8px 16px;
-  gap: 10px;
+  padding: 0 12px 0 14px;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(11, 15, 25, 0.04);
   user-select: none;
+  box-sizing: border-box;
 }
 
-.tp-modal-login-prompt:hover {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 3px 10px rgba(11, 15, 25, 0.05);
+.tp-btn-google-one-tap:hover:not(:disabled) {
+  border-color: #4285F4;
+  box-shadow: 0 4px 14px rgba(66, 133, 244, 0.15);
 }
 
-.tp-login-prompt-content {
+.tp-btn-google-one-tap:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.tp-btn-google-one-tap.is-loading,
+.tp-btn-google-one-tap:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.tp-google-btn-inner {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
-  font-size: 0.78rem;
-  color: #64748b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.tp-prompt-sparkle {
-  color: #0b0f19;
+.tp-google-icon-svg {
   flex-shrink: 0;
 }
 
-.tp-prompt-highlight {
-  color: #0b0f19;
+.tp-google-btn-label {
+  font-size: 0.86rem;
   font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
-.tp-prompt-cta-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  color: #0b0f19;
+.tp-google-pill-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tp-btn-google-one-tap:hover:not(:disabled) .tp-google-pill-tag {
+  background: #e8f0fe;
+  color: #1a73e8;
+}
+
+.tp-google-mini-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e2e8f0;
+  border-top-color: #4285F4;
+  border-radius: 50%;
+  animation: tpGoogleSpin 0.7s linear infinite;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
 }
 
-.tp-modal-login-prompt:hover .tp-prompt-cta-link {
-  transform: translateX(2px);
+@keyframes tpGoogleSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hairline Divider */
+.tp-modal-or-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0.25rem 0 0.1rem 0;
+}
+
+.tp-modal-or-divider::before,
+.tp-modal-or-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tp-modal-or-divider span {
+  padding: 0 10px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tp-compact-input {
+  min-height: 42px !important;
+  margin-bottom: 0.45rem !important;
+}
+
+.tp-compact-input .tp-auth-pill-input {
+  font-size: 0.85rem !important;
+}
+
+.tp-modal-inline-err {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ef4444;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: -0.2rem 0 0.45rem 10px;
+  animation: tpFadeIn 0.2s ease;
+}
+
+@media (max-width: 440px) {
+  .tp-btn-google-one-tap {
+    height: 40px;
+    padding: 0 10px 0 12px;
+  }
+
+  .tp-google-btn-label {
+    font-size: 0.8rem;
+  }
+
+  .tp-google-pill-tag {
+    font-size: 0.65rem;
+    padding: 3px 8px;
+  }
 }
 
 /* Verified Traveler Strip (Shows Known User Info Without Redundant Input Fields) */
@@ -7172,6 +7266,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);

@@ -18,8 +18,8 @@ export function getOrCreateThreadId(userInfo = {}) {
   if (!threadId) {
     const userSlug = (userInfo.email || userInfo.phone || userInfo.name || 'devotee')
       .replace(/[^a-zA-Z0-9]/g, '')
-      .slice(0, 10);
-    threadId = `th_${userSlug}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+      .slice(0, 10) || 'pilgrim';
+    threadId = `th_${userSlug}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
     localStorage.setItem(THREAD_STORAGE_KEY, threadId);
   }
   return threadId;
@@ -35,6 +35,49 @@ const AUTO_RESPONSES = {
   custom: "Radhe Radhe! We specialize in custom 1-Day, 2-Day, and 84 Kos Brij Mahayatra itineraries for families and groups. Please share your arrival date, number of devotees, and preferred temples.",
   default: "Thank you for reaching out to Vrinda Vihar Help Centre. Your inquiry has been registered with priority ticket #VT-{ID}. A dedicated Brajwasi pilgrimage concierge is reviewing your request and will reply shortly."
 };
+
+/**
+ * Real-time Supabase listener for a single devotee thread
+ */
+export function subscribeToThread(threadId, onNewMessage) {
+  if (!threadId || !supabase) return () => {};
+
+  const channel = supabase
+    .channel(`realtime_thread_${threadId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'support_messages',
+        filter: `thread_id=eq.${threadId}`
+      },
+      (payload) => {
+        const raw = payload.new;
+        if (raw) {
+          const msg = {
+            id: raw.id,
+            thread_id: raw.thread_id,
+            sender: raw.sender === 'system' ? 'concierge_bot' : raw.sender,
+            sender_name: raw.sender_name,
+            sender_email: raw.sender_email,
+            sender_phone: raw.sender_phone,
+            message: raw.text || raw.message || '',
+            text: raw.text || raw.message || '',
+            category: raw.category || 'general',
+            metadata: raw.metadata || {},
+            created_at: raw.created_at || new Date().toISOString()
+          };
+          onNewMessage(msg);
+        }
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}
 
 /**
  * Send a message from Devotee to Vrinda Vihar Help Centre
@@ -62,6 +105,7 @@ export async function sendSupportMessage({
     sender_email: senderEmail,
     sender_phone: senderPhone,
     message: text.trim(),
+    text: text.trim(),
     category,
     status: 'sent',
     created_at: timestamp,
@@ -102,27 +146,24 @@ export async function sendSupportMessage({
 
   // 2. Persist to Supabase Database
   try {
-    const { data, error } = await supabase
+    const supabaseSender = messageObj.sender === 'concierge_bot' ? 'system' : (messageObj.sender || 'user');
+    await supabase
       .from('support_messages')
       .insert([
         {
           id: messageObj.id,
           thread_id: threadId,
-          sender: messageObj.sender,
-          sender_name: messageObj.sender_name,
-          sender_email: messageObj.sender_email,
-          sender_phone: messageObj.sender_phone,
-          message: messageObj.message,
-          category: messageObj.category,
-          status: 'open',
-          metadata: messageObj.metadata,
+          sender: supabaseSender,
+          sender_name: messageObj.sender_name || 'Devotee Pilgrim',
+          sender_email: messageObj.sender_email || '',
+          sender_phone: messageObj.sender_phone || '',
+          text: messageObj.message,
+          category: messageObj.category || 'general',
+          metadata: messageObj.metadata || {},
+          is_read: false,
           created_at: timestamp
         }
       ]);
-
-    if (error) {
-      console.warn('Supabase support_messages notice:', error.message);
-    }
   } catch (e) {
     console.warn('Supabase support_messages insert fallback:', e);
   }
@@ -148,7 +189,7 @@ export async function sendSupportMessage({
         senderName: 'Vrinda Vihar Concierge',
         sender: 'concierge_bot'
       });
-    }, 1000);
+    }, 1200);
   }
 
   return messageObj;
@@ -164,6 +205,7 @@ async function sendConciergeResponse({ threadId, text, senderName, sender = 'con
     sender,
     sender_name: senderName,
     message: text,
+    text: text,
     status: 'delivered',
     created_at: new Date().toISOString()
   };
@@ -187,10 +229,10 @@ async function sendConciergeResponse({ threadId, text, senderName, sender = 'con
       {
         id: replyObj.id,
         thread_id: threadId,
-        sender: replyObj.sender,
+        sender: 'system',
         sender_name: replyObj.sender_name,
-        message: replyObj.message,
-        status: 'delivered',
+        text: replyObj.message,
+        is_read: false,
         created_at: replyObj.created_at
       }
     ]);
@@ -206,7 +248,7 @@ async function sendConciergeResponse({ threadId, text, senderName, sender = 'con
 export async function sendAdminReply({
   threadId,
   replyText,
-  adminName = 'Vrinda Vihar Help Desk',
+  adminName = 'Vrinda Vihar Operations',
   adminEmail = 'support@vrindatours.com'
 }) {
   if (!replyText || !replyText.trim()) return null;
@@ -221,6 +263,7 @@ export async function sendAdminReply({
     sender_name: adminName,
     sender_email: adminEmail,
     message: replyText.trim(),
+    text: replyText.trim(),
     status: 'delivered',
     created_at: timestamp
   };
@@ -250,8 +293,8 @@ export async function sendAdminReply({
         sender: 'admin',
         sender_name: adminName,
         sender_email: adminEmail,
-        message: replyObj.message,
-        status: 'in_progress',
+        text: replyObj.message,
+        is_read: false,
         created_at: timestamp
       }
     ]);
@@ -282,8 +325,13 @@ export async function getThreadMessages(threadId) {
       .order('created_at', { ascending: true });
 
     if (!error && data && data.length > 0) {
+      const normalizedData = data.map(m => ({ 
+        ...m, 
+        sender: m.sender === 'system' ? 'concierge_bot' : m.sender,
+        message: m.text || m.message || '' 
+      }));
       const map = new Map();
-      [...localMsgs, ...data].forEach(item => {
+      [...localMsgs, ...normalizedData].forEach(item => {
         if (item.id && !map.has(item.id)) {
           map.set(item.id, item);
         }
@@ -308,11 +356,16 @@ export async function getAllSupportThreads() {
     const { data, error } = await supabase
       .from('support_messages')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
     if (!error && data && data.length > 0) {
       const threadsMap = { ...localThreads };
-      data.forEach(msg => {
+      data.forEach(rawMsg => {
+        const msg = { 
+          ...rawMsg, 
+          sender: rawMsg.sender === 'system' ? 'concierge_bot' : rawMsg.sender,
+          message: rawMsg.text || rawMsg.message || '' 
+        };
         const tId = msg.thread_id;
         if (!tId) return;
 
@@ -322,14 +375,22 @@ export async function getAllSupportThreads() {
             sender_name: msg.sender_name || 'Devotee Pilgrim',
             sender_email: msg.sender_email || '',
             sender_phone: msg.sender_phone || '',
-            status: msg.status || 'open',
+            status: 'open',
             category: msg.category || 'general',
             last_message: msg.message,
             last_updated: msg.created_at,
             messages: []
           };
         }
-        // Insert message if not already present
+        
+        if (msg.sender === 'user' && msg.sender_name && msg.sender_name !== 'Devotee Pilgrim') {
+          threadsMap[tId].sender_name = msg.sender_name;
+        }
+        if (msg.sender_email) threadsMap[tId].sender_email = msg.sender_email;
+        if (msg.sender_phone) threadsMap[tId].sender_phone = msg.sender_phone;
+        threadsMap[tId].last_message = msg.message;
+        threadsMap[tId].last_updated = msg.created_at;
+
         if (!threadsMap[tId].messages.some(m => m.id === msg.id)) {
           threadsMap[tId].messages.push(msg);
         }
@@ -358,12 +419,5 @@ export async function updateThreadStatus(threadId, status) {
       allThreads[threadId].status = status;
       localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
     }
-  } catch {}
-
-  try {
-    await supabase
-      .from('support_messages')
-      .update({ status })
-      .eq('thread_id', threadId);
   } catch {}
 }

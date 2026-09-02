@@ -21,16 +21,13 @@ export const validatePhoneNumber = (rawPhone) => {
     localDigits = digitsOnly.slice(1);
   }
 
-  // 10-digit Indian Mobile Number
+  // 10-digit Mobile Number
   if (localDigits.length === 10) {
-    if (/^[6-9]\d{9}$/.test(localDigits)) {
-      return {
-        isValid: true,
-        formatted: `+91 ${localDigits.slice(0, 5)} ${localDigits.slice(5)}`,
-        clean: `+91${localDigits}`
-      };
-    }
-    return { isValid: false, message: 'Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.' };
+    return {
+      isValid: true,
+      formatted: `+91 ${localDigits.slice(0, 5)} ${localDigits.slice(5)}`,
+      clean: `+91${localDigits}`
+    };
   }
 
   // International phone numbers (7 to 15 digits)

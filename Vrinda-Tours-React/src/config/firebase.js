@@ -43,9 +43,9 @@ try {
 }
 export const firestore = db;
 
-// Initialize Analytics conditionally where supported
+// Initialize Analytics conditionally where supported (in production only to prevent localhost ping errors)
 export let analytics = null;
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && !import.meta.env.DEV) {
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);

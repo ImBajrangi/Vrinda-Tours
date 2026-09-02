@@ -8,7 +8,7 @@ import {
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
   Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
-  Check, Copy, UtensilsCrossed, Headphones, MessageSquare
+  Check, Copy, UtensilsCrossed, Headphones, MessageSquare, AlertCircle
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -45,6 +45,7 @@ import { useGeolocation } from '../../hooks/useGeolocation';
 import { doc, updateDoc, deleteField } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { getPersistedLocalRide, subscribeToRideRequest } from '../../services/rideService';
+import { validatePhoneNumber } from '../../utils/phoneValidator';
 import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
 import './PartnerLandingPage.css';
@@ -545,7 +546,7 @@ function OmniSearchModal({
             ref={inputRef}
             type="text"
             className="tp-search-modal-input"
-            placeholder="Search trips, sacred dhams, services, VIP passes, darshans..."
+            placeholder="Search trips, sacred dhams, services, passes, darshans..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -1101,6 +1102,8 @@ export default function PartnerLandingPage({
   const [activeGalleryCardId, setActiveGalleryCardId] = useState(null);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isGoogleSigningIn, setIsGoogleSigningIn] = useState(false);
+  const [bookingError, setBookingError] = useState('');
 
   // Global Keyboard Shortcut (Cmd+K / Ctrl+K) to open Spotlight Search
   useEffect(() => {
@@ -1173,7 +1176,7 @@ export default function PartnerLandingPage({
     if (!ROLE_CONFIGS[newRoleKey]) return;
     try {
       localStorage.setItem('vt_user_role', newRoleKey);
-    } catch {}
+    } catch { }
     if (currentUser) {
       const updated = { ...currentUser, role: newRoleKey, category: newRoleKey };
       setCurrentUser(updated);
@@ -1380,7 +1383,7 @@ export default function PartnerLandingPage({
     const initials = name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) || 'TR';
     const cached = getCachedData('traveler_user', null);
     const existingPhone = (cached && (cached.uid === u.id || cached.email === email) && cached.phone) ? cached.phone : (meta.phone || '');
-    
+
     // Resolve Category/Role Tag
     const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
       .split(',')
@@ -1391,7 +1394,7 @@ export default function PartnerLandingPage({
     try {
       const storedRole = localStorage.getItem('vt_user_role');
       if (storedRole && ROLE_CONFIGS[storedRole]) assignedRole = storedRole;
-    } catch {}
+    } catch { }
 
     return {
       uid: u.id,
@@ -1410,6 +1413,20 @@ export default function PartnerLandingPage({
 
   // Sync Supabase Auth state changes in real-time
   useEffect(() => {
+    // Restore pending booking item if returning from Google OAuth redirect
+    try {
+      const pendingBooking = sessionStorage.getItem('vt_pending_booking_item');
+      if (pendingBooking) {
+        const parsed = JSON.parse(pendingBooking);
+        if (parsed) {
+          setSelectedItem(parsed);
+          sessionStorage.removeItem('vt_pending_booking_item');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to restore pending booking item:', e);
+    }
+
     // Load existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -1712,6 +1729,21 @@ export default function PartnerLandingPage({
     }
   };
 
+  // Direct Google 1-Click Login for Booking Modal (Preserves trip item & skips manual registration)
+  const handleDirectGoogleLogin = async () => {
+    setIsGoogleSigningIn(true);
+    setAuthError('');
+    try {
+      if (selectedItem) {
+        sessionStorage.setItem('vt_pending_booking_item', JSON.stringify(selectedItem));
+      }
+      await handleGoogleAuth();
+    } catch (err) {
+      console.error('Direct Google login error:', err);
+      setIsGoogleSigningIn(false);
+    }
+  };
+
   // Handler for Phone Prompt Confirmation in Sign-in Process
   const handlePhonePromptSubmit = (e) => {
     if (e) e.preventDefault();
@@ -1824,6 +1856,7 @@ export default function PartnerLandingPage({
 
   const handleBookingPhoneChange = (val) => {
     setBookingPhone(val);
+    if (bookingError) setBookingError('');
     if (currentUser) {
       const updated = { ...currentUser, phone: val };
       setCurrentUser(updated);
@@ -1904,54 +1937,45 @@ export default function PartnerLandingPage({
     }
   };
 
-  const handleBookingSubmit = (e) => {
-    e.preventDefault();
-    const finalName = bookingName || currentUser?.name || 'Guest Traveler';
+  const handleBookingSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setBookingError('');
+    const finalName = bookingName || currentUser?.name || 'Guest Devotee';
     const finalEmail = bookingEmail || currentUser?.email || 'Not provided';
     const finalPhone = bookingPhone || currentUser?.phone || '';
 
-    if (finalPhone) {
-      const validation = validatePhoneNumber(finalPhone);
-      if (!validation.isValid) {
-        setFloatingToast({
-          id: `err_${Date.now()}`,
-          title: 'Invalid Phone Number',
-          desc: validation.message,
-          highlight: true
-        });
-        setTimeout(() => setFloatingToast(null), 4000);
-        return;
-      }
-    } else {
-      setFloatingToast({
-        id: `err_${Date.now()}`,
-        title: 'Phone Required',
-        desc: 'Please enter your 10-digit mobile number for booking confirmation.',
-        highlight: true
-      });
-      setTimeout(() => setFloatingToast(null), 4000);
+    if (!finalPhone || !finalPhone.trim()) {
+      setBookingError('Please enter your 10-digit mobile number.');
+      return;
+    }
+
+    const validation = validatePhoneNumber(finalPhone);
+    if (!validation.isValid) {
+      setBookingError(validation.message);
       return;
     }
 
     setBookingSuccess(true);
-    setTimeout(async () => {
-      const inquiryText = `Radhe Radhe! I would like to reserve *${selectedItem?.title || destination}*.\n• Dates: ${checkInDate} to ${checkOutDate}\n• Devotee: ${finalName}\n• Mobile: ${finalPhone}\n• Email: ${finalEmail}\n• Party: ${roomsGuests}`;
+    const destinationTitle = selectedItem?.title || destination || 'Brij Yatra';
+    const datesStr = formatTripDates(checkInDate, checkOutDate);
+    const inquiryText = `Radhe Radhe! I would like to reserve *${destinationTitle}*.\n• Dates: ${datesStr}\n• Devotee: ${finalName}\n• Mobile: ${validation.formatted || finalPhone}\n• Email: ${finalEmail}\n• Party: ${roomsGuests || '2 Guests'}`;
 
-      try {
-        const tId = getOrCreateThreadId({ name: finalName, phone: finalPhone, email: finalEmail });
-        await sendSupportMessage({
-          threadId: tId,
-          sender: 'user',
-          text: inquiryText,
-          senderName: finalName,
-          senderEmail: finalEmail,
-          senderPhone: finalPhone,
-          category: 'booking'
-        });
-      } catch (err) {
-        console.warn('Booking inquiry save error:', err);
-      }
+    try {
+      const tId = getOrCreateThreadId({ name: finalName, phone: finalPhone, email: finalEmail });
+      await sendSupportMessage({
+        threadId: tId,
+        sender: 'user',
+        text: inquiryText,
+        senderName: finalName,
+        senderEmail: finalEmail,
+        senderPhone: finalPhone,
+        category: 'booking'
+      });
+    } catch (err) {
+      console.warn('Booking inquiry save error:', err);
+    }
 
+    setTimeout(() => {
       setSelectedItem(null);
       setBookingSuccess(false);
 
@@ -1961,8 +1985,8 @@ export default function PartnerLandingPage({
 
       setFloatingToast({
         id: `book_${Date.now()}`,
-        title: 'Booking Inquiry Connected',
-        desc: 'Vrinda Vihar Help Centre concierge is ready in live chat.',
+        title: 'Reservation Inquiry Connected',
+        desc: 'Vrinda Vihar live concierge is ready to assist you in chat.',
         highlight: true
       });
       setTimeout(() => setFloatingToast(null), 5000);
@@ -1972,7 +1996,7 @@ export default function PartnerLandingPage({
         setBookingEmail('');
         setBookingPhone('');
       }
-    }, 600);
+    }, 450);
   };
 
   const handleNewsletterSubmit = (e) => {
@@ -4031,25 +4055,37 @@ export default function PartnerLandingPage({
                 </div>
               </div>
 
-              {/* Sign In Prompt for Guest Travelers */}
+              {/* Ultra-Light 1-Tap Google Login */}
               {!currentUser && (
-                <div
-                  className="tp-modal-login-prompt"
-                  onClick={() => {
-                    setAuthMode('login');
-                    setIsAuthModalOpen(true);
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <div className="tp-login-prompt-content">
-                    <Sparkles size={13} className="tp-prompt-sparkle" />
-                    <span>Sign in for <strong>1-click booking autofill</strong></span>
+                <div className="tp-modal-quick-auth">
+                  <button
+                    type="button"
+                    className={`tp-btn-google-one-tap ${isGoogleSigningIn ? 'is-loading' : ''}`}
+                    onClick={handleDirectGoogleLogin}
+                    disabled={isGoogleSigningIn}
+                    aria-label="Continue with Google"
+                  >
+                    <div className="tp-google-btn-inner">
+                      {isGoogleSigningIn ? (
+                        <div className="tp-google-mini-spinner" />
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24" className="tp-google-icon-svg">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                        </svg>
+                      )}
+                      <span className="tp-google-btn-label">
+                        {isGoogleSigningIn ? 'Connecting to Google...' : 'Continue with Google'}
+                      </span>
+                    </div>
+                    <span className="tp-google-pill-tag">1-Tap Autofill</span>
+                  </button>
+
+                  <div className="tp-modal-or-divider">
+                    <span>or quick reserve with mobile</span>
                   </div>
-                  <span className="tp-prompt-cta-link">
-                    <span>Sign In</span>
-                    <ArrowRight size={12} />
-                  </span>
                 </div>
               )}
 
@@ -4086,48 +4122,39 @@ export default function PartnerLandingPage({
                     </div>
                   )}
 
-                  {/* Show Name input ONLY if not already known */}
+                  {/* Optional Name (Only shown if not logged in) */}
                   {!currentUser?.name && (
-                    <div className="tp-auth-pill-input-wrap">
-                      <User size={17} className="tp-auth-pill-icon" />
+                    <div className="tp-auth-pill-input-wrap tp-compact-input">
+                      <User size={16} className="tp-auth-pill-icon" />
                       <input
                         type="text"
                         className="tp-auth-pill-input"
-                        placeholder="Your Full Name"
+                        placeholder="Your Name"
                         value={bookingName}
                         onChange={(e) => handleBookingNameChange(e.target.value)}
-                        required
                       />
                     </div>
                   )}
 
-                  {/* Show Email input ONLY if not already known */}
-                  {!currentUser?.email && (
-                    <div className="tp-auth-pill-input-wrap">
-                      <Mail size={17} className="tp-auth-pill-icon" />
-                      <input
-                        type="email"
-                        className="tp-auth-pill-input"
-                        placeholder="Email Address"
-                        value={bookingEmail}
-                        onChange={(e) => handleBookingEmailChange(e.target.value)}
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {/* Mobile input (the only missing piece when logged in) */}
-                  <div className="tp-auth-pill-input-wrap">
-                    <Phone size={17} className="tp-auth-pill-icon" />
+                  {/* Primary Mobile input */}
+                  <div className="tp-auth-pill-input-wrap tp-compact-input">
+                    <Phone size={16} className="tp-auth-pill-icon" />
                     <input
                       type="tel"
                       className="tp-auth-pill-input"
-                      placeholder="10-digit Mobile (e.g. 9876543210)"
+                      placeholder="Enter 10-digit Mobile / WhatsApp *"
                       value={bookingPhone}
                       onChange={(e) => handleBookingPhoneChange(e.target.value)}
                       required
                     />
                   </div>
+
+                  {bookingError && (
+                    <div className="tp-modal-inline-err">
+                      <AlertCircle size={13} />
+                      <span>{bookingError}</span>
+                    </div>
+                  )}
 
                   <div className="tp-modal-payment-cta-stack">
                     <button
@@ -4942,167 +4969,167 @@ export default function PartnerLandingPage({
               return (
                 <div className="tp-auth-modal-body" style={{ marginTop: '0.8rem' }}>
                   <div style={{ background: '#fafafa', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '0.8rem 1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                            <div>
-                              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
-                                Your Referral Code
-                              </span>
-                              <span style={{ fontSize: '1.12rem', fontWeight: 900, color: '#0f172a', letterSpacing: '0.06em' }}>
-                                {myRefCode}
-                              </span>
-                            </div>
+                    <div>
+                      <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block' }}>
+                        Your Referral Code
+                      </span>
+                      <span style={{ fontSize: '1.12rem', fontWeight: 900, color: '#0f172a', letterSpacing: '0.06em' }}>
+                        {myRefCode}
+                      </span>
+                    </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard?.writeText(myRefCode);
+                          setCopiedRefTarget('CODE');
+                          setTimeout(() => setCopiedRefTarget(''), 2200);
+                        }}
+                        style={{
+                          background: '#ffffff',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '8px',
+                          padding: '5px 9px',
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          color: '#334155'
+                        }}
+                      >
+                        {copiedRefTarget === 'CODE' ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                        <span>{copiedRefTarget === 'CODE' ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Category Selector Tabs */}
+                  <div className="tp-ref-category-tabs">
+                    {REFERRAL_CATEGORIES.map(cat => {
+                      const isSel = selectedRefCategory === cat.id;
+                      return (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          className={`tp-ref-tab-btn ${isSel ? 'active' : ''}`}
+                          onClick={() => setSelectedRefCategory(cat.id)}
+                        >
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Active Selected Category Card */}
+                  <div className="tp-ref-preview-card">
+                    <div className="tp-ref-preview-header">
+                      <span className="tp-ref-target-badge">{activeCategoryConfig.targetBadge}</span>
+                      <h4 className="tp-ref-target-title">{activeCategoryConfig.title}</h4>
+                      <p className="tp-ref-target-desc">{activeCategoryConfig.desc}</p>
+                    </div>
+
+                    <div className="tp-ref-link-box">
+                      <input
+                        type="text"
+                        readOnly
+                        value={activeLink}
+                        className="tp-ref-link-input"
+                      />
+                      <button
+                        type="button"
+                        className="tp-ref-copy-btn"
+                        onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
+                      >
+                        {copiedRefTarget === activeCategoryConfig.id ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                        <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied' : 'Copy'}</span>
+                      </button>
+                    </div>
+
+                    <div className="tp-ref-actions-row">
+                      <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(activeMsg)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="tp-ref-action-btn-whatsapp"
+                      >
+                        <Send size={14} />
+                        <span>WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Toggle: View All Category Direct Links */}
+                  <div className="tp-ref-direct-list-wrap">
+                    <div className="tp-ref-direct-list-title">
+                      <span>Direct Links for All Categories</span>
+                    </div>
+
+                    <div className="tp-ref-direct-list">
+                      {REFERRAL_CATEGORIES.map(cat => {
+                        const link = cat.getLink(myRefCode);
+                        const isCopied = copiedRefTarget === cat.id;
+                        return (
+                          <div key={cat.id} className="tp-ref-direct-item">
+                            <div className="tp-ref-direct-item-left">
+                              <span className="tp-ref-direct-icon">{cat.icon}</span>
+                              <div className="tp-ref-direct-info">
+                                <strong>{cat.title}</strong>
+                                <small>{link}</small>
+                              </div>
+                            </div>
+                            <div className="tp-ref-direct-actions">
                               <button
                                 type="button"
-                                onClick={() => {
-                                  navigator.clipboard?.writeText(myRefCode);
-                                  setCopiedRefTarget('CODE');
-                                  setTimeout(() => setCopiedRefTarget(''), 2200);
-                                }}
-                                style={{
-                                  background: '#ffffff',
-                                  border: '1px solid #cbd5e1',
-                                  borderRadius: '8px',
-                                  padding: '5px 9px',
-                                  fontSize: '0.74rem',
-                                  fontWeight: 700,
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  color: '#334155'
-                                }}
+                                className="tp-ref-mini-btn"
+                                onClick={() => handleCopyCategoryLink(cat)}
+                                title="Copy Link"
                               >
-                                {copiedRefTarget === 'CODE' ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
-                                <span>{copiedRefTarget === 'CODE' ? 'Copied' : 'Copy'}</span>
+                                {isCopied ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
                               </button>
-                            </div>
-                          </div>
-
-                          {/* Category Selector Tabs */}
-                          <div className="tp-ref-category-tabs">
-                            {REFERRAL_CATEGORIES.map(cat => {
-                              const isSel = selectedRefCategory === cat.id;
-                              return (
-                                <button
-                                  key={cat.id}
-                                  type="button"
-                                  className={`tp-ref-tab-btn ${isSel ? 'active' : ''}`}
-                                  onClick={() => setSelectedRefCategory(cat.id)}
-                                >
-                                  <span>{cat.icon}</span>
-                                  <span>{cat.name}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-
-                          {/* Active Selected Category Card */}
-                          <div className="tp-ref-preview-card">
-                            <div className="tp-ref-preview-header">
-                              <span className="tp-ref-target-badge">{activeCategoryConfig.targetBadge}</span>
-                              <h4 className="tp-ref-target-title">{activeCategoryConfig.title}</h4>
-                              <p className="tp-ref-target-desc">{activeCategoryConfig.desc}</p>
-                            </div>
-
-                            <div className="tp-ref-link-box">
-                              <input
-                                type="text"
-                                readOnly
-                                value={activeLink}
-                                className="tp-ref-link-input"
-                              />
-                              <button
-                                type="button"
-                                className="tp-ref-copy-btn"
-                                onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
-                              >
-                                {copiedRefTarget === activeCategoryConfig.id ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                                <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied' : 'Copy'}</span>
-                              </button>
-                            </div>
-
-                            <div className="tp-ref-actions-row">
                               <a
-                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(activeMsg)}`}
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="tp-ref-action-btn-whatsapp"
+                                className="tp-ref-mini-btn whatsapp"
+                                title="Share on WhatsApp"
                               >
-                                <Send size={14} />
-                                <span>WhatsApp</span>
+                                <Send size={13} />
                               </a>
                             </div>
                           </div>
-
-                          {/* Toggle: View All Category Direct Links */}
-                          <div className="tp-ref-direct-list-wrap">
-                            <div className="tp-ref-direct-list-title">
-                              <span>Direct Links for All Categories</span>
-                            </div>
-
-                            <div className="tp-ref-direct-list">
-                              {REFERRAL_CATEGORIES.map(cat => {
-                                const link = cat.getLink(myRefCode);
-                                const isCopied = copiedRefTarget === cat.id;
-                                return (
-                                  <div key={cat.id} className="tp-ref-direct-item">
-                                    <div className="tp-ref-direct-item-left">
-                                      <span className="tp-ref-direct-icon">{cat.icon}</span>
-                                      <div className="tp-ref-direct-info">
-                                        <strong>{cat.title}</strong>
-                                        <small>{link}</small>
-                                      </div>
-                                    </div>
-                                    <div className="tp-ref-direct-actions">
-                                      <button
-                                        type="button"
-                                        className="tp-ref-mini-btn"
-                                        onClick={() => handleCopyCategoryLink(cat)}
-                                        title="Copy Link"
-                                      >
-                                        {isCopied ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
-                                      </button>
-                                      <a
-                                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="tp-ref-mini-btn whatsapp"
-                                        title="Share on WhatsApp"
-                                      >
-                                        <Send size={13} />
-                                      </a>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => setIsReferralModalOpen(false)}
-                            style={{
-                              width: '100%',
-                              padding: '0.7rem',
-                              marginTop: '0.8rem',
-                              background: 'transparent',
-                              border: 'none',
-                              color: '#64748b',
-                              fontWeight: 700,
-                              fontSize: '0.82rem',
-                              cursor: 'pointer'
-                            }}
-                          >
-                            Close
-                          </button>
-                        </div>
-                      );
-                    })()}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>,
-                document.body
-              )}
+
+                  <button
+                    type="button"
+                    onClick={() => setIsReferralModalOpen(false)}
+                    style={{
+                      width: '100%',
+                      padding: '0.7rem',
+                      marginTop: '0.8rem',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#64748b',
+                      fontWeight: 700,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+              );
+            })()}
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Floating Interactive Toast for Registration & Profile Completion Prompt (Mounted via Portal to Screen Body) */}
       {floatingToast && !selectedItem && !isTripPackagesModalOpen && !isRoleModalOpen && !isVideoModalOpen && !isFilterModalOpen && !isAuthModalOpen && !isMobileMenuOpen && !isInstantRideModalOpen && !stripeModalItem && !lightboxItem && !isReferralModalOpen && typeof document !== 'undefined' && createPortal(

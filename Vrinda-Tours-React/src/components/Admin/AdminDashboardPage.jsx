@@ -1917,7 +1917,29 @@ export default function AdminDashboardPage({
                                     {isMe ? 'Vrinda Vihar Desk (You)' : isBot ? 'Concierge Bot' : (m.sender_name || 'Devotee')}
                                   </span>
                                   <div className="dmd-chat-bubble-box">
-                                    {m.message}
+                                    {(() => {
+                                      const text = m.message || m.text || '';
+                                      if (text.includes('•')) {
+                                        const parts = text.split('•').map(p => p.trim()).filter(Boolean);
+                                        return (
+                                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            {parts.map((p, pIdx) => (
+                                              <div 
+                                                key={pIdx} 
+                                                style={{ 
+                                                  fontSize: pIdx === 0 ? '0.88rem' : '0.8rem', 
+                                                  fontWeight: pIdx === 0 ? 800 : 500,
+                                                  color: pIdx === 0 ? '#15803d' : 'inherit'
+                                                }}
+                                              >
+                                                {p.replace(/\*/g, '')}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        );
+                                      }
+                                      return text;
+                                    })()}
                                   </div>
                                 </div>
                               );
