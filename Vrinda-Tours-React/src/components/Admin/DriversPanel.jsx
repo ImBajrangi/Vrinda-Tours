@@ -170,6 +170,11 @@ export default function DriversPanel({
                           <span className={`di-dot-indicator ${status}`} />
                           {status === 'available' ? 'Available' : (status === 'busy' ? 'Busy' : 'Offline')}
                         </span>
+                        {d.commissionDue > 0 && (
+                          <span style={{ marginLeft: '4px', fontSize: '0.68rem', fontWeight: 800, color: '#e11d48', background: '#ffe4e6', padding: '1px 6px', borderRadius: '4px' }}>
+                            Due: ₹{d.commissionDue}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="di-actions">

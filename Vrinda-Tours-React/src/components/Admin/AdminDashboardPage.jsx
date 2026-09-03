@@ -12,7 +12,8 @@ import {
   ChevronRightIcon, ArrowLeftIcon, CheckBadgeIcon,
   ArrowTrendingUpIcon, ServerStackIcon, BoltIcon,
   EnvelopeIcon, CheckIcon, ClipboardDocumentIcon,
-  ArrowUpRightIcon, SparklesIcon as SparklesSolid, SignalIcon
+  ArrowUpRightIcon, SparklesIcon as SparklesSolid, SignalIcon,
+  DocumentTextIcon, XCircleIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
 import { 
@@ -20,9 +21,16 @@ import {
   onSnapshot, query as firestoreQuery, orderBy, limit as firestoreLimit 
 } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
-import { supabase } from '../../config/supabase';
-import { getPaymentsHistory, formatINR, STRIPE_PUBLISHABLE_KEY } from '../../services/stripeService';
-import { getAllSupportThreads, sendAdminReply, updateThreadStatus } from '../../services/messagingService';
+import { supabase, safeRemoveChannel } from '../../config/supabase';
+import { getPaymentsHistory, formatINR, STRIPE_PUBLISHABLE_KEY, subscribeToPayments } from '../../services/stripeService';
+import { getAllSupportThreads, sendAdminReply, updateThreadStatus, subscribeToAdminInbox, approveSupportRequest, rejectSupportRequest, inquireSupportRequest } from '../../services/messagingService';
+import { 
+  approveSettlement, 
+  rejectSettlement, 
+  subscribeToAllSettlements, 
+  manuallyAdjustDriverDue,
+  ADMIN_PAYMENT_CONFIG 
+} from '../../services/commissionService';
 import './AdminDashboardPage.css';
 
 // Admin email whitelist and master passcode
@@ -85,6 +93,14 @@ export default function AdminDashboardPage({
   const [supportSearch, setSupportSearch] = useState('');
   const [isLoadingData, setIsLoadingData] = useState(false);
 
+  const adminChatEndRef = useRef(null);
+  const hasAutoSelectedRef = useRef(false);
+  const selectedThreadIdRef = useRef(selectedThreadId);
+
+  useEffect(() => {
+    selectedThreadIdRef.current = selectedThreadId;
+  }, [selectedThreadId]);
+
   // Telemetry Metrics (Computed dynamically)
   const [telemetry, setTelemetry] = useState({
     supabaseLatency: 24,
@@ -102,9 +118,77 @@ export default function AdminDashboardPage({
   const [copiedId, setCopiedId] = useState(null);
   const [newBroadcastText, setNewBroadcastText] = useState('');
 
+  // Driver Commission & UTR Settlement State
+  const [settlements, setSettlements] = useState([]);
+  const [paymentsSubTab, setPaymentsSubTab] = useState('driver_commissions'); // 'driver_commissions' | 'stripe_payments'
+  const [settlementFilter, setSettlementFilter] = useState('all'); // 'all' | 'pending' | 'approved' | 'rejected'
+  const [settlementSearch, setSettlementSearch] = useState('');
+  const [approvingSettlementId, setApprovingSettlementId] = useState(null);
+  const [rejectingSettlementModal, setRejectingSettlementModal] = useState({ open: false, settlement: null, reason: 'पैसे बैंक खाते में प्राप्त नहीं हुए (Payment not received in bank account)', customReason: '' });
+  const [proofPreviewModal, setProofPreviewModal] = useState(null);
+  const [manualAdjustModal, setManualAdjustModal] = useState({ open: false, driver: null, newAmount: '', reason: '' });
+
+  // Subscribe to all settlements in real-time
+  useEffect(() => {
+    const unsub = subscribeToAllSettlements((list) => {
+      setSettlements(list);
+    });
+    return () => unsub();
+  }, []);
+
   const showToast = (msg, type = 'success') => {
     setToastMsg({ text: msg, type });
     setTimeout(() => setToastMsg(null), 3200);
+  };
+
+  const handleApproveSettlement = async (settlement) => {
+    if (!settlement?.id) return;
+    setApprovingSettlementId(settlement.id);
+    try {
+      await approveSettlement(settlement.id, 'Verified in bank account by Admin');
+      showToast(`✓ UTR ${settlement.utrNumber} Approved! ₹${settlement.amount} deducted from ${settlement.driverName}'s due.`);
+    } catch (err) {
+      showToast(err.message || 'Failed to approve settlement', 'error');
+    } finally {
+      setApprovingSettlementId(null);
+    }
+  };
+
+  const handleOpenRejectModal = (settlement) => {
+    setRejectingSettlementModal({
+      open: true,
+      settlement,
+      reason: 'पैसे बैंक खाते में प्राप्त नहीं हुए (Payment not received in bank account)',
+      customReason: ''
+    });
+  };
+
+  const handleConfirmRejectSettlement = async (e) => {
+    e.preventDefault();
+    const { settlement, reason, customReason } = rejectingSettlementModal;
+    if (!settlement?.id) return;
+    
+    const finalReason = reason === 'custom' ? (customReason.trim() || 'Payment not verified') : reason;
+    try {
+      await rejectSettlement(settlement.id, finalReason, 'Rejected by Admin');
+      showToast(`✗ UTR ${settlement.utrNumber} Rejected. Rejection note recorded.`, 'error');
+      setRejectingSettlementModal({ open: false, settlement: null, reason: '', customReason: '' });
+    } catch (err) {
+      showToast(err.message || 'Failed to reject settlement', 'error');
+    }
+  };
+
+  const handleManualAdjustSubmit = async (e) => {
+    e.preventDefault();
+    const { driver, newAmount, reason } = manualAdjustModal;
+    if (!driver?.id) return;
+    try {
+      await manuallyAdjustDriverDue(driver.id, newAmount, reason || 'Manual Admin Override');
+      showToast(`✓ Updated ${driver.name}'s commission due to ₹${newAmount}.`);
+      setManualAdjustModal({ open: false, driver: null, newAmount: '', reason: '' });
+    } catch (err) {
+      showToast(err.message || 'Failed to update balance', 'error');
+    }
   };
 
   const copyToClipboard = (text, id) => {
@@ -211,8 +295,11 @@ export default function AdminDashboardPage({
       const threads = await getAllSupportThreads();
       if (threads) {
         setSupportThreads(threads);
-        if (threads.length > 0 && !selectedThreadId) {
-          setSelectedThreadId(threads[0].thread_id);
+        if (threads.length > 0 && !selectedThreadIdRef.current && !hasAutoSelectedRef.current) {
+          if (typeof window !== 'undefined' && window.innerWidth > 900) {
+            hasAutoSelectedRef.current = true;
+            setSelectedThreadId(threads[0].thread_id);
+          }
         }
       }
 
@@ -228,7 +315,17 @@ export default function AdminDashboardPage({
     } finally {
       setIsLoadingData(false);
     }
-  }, [selectedThreadId]);
+  }, []);
+
+  // Auto-scroll admin chat stream when thread or messages change
+  useEffect(() => {
+    if (selectedThreadId) {
+      const timer = setTimeout(() => {
+        adminChatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 60);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedThreadId, supportThreads]);
 
   // 3. Real-Time Supabase WebSocket Subscriptions + Firestore onSnapshot Listeners
   useEffect(() => {
@@ -240,6 +337,7 @@ export default function AdminDashboardPage({
     // A. Supabase Real-time Channel (0ms live updates)
     const supaChannel = supabase
       .channel('admin_realtime_stream')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'partners' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_requests' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'room_bookings' }, () => fetchAllData())
@@ -256,7 +354,55 @@ export default function AdminDashboardPage({
         }
       });
 
-    // B. Real-time Announcements Listener (with resilient fallback)
+    // B. Real-Time Bi-Directional Devotee Chat Inbox Subscription (<20ms instant sync)
+    const unsubInbox = subscribeToAdminInbox((eventPayload) => {
+      if (eventPayload?.thread_id && eventPayload?.message) {
+        setSupportThreads(prev => {
+          const existing = prev.find(t => t.thread_id === eventPayload.thread_id);
+          if (existing) {
+            return prev.map(t => {
+              if (t.thread_id === eventPayload.thread_id) {
+                const hasMsg = t.messages.some(m => m.id === eventPayload.id);
+                return {
+                  ...t,
+                  last_message: eventPayload.message,
+                  last_updated: eventPayload.created_at || new Date().toISOString(),
+                  messages: hasMsg ? t.messages : [...t.messages, eventPayload]
+                };
+              }
+              return t;
+            });
+          }
+          return [{
+            thread_id: eventPayload.thread_id,
+            sender_name: eventPayload.sender_name || 'Devotee Pilgrim',
+            sender_email: eventPayload.sender_email || '',
+            sender_phone: eventPayload.sender_phone || '',
+            status: 'open',
+            category: eventPayload.category || 'general',
+            last_message: eventPayload.message,
+            last_updated: eventPayload.created_at || new Date().toISOString(),
+            messages: [eventPayload]
+          }, ...prev];
+        });
+      } else {
+        getAllSupportThreads().then(threads => setSupportThreads(threads));
+      }
+    });
+
+    // C. Real-Time Stripe Payment Stream (<20ms live updates)
+    const unsubPayments = subscribeToPayments((paymentRecord) => {
+      if (paymentRecord) {
+        setPayments(prev => {
+          const id = paymentRecord.id || paymentRecord.transaction_id;
+          if (prev.some(p => (p.id || p.transaction_id) === id)) return prev;
+          return [paymentRecord, ...prev];
+        });
+        showToast(`💳 Live Stripe Payment: ${formatINR(paymentRecord.amount)} (${paymentRecord.customer_name || 'Devotee'})`);
+      }
+    });
+
+    // D. Real-time Announcements Listener (with resilient fallback)
     const startFs = performance.now();
     let unsubAnnouncements = () => {};
     try {
@@ -297,10 +443,12 @@ export default function AdminDashboardPage({
     }
 
     return () => {
-      supabase.removeChannel(supaChannel);
+      safeRemoveChannel(supaChannel);
+      unsubInbox();
+      unsubPayments();
       if (typeof unsubAnnouncements === 'function') unsubAnnouncements();
     };
-  }, [isLoggedIn, fetchAllData]);
+  }, [isLoggedIn]);
 
   // 4. Compute Volume Chart DYNAMICALLY from Real Database Records
   const dynamicVolumeAnalytics = useMemo(() => {
@@ -587,6 +735,96 @@ export default function AdminDashboardPage({
     showToast(`Thread marked as ${newStatus}`, 'success');
     const updated = await getAllSupportThreads();
     setSupportThreads(updated);
+  };
+
+  const handleApproveSupport = async (thread) => {
+    if (!thread) return;
+    try {
+      let title = 'Pilgrimage Service';
+      let requestType = thread.category || 'booking';
+      let entityId = null;
+      let entityTable = null;
+
+      const fullText = (thread.messages || []).map(m => m.message || m.text || '').join(' ');
+      if (fullText.includes('Package:')) {
+        const match = fullText.match(/Package:\s*([^\n•]+)/);
+        if (match) title = match[1].trim();
+      } else if (fullText.includes('Yatra:')) {
+        const match = fullText.match(/Yatra:\s*([^\n•]+)/);
+        if (match) title = match[1].trim();
+      } else if (thread.category === 'partner' || fullText.toLowerCase().includes('partner') || fullText.toLowerCase().includes('registration')) {
+        title = 'Partner Registration Application';
+        requestType = 'partner_registration';
+        entityTable = 'partners';
+      }
+
+      await approveSupportRequest({
+        threadId: thread.thread_id,
+        requestType,
+        entityId,
+        entityTable,
+        title,
+        adminName: 'Vrinda Operations',
+        notes: 'Verified & Approved by Vrinda Vihar Operations Desk. Priority concierge passes issued.'
+      });
+
+      showToast(`✅ Approved & Confirmed! Live confirmation pass sent to devotee chat.`);
+      const updated = await getAllSupportThreads();
+      setSupportThreads(updated);
+      fetchAllData();
+    } catch (err) {
+      showToast('Error approving request: ' + err.message, 'error');
+    }
+  };
+
+  const handleRejectSupport = async (thread) => {
+    if (!thread) return;
+    try {
+      const reason = window.prompt('Enter reason for declining this request (optional):', 'Selected date slot is unavailable. Please choose another date or contact desk.') || 'Selected slot unavailable';
+
+      let title = 'Pilgrimage Service';
+      const fullText = (thread.messages || []).map(m => m.message || m.text || '').join(' ');
+      if (fullText.includes('Package:')) {
+        const match = fullText.match(/Package:\s*([^\n•]+)/);
+        if (match) title = match[1].trim();
+      }
+
+      await rejectSupportRequest({
+        threadId: thread.thread_id,
+        requestType: thread.category || 'booking',
+        title,
+        adminName: 'Vrinda Operations',
+        reason
+      });
+
+      showToast(`❌ Request marked as declined and user notified in chat.`);
+      const updated = await getAllSupportThreads();
+      setSupportThreads(updated);
+      fetchAllData();
+    } catch (err) {
+      showToast('Error declining request', 'error');
+    }
+  };
+
+  const handleInquireSupport = async (thread, defaultPrompt = null) => {
+    if (!thread) return;
+    try {
+      const promptText = defaultPrompt || window.prompt('Enter details or documents required from devotee / applicant:', 'Please share your ID proof / exact party count to finalize your confirmation.') || 'Please share your ID proof to confirm.';
+
+      await inquireSupportRequest({
+        threadId: thread.thread_id,
+        requestType: thread.category || 'booking',
+        title: 'Pilgrimage Service Verification',
+        adminName: 'Vrinda Operations',
+        inquiryText: promptText
+      });
+
+      showToast(`📋 Inquiry dispatched directly to devotee chat.`);
+      const updated = await getAllSupportThreads();
+      setSupportThreads(updated);
+    } catch (err) {
+      showToast('Error sending inquiry', 'error');
+    }
   };
 
   // POI CRUD State & Handlers
@@ -1703,95 +1941,640 @@ export default function AdminDashboardPage({
               </div>
             )}
 
-            {/* TAB 7: STRIPE PAYMENTS */}
+            {/* TAB 7: PAYMENTS & DRIVER COMMISSION SETTLEMENTS */}
             {activeTab === 'payments' && (
               <div className="dmd-admin-fade">
-                
-                {/* Revenue Banner (Editorial Dark Block) */}
-                <div className="dmd-stripe-editorial-banner">
-                  <div>
-                    <span className="dmd-stripe-tag">STRIPE GATEWAY SETTLEMENT</span>
-                    <h1 className="dmd-stripe-amount">
-                      {formatINR(payments.reduce((s, p) => s + (p.amount || 0), 0))}
-                    </h1>
-                    <small>Verified transactions with instant digital voucher issuance</small>
-                  </div>
-                  <button type="button" className="dmd-action-btn" onClick={fetchAllData}>
-                    <ArrowPathIcon style={{ width: 15, height: 15 }} /> Refresh Transactions
+                {/* Sub-tab Navigation */}
+                <div className="dmd-payments-subtab-bar">
+                  <button 
+                    type="button" 
+                    className={`dmd-subtab-btn ${paymentsSubTab === 'driver_commissions' ? 'active' : ''}`}
+                    onClick={() => setPaymentsSubTab('driver_commissions')}
+                  >
+                    <TruckIcon style={{ width: 16, height: 16 }} />
+                    <span>Driver Commission &amp; UTR Verifications</span>
+                    {pendingSettlements.length > 0 && (
+                      <span className="dmd-subtab-badge pulse">{pendingSettlements.length} Pending</span>
+                    )}
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`dmd-subtab-btn ${paymentsSubTab === 'stripe_payments' ? 'active' : ''}`}
+                    onClick={() => setPaymentsSubTab('stripe_payments')}
+                  >
+                    <CreditCardIcon style={{ width: 16, height: 16 }} />
+                    <span>Devotee Stripe Yatra Bookings ({payments.length})</span>
                   </button>
                 </div>
 
-                <div className="dmd-table-wrapper" style={{ marginTop: '20px' }}>
-                  <table className="dmd-data-table">
-                    <thead>
-                      <tr>
-                        <th>Transaction ID</th>
-                        <th>Devotee / Customer</th>
-                        <th>Package / Stay</th>
-                        <th>Amount</th>
-                        <th>Payment Method</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {payments.length === 0 ? (
-                        <tr>
-                          <td colSpan="7" style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>
-                            <CreditCardIcon style={{ width: 40, height: 40, margin: '0 auto 10px', color: '#000000' }} />
-                            <p style={{ margin: '0 0 4px 0', fontWeight: 800, color: '#000000', fontSize: '1rem' }}>
-                              No Stripe Transactions Recorded Yet
-                            </p>
-                            <small>When devotees book yatra packages, verified receipts appear here automatically.</small>
-                          </td>
-                        </tr>
+                {paymentsSubTab === 'driver_commissions' ? (
+                  <div className="dmd-driver-comm-view">
+                    {/* KPI Metric Cards */}
+                    <div className="dmd-comm-kpis-grid">
+                      <div className="dmd-comm-kpi-card highlight-due">
+                        <div className="dmd-kpi-top">
+                          <span className="dmd-kpi-label">कुल बकाया ड्राइवर कमीशन</span>
+                          <span className="dmd-kpi-badge due">Pending Dues</span>
+                        </div>
+                        <h2 className="dmd-kpi-val due">₹{totalCommissionDue}</h2>
+                        <small className="dmd-kpi-sub">Across {drivers.length} registered vehicle drivers (10% rate)</small>
+                      </div>
+
+                      <div className="dmd-comm-kpi-card">
+                        <div className="dmd-kpi-top">
+                          <span className="dmd-kpi-label">सत्यापित व प्राप्त कमीशन</span>
+                          <span className="dmd-kpi-badge settled">Approved</span>
+                        </div>
+                        <h2 className="dmd-kpi-val settled">₹{totalCommissionSettled}</h2>
+                        <small className="dmd-kpi-sub">{approvedSettlements.length} UTR transactions settled in bank</small>
+                      </div>
+
+                      <div className="dmd-comm-kpi-card">
+                        <div className="dmd-kpi-top">
+                          <span className="dmd-kpi-label">सत्यापन प्रतीक्षा सूची</span>
+                          <span className="dmd-kpi-badge pending">Action Needed</span>
+                        </div>
+                        <h2 className="dmd-kpi-val pending">{pendingSettlements.length}</h2>
+                        <small className="dmd-kpi-sub">Drivers waiting for UTR approval/balance clearance</small>
+                      </div>
+
+                      <div className="dmd-comm-kpi-card">
+                        <div className="dmd-kpi-top">
+                          <span className="dmd-kpi-label">कुल पंजीकृत सारथी (Drivers)</span>
+                          <span className="dmd-kpi-badge verified">Active Fleet</span>
+                        </div>
+                        <h2 className="dmd-kpi-val">{drivers.length}</h2>
+                        <small className="dmd-kpi-sub">Taxis, Bikes, Autos &amp; E-Rickshaws in Vrindavan</small>
+                      </div>
+                    </div>
+
+                    {/* PENDING UTR APPROVALS QUEUE */}
+                    <div className="dmd-pending-utr-section">
+                      <div className="dmd-section-header-bar">
+                        <div className="dmd-shb-left">
+                          <div className="dmd-pulse-icon-circle">
+                            <ClockIcon style={{ width: 16, height: 16, color: '#f59e0b' }} />
+                          </div>
+                          <div>
+                            <h3 className="dmd-section-heading">Pending UTR Verification Requests</h3>
+                            <span className="dmd-section-subheading">Verify amount in bank SMS/app then 1-Click Approve to clear driver's due balance</span>
+                          </div>
+                        </div>
+                        <span className="dmd-count-pill">{pendingSettlements.length} Pending</span>
+                      </div>
+
+                      {pendingSettlements.length === 0 ? (
+                        <div className="dmd-comm-empty-queue">
+                          <CheckCircleIcon style={{ width: 36, height: 36, color: '#16a34a' }} />
+                          <h4>All Driver UTRs are Verified &amp; Up to Date!</h4>
+                          <p>When drivers pay online and submit UTR / transaction IDs, they appear here for 1-click verification.</p>
+                        </div>
                       ) : (
-                        payments.map((p, idx) => {
-                          const txnId = p.transaction_id || p.id || `txn_${idx}`;
-                          return (
-                            <tr key={txnId}>
-                              <td>
-                                <div className="dmd-copy-id-wrap" onClick={() => copyToClipboard(txnId, txnId)}>
-                                  <code className="dmd-coord-pill">{txnId.slice(0, 16)}...</code>
-                                  {copiedId === txnId ? (
-                                    <CheckIcon style={{ width: 12, height: 12, color: '#16a34a' }} />
-                                  ) : (
-                                    <ClipboardDocumentIcon style={{ width: 12, height: 12, color: '#94a3b8' }} />
-                                  )}
+                        <div className="dmd-pending-cards-grid">
+                          {pendingSettlements.map((s) => {
+                            const driverRecord = drivers.find(d => d.id === s.driverId);
+                            const currentDue = driverRecord?.commissionDue || 0;
+                            const isApproving = approvingSettlementId === s.id;
+
+                            return (
+                              <div key={s.id} className="dmd-pending-utr-card">
+                                <div className="dmd-puc-top">
+                                  <div className="dmd-puc-driver">
+                                    <div className="dmd-puc-avatar">
+                                      <img 
+                                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(s.driverName || 'Driver')}&backgroundColor=f1f5f9`} 
+                                        alt={s.driverName} 
+                                      />
+                                    </div>
+                                    <div>
+                                      <h4 className="dmd-puc-name">{s.driverName}</h4>
+                                      <span className="dmd-puc-sub">{s.vehicleType || 'Vehicle'} • {s.vehicleNo || 'UP-85'} • {s.driverPhone}</span>
+                                    </div>
+                                  </div>
+                                  <span className="dmd-puc-badge pending">● Pending Verification</span>
                                 </div>
-                              </td>
-                              <td>
-                                <strong>{p.customer_name || 'Guest Devotee'}</strong>
-                                <span className="dmd-cell-sub">{p.customer_email || p.customer_phone || 'Direct'}</span>
-                              </td>
-                              <td>
-                                <strong>{p.item_title || 'Brij Yatra Package'}</strong>
-                              </td>
-                              <td>
-                                <strong style={{ color: '#16a34a', fontSize: '0.98rem' }}>{formatINR(p.amount)}</strong>
-                              </td>
-                              <td>
-                                <span className="dmd-cell-sub">
-                                  {p.payment_method === 'stripe_card' ? `Card (•••• ${p.card_last4 || '4242'})` : p.payment_method || 'Card'}
-                                </span>
-                              </td>
-                              <td>
-                                <span className="dmd-verify-pill verified">
-                                  <CheckCircleIcon style={{ width: 12, height: 12 }} />
-                                  {p.status || 'Succeeded'}
-                                </span>
-                              </td>
-                              <td>
-                                <span className="dmd-cell-sub">
-                                  {p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
-                                </span>
+
+                                <div className="dmd-puc-details-grid">
+                                  <div className="dmd-puc-detail-box">
+                                    <small>Claimed Amount Paid</small>
+                                    <strong className="dmd-amount-green">₹{s.amount}</strong>
+                                  </div>
+                                  <div className="dmd-puc-detail-box">
+                                    <small>Current Due (बकाया)</small>
+                                    <strong className="dmd-amount-due">₹{currentDue}</strong>
+                                  </div>
+                                  <div className="dmd-puc-detail-box">
+                                    <small>Balance After Approval</small>
+                                    <strong style={{ color: '#09090b' }}>₹{Math.max(0, currentDue - s.amount)}</strong>
+                                  </div>
+                                </div>
+
+                                <div className="dmd-puc-utr-row">
+                                  <div className="dmd-utr-code-wrap">
+                                    <small>12-DIGIT UTR / TRANSACTION ID</small>
+                                    <div className="dmd-code-copy-flex">
+                                      <code className="dmd-utr-text">{s.utrNumber}</code>
+                                      <button 
+                                        type="button" 
+                                        className="dmd-btn-copy-utr" 
+                                        onClick={() => copyToClipboard(s.utrNumber, `utr_${s.id}`)}
+                                        title="Copy UTR to verify in Bank App"
+                                      >
+                                        {copiedId === `utr_${s.id}` ? <CheckIcon style={{ width: 14, height: 14, color: '#16a34a' }} /> : <ClipboardDocumentIcon style={{ width: 14, height: 14 }} />}
+                                        <span>{copiedId === `utr_${s.id}` ? 'Copied' : 'Copy'}</span>
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="dmd-puc-mode-wrap">
+                                    <span className="dmd-pay-mode-tag">{s.paymentMethod || 'UPI'}</span>
+                                    <span className="dmd-puc-time">{formatRelativeTime(s.createdAt)}</span>
+                                  </div>
+                                </div>
+
+                                {s.proofImage && (
+                                  <div className="dmd-puc-proof-row">
+                                    <button 
+                                      type="button" 
+                                      className="dmd-btn-view-proof"
+                                      onClick={() => setProofPreviewModal(s.proofImage)}
+                                    >
+                                      <EyeIcon style={{ width: 14, height: 14 }} /> View Payment Screenshot
+                                    </button>
+                                  </div>
+                                )}
+
+                                {s.notes && (
+                                  <div className="dmd-puc-note-box">
+                                    <DocumentTextIcon style={{ width: 14, height: 14, color: '#64748b' }} />
+                                    <span>"{s.notes}"</span>
+                                  </div>
+                                )}
+
+                                <div className="dmd-puc-actions">
+                                  <button 
+                                    type="button" 
+                                    className="dmd-btn-reject-utr"
+                                    onClick={() => handleOpenRejectModal(s)}
+                                    title="Reject payment (e.g. money not received in bank)"
+                                  >
+                                    <XCircleIcon style={{ width: 16, height: 16 }} />
+                                    <span>Reject (पैसे नहीं आए)</span>
+                                  </button>
+                                  <button 
+                                    type="button" 
+                                    className="dmd-btn-approve-utr"
+                                    onClick={() => handleApproveSettlement(s)}
+                                    disabled={isApproving}
+                                    title="Approve and deduct from driver's outstanding balance"
+                                  >
+                                    <CheckCircleIcon style={{ width: 16, height: 16 }} />
+                                    <span>{isApproving ? 'Approving...' : `Approve & Clear ₹${s.amount}`}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* SETTLEMENTS HISTORY & AUDIT LOG */}
+                    <div className="dmd-comm-table-section">
+                      <div className="dmd-table-header-controls">
+                        <div>
+                          <h3 className="dmd-section-heading">All Commission Settlements &amp; UTR Audit Log</h3>
+                          <span className="dmd-section-subheading">Complete immutable ledger of all driver payment submissions and approvals</span>
+                        </div>
+
+                        <div className="dmd-table-filter-group">
+                          <div className="dmd-filter-chips">
+                            {['all', 'pending', 'approved', 'rejected'].map(f => (
+                              <button
+                                key={f}
+                                type="button"
+                                className={`dmd-fchip ${settlementFilter === f ? 'active' : ''}`}
+                                onClick={() => setSettlementFilter(f)}
+                              >
+                                {f.toUpperCase()}
+                              </button>
+                            ))}
+                          </div>
+
+                          <div className="dmd-search-pill-box">
+                            <MagnifyingGlassIcon style={{ width: 14, height: 14, color: '#64748b' }} />
+                            <input 
+                              type="text" 
+                              placeholder="Search by UTR, driver, phone..." 
+                              value={settlementSearch}
+                              onChange={(e) => setSettlementSearch(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="dmd-table-wrapper" style={{ marginTop: '14px' }}>
+                        <table className="dmd-data-table">
+                          <thead>
+                            <tr>
+                              <th>UTR / Transaction ID</th>
+                              <th>Driver Partner</th>
+                              <th>Vehicle Type</th>
+                              <th>Amount Paid</th>
+                              <th>Method</th>
+                              <th>Status</th>
+                              <th>Date</th>
+                              <th>Proof</th>
+                              <th>Admin Review / Notes</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredSettlements.length === 0 ? (
+                              <tr>
+                                <td colSpan="9" style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                  No settlements found matching the criteria.
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredSettlements.map((s) => (
+                                <tr key={s.id}>
+                                  <td>
+                                    <div className="dmd-copy-id-wrap" onClick={() => copyToClipboard(s.utrNumber, `tbl_${s.id}`)}>
+                                      <code className="dmd-coord-pill">{s.utrNumber}</code>
+                                      {copiedId === `tbl_${s.id}` ? (
+                                        <CheckIcon style={{ width: 12, height: 12, color: '#16a34a' }} />
+                                      ) : (
+                                        <ClipboardDocumentIcon style={{ width: 12, height: 12, color: '#94a3b8' }} />
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <strong>{s.driverName}</strong>
+                                    <span className="dmd-cell-sub">{s.driverPhone}</span>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">{s.vehicleType} • {s.vehicleNo}</span>
+                                  </td>
+                                  <td>
+                                    <strong style={{ color: '#16a34a', fontSize: '0.96rem' }}>₹{s.amount}</strong>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">{s.paymentMethod || 'UPI'}</span>
+                                  </td>
+                                  <td>
+                                    <span className={`dmd-verify-pill ${s.status === 'approved' ? 'verified' : s.status === 'rejected' ? 'rejected' : 'pending'}`}>
+                                      {s.status === 'approved' ? '✓ Approved' : s.status === 'rejected' ? '✗ Rejected' : '● Pending'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">
+                                      {s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    {s.proofImage ? (
+                                      <button 
+                                        type="button" 
+                                        className="dmd-tbl-view-img-btn"
+                                        onClick={() => setProofPreviewModal(s.proofImage)}
+                                      >
+                                        <EyeIcon style={{ width: 13, height: 13 }} /> View
+                                      </button>
+                                    ) : (
+                                      <span className="dmd-cell-sub">—</span>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">
+                                      {s.status === 'rejected' ? (
+                                        <span style={{ color: '#dc2626', fontWeight: 600 }}>{s.rejectionReason || 'Payment not received'}</span>
+                                      ) : s.status === 'approved' ? (
+                                        <span style={{ color: '#16a34a', fontWeight: 600 }}>Balance cleared by Admin</span>
+                                      ) : (
+                                        <span style={{ color: '#d97706' }}>Awaiting verification</span>
+                                      )}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* DRIVERS COMMISSION BALANCES TABLE */}
+                    <div className="dmd-comm-table-section" style={{ marginTop: '24px' }}>
+                      <div className="dmd-section-header-bar">
+                        <div className="dmd-shb-left">
+                          <TruckIcon style={{ width: 18, height: 18, color: '#09090b' }} />
+                          <div>
+                            <h3 className="dmd-section-heading">Driver Commission Balances &amp; Dues Ledger</h3>
+                            <span className="dmd-section-subheading">Live balance overview of every driver partner with direct manual override</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="dmd-table-wrapper" style={{ marginTop: '14px' }}>
+                        <table className="dmd-data-table">
+                          <thead>
+                            <tr>
+                              <th>Driver Partner</th>
+                              <th>Vehicle Type &amp; Reg</th>
+                              <th>Phone</th>
+                              <th>Total Cash Collected</th>
+                              <th>Outstanding Commission Due</th>
+                              <th>Total Settled (Paid)</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {drivers.length === 0 ? (
+                              <tr>
+                                <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                  No drivers registered yet.
+                                </td>
+                              </tr>
+                            ) : (
+                              drivers.map((d) => {
+                                const due = d.commissionDue || 0;
+                                return (
+                                  <tr key={d.id}>
+                                    <td>
+                                      <strong>{d.name}</strong>
+                                      <span className="dmd-cell-sub">★ {d.rating || '4.9'}</span>
+                                    </td>
+                                    <td>
+                                      <strong>{d.vehicleType || 'E-Rickshaw'}</strong>
+                                      <span className="dmd-cell-sub">{d.vehicleNo || 'UP-85'}</span>
+                                    </td>
+                                    <td>
+                                      <span>{d.phone || '—'}</span>
+                                    </td>
+                                    <td>
+                                      <strong>₹{d.totalCashCollected || 0}</strong>
+                                    </td>
+                                    <td>
+                                      <strong style={{ color: due > 0 ? '#e11d48' : '#16a34a', fontSize: '1rem' }}>
+                                        ₹{due}
+                                      </strong>
+                                    </td>
+                                    <td>
+                                      <span style={{ color: '#16a34a', fontWeight: 700 }}>₹{d.totalCommissionPaid || 0}</span>
+                                    </td>
+                                    <td>
+                                      <button 
+                                        type="button" 
+                                        className="dmd-action-btn-sm"
+                                        onClick={() => setManualAdjustModal({ open: true, driver: d, newAmount: String(due), reason: '' })}
+                                        title="Manually adjust commission balance"
+                                      >
+                                        <PencilSquareIcon style={{ width: 13, height: 13 }} /> Adjust Due
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* STRIPE DEVOTEE YATRA PAYMENTS SUBTAB */
+                  <div>
+                    {/* Revenue Banner (Editorial Dark Block) */}
+                    <div className="dmd-stripe-editorial-banner">
+                      <div>
+                        <span className="dmd-stripe-tag">STRIPE GATEWAY SETTLEMENT</span>
+                        <h1 className="dmd-stripe-amount">
+                          {formatINR(payments.reduce((s, p) => s + (p.amount || 0), 0))}
+                        </h1>
+                        <small>Verified transactions with instant digital voucher issuance</small>
+                      </div>
+                      <button type="button" className="dmd-action-btn" onClick={fetchAllData}>
+                        <ArrowPathIcon style={{ width: 15, height: 15 }} /> Refresh Transactions
+                      </button>
+                    </div>
+
+                    <div className="dmd-table-wrapper" style={{ marginTop: '20px' }}>
+                      <table className="dmd-data-table">
+                        <thead>
+                          <tr>
+                            <th>Transaction ID</th>
+                            <th>Devotee / Customer</th>
+                            <th>Package / Stay</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {payments.length === 0 ? (
+                            <tr>
+                              <td colSpan="7" style={{ textAlign: 'center', padding: '4rem', color: '#64748b' }}>
+                                <CreditCardIcon style={{ width: 40, height: 40, margin: '0 auto 10px', color: '#000000' }} />
+                                <p style={{ margin: '0 0 4px 0', fontWeight: 800, color: '#000000', fontSize: '1rem' }}>
+                                  No Stripe Transactions Recorded Yet
+                                </p>
+                                <small>When devotees book yatra packages, verified receipts appear here automatically.</small>
                               </td>
                             </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
+                          ) : (
+                            payments.map((p, idx) => {
+                              const txnId = p.transaction_id || p.id || `txn_${idx}`;
+                              return (
+                                <tr key={txnId}>
+                                  <td>
+                                    <div className="dmd-copy-id-wrap" onClick={() => copyToClipboard(txnId, txnId)}>
+                                      <code className="dmd-coord-pill">{txnId.slice(0, 16)}...</code>
+                                      {copiedId === txnId ? (
+                                        <CheckIcon style={{ width: 12, height: 12, color: '#16a34a' }} />
+                                      ) : (
+                                        <ClipboardDocumentIcon style={{ width: 12, height: 12, color: '#94a3b8' }} />
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <strong>{p.customer_name || 'Guest Devotee'}</strong>
+                                    <span className="dmd-cell-sub">{p.customer_email || p.customer_phone || 'Direct'}</span>
+                                  </td>
+                                  <td>
+                                    <strong>{p.item_title || 'Brij Yatra Package'}</strong>
+                                  </td>
+                                  <td>
+                                    <strong style={{ color: '#16a34a', fontSize: '0.98rem' }}>{formatINR(p.amount)}</strong>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">
+                                      {p.payment_method === 'stripe_card' ? `Card (•••• ${p.card_last4 || '4242'})` : p.payment_method || 'Card'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-verify-pill verified">
+                                      <CheckCircleIcon style={{ width: 12, height: 12 }} />
+                                      {p.status || 'Succeeded'}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <span className="dmd-cell-sub">
+                                      {p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* REJECTION REASON MODAL */}
+            {rejectingSettlementModal.open && (
+              <div className="dmd-modal-overlay" onClick={() => setRejectingSettlementModal({ open: false, settlement: null, reason: '', customReason: '' })}>
+                <div className="dmd-modal-card" onClick={e => e.stopPropagation()}>
+                  <div className="dmd-modal-header">
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Reject Payment UTR (अस्वीकार करें)</h3>
+                      <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Driver: {rejectingSettlementModal.settlement?.driverName} • Amount: ₹{rejectingSettlementModal.settlement?.amount}</span>
+                    </div>
+                    <button type="button" className="dmd-modal-close" onClick={() => setRejectingSettlementModal({ open: false, settlement: null, reason: '', customReason: '' })}>
+                      <XMarkIcon style={{ width: 18, height: 18 }} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleConfirmRejectSettlement} className="dmd-modal-body">
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#334155' }}>
+                      Select the reason for rejecting this UTR (<strong>{rejectingSettlementModal.settlement?.utrNumber}</strong>). The driver will be notified and their due balance will not be deducted.
+                    </p>
+
+                    <div className="dmd-reject-reasons-list">
+                      {[
+                        'पैसे बैंक खाते में प्राप्त नहीं हुए (Payment not received in bank account)',
+                        'गलत UTR नंबर / रसीद अमान्य (Invalid UTR or Fake receipt)',
+                        'भुगतान राशि बेमेल (Amount mismatch)',
+                        'custom'
+                      ].map((r) => (
+                        <label key={r} className="dmd-radio-option">
+                          <input 
+                            type="radio" 
+                            name="rejectReason" 
+                            checked={rejectingSettlementModal.reason === r} 
+                            onChange={() => setRejectingSettlementModal(prev => ({ ...prev, reason: r }))}
+                          />
+                          <span>{r === 'custom' ? 'Other custom reason (अन्य कारण)...' : r}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {rejectingSettlementModal.reason === 'custom' && (
+                      <textarea
+                        rows={3}
+                        placeholder="Type rejection reason for driver..."
+                        value={rejectingSettlementModal.customReason}
+                        onChange={(e) => setRejectingSettlementModal(prev => ({ ...prev, customReason: e.target.value }))}
+                        className="dmd-textarea"
+                        required
+                      />
+                    )}
+
+                    <div className="dmd-modal-actions">
+                      <button 
+                        type="button" 
+                        className="dmd-btn-cancel"
+                        onClick={() => setRejectingSettlementModal({ open: false, settlement: null, reason: '', customReason: '' })}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="dmd-btn-confirm-reject"
+                      >
+                        Confirm Rejection (अस्वीकार करें)
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {/* SCREENSHOT PROOF FULL PREVIEW MODAL */}
+            {proofPreviewModal && (
+              <div className="dmd-modal-overlay" onClick={() => setProofPreviewModal(null)}>
+                <div className="dmd-proof-modal-card" onClick={e => e.stopPropagation()}>
+                  <div className="dmd-modal-header">
+                    <h4 style={{ margin: 0 }}>Payment Screenshot Proof</h4>
+                    <button type="button" className="dmd-modal-close" onClick={() => setProofPreviewModal(null)}>
+                      <XMarkIcon style={{ width: 18, height: 18 }} />
+                    </button>
+                  </div>
+                  <div style={{ padding: '1rem', textAlign: 'center', maxHeight: '75vh', overflow: 'auto' }}>
+                    <img src={proofPreviewModal} alt="Payment Receipt" style={{ maxWidth: '100%', maxHeight: '65vh', borderRadius: '12px' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MANUAL ADJUST DRIVER DUE MODAL */}
+            {manualAdjustModal.open && (
+              <div className="dmd-modal-overlay" onClick={() => setManualAdjustModal({ open: false, driver: null, newAmount: '', reason: '' })}>
+                <div className="dmd-modal-card" onClick={e => e.stopPropagation()}>
+                  <div className="dmd-modal-header">
+                    <div>
+                      <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>Adjust Driver Commission Due</h3>
+                      <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Driver: {manualAdjustModal.driver?.name} ({manualAdjustModal.driver?.vehicleNo})</span>
+                    </div>
+                    <button type="button" className="dmd-modal-close" onClick={() => setManualAdjustModal({ open: false, driver: null, newAmount: '', reason: '' })}>
+                      <XMarkIcon style={{ width: 18, height: 18 }} />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleManualAdjustSubmit} className="dmd-modal-body">
+                    <div>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>New Outstanding Due Amount (₹)</label>
+                      <input 
+                        type="number" 
+                        min="0"
+                        value={manualAdjustModal.newAmount}
+                        onChange={(e) => setManualAdjustModal(prev => ({ ...prev, newAmount: e.target.value }))}
+                        className="dmd-input"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Reason for adjustment</label>
+                      <input 
+                        type="text" 
+                        value={manualAdjustModal.reason}
+                        onChange={(e) => setManualAdjustModal(prev => ({ ...prev, reason: e.target.value }))}
+                        placeholder="e.g. Manual cash settled at office"
+                        className="dmd-input"
+                      />
+                    </div>
+
+                    <div className="dmd-modal-actions">
+                      <button 
+                        type="button" 
+                        className="dmd-btn-cancel"
+                        onClick={() => setManualAdjustModal({ open: false, driver: null, newAmount: '', reason: '' })}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="dmd-btn-save"
+                      >
+                        Update Balance
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}
@@ -1812,7 +2595,7 @@ export default function AdminDashboardPage({
                 <div className="dmd-inbox-grid">
                   
                   {/* Left: Thread List */}
-                  <div className="dmd-inbox-threads-pane">
+                  <div className={`dmd-inbox-threads-pane ${selectedThreadId ? 'is-hidden-mobile' : ''}`}>
                     <div className="dmd-inbox-search">
                       <input 
                         type="text" 
@@ -1861,7 +2644,7 @@ export default function AdminDashboardPage({
                   </div>
 
                   {/* Right: Message Stream */}
-                  <div className="dmd-inbox-chat-pane">
+                  <div className={`dmd-inbox-chat-pane ${!selectedThreadId ? 'is-hidden-mobile' : ''}`}>
                     {(() => {
                       const activeThread = supportThreads.find(t => t.thread_id === selectedThreadId);
                       if (!activeThread) {
@@ -1877,15 +2660,26 @@ export default function AdminDashboardPage({
                       return (
                         <>
                           <div className="dmd-chat-pane-header">
-                            <div>
-                              <h3>{activeThread.sender_name || 'Devotee Pilgrim'}</h3>
-                              <span className="dmd-chat-meta">
-                                {activeThread.sender_phone ? `📞 ${activeThread.sender_phone} • ` : ''}
-                                {activeThread.sender_email ? `✉️ ${activeThread.sender_email} • ` : ''}
-                                Ticket #{activeThread.thread_id.slice(-6).toUpperCase()}
-                              </span>
+                            <div className="dmd-chat-header-title-wrap">
+                              <button
+                                type="button"
+                                className="dmd-btn-back-threads"
+                                onClick={() => setSelectedThreadId(null)}
+                                title="Back to all conversations"
+                              >
+                                <ArrowLeftIcon style={{ width: 14, height: 14 }} />
+                                <span>Inbox</span>
+                              </button>
+                              <div>
+                                <h3>{activeThread.sender_name || 'Devotee Pilgrim'}</h3>
+                                <span className="dmd-chat-meta">
+                                  {activeThread.sender_phone ? `📞 ${activeThread.sender_phone} • ` : ''}
+                                  {activeThread.sender_email ? `✉️ ${activeThread.sender_email} • ` : ''}
+                                  Ticket #{activeThread.thread_id.slice(-6).toUpperCase()}
+                                </span>
+                              </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                               <button
                                 type="button"
                                 className="dmd-action-btn"
@@ -1904,13 +2698,72 @@ export default function AdminDashboardPage({
                             </div>
                           </div>
 
+                          {/* Executive Operations Direct Decision Bar */}
+                          <div className="dmd-executive-actions-bar">
+                            <div className="dmd-exec-actions-left">
+                              <span className="dmd-exec-label">Direct Decision:</span>
+                              <button
+                                type="button"
+                                className="dmd-btn-exec dmd-btn-approve"
+                                onClick={() => handleApproveSupport(activeThread)}
+                                title="Approve and confirm booking or registration in Supabase & chat"
+                              >
+                                <CheckCircleIcon style={{ width: 14, height: 14 }} />
+                                <span>Approve & Confirm</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="dmd-btn-exec dmd-btn-inquire"
+                                onClick={() => handleInquireSupport(activeThread)}
+                                title="Request ID proof or more details from devotee"
+                              >
+                                <DocumentTextIcon style={{ width: 14, height: 14 }} />
+                                <span>Request Details</span>
+                              </button>
+                              <button
+                                type="button"
+                                className="dmd-btn-exec dmd-btn-reject"
+                                onClick={() => handleRejectSupport(activeThread)}
+                                title="Decline request with reason"
+                              >
+                                <XCircleIcon style={{ width: 14, height: 14 }} />
+                                <span>Decline</span>
+                              </button>
+                            </div>
+                            <div className="dmd-exec-quick-chips">
+                              <button
+                                type="button"
+                                className="dmd-exec-chip"
+                                onClick={() => handleInquireSupport(activeThread, 'Hare Krishna! Please share your preferred Aarti / Darshan timings.')}
+                              >
+                                ✨ Darshan Timings
+                              </button>
+                              <button
+                                type="button"
+                                className="dmd-exec-chip"
+                                onClick={() => handleInquireSupport(activeThread, 'Radhe Radhe! AC Vehicle & Brajwasi Guide assigned. Please confirm pickup landmark.')}
+                              >
+                                🚗 Assign Guide
+                              </button>
+                              <button
+                                type="button"
+                                className="dmd-exec-chip"
+                                onClick={() => handleInquireSupport(activeThread, 'Namaste! Ashram room reserved. Please share devotee Aadhaar numbers for check-in registry.')}
+                              >
+                                🏨 Ashram ID Proof
+                              </button>
+                            </div>
+                          </div>
+
                           <div className="dmd-chat-bubbles-scroll">
-                            {(activeThread.messages || []).map((m, idx) => {
+                            {Array.from(
+                              new Map((activeThread.messages || []).filter(Boolean).map((m, idx) => [m.id || `msg_${idx}`, m])).values()
+                            ).map((m, idx) => {
                               const isMe = m.sender === 'admin';
                               const isBot = m.sender === 'concierge_bot';
                               return (
                                 <div
-                                  key={m.id || idx}
+                                  key={`adm_msg_${m.id || idx}_${idx}`}
                                   className={`dmd-chat-row ${isMe ? 'is-admin' : isBot ? 'is-bot' : 'is-devotee'}`}
                                 >
                                   <span className="dmd-chat-author-tag">
@@ -1944,6 +2797,7 @@ export default function AdminDashboardPage({
                                 </div>
                               );
                             })}
+                            <div ref={adminChatEndRef} />
                           </div>
 
                           <form className="dmd-chat-compose-box" onSubmit={handleSendAdminReply}>

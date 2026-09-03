@@ -24,6 +24,48 @@ const QUICK_PROMPTS = [
 function parseBookingOrPayment(text) {
   if (!text || typeof text !== 'string') return null;
 
+  if (text.includes('REQUEST APPROVED & CONFIRMED')) {
+    const srvMatch = text.match(/Service:\s*([^•\n]+)/i);
+    const decMatch = text.match(/Decision:\s*([^•\n]+)/i);
+    const refMatch = text.match(/Ticket Reference:\s*([^•\n]+)/i);
+    const notesMatch = text.match(/Operational Notes:\s*([^•\n]+)/i);
+
+    return {
+      type: 'approved',
+      title: srvMatch ? srvMatch[1].trim() : 'Pilgrimage Service Request',
+      decision: decMatch ? decMatch[1].trim() : 'Approved by Vrinda Operations',
+      ref: refMatch ? refMatch[1].trim() : '',
+      notes: notesMatch ? notesMatch[1].trim() : 'All checks verified. Your sacred pilgrimage request is active.'
+    };
+  }
+
+  if (text.includes('REQUEST STATUS: DECLINED')) {
+    const srvMatch = text.match(/Service:\s*([^•\n]+)/i);
+    const rsnMatch = text.match(/Reason:\s*([^•\n]+)/i);
+    const refMatch = text.match(/Ticket Reference:\s*([^•\n]+)/i);
+
+    return {
+      type: 'declined',
+      title: srvMatch ? srvMatch[1].trim() : 'Pilgrimage Service',
+      reason: rsnMatch ? rsnMatch[1].trim() : 'Selected slot unavailable',
+      ref: refMatch ? refMatch[1].trim() : ''
+    };
+  }
+
+  if (text.includes('ADDITIONAL DETAILS REQUIRED')) {
+    const inqMatch = text.match(/Inquiry:\s*([^•\n]+)/i);
+    const fromMatch = text.match(/From:\s*([^•\n]+)/i);
+    const refMatch = text.match(/Ticket Reference:\s*([^•\n]+)/i);
+
+    return {
+      type: 'info_requested',
+      title: 'Action Required: Additional Details',
+      inquiry: inqMatch ? inqMatch[1].trim() : 'Please provide requested information to finalize booking.',
+      from: fromMatch ? fromMatch[1].trim() : 'Vrinda Operations',
+      ref: refMatch ? refMatch[1].trim() : ''
+    };
+  }
+
   if (text.includes('Payment Verified via Stripe') || text.includes('Stripe*')) {
     const pkgMatch = text.match(/Package:\s*([^•\n]+)/i);
     const txnMatch = text.match(/Transaction ID:\s*([^•\n]+)/i);
@@ -192,7 +234,10 @@ export default function HelpCenterModal({
     });
 
     if (newMsg) {
-      setMessages((prev) => [...prev, newMsg]);
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
     }
     setIsSending(false);
 
@@ -367,7 +412,9 @@ export default function HelpCenterModal({
 
             {/* Chat Messages Body */}
             <div className="hc-messages-body">
-              {messages.map((msg, index) => {
+              {Array.from(
+                new Map((messages || []).filter(Boolean).map((m, i) => [m.id || `msg_${i}`, m])).values()
+              ).map((msg, index) => {
                 const parsedReceipt = parseBookingOrPayment(msg.message || msg.text);
                 const isMe = msg.sender === 'user' || (userName && msg.sender_name === userName && msg.sender !== 'admin' && !parsedReceipt);
                 const isAdmin = msg.sender === 'admin';
@@ -376,8 +423,122 @@ export default function HelpCenterModal({
                 /* Case A & B: Full-Width Rich Boarding Pass / Ticket Cards */
                 if (parsedReceipt) {
                   return (
-                    <div key={msg.id || index} className="hc-ticket-row">
-                      {parsedReceipt.type === 'payment' ? (
+                    <div key={`ticket_${msg.id || index}_${index}`} className="hc-ticket-row">
+                      {parsedReceipt.type === 'approved' ? (
+                        <div className="hc-receipt-card hc-receipt-approved">
+                          <div className="hc-receipt-top">
+                            <div className="hc-receipt-badge hc-badge-approved">
+                              <CheckCircle2 size={13} />
+                              <span>Official Request Approved & Confirmed</span>
+                            </div>
+                            <span className="hc-approved-live-tag">Active • 100% Guaranteed</span>
+                          </div>
+
+                          <h4 className="hc-receipt-title">{parsedReceipt.title}</h4>
+
+                          <div className="hc-receipt-grid">
+                            {parsedReceipt.decision && (
+                              <div className="hc-receipt-cell">
+                                <span className="hc-cell-lbl">Authority</span>
+                                <span className="hc-cell-val hc-status-active">{parsedReceipt.decision}</span>
+                              </div>
+                            )}
+                            {parsedReceipt.ref && (
+                              <div className="hc-receipt-cell">
+                                <span className="hc-cell-lbl">Ticket Reference</span>
+                                <span className="hc-cell-val font-mono">{parsedReceipt.ref}</span>
+                              </div>
+                            )}
+                            {parsedReceipt.notes && (
+                              <div className="hc-receipt-cell hc-cell-full">
+                                <span className="hc-cell-lbl">Operational Notes</span>
+                                <span className="hc-cell-val">{parsedReceipt.notes}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="hc-receipt-footer">
+                            <span className="hc-receipt-footer-note">
+                              🛕 Verified by Vrinda Vihar Operations Desk • All passes & guides activated.
+                            </span>
+                          </div>
+                        </div>
+                      ) : parsedReceipt.type === 'declined' ? (
+                        <div className="hc-receipt-card hc-receipt-declined">
+                          <div className="hc-receipt-top">
+                            <div className="hc-receipt-badge hc-badge-declined">
+                              <AlertCircle size={13} />
+                              <span>Request Status: Declined</span>
+                            </div>
+                          </div>
+
+                          <h4 className="hc-receipt-title">{parsedReceipt.title}</h4>
+
+                          <div className="hc-receipt-grid">
+                            {parsedReceipt.reason && (
+                              <div className="hc-receipt-cell hc-cell-full">
+                                <span className="hc-cell-lbl">Reason</span>
+                                <span className="hc-cell-val" style={{ color: '#991b1b' }}>{parsedReceipt.reason}</span>
+                              </div>
+                            )}
+                            {parsedReceipt.ref && (
+                              <div className="hc-receipt-cell">
+                                <span className="hc-cell-lbl">Ticket Reference</span>
+                                <span className="hc-cell-val font-mono">{parsedReceipt.ref}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="hc-receipt-footer">
+                            <span className="hc-receipt-footer-note">
+                              Please reply below with alternative dates or contact our 24/7 concierge for alternate arrangements.
+                            </span>
+                          </div>
+                        </div>
+                      ) : parsedReceipt.type === 'info_requested' ? (
+                        <div className="hc-receipt-card hc-receipt-inquiry-action">
+                          <div className="hc-receipt-top">
+                            <div className="hc-receipt-badge hc-badge-inquiry">
+                              <Sparkles size={13} />
+                              <span>Action Required: Additional Details</span>
+                            </div>
+                            <span className="hc-inquiry-status-pill">
+                              <span className="hc-pulse-dot-amber" />
+                              Details Needed
+                            </span>
+                          </div>
+
+                          <h4 className="hc-receipt-title">{parsedReceipt.title}</h4>
+
+                          <div className="hc-receipt-grid">
+                            {parsedReceipt.inquiry && (
+                              <div className="hc-receipt-cell hc-cell-full">
+                                <span className="hc-cell-lbl">From Operations Desk</span>
+                                <span className="hc-cell-val" style={{ fontWeight: 700, color: '#92400e' }}>
+                                  {parsedReceipt.inquiry}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="hc-devotee-reply-chips">
+                            <button
+                              type="button"
+                              className="hc-devotee-chip-btn"
+                              onClick={() => handleSendMessage('Here are our details: 2 Devotees, arriving morning 8:00 AM. Ready to confirm.')}
+                            >
+                              📝 Confirm 2 Devotees & 8 AM Arrival
+                            </button>
+                            <button
+                              type="button"
+                              className="hc-devotee-chip-btn"
+                              onClick={() => handleSendMessage('Sharing ID documents and devotee registration proof.')}
+                            >
+                              📄 Share ID Proof
+                            </button>
+                          </div>
+                        </div>
+                      ) : parsedReceipt.type === 'payment' ? (
                         <div className="hc-receipt-card hc-receipt-stripe">
                           <div className="hc-receipt-top">
                             <div className="hc-receipt-badge hc-badge-success">
@@ -498,7 +659,7 @@ export default function HelpCenterModal({
                 /* Case C: Standard Rich Chat Bubble */
                 return (
                   <div 
-                    key={msg.id || index} 
+                    key={`bubble_${msg.id || index}_${index}`} 
                     className={`hc-message-row ${isMe ? 'is-me' : 'is-support'}`}
                   >
                     {!isMe && (

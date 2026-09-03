@@ -10,7 +10,7 @@ import RestaurantPortalTab from './RestaurantPortalTab';
 import HotelPortalTab from './HotelPortalTab';
 import AgencyPortalTab from './AgencyPortalTab';
 import OperationsAdminTab from './OperationsAdminTab';
-import { supabase } from '../../config/supabase';
+import { supabase, safeRemoveChannel } from '../../config/supabase';
 import './PartnerHubModal.css';
 
 // Admin email whitelist from environment — only these emails get admin access
@@ -119,7 +119,7 @@ export default function PartnerHubModal({
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
+      safeRemoveChannel(channel);
     };
   }, [partnerId, propPartnerId]);
 

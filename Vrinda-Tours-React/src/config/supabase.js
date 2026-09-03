@@ -108,8 +108,25 @@ export async function executeWithRetry(queryFn, options = {}) {
     }
   }
 
-  console.warn(`[Supabase Query Warning] Failed after ${retries + 1} attempts:`, lastError?.message || lastError);
   return { data: fallbackData, error: lastError };
+}
+
+/**
+ * Safely tear down a Supabase channel without triggering premature socket disconnect errors
+ */
+export function safeRemoveChannel(channel) {
+  if (!channel || !supabase) return;
+  try {
+    if (channel.state === 'joining') {
+      setTimeout(() => {
+        try {
+          supabase.removeChannel(channel);
+        } catch {}
+      }, 500);
+    } else {
+      supabase.removeChannel(channel);
+    }
+  } catch {}
 }
 
 export default supabase;

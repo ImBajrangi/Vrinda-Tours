@@ -1,14 +1,19 @@
 /**
  * Vrinda Tours — Vrinda Vihar In-App Help Centre & Support Messaging Engine
  * Provides real-time bidirectional messaging between pilgrims/devotees and
- * the Vrinda Vihar Operations Support Desk, backed by Supabase & 0ms LocalStorage cache.
+ * the Vrinda Vihar Operations Support Desk, backed by Supabase Real-Time Broadcast & Postgres.
  */
 
-import { supabase } from '../config/supabase';
+import { supabase, safeRemoveChannel } from '../config/supabase';
 
 const THREAD_STORAGE_KEY = 'vt_helpcenter_thread_id';
 const MESSAGES_CACHE_KEY = 'vt_helpcenter_messages_cache';
 const ALL_THREADS_CACHE_KEY = 'vt_admin_support_threads_cache';
+
+// Browser-level cross-tab broadcast channel
+const localBc = typeof window !== 'undefined' && 'BroadcastChannel' in window 
+  ? new BroadcastChannel('vt_realtime_chat_hub') 
+  : null;
 
 /**
  * Get or create a unique persistent Thread ID for the current devotee/browser session
@@ -25,57 +30,133 @@ export function getOrCreateThreadId(userInfo = {}) {
   return threadId;
 }
 
-/**
- * Common auto-responses for instant guidance while an admin connects
- */
-const AUTO_RESPONSES = {
-  vip: "Radhe Radhe! For Bankey Bihari VIP Darshan & Prem Mandir Light Show passes, our local Brajwasi guide coordinates priority entry slots daily from 8:00 AM to 12:00 PM and 5:00 PM to 9:30 PM. Would you like us to reserve a VIP pass for your travel dates?",
-  hotel: "Namaste! Vrinda Vihar verified stays include traditional Gaudiya Ashrams, AC Guest Houses, and 4-Star Pilgrim Resorts in Raman Reti, VIP Road, and Govardhan. You can book directly with zero platform fee.",
-  parikrama: "Hare Krishna! The Govardhan Parikrama (21 km) and Vrindavan Panchkosi Parikrama (11 km) can be arranged on foot or via electric E-Rickshaw with our verified Brajwasi sevaks. E-Rickshaw assistance is available 24/7.",
-  custom: "Radhe Radhe! We specialize in custom 1-Day, 2-Day, and 84 Kos Brij Mahayatra itineraries for families and groups. Please share your arrival date, number of devotees, and preferred temples.",
-  default: "Thank you for reaching out to Vrinda Vihar Help Centre. Your inquiry has been registered with priority ticket #VT-{ID}. A dedicated Brajwasi pilgrimage concierge is reviewing your request and will reply shortly."
-};
+// Active Supabase channel registry to reuse joined WebSocket connections
+const activeThreadChannels = new Map();
+let activeAdminChannel = null;
+
+function safeBroadcast(channelInstance, eventName, payload) {
+  if (!channelInstance) return;
+  try {
+    if (channelInstance.state === 'joined') {
+      channelInstance.send({
+        type: 'broadcast',
+        event: eventName,
+        payload
+      });
+    }
+  } catch {}
+}
 
 /**
- * Real-time Supabase listener for a single devotee thread
+ * Real-time Supabase listener for a single devotee thread (Bi-directional WebSocket + Postgres)
  */
 export function subscribeToThread(threadId, onNewMessage) {
-  if (!threadId || !supabase) return () => {};
+  if (!threadId) return () => {};
 
-  const channel = supabase
-    .channel(`realtime_thread_${threadId}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'support_messages',
-        filter: `thread_id=eq.${threadId}`
-      },
-      (payload) => {
-        const raw = payload.new;
-        if (raw) {
-          const msg = {
-            id: raw.id,
-            thread_id: raw.thread_id,
-            sender: raw.sender === 'system' ? 'concierge_bot' : raw.sender,
-            sender_name: raw.sender_name,
-            sender_email: raw.sender_email,
-            sender_phone: raw.sender_phone,
-            message: raw.text || raw.message || '',
-            text: raw.text || raw.message || '',
-            category: raw.category || 'general',
-            metadata: raw.metadata || {},
-            created_at: raw.created_at || new Date().toISOString()
-          };
-          onNewMessage(msg);
+  // 1. Cross-tab & In-tab broadcast listeners
+  const handleLocalMsg = (msg) => {
+    if (msg && msg.thread_id === threadId) {
+      onNewMessage(msg);
+    }
+  };
+
+  const bcHandler = (e) => {
+    if (e?.data) handleLocalMsg(e.data);
+  };
+  if (localBc) {
+    localBc.addEventListener('message', bcHandler);
+  }
+
+  const windowHandler = (e) => {
+    if (e.detail?.threadId === threadId && e.detail?.message) {
+      onNewMessage(e.detail.message);
+    }
+  };
+  window.addEventListener('vt_new_support_message', windowHandler);
+
+  // 2. Supabase Real-Time Broadcast & Postgres Channel
+  let channel = null;
+  if (supabase) {
+    channel = supabase
+      .channel(`vt_chat_${threadId}`)
+      .on('broadcast', { event: 'new_message' }, ({ payload }) => {
+        if (payload && payload.thread_id === threadId) {
+          onNewMessage(payload);
         }
-      }
-    )
-    .subscribe();
+      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'support_messages',
+          filter: `thread_id=eq.${threadId}`
+        },
+        (payload) => {
+          const raw = payload.new;
+          if (raw) {
+            const msg = {
+              id: raw.id,
+              thread_id: raw.thread_id,
+              sender: raw.sender === 'system' ? 'concierge_bot' : raw.sender,
+              sender_name: raw.sender_name,
+              sender_email: raw.sender_email,
+              sender_phone: raw.sender_phone,
+              message: raw.text || raw.message || '',
+              text: raw.text || raw.message || '',
+              category: raw.category || 'general',
+              metadata: raw.metadata || {},
+              created_at: raw.created_at || new Date().toISOString()
+            };
+            onNewMessage(msg);
+          }
+        }
+      )
+      .subscribe();
+
+    activeThreadChannels.set(threadId, channel);
+  }
 
   return () => {
-    supabase.removeChannel(channel);
+    if (localBc) localBc.removeEventListener('message', bcHandler);
+    window.removeEventListener('vt_new_support_message', windowHandler);
+    activeThreadChannels.delete(threadId);
+    safeRemoveChannel(channel);
+  };
+}
+
+/**
+ * Real-time Supabase listener for Admin Inbox (Listens to ALL devotee inquiries globally)
+ */
+export function subscribeToAdminInbox(onInboxEvent) {
+  if (!supabase) return () => {};
+
+  const channel = supabase
+    .channel('vt_admin_global_inbox')
+    .on('broadcast', { event: 'devotee_inquiry' }, ({ payload }) => {
+      onInboxEvent(payload);
+    })
+    .on('broadcast', { event: 'new_message' }, ({ payload }) => {
+      onInboxEvent(payload);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'support_messages' }, () => {
+      onInboxEvent();
+    })
+    .subscribe();
+
+  activeAdminChannel = channel;
+
+  const bcHandler = (e) => {
+    if (e?.data) onInboxEvent(e.data);
+  };
+  if (localBc) {
+    localBc.addEventListener('message', bcHandler);
+  }
+
+  return () => {
+    if (localBc) localBc.removeEventListener('message', bcHandler);
+    if (activeAdminChannel === channel) activeAdminChannel = null;
+    safeRemoveChannel(channel);
   };
 }
 
@@ -112,13 +193,12 @@ export async function sendSupportMessage({
     metadata
   };
 
-  // 1. Save to Local Cache (0ms instant optimistic UI update)
+  // 1. Optimistic Local Cache Update (0ms)
   try {
     const cached = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
-    const updated = [...cached, messageObj];
-    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(updated));
+    cached.push(messageObj);
+    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(cached));
 
-    // Also update Admin threads cache so Admin Panel reflects it instantly
     const allThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
     if (!allThreads[threadId]) {
       allThreads[threadId] = {
@@ -140,11 +220,20 @@ export async function sendSupportMessage({
     allThreads[threadId].sender_phone = senderPhone || allThreads[threadId].sender_phone;
     allThreads[threadId].messages.push(messageObj);
     localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
-  } catch (err) {
-    console.warn('Local messaging cache warning:', err);
-  }
+  } catch {}
 
-  // 2. Persist to Supabase Database
+  // 2. Broadcast immediately over local bus
+  if (localBc) {
+    try { localBc.postMessage(messageObj); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: messageObj } }));
+
+  // 3. Broadcast safely over active Supabase Real-Time WebSocket channels
+  const activeThreadChan = activeThreadChannels.get(threadId);
+  safeBroadcast(activeThreadChan, 'new_message', messageObj);
+  safeBroadcast(activeAdminChannel, 'devotee_inquiry', messageObj);
+
+  // 4. Persist permanently to Supabase Postgres Database
   try {
     const supabaseSender = messageObj.sender === 'concierge_bot' ? 'system' : (messageObj.sender || 'user');
     await supabase
@@ -168,82 +257,11 @@ export async function sendSupportMessage({
     console.warn('Supabase support_messages insert fallback:', e);
   }
 
-  // 3. Trigger smart concierge auto-reply if user is initiating query
-  if (sender === 'user') {
-    setTimeout(async () => {
-      let autoText = AUTO_RESPONSES.default.replace('{ID}', threadId.slice(-4).toUpperCase());
-      const lower = text.toLowerCase();
-      if (lower.includes('vip') || lower.includes('pass') || lower.includes('darshan') || lower.includes('bihari')) {
-        autoText = AUTO_RESPONSES.vip;
-      } else if (lower.includes('hotel') || lower.includes('room') || lower.includes('stay') || lower.includes('ashram')) {
-        autoText = AUTO_RESPONSES.hotel;
-      } else if (lower.includes('parikrama') || lower.includes('govardhan') || lower.includes('rickshaw') || lower.includes('driver')) {
-        autoText = AUTO_RESPONSES.parikrama;
-      } else if (lower.includes('custom') || lower.includes('package') || lower.includes('plan') || lower.includes('itinerary')) {
-        autoText = AUTO_RESPONSES.custom;
-      }
-
-      await sendConciergeResponse({
-        threadId,
-        text: autoText,
-        senderName: 'Vrinda Vihar Concierge',
-        sender: 'concierge_bot'
-      });
-    }, 1200);
-  }
-
   return messageObj;
 }
 
 /**
- * Send automated concierge reply
- */
-async function sendConciergeResponse({ threadId, text, senderName, sender = 'concierge_bot' }) {
-  const replyObj = {
-    id: `bot_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    thread_id: threadId,
-    sender,
-    sender_name: senderName,
-    message: text,
-    text: text,
-    status: 'delivered',
-    created_at: new Date().toISOString()
-  };
-
-  try {
-    const cached = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
-    cached.push(replyObj);
-    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(cached));
-
-    const allThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
-    if (allThreads[threadId]) {
-      allThreads[threadId].messages.push(replyObj);
-      allThreads[threadId].last_message = text;
-      allThreads[threadId].last_updated = replyObj.created_at;
-      localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
-    }
-  } catch {}
-
-  try {
-    await supabase.from('support_messages').insert([
-      {
-        id: replyObj.id,
-        thread_id: threadId,
-        sender: 'system',
-        sender_name: replyObj.sender_name,
-        text: replyObj.message,
-        is_read: false,
-        created_at: replyObj.created_at
-      }
-    ]);
-  } catch {}
-
-  // Dispatch custom window event so open chat windows update immediately
-  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: replyObj } }));
-}
-
-/**
- * Admin sends a direct reply to user's thread
+ * Admin sends a direct reply to user's thread (Bi-Directional WebSocket & DB persist)
  */
 export async function sendAdminReply({
   threadId,
@@ -284,7 +302,17 @@ export async function sendAdminReply({
     }
   } catch {}
 
-  // 2. Persist to Supabase
+  // 2. Broadcast locally
+  if (localBc) {
+    try { localBc.postMessage(replyObj); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: replyObj } }));
+
+  // 3. Broadcast safely over active Supabase WebSocket to devotee (<20ms)
+  const activeThreadChan = activeThreadChannels.get(threadId);
+  safeBroadcast(activeThreadChan, 'new_message', replyObj);
+
+  // 4. Persist to Supabase Database
   try {
     await supabase.from('support_messages').insert([
       {
@@ -302,8 +330,6 @@ export async function sendAdminReply({
     console.warn('Supabase admin reply warning:', err);
   }
 
-  // Notify active windows
-  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: replyObj } }));
   return replyObj;
 }
 
@@ -311,12 +337,6 @@ export async function sendAdminReply({
  * Get message history for a specific thread
  */
 export async function getThreadMessages(threadId) {
-  let localMsgs = [];
-  try {
-    const all = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
-    localMsgs = all.filter(m => m.thread_id === threadId);
-  } catch {}
-
   try {
     const { data, error } = await supabase
       .from('support_messages')
@@ -324,22 +344,31 @@ export async function getThreadMessages(threadId) {
       .eq('thread_id', threadId)
       .order('created_at', { ascending: true });
 
-    if (!error && data && data.length > 0) {
-      const normalizedData = data.map(m => ({ 
-        ...m, 
-        sender: m.sender === 'system' ? 'concierge_bot' : m.sender,
-        message: m.text || m.message || '' 
-      }));
-      const map = new Map();
-      [...localMsgs, ...normalizedData].forEach(item => {
-        if (item.id && !map.has(item.id)) {
-          map.set(item.id, item);
-        }
-      });
-      return Array.from(map.values());
+    if (!error) {
+      if (data && data.length > 0) {
+        const normalizedData = data.map(m => ({ 
+          ...m, 
+          sender: m.sender === 'system' ? 'concierge_bot' : m.sender,
+          message: m.text || m.message || '' 
+        }));
+        return normalizedData;
+      } else {
+        // If Supabase has 0 messages, clear stale local cache for this thread
+        try {
+          const all = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
+          const remaining = all.filter(m => m.thread_id !== threadId);
+          localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(remaining));
+        } catch {}
+        return [];
+      }
     }
   } catch {}
 
+  let localMsgs = [];
+  try {
+    const all = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
+    localMsgs = all.filter(m => m.thread_id === threadId);
+  } catch {}
   return localMsgs;
 }
 
@@ -347,19 +376,22 @@ export async function getThreadMessages(threadId) {
  * Get all support threads for the Admin Console
  */
 export async function getAllSupportThreads() {
-  let localThreads = {};
-  try {
-    localThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
-  } catch {}
-
   try {
     const { data, error } = await supabase
       .from('support_messages')
       .select('*')
       .order('created_at', { ascending: true });
 
-    if (!error && data && data.length > 0) {
-      const threadsMap = { ...localThreads };
+    if (!error) {
+      if (!data || data.length === 0) {
+        try {
+          localStorage.removeItem(ALL_THREADS_CACHE_KEY);
+          localStorage.removeItem(MESSAGES_CACHE_KEY);
+        } catch {}
+        return [];
+      }
+
+      const threadsMap = {};
       data.forEach(rawMsg => {
         const msg = { 
           ...rawMsg, 
@@ -406,7 +438,30 @@ export async function getAllSupportThreads() {
     }
   } catch {}
 
+  let localThreads = {};
+  try {
+    localThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
+  } catch {}
   return Object.values(localThreads).sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated));
+}
+
+/**
+ * Clear entire support chat history from Supabase and client storage
+ */
+export async function clearAllChatHistory() {
+  try {
+    localStorage.removeItem(MESSAGES_CACHE_KEY);
+    localStorage.removeItem(ALL_THREADS_CACHE_KEY);
+    localStorage.removeItem(THREAD_STORAGE_KEY);
+  } catch {}
+
+  try {
+    if (supabase) {
+      await supabase.from('support_messages').delete().neq('id', 'keep_none');
+    }
+  } catch (err) {
+    console.warn('Supabase clear history warning:', err);
+  }
 }
 
 /**
@@ -420,4 +475,276 @@ export async function updateThreadStatus(threadId, status) {
       localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
     }
   } catch {}
+}
+
+/**
+ * Admin directly approves a registration or tour/travel booking request from the Help Center
+ */
+export async function approveSupportRequest({
+  threadId,
+  requestType = 'booking',
+  entityId = null,
+  entityTable = null,
+  title = 'Pilgrimage Service',
+  adminName = 'Vrinda Operations',
+  notes = ''
+}) {
+  const timestamp = new Date().toISOString();
+  const ticketRef = threadId.slice(-6).toUpperCase();
+
+  // 1. Update target table in Supabase if entity exists
+  try {
+    if (entityId && entityTable && supabase) {
+      if (entityTable === 'partners') {
+        await supabase.from('partners').update({ verified: true, status: 'active', verified_at: timestamp }).eq('id', entityId);
+      } else if (entityTable === 'driver_registrations' || entityTable === 'hotel_registrations' || entityTable === 'restaurant_registrations' || entityTable === 'agency_registrations') {
+        await supabase.from(entityTable).update({ status: 'approved', verified: true }).eq('id', entityId);
+      } else if (entityTable === 'room_bookings' || entityTable === 'table_reservations') {
+        await supabase.from(entityTable).update({ status: 'confirmed', confirmed_at: timestamp }).eq('id', entityId);
+      } else if (entityTable === 'ride_requests') {
+        await supabase.from('ride_requests').update({ status: 'accepted' }).eq('id', entityId);
+      }
+    }
+  } catch (err) {
+    console.warn('Supabase entity status update warning:', err);
+  }
+
+  // 2. Craft high-impact official approval ticket message
+  const approvalText = `✅ *REQUEST APPROVED & CONFIRMED*\n• Service: ${title}\n• Decision: Approved & Verified by ${adminName}\n• Ticket Reference: #VT-${ticketRef}\n• Status: 100% Confirmed & Active\n• Operational Notes: ${notes || 'All requirements satisfied. Your sacred pilgrimage request is verified.'}`;
+
+  const messageObj = {
+    id: `adm_appr_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    thread_id: threadId,
+    sender: 'admin',
+    sender_name: adminName,
+    sender_email: 'operations@vrindatours.com',
+    message: approvalText,
+    text: approvalText,
+    category: requestType,
+    status: 'delivered',
+    created_at: timestamp,
+    metadata: {
+      action_status: 'approved',
+      request_type: requestType,
+      entity_id: entityId,
+      entity_table: entityTable,
+      title,
+      verified_by: adminName,
+      resolved_at: timestamp
+    }
+  };
+
+  // 3. Update Local Storage Cache
+  try {
+    const cached = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
+    cached.push(messageObj);
+    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(cached));
+
+    const allThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
+    if (allThreads[threadId]) {
+      allThreads[threadId].messages.push(messageObj);
+      allThreads[threadId].last_message = approvalText;
+      allThreads[threadId].last_updated = timestamp;
+      allThreads[threadId].status = 'resolved';
+      localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
+    }
+  } catch {}
+
+  // 4. Multi-tab local broadcast
+  if (localBc) {
+    try { localBc.postMessage(messageObj); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: messageObj } }));
+
+  // 5. Supabase WebSocket Broadcast (<20ms)
+  const activeThreadChan = activeThreadChannels.get(threadId);
+  safeBroadcast(activeThreadChan, 'new_message', messageObj);
+  safeBroadcast(activeAdminChannel, 'new_message', messageObj);
+
+  // 6. Persist message to Supabase Postgres
+  try {
+    await supabase.from('support_messages').insert([
+      {
+        id: messageObj.id,
+        thread_id: threadId,
+        sender: 'admin',
+        sender_name: adminName,
+        sender_email: 'operations@vrindatours.com',
+        text: messageObj.message,
+        category: requestType,
+        metadata: messageObj.metadata,
+        is_read: false,
+        created_at: timestamp
+      }
+    ]);
+  } catch {}
+
+  return messageObj;
+}
+
+/**
+ * Admin directly rejects or declines a request
+ */
+export async function rejectSupportRequest({
+  threadId,
+  requestType = 'booking',
+  entityId = null,
+  entityTable = null,
+  title = 'Pilgrimage Service',
+  adminName = 'Vrinda Operations',
+  reason = 'Unavailable for selected dates or slot'
+}) {
+  const timestamp = new Date().toISOString();
+  const ticketRef = threadId.slice(-6).toUpperCase();
+
+  try {
+    if (entityId && entityTable && supabase) {
+      await supabase.from(entityTable).update({ status: 'declined', decline_reason: reason }).eq('id', entityId);
+    }
+  } catch {}
+
+  const rejectText = `❌ *REQUEST STATUS: DECLINED*\n• Service: ${title}\n• Decision: Declined by ${adminName}\n• Reason: ${reason}\n• Ticket Reference: #VT-${ticketRef}\n• Alternative: Please reply below or select alternative dates.`;
+
+  const messageObj = {
+    id: `adm_rej_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    thread_id: threadId,
+    sender: 'admin',
+    sender_name: adminName,
+    sender_email: 'operations@vrindatours.com',
+    message: rejectText,
+    text: rejectText,
+    category: requestType,
+    status: 'delivered',
+    created_at: timestamp,
+    metadata: {
+      action_status: 'rejected',
+      request_type: requestType,
+      entity_id: entityId,
+      entity_table: entityTable,
+      reason,
+      resolved_at: timestamp
+    }
+  };
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
+    cached.push(messageObj);
+    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(cached));
+
+    const allThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
+    if (allThreads[threadId]) {
+      allThreads[threadId].messages.push(messageObj);
+      allThreads[threadId].last_message = rejectText;
+      allThreads[threadId].last_updated = timestamp;
+      allThreads[threadId].status = 'resolved';
+      localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
+    }
+  } catch {}
+
+  if (localBc) {
+    try { localBc.postMessage(messageObj); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: messageObj } }));
+
+  const activeThreadChan = activeThreadChannels.get(threadId);
+  safeBroadcast(activeThreadChan, 'new_message', messageObj);
+  safeBroadcast(activeAdminChannel, 'new_message', messageObj);
+
+  try {
+    await supabase.from('support_messages').insert([
+      {
+        id: messageObj.id,
+        thread_id: threadId,
+        sender: 'admin',
+        sender_name: adminName,
+        sender_email: 'operations@vrindatours.com',
+        text: messageObj.message,
+        category: requestType,
+        metadata: messageObj.metadata,
+        is_read: false,
+        created_at: timestamp
+      }
+    ]);
+  } catch {}
+
+  return messageObj;
+}
+
+/**
+ * Admin inquires or requests additional details/documents from applicant/devotee
+ */
+export async function inquireSupportRequest({
+  threadId,
+  requestType = 'booking',
+  entityId = null,
+  title = 'Pilgrimage Request',
+  adminName = 'Vrinda Operations',
+  inquiryText = 'Please share your ID proof / exact party count to confirm your request.'
+}) {
+  const timestamp = new Date().toISOString();
+  const ticketRef = threadId.slice(-6).toUpperCase();
+
+  const formattedInquiry = `📋 *ADDITIONAL DETAILS REQUIRED*\n• From: ${adminName} (Operations Desk)\n• Inquiry: ${inquiryText}\n• Ticket Reference: #VT-${ticketRef}\n• Action Required: Please reply directly in this chat with the requested information.`;
+
+  const messageObj = {
+    id: `adm_inq_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    thread_id: threadId,
+    sender: 'admin',
+    sender_name: adminName,
+    sender_email: 'operations@vrindatours.com',
+    message: formattedInquiry,
+    text: formattedInquiry,
+    category: requestType,
+    status: 'delivered',
+    created_at: timestamp,
+    metadata: {
+      action_status: 'info_requested',
+      request_type: requestType,
+      entity_id: entityId,
+      inquiry_text: inquiryText
+    }
+  };
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(MESSAGES_CACHE_KEY) || '[]');
+    cached.push(messageObj);
+    localStorage.setItem(MESSAGES_CACHE_KEY, JSON.stringify(cached));
+
+    const allThreads = JSON.parse(localStorage.getItem(ALL_THREADS_CACHE_KEY) || '{}');
+    if (allThreads[threadId]) {
+      allThreads[threadId].messages.push(messageObj);
+      allThreads[threadId].last_message = formattedInquiry;
+      allThreads[threadId].last_updated = timestamp;
+      allThreads[threadId].status = 'in_progress';
+      localStorage.setItem(ALL_THREADS_CACHE_KEY, JSON.stringify(allThreads));
+    }
+  } catch {}
+
+  if (localBc) {
+    try { localBc.postMessage(messageObj); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_support_message', { detail: { threadId, message: messageObj } }));
+
+  const activeThreadChan = activeThreadChannels.get(threadId);
+  safeBroadcast(activeThreadChan, 'new_message', messageObj);
+  safeBroadcast(activeAdminChannel, 'new_message', messageObj);
+
+  try {
+    await supabase.from('support_messages').insert([
+      {
+        id: messageObj.id,
+        thread_id: threadId,
+        sender: 'admin',
+        sender_name: adminName,
+        sender_email: 'operations@vrindatours.com',
+        text: messageObj.message,
+        category: requestType,
+        metadata: messageObj.metadata,
+        is_read: false,
+        created_at: timestamp
+      }
+    ]);
+  } catch {}
+
+  return messageObj;
 }

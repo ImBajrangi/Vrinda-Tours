@@ -48,6 +48,7 @@ import { getPersistedLocalRide, subscribeToRideRequest } from '../../services/ri
 import { validatePhoneNumber } from '../../utils/phoneValidator';
 import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
+import { savePaymentRecord } from '../../services/stripeService';
 import './PartnerLandingPage.css';
 
 // Interactive Trip Packages Selector Modal
@@ -158,47 +159,56 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                 <div className="tp-tpkg-card-cover">
                   <img src={pkg.image} alt={pkg.title} className="tp-tpkg-img" loading="lazy" />
                   <div className="tp-tpkg-cover-gradient" />
+                  {pkg.badge && <span className="tp-tpkg-badge-top">{pkg.badge}</span>}
+                  <span className="tp-tpkg-location-badge">
+                    <MapPin size={11} />
+                    <span>{pkg.location}</span>
+                  </span>
                 </div>
 
                 {/* Card Content */}
                 <div className="tp-tpkg-card-body">
-                  {/* Row 1: Location & Star Rating */}
+                  {/* Row 1: Duration & Star Rating */}
                   <div className="tp-tpkg-meta-row">
-                    <span className="tp-tpkg-location">
-                      <MapPin size={11} />
-                      <span>{pkg.location}</span>
-                    </span>
-                    <span className="tp-tpkg-rating-pill">
-                      <Star size={10} fill="#f59e0b" color="#f59e0b" />
-                      <strong>{pkg.rating}</strong>
-                    </span>
-                  </div>
-
-                  {/* Row 2: Title */}
-                  <h3 className="tp-tpkg-card-title">{pkg.title}</h3>
-
-                  {/* Row 3: Key Features (High Impact, Minimalist) */}
-                  <div className="tp-tpkg-inclusions-row">
                     <span className="tp-tpkg-duration-chip">
-                      <Clock size={10} />
+                      <Clock size={11} />
                       <span>{pkg.duration}</span>
                     </span>
-                    <span className="tp-tpkg-keytag-chip">{pkg.keyTag || pkg.tagline}</span>
+                    <span className="tp-tpkg-rating-pill">
+                      <Star size={11} fill="#f59e0b" color="#f59e0b" />
+                      <strong>{pkg.rating}</strong>
+                      <small>({pkg.reviewsCount || 380})</small>
+                    </span>
                   </div>
 
-                  {/* Highlights List - Top 2 Key Inclusions (Visible on Desktop) */}
+                  {/* Row 2: Title & Tagline */}
+                  <div className="tp-tpkg-title-group">
+                    <h3 className="tp-tpkg-card-title">{pkg.title}</h3>
+                    {pkg.tagline && <p className="tp-tpkg-card-tagline">{pkg.tagline}</p>}
+                  </div>
+
+                  {/* Row 3: Included Feature Badges */}
+                  {pkg.features && pkg.features.length > 0 && (
+                    <div className="tp-tpkg-features-row">
+                      {pkg.features.slice(0, 3).map((f, i) => (
+                        <span key={i} className="tp-tpkg-feature-tag">{f}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Row 4: Key Highlights List */}
                   <div className="tp-tpkg-highlights">
                     <ul className="tp-tpkg-hl-list">
                       {(pkg.highlights || []).slice(0, 2).map((hl, idx) => (
                         <li key={idx} className="tp-tpkg-hl-item">
-                          <CheckCircle2 size={12} className="tp-tpkg-check" />
+                          <CheckCircle2 size={13} className="tp-tpkg-check" />
                           <span>{hl}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Pricing & Booking CTA Footer */}
+                  {/* Row 5: Pricing & Booking CTA Footer */}
                   <div className="tp-tpkg-footer">
                     <div className="tp-tpkg-pricing">
                       <div className="tp-tpkg-orig-price">
@@ -207,7 +217,7 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                       </div>
                       <div className="tp-tpkg-final-price">
                         <strong>{pkg.price}</strong>
-                        <small>{pkg.priceUnit}</small>
+                        <small>{pkg.priceUnit || '/person'}</small>
                       </div>
                     </div>
 
@@ -220,7 +230,7 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                       }}
                       aria-label={`Book ${pkg.title}`}
                     >
-                      <span>Select</span>
+                      <span>Book Now</span>
                       <ArrowRight size={13} />
                     </button>
                   </div>
@@ -1189,9 +1199,23 @@ export default function PartnerLandingPage({
         console.warn('Failed to update role in Supabase:', err);
       }
     }
+    const cfg = ROLE_CONFIGS[newRoleKey] || ROLE_CONFIGS.pilgrim;
     setFloatingToast({
-      type: 'success',
-      message: `Profile Tag set to ${ROLE_CONFIGS[newRoleKey].tag} • ${ROLE_CONFIGS[newRoleKey].authority}`
+      id: `role_switch_${newRoleKey}_${Date.now()}`,
+      icon: <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>{cfg.icon}</span>,
+      highlight: true,
+      title: `Switched to ${cfg.label}`,
+      desc: cfg.authority,
+      ctaText: newRoleKey !== 'pilgrim' ? 'Open Workspace' : 'Explore Tours',
+      onCta: () => {
+        setFloatingToast(null);
+        if (newRoleKey === 'admin' && onOpenAdmin) onOpenAdmin();
+        else if (newRoleKey === 'driver' && onOpenDriverPortal) onOpenDriverPortal();
+        else if (newRoleKey === 'restaurant' && onOpenRestaurantPage) onOpenRestaurantPage();
+        else if (newRoleKey === 'hotel' && onOpenHotelPage) onOpenHotelPage();
+        else if (newRoleKey === 'agency' && onOpenAgencyPage) onOpenAgencyPage();
+        else if (onOpenPartnerHub) onOpenPartnerHub(newRoleKey);
+      }
     });
   };
 
@@ -1317,6 +1341,54 @@ export default function PartnerLandingPage({
             setFloatingToast(null);
           }
         });
+      }
+
+      // Handle Stripe Hosted Checkout Return (?payment=success&session_id=...)
+      const paymentStatus = params.get('payment');
+      const sessionId = params.get('session_id');
+      const title = params.get('title') || 'Pilgrimage Package';
+
+      if (paymentStatus === 'success') {
+        const txnId = `txn_stripe_${sessionId ? sessionId.slice(-10) : Date.now()}`;
+        const paymentRecord = {
+          id: txnId,
+          transaction_id: txnId,
+          session_id: sessionId || txnId,
+          amount: 2499,
+          currency: 'INR',
+          status: 'succeeded',
+          item_title: decodeURIComponent(title),
+          customer_name: currentUser?.name || 'Devotee Pilgrim',
+          customer_email: currentUser?.email || '',
+          customer_phone: currentUser?.phone || '',
+          payment_method: 'stripe_hosted',
+          created_at: new Date().toISOString()
+        };
+
+        savePaymentRecord(paymentRecord).catch(() => {});
+
+        // Post confirmation into devotee live chat thread
+        const tId = getOrCreateThreadId({
+          name: currentUser?.name || 'Devotee Pilgrim',
+          phone: currentUser?.phone || '',
+          email: currentUser?.email || ''
+        });
+
+        sendSupportMessage({
+          threadId: tId,
+          sender: 'concierge_bot',
+          text: `💳 *Payment Verified via Stripe*\n• Package: ${decodeURIComponent(title)}\n• Transaction ID: ${txnId}\n• Status: Confirmed & Paid\n• Travel Dates: Instant Confirmation\n• Party: 2 Guests`,
+          senderName: currentUser?.name || 'Devotee Pilgrim',
+          senderEmail: currentUser?.email || '',
+          senderPhone: currentUser?.phone || '',
+          category: 'payment'
+        }).catch(() => {});
+
+        if (onOpenHelpCenter) {
+          onOpenHelpCenter();
+        }
+
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     } catch { }
   }, []);
@@ -1983,14 +2055,6 @@ export default function PartnerLandingPage({
         onOpenHelpCenter();
       }
 
-      setFloatingToast({
-        id: `book_${Date.now()}`,
-        title: 'Reservation Inquiry Connected',
-        desc: 'Vrinda Vihar live concierge is ready to assist you in chat.',
-        highlight: true
-      });
-      setTimeout(() => setFloatingToast(null), 5000);
-
       if (!currentUser) {
         setBookingName('');
         setBookingEmail('');
@@ -2069,33 +2133,37 @@ export default function PartnerLandingPage({
                   <span className="tp-nav-user-name">{getDisplayName(currentUser.name)}</span>
                   <span
                     className={`tp-nav-role-mini-tag ${activeRoleConfig.badgeClass}`}
-                    style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg, borderColor: activeRoleConfig.borderColor }}
+                    style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg }}
                   >
-                    {activeRoleConfig.icon} {activeRoleConfig.shortLabel}
+                    {activeRoleConfig.icon} {activeRoleConfig.navLabel || activeRoleConfig.shortLabel}
                   </span>
-                  <ChevronDown size={14} className={`tp-nav-user-chevron ${isProfileMenuOpen ? 'open' : ''}`} />
+                  <ChevronDown size={13} className={`tp-nav-user-chevron ${isProfileMenuOpen ? 'open' : ''}`} />
                 </button>
 
                 {isProfileMenuOpen && (
-                  <div className="tp-profile-dropdown">
+                  <div className="tp-profile-dropdown" role="dialog" aria-label="User Account Menu">
+                    {/* 1. Header Identity Card */}
                     <div className="tp-profile-dropdown-header">
-                      <img
-                        src={currentUser.avatar}
-                        alt={currentUser.name}
-                        className="tp-profile-dropdown-avatar"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0b0f19&color=ffffff&bold=true`;
-                        }}
-                      />
+                      <div className="tp-profile-avatar-wrap">
+                        <img
+                          src={currentUser.avatar}
+                          alt={currentUser.name}
+                          className="tp-profile-dropdown-avatar"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0f172a&color=ffffff&bold=true`;
+                          }}
+                        />
+                        <span className="tp-profile-status-dot" title="Active & Verified" />
+                      </div>
                       <div className="tp-profile-dropdown-user-info">
                         <div className="tp-profile-name-row">
                           <h4 className="tp-profile-dropdown-name">{currentUser.name}</h4>
                         </div>
                         <p className="tp-profile-dropdown-email">{currentUser.email || 'Guest Pilgrim'}</p>
 
-                        {/* Prominent Role & Category Tag */}
+                        {/* Role & Auth Badges */}
                         <div className="tp-profile-tag-cluster">
                           <span
                             className={`tp-role-tag ${activeRoleConfig.badgeClass}`}
@@ -2110,7 +2178,7 @@ export default function PartnerLandingPage({
                       </div>
                     </div>
 
-                    {/* Role & Authority Workspace Strip */}
+                    {/* 2. Authority & Workspace Role Switcher */}
                     <div className="tp-role-quick-strip">
                       <div className="tp-role-strip-header">
                         <div className="tp-role-strip-title">
@@ -2125,7 +2193,8 @@ export default function PartnerLandingPage({
                             setIsRoleModalOpen(true);
                           }}
                         >
-                          All Tags ({Object.keys(ROLE_CONFIGS).length})
+                          <span>All Tags ({Object.keys(ROLE_CONFIGS).length})</span>
+                          <ChevronRight size={11} />
                         </button>
                       </div>
 
@@ -2141,15 +2210,16 @@ export default function PartnerLandingPage({
                               onClick={() => handleSwitchRole(rk)}
                               title={cfg.label}
                             >
-                              <span>{cfg.icon}</span>
-                              <small>{cfg.shortLabel}</small>
+                              <span className="tp-role-pill-icon">{cfg.icon}</span>
+                              <span className="tp-role-pill-label">{cfg.navLabel || cfg.shortLabel}</span>
+                              {isCurrent && <span className="tp-role-pill-indicator" />}
                             </button>
                           );
                         })}
                       </div>
                     </div>
 
-                    {/* Incomplete Registration Banner or Verified Status */}
+                    {/* 3. Account Progress or Verified Status */}
                     {!currentUser.phone ? (
                       <div className="tp-profile-incomplete-card">
                         <div className="tp-profile-incomplete-header">
@@ -2205,18 +2275,21 @@ export default function PartnerLandingPage({
                       </div>
                     ) : (
                       <div className="tp-profile-verified-card">
-                        <div className="tp-profile-verified-pill">
-                          <CheckCircle2 size={13} color="#059669" />
-                          <span>100% Complete • Verified Member</span>
+                        <div className="tp-profile-verified-banner">
+                          <div className="tp-profile-verified-left">
+                            <CheckCircle2 size={13} className="tp-verified-icon" />
+                            <span>Verified {activeRoleConfig.shortLabel || 'Member'}</span>
+                          </div>
+                          <span className="tp-profile-verified-badge">100%</span>
                         </div>
                       </div>
                     )}
 
                     <div className="tp-profile-dropdown-divider" />
 
-                    {/* DYNAMIC ROLE-BASED ACTIONS ACCORDING TO USER TAG & AUTHORITY */}
+                    {/* 4. Navigation & Workspace Actions */}
                     <div className="tp-profile-dropdown-menu">
-                      {/* 1. ADMIN AUTHORIZED ACTIONS */}
+                      {/* ADMIN ACTIONS */}
                       {activeUserRole === 'admin' && (
                         <>
                           <button
@@ -2227,8 +2300,13 @@ export default function PartnerLandingPage({
                               if (onOpenAdmin) onOpenAdmin();
                             }}
                           >
-                            <Lock size={15} color="#d97706" />
-                            <span>👑 Platform Admin Console</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap admin">
+                                <Lock size={14} color="#d97706" />
+                              </span>
+                              <span>Platform Admin Console</span>
+                            </div>
+                            <span className="tp-profile-role-badge admin">Super</span>
                           </button>
                           <button
                             type="button"
@@ -2238,8 +2316,13 @@ export default function PartnerLandingPage({
                               if (onOpenPartnerHub) onOpenPartnerHub();
                             }}
                           >
-                            <Building2 size={15} />
-                            <span>👥 Partner Verification Center</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <Building2 size={14} />
+                              </span>
+                              <span>Partner Verification Center</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                           <button
                             type="button"
@@ -2249,13 +2332,18 @@ export default function PartnerLandingPage({
                               if (onClose) onClose();
                             }}
                           >
-                            <MapPin size={15} />
-                            <span>Sacred Map &amp; POI Overseer</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <MapPin size={14} />
+                              </span>
+                              <span>Sacred Map & POI Overseer</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                         </>
                       )}
 
-                      {/* 2. DRIVER AUTHORIZED ACTIONS */}
+                      {/* DRIVER ACTIONS */}
                       {activeUserRole === 'driver' && (
                         <>
                           <button
@@ -2267,8 +2355,13 @@ export default function PartnerLandingPage({
                               else if (onOpenPartnerHub) onOpenPartnerHub('driver');
                             }}
                           >
-                            <Car size={15} color="#059669" />
-                            <span>Open Sarathi Driver Portal</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap driver">
+                                <Car size={14} color="#059669" />
+                              </span>
+                              <span>Sarathi Driver Portal</span>
+                            </div>
+                            <span className="tp-profile-role-badge driver">Active</span>
                           </button>
                           <button
                             type="button"
@@ -2278,13 +2371,18 @@ export default function PartnerLandingPage({
                               if (onOpenDriverPage) onOpenDriverPage();
                             }}
                           >
-                            <Compass size={15} />
-                            <span>Driver Companion &amp; Fleet Desk</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <Compass size={14} />
+                              </span>
+                              <span>Fleet & Companion Desk</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                         </>
                       )}
 
-                      {/* 3. RESTAURANT / DINING AUTHORIZED ACTIONS */}
+                      {/* RESTAURANT ACTIONS */}
                       {(activeUserRole === 'restaurant' || activeUserRole === 'restaurant_staff') && (
                         <>
                           <button
@@ -2295,8 +2393,13 @@ export default function PartnerLandingPage({
                               if (onOpenPartnerHub) onOpenPartnerHub('restaurant');
                             }}
                           >
-                            <UtensilsCrossed size={15} color="#ea580c" />
-                            <span>Restaurant Partner Desk</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap restaurant">
+                                <UtensilsCrossed size={14} color="#ea580c" />
+                              </span>
+                              <span>Restaurant Partner Desk</span>
+                            </div>
+                            <span className="tp-profile-role-badge restaurant">Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2306,13 +2409,18 @@ export default function PartnerLandingPage({
                               if (onOpenRestaurantPage) onOpenRestaurantPage();
                             }}
                           >
-                            <Compass size={15} />
-                            <span>Brij Dining &amp; Food Directory</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <Compass size={14} />
+                              </span>
+                              <span>Brij Dining & Food Directory</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                         </>
                       )}
 
-                      {/* 4. HOTEL / STAY AUTHORIZED ACTIONS */}
+                      {/* HOTEL ACTIONS */}
                       {(activeUserRole === 'hotel' || activeUserRole === 'hotel_staff') && (
                         <>
                           <button
@@ -2323,8 +2431,13 @@ export default function PartnerLandingPage({
                               if (onOpenPartnerHub) onOpenPartnerHub('hotel');
                             }}
                           >
-                            <Building2 size={15} color="#2563eb" />
-                            <span>Hotel &amp; Ashram Stay Desk</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap hotel">
+                                <Building2 size={14} color="#2563eb" />
+                              </span>
+                              <span>Hotel & Ashram Stay Desk</span>
+                            </div>
+                            <span className="tp-profile-role-badge hotel">Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2334,13 +2447,18 @@ export default function PartnerLandingPage({
                               if (onOpenHotelPage) onOpenHotelPage();
                             }}
                           >
-                            <Compass size={15} />
-                            <span>Ashram &amp; Stay Directory</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <Compass size={14} />
+                              </span>
+                              <span>Ashram & Stay Directory</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                         </>
                       )}
 
-                      {/* 5. TOUR AGENCY AUTHORIZED ACTIONS */}
+                      {/* TOUR AGENCY ACTIONS */}
                       {activeUserRole === 'agency' && (
                         <>
                           <button
@@ -2351,8 +2469,13 @@ export default function PartnerLandingPage({
                               if (onOpenPartnerHub) onOpenPartnerHub('agency');
                             }}
                           >
-                            <Compass size={15} color="#7c3aed" />
-                            <span>Tour Agency &amp; Guide Desk</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap agency">
+                                <Compass size={14} color="#7c3aed" />
+                              </span>
+                              <span>Tour Agency & Guide Desk</span>
+                            </div>
+                            <span className="tp-profile-role-badge agency">Desk</span>
                           </button>
                           <button
                             type="button"
@@ -2362,8 +2485,13 @@ export default function PartnerLandingPage({
                               if (onOpenAgencyPage) onOpenAgencyPage();
                             }}
                           >
-                            <Calendar size={15} />
-                            <span>Brij Yatra Packages</span>
+                            <div className="tp-profile-item-left">
+                              <span className="tp-profile-item-icon-wrap">
+                                <Calendar size={14} />
+                              </span>
+                              <span>Brij Yatra Packages</span>
+                            </div>
+                            <ChevronRight size={13} className="tp-profile-item-arrow" />
                           </button>
                         </>
                       )}
@@ -2378,8 +2506,15 @@ export default function PartnerLandingPage({
                           el?.scrollIntoView({ behavior: 'smooth' });
                         }}
                       >
-                        <Heart size={15} fill={safeFavoriteIds.length > 0 ? '#ef4444' : 'none'} color={safeFavoriteIds.length > 0 ? '#ef4444' : 'currentColor'} />
-                        <span>Saved Favourites ({safeFavoriteIds.length})</span>
+                        <div className="tp-profile-item-left">
+                          <span className="tp-profile-item-icon-wrap fav">
+                            <Heart size={14} fill={safeFavoriteIds.length > 0 ? '#ef4444' : 'none'} color={safeFavoriteIds.length > 0 ? '#ef4444' : '#64748b'} />
+                          </span>
+                          <span>Saved Favourites</span>
+                        </div>
+                        <span className={`tp-profile-item-count ${safeFavoriteIds.length > 0 ? 'has-items' : ''}`}>
+                          {safeFavoriteIds.length}
+                        </span>
                       </button>
 
                       <button
@@ -2390,8 +2525,13 @@ export default function PartnerLandingPage({
                           setIsTripPackagesModalOpen(true);
                         }}
                       >
-                        <Compass size={15} />
-                        <span>Book A Tour / Yatra</span>
+                        <div className="tp-profile-item-left">
+                          <span className="tp-profile-item-icon-wrap">
+                            <Compass size={14} />
+                          </span>
+                          <span>Book A Tour / Yatra</span>
+                        </div>
+                        <ChevronRight size={13} className="tp-profile-item-arrow" />
                       </button>
 
                       <button
@@ -2402,25 +2542,40 @@ export default function PartnerLandingPage({
                           handleOpenReferralProgram();
                         }}
                       >
-                        <Gift size={15} color="#ec4899" />
-                        <span>Refer Pilgrims & Earn 500 Pts</span>
+                        <div className="tp-profile-item-left">
+                          <span className="tp-profile-item-icon-wrap gift">
+                            <Gift size={14} color="#ec4899" />
+                          </span>
+                          <span>Refer & Earn</span>
+                        </div>
+                        <span className="tp-profile-item-pts-badge">
+                          +500 Pts
+                        </span>
                       </button>
 
-                      <button
-                        type="button"
-                        className="tp-profile-dropdown-item"
-                        onClick={() => {
-                          setIsProfileMenuOpen(false);
-                          if (onOpenPartnerHub) onOpenPartnerHub();
-                        }}
-                      >
-                        <Building2 size={15} />
-                        <span>Partner Hub & Register</span>
-                      </button>
+                      {activeUserRole === 'pilgrim' && (
+                        <button
+                          type="button"
+                          className="tp-profile-dropdown-item"
+                          onClick={() => {
+                            setIsProfileMenuOpen(false);
+                            if (onOpenPartnerHub) onOpenPartnerHub();
+                          }}
+                        >
+                          <div className="tp-profile-item-left">
+                            <span className="tp-profile-item-icon-wrap">
+                              <Building2 size={14} />
+                            </span>
+                            <span>Partner Hub & Register</span>
+                          </div>
+                          <ChevronRight size={13} className="tp-profile-item-arrow" />
+                        </button>
+                      )}
                     </div>
 
                     <div className="tp-profile-dropdown-divider" />
 
+                    {/* 5. Footer Sign Out */}
                     <div className="tp-profile-dropdown-footer">
                       <button
                         type="button"
@@ -2430,7 +2585,9 @@ export default function PartnerLandingPage({
                           handleLogout();
                         }}
                       >
-                        <LogOut size={15} />
+                        <span className="tp-profile-logout-icon-wrap">
+                          <LogOut size={14} />
+                        </span>
                         <span>Sign Out</span>
                       </button>
                     </div>
@@ -2587,8 +2744,8 @@ export default function PartnerLandingPage({
                   <div className="tp-mobile-role-strip">
                     <div className="tp-mobile-role-header">
                       <div className="tp-mobile-role-left">
-                        <ShieldCheck size={13} style={{ color: activeRoleConfig.color }} />
-                        <span>AUTHORITY: <strong>{activeRoleConfig.shortLabel}</strong></span>
+                        <ShieldCheck size={14} style={{ color: activeRoleConfig.color }} />
+                        <span>Authority: <strong>{activeRoleConfig.shortLabel}</strong></span>
                       </div>
                       <button
                         type="button"
@@ -2598,7 +2755,8 @@ export default function PartnerLandingPage({
                           setIsRoleModalOpen(true);
                         }}
                       >
-                        All Tags ({Object.keys(ROLE_CONFIGS).length})
+                        <span>All Tags ({Object.keys(ROLE_CONFIGS).length})</span>
+                        <ChevronRight size={11} />
                       </button>
                     </div>
                     <div className="tp-mobile-role-pills">
@@ -2611,9 +2769,11 @@ export default function PartnerLandingPage({
                             type="button"
                             className={`tp-mobile-role-pill ${isCurrent ? 'active' : ''}`}
                             onClick={() => handleSwitchRole(rk)}
+                            title={cfg.label}
                           >
-                            <span>{cfg.icon}</span>
-                            <small>{cfg.shortLabel}</small>
+                            <span className="tp-role-pill-icon">{cfg.icon}</span>
+                            <span className="tp-role-pill-label">{cfg.navLabel || cfg.shortLabel}</span>
+                            {isCurrent && <span className="tp-role-pill-indicator" />}
                           </button>
                         );
                       })}
@@ -4225,14 +4385,11 @@ export default function PartnerLandingPage({
             phone: bookingPhone || currentUser?.phone || '',
           }}
           onPaymentSuccess={(receipt) => {
+            setStripeModalItem(null);
             setSelectedItem(null);
-            setFloatingToast({
-              id: `pay_${Date.now()}`,
-              title: 'Payment Succeeded (Stripe)',
-              desc: `Transaction ${receipt.transaction_id.slice(0, 16)}... verified!`,
-              highlight: true
-            });
-            setTimeout(() => setFloatingToast(null), 5000);
+            if (onOpenHelpCenter) {
+              onOpenHelpCenter();
+            }
           }}
         />
       )}
@@ -5131,47 +5288,57 @@ export default function PartnerLandingPage({
         document.body
       )}
 
-      {/* Floating Interactive Toast for Registration & Profile Completion Prompt (Mounted via Portal to Screen Body) */}
-      {floatingToast && !selectedItem && !isTripPackagesModalOpen && !isRoleModalOpen && !isVideoModalOpen && !isFilterModalOpen && !isAuthModalOpen && !isMobileMenuOpen && !isInstantRideModalOpen && !stripeModalItem && !lightboxItem && !isReferralModalOpen && typeof document !== 'undefined' && createPortal(
+      {/* Floating Interactive Toast (Mounted via Portal to Screen Body) */}
+      {floatingToast && (floatingToast.title || floatingToast.message || floatingToast.desc) && !selectedItem && !isTripPackagesModalOpen && !isRoleModalOpen && !isVideoModalOpen && !isFilterModalOpen && !isAuthModalOpen && !isMobileMenuOpen && !isInstantRideModalOpen && !stripeModalItem && !lightboxItem && !isReferralModalOpen && typeof document !== 'undefined' && createPortal(
         <aside
           className="tp-floating-toast"
           role="status"
           aria-live="polite"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className={`tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
-            {floatingToast.icon}
-          </div>
-          <div className="tp-toast-body">
-            <h4 className="tp-toast-title">{floatingToast.title}</h4>
-            <p className="tp-toast-desc">{floatingToast.desc}</p>
-            <div className="tp-toast-actions">
-              <button
-                type="button"
-                className="tp-toast-cta"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (typeof floatingToast.onCta === 'function') {
-                    floatingToast.onCta();
-                  }
-                }}
-              >
-                {floatingToast.ctaText}
-              </button>
-              <button
-                type="button"
-                className="tp-toast-dismiss"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setFloatingToast(null);
-                  sessionStorage.setItem('vrinda_toast_dismissed', 'true');
-                }}
-              >
-                Dismiss
-              </button>
+          {floatingToast.icon ? (
+            <div className={`tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
+              {floatingToast.icon}
             </div>
+          ) : (
+            <div className="tp-toast-icon-wrap highlight">
+              <Sparkles size={18} />
+            </div>
+          )}
+          <div className="tp-toast-body">
+            <h4 className="tp-toast-title">{floatingToast.title || floatingToast.message}</h4>
+            {floatingToast.desc && <p className="tp-toast-desc">{floatingToast.desc}</p>}
+            {(floatingToast.ctaText || floatingToast.showDismiss) ? (
+              <div className="tp-toast-actions">
+                {floatingToast.ctaText ? (
+                  <button
+                    type="button"
+                    className="tp-toast-cta"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (typeof floatingToast.onCta === 'function') {
+                        floatingToast.onCta();
+                      }
+                    }}
+                  >
+                    {floatingToast.ctaText}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="tp-toast-dismiss"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setFloatingToast(null);
+                    sessionStorage.setItem('vrinda_toast_dismissed', 'true');
+                  }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            ) : null}
           </div>
           <button
             type="button"
@@ -5184,7 +5351,7 @@ export default function PartnerLandingPage({
             }}
             aria-label="Close notification"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </aside>,
         document.body

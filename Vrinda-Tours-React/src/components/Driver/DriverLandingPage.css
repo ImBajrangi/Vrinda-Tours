@@ -551,7 +551,8 @@
 .dmd-nav-center {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
+  flex-shrink: 1;
 }
 
 .dmd-nav-link {
@@ -566,6 +567,7 @@
   text-decoration: none;
   transition: color 0.15s ease;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .dmd-nav-link:hover {
@@ -591,16 +593,22 @@
 .dmd-nav-link-pill {
   background: #f4f4f5;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #18181b;
-  padding: 5px 14px;
+  padding: 5px 12px;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.15s ease;
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.dmd-nav-link-pill span {
+  white-space: nowrap !important;
 }
 
 .dmd-nav-link-pill:hover {
@@ -612,17 +620,49 @@
   color: #ffffff;
 }
 
-@media (max-width: 860px) {
-  .dmd-nav-center {
-    display: none;
-  }
-}
-
 .dmd-nav-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+@media (max-width: 1280px) {
+  .dmd-nav-center {
+    gap: 12px;
+  }
+  .dmd-nav-link-pill {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1160px) {
+  .dmd-nav-btn-icon .dmd-btn-text-desktop {
+    display: none !important;
+  }
+  .dmd-nav-btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0 !important;
+    border-radius: 50%;
+    justify-content: center;
+    gap: 0 !important;
+  }
+  .dmd-btn-signin {
+    padding: 6px 12px;
+    font-size: 12.5px;
+  }
+  .dmd-btn-register-cta,
+  .dmd-nav-right .dmd-btn-primary {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .dmd-nav-center {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================

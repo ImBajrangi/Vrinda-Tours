@@ -16,8 +16,9 @@ import {
   deleteField 
 } from 'firebase/firestore';
 import { firestore } from '../config/firebase';
-import { supabase, TABLES } from '../config/supabase';
+import { supabase, TABLES, safeRemoveChannel } from '../config/supabase';
 import { calculateDistance } from '../utils/distance';
+import { recordCompletedRideCommission } from './commissionService';
 
 const STORAGE_KEY = 'vt_active_ride_request';
 const DRIVER_SKIPPED_KEY = 'vt_driver_skipped_rides';
@@ -251,7 +252,7 @@ export function subscribeToRideRequest(rideId, onUpdate) {
   return () => {
     isUnsubscribed = true;
     window.removeEventListener('vt:ride-updated', handleLocalUpdate);
-    if (sbChannel) supabase.removeChannel(sbChannel);
+    safeRemoveChannel(sbChannel);
     unsubFirestore();
   };
 }
@@ -376,7 +377,7 @@ export function subscribeToAvailableRides(driverPosition, onListUpdate) {
   return () => {
     isUnsubscribed = true;
     window.removeEventListener('vt:ride-updated', handleBroadcast);
-    if (sbChannel) supabase.removeChannel(sbChannel);
+    safeRemoveChannel(sbChannel);
     unsubFirestore();
   };
 }
@@ -549,6 +550,16 @@ export async function completeRide(rideId, driverId) {
       });
     }
   } catch (err) {}
+
+  // 3. Record Cash Ride & Calculate Platform Commission (10%)
+  try {
+    const activeDriverId = driverId || updated.driver?.id;
+    if (activeDriverId) {
+      await recordCompletedRideCommission(activeDriverId, updated);
+    }
+  } catch (commErr) {
+    console.warn('[RideService] Commission record notice:', commErr);
+  }
 
   return updated;
 }

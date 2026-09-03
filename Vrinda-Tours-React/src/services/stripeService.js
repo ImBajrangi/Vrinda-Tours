@@ -4,7 +4,7 @@
  * Supabase Transaction Syncing, and Cached Payment History.
  */
 
-import { supabase } from '../config/supabase';
+import { supabase, safeRemoveChannel } from '../config/supabase';
 
 // Stripe API credentials
 export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '';
@@ -115,6 +115,93 @@ export async function createStripeCheckoutSession({
   }
 }
 
+// Cross-tab broadcast channel for instant multi-tab sync on same machine
+const localPaymentBc = typeof window !== 'undefined' && typeof window.BroadcastChannel !== 'undefined'
+  ? new BroadcastChannel('vt_realtime_payments_hub')
+  : null;
+
+let activePaymentsChannel = null;
+
+function safeBroadcastPayment(channelInstance, eventName, payload) {
+  if (!channelInstance) return;
+  try {
+    if (channelInstance.state === 'joined') {
+      channelInstance.send({
+        type: 'broadcast',
+        event: eventName,
+        payload
+      });
+    }
+  } catch {}
+}
+
+/**
+ * Real-time listener for Stripe Payments across all devices & browser tabs (<20ms)
+ */
+export function subscribeToPayments(onNewPayment) {
+  if (typeof onNewPayment !== 'function') return () => {};
+
+  // 1. Cross-tab & local in-tab listeners
+  const bcHandler = (e) => {
+    if (e?.data) onNewPayment(e.data);
+  };
+  if (localPaymentBc) {
+    localPaymentBc.addEventListener('message', bcHandler);
+  }
+
+  const windowHandler = (e) => {
+    if (e.detail) onNewPayment(e.detail);
+  };
+  window.addEventListener('vt_new_payment', windowHandler);
+
+  // 2. Supabase Real-Time Broadcast + Postgres Changes Listener
+  let channel = null;
+  if (supabase) {
+    channel = supabase
+      .channel('vt_payments_stream')
+      .on('broadcast', { event: 'new_payment' }, ({ payload }) => {
+        if (payload) onNewPayment(payload);
+      })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'payments'
+        },
+        (payload) => {
+          const raw = payload.new || payload.old;
+          if (raw) {
+            onNewPayment({
+              id: raw.id,
+              transaction_id: raw.id,
+              amount: raw.amount,
+              currency: raw.currency || 'INR',
+              status: raw.status || 'succeeded',
+              item_title: raw.metadata?.item_title || raw.item_type || 'Pilgrimage Package',
+              customer_name: raw.customer_name || 'Devotee',
+              customer_email: raw.customer_email || '',
+              customer_phone: raw.metadata?.customer_phone || '',
+              payment_method: raw.metadata?.payment_method || 'stripe_card',
+              created_at: raw.created_at || new Date().toISOString(),
+              metadata: raw.metadata || {}
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    activePaymentsChannel = channel;
+  }
+
+  return () => {
+    if (localPaymentBc) localPaymentBc.removeEventListener('message', bcHandler);
+    window.removeEventListener('vt_new_payment', windowHandler);
+    if (activePaymentsChannel === channel) activePaymentsChannel = null;
+    safeRemoveChannel(channel);
+  };
+}
+
 /**
  * Process in-app instant payment with direct tokenization and verification
  */
@@ -152,7 +239,7 @@ export async function processInAppPayment({
     }
   };
 
-  // 1. Save to Supabase
+  // 1. Save to Supabase (and trigger real-time replication)
   try {
     await savePaymentRecord(paymentRecord);
   } catch (err) {
@@ -165,6 +252,13 @@ export async function processInAppPayment({
     const updated = [paymentRecord, ...cached].slice(0, 50);
     localStorage.setItem('vt_payments_cache', JSON.stringify(updated));
   } catch {}
+
+  // 3. Broadcast across tabs and active WebSockets (<20ms)
+  if (localPaymentBc) {
+    try { localPaymentBc.postMessage(paymentRecord); } catch {}
+  }
+  window.dispatchEvent(new CustomEvent('vt_new_payment', { detail: paymentRecord }));
+  safeBroadcastPayment(activePaymentsChannel, 'new_payment', paymentRecord);
 
   return {
     success: true,
@@ -205,6 +299,14 @@ export async function savePaymentRecord(paymentData) {
     if (error) {
       console.warn('Supabase payments table insert notice:', error.message);
     }
+
+    // Broadcast across tabs and active WebSockets (<20ms)
+    if (localPaymentBc) {
+      try { localPaymentBc.postMessage(paymentData); } catch {}
+    }
+    window.dispatchEvent(new CustomEvent('vt_new_payment', { detail: paymentData }));
+    safeBroadcastPayment(activePaymentsChannel, 'new_payment', paymentData);
+
     return data;
   } catch (err) {
     console.warn('Supabase savePaymentRecord exception:', err);

@@ -16,6 +16,7 @@ import { firestore } from '../../config/firebase';
 import { supabase } from '../../config/supabase';
 import { getPaymentsHistory, formatINR } from '../../services/stripeService';
 import { getAllSupportThreads, sendAdminReply, updateThreadStatus } from '../../services/messagingService';
+import { approveSettlement, rejectSettlement, subscribeToAllSettlements } from '../../services/commissionService';
 import './AdminPanel.css';
 
 // Admin email whitelist and master passcode from environment
@@ -89,12 +90,23 @@ export default function AdminPanel({
   const [tableReservations, setTableReservations] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [settlements, setSettlements] = useState([]);
+  const [paymentsSubTab, setPaymentsSubTab] = useState('driver_commissions');
   const [supportThreads, setSupportThreads] = useState([]);
   const [selectedThreadId, setSelectedThreadId] = useState(null);
   const [adminReplyText, setAdminReplyText] = useState('');
   const [isSendingReply, setIsSendingReply] = useState(false);
   const [supportSearch, setSupportSearch] = useState('');
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [approvingId, setApprovingId] = useState(null);
+
+  // Subscribe to all driver settlements in real-time
+  useEffect(() => {
+    const unsub = subscribeToAllSettlements((list) => {
+      setSettlements(list);
+    });
+    return () => unsub();
+  }, []);
 
   // Modals & CRUD Form States
   const [showAddPoiModal, setShowAddPoiModal] = useState(false);
@@ -109,6 +121,29 @@ export default function AdminPanel({
   const showToast = (msg, type = 'success') => {
     setToastMsg({ text: msg, type });
     setTimeout(() => setToastMsg(null), 3200);
+  };
+
+  const handleApproveSettlement = async (settlement) => {
+    if (!settlement?.id) return;
+    setApprovingId(settlement.id);
+    try {
+      await approveSettlement(settlement.id, 'Verified by Admin');
+      showToast(`✓ UTR ${settlement.utrNumber} Approved! Balance deducted.`);
+    } catch (err) {
+      showToast(err.message || 'Failed to approve', 'error');
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleRejectSettlement = async (settlement, reason = 'पैसे बैंक में प्राप्त नहीं हुए') => {
+    if (!settlement?.id) return;
+    try {
+      await rejectSettlement(settlement.id, reason, 'Admin review');
+      showToast(`✗ UTR ${settlement.utrNumber} Rejected.`, 'error');
+    } catch (err) {
+      showToast(err.message || 'Failed to reject', 'error');
+    }
   };
 
   // Fetch all Supabase backend entities
@@ -1377,91 +1412,236 @@ export default function AdminPanel({
             </div>
           )}
 
-          {/* TAB 7: STRIPE PAYMENTS & TRANSACTION RECORDS */}
+          {/* TAB 7: PAYMENTS & DRIVER COMMISSION SETTLEMENTS */}
           {activeTab === 'payments' && (
             <div className="adm-tab-pane">
-              <div className="adm-pane-header">
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Stripe Payment Gateway Records</h3>
-                  <span style={{ fontSize: '0.8rem', color: '#71717a' }}>Real-time transactions, booking payments, and verified receipts</span>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="adm-action-pill" onClick={fetchAllData}>
-                    <ArrowPathIcon style={{ width: 14, height: 14 }} /> Refresh Transactions
-                  </button>
-                </div>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px' }}>
+                <button
+                  type="button"
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: paymentsSubTab === 'driver_commissions' ? '#0f172a' : '#f1f5f9',
+                    color: paymentsSubTab === 'driver_commissions' ? '#fff' : '#475569',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setPaymentsSubTab('driver_commissions')}
+                >
+                  Driver Commissions &amp; UTRs ({settlements.filter(s => s.status === 'pending').length} Pending)
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    padding: '8px 14px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: paymentsSubTab === 'stripe_payments' ? '#0f172a' : '#f1f5f9',
+                    color: paymentsSubTab === 'stripe_payments' ? '#fff' : '#475569',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => setPaymentsSubTab('stripe_payments')}
+                >
+                  Stripe Devotee Payments ({payments.length})
+                </button>
               </div>
 
-              <div className="adm-table-container">
-                {payments.length === 0 ? (
-                  <div style={{ padding: '3rem 1rem', textAlign: 'center', color: '#71717a' }}>
-                    <CreditCardIcon style={{ width: 36, height: 36, margin: '0 auto 8px', color: '#a1a1aa' }} />
-                    <p style={{ margin: 0, fontWeight: 700 }}>No payments recorded yet</p>
-                    <span style={{ fontSize: '0.8rem' }}>When devotees complete Stripe checkout, transactions will appear here live.</span>
+              {paymentsSubTab === 'driver_commissions' ? (
+                <div>
+                  {/* Summary Cards */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ padding: '12px 14px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '12px' }}>
+                      <small style={{ color: '#be123c', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.7rem' }}>कुल बकाया कमीशन</small>
+                      <h3 style={{ margin: '4px 0 0 0', color: '#e11d48', fontSize: '1.4rem' }}>
+                        ₹{drivers.reduce((s, d) => s + (d.commissionDue || 0), 0)}
+                      </h3>
+                    </div>
+                    <div style={{ padding: '12px 14px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px' }}>
+                      <small style={{ color: '#15803d', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.7rem' }}>जमा प्राप्त कमीशन</small>
+                      <h3 style={{ margin: '4px 0 0 0', color: '#16a34a', fontSize: '1.4rem' }}>
+                        ₹{settlements.filter(s => s.status === 'approved').reduce((s, x) => s + (x.amount || 0), 0)}
+                      </h3>
+                    </div>
+                    <div style={{ padding: '12px 14px', background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '12px' }}>
+                      <small style={{ color: '#b45309', fontWeight: 800, textTransform: 'uppercase', fontSize: '0.7rem' }}>सत्यापन प्रतीक्षा</small>
+                      <h3 style={{ margin: '4px 0 0 0', color: '#d97706', fontSize: '1.4rem' }}>
+                        {settlements.filter(s => s.status === 'pending').length} UTR
+                      </h3>
+                    </div>
                   </div>
-                ) : (
-                  <table className="adm-table">
-                    <thead>
-                      <tr>
-                        <th>Transaction ID</th>
-                        <th>Devotee / Customer</th>
-                        <th>Package / Service</th>
-                        <th>Amount</th>
-                        <th>Method</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {payments.map((p, idx) => (
-                        <tr key={p.id || p.transaction_id || idx}>
-                          <td>
-                            <code style={{ fontSize: '0.78rem', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>
-                              {(p.transaction_id || p.id || '').slice(0, 18)}...
-                            </code>
-                          </td>
-                          <td>
-                            <strong style={{ display: 'block', fontSize: '0.85rem' }}>{p.customer_name || 'Guest Traveler'}</strong>
-                            <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{p.customer_email || p.customer_phone || 'Direct'}</span>
-                          </td>
-                          <td>
-                            <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.item_title || 'Brij Yatra Package'}</span>
-                          </td>
-                          <td>
-                            <strong style={{ color: '#059669', fontSize: '0.92rem' }}>{formatINR(p.amount)}</strong>
-                          </td>
-                          <td>
-                            <span style={{ fontSize: '0.78rem', textTransform: 'capitalize' }}>
-                              {p.payment_method === 'stripe_card' ? `Card (•••• ${p.card_last4 || '4242'})` : p.payment_method || 'Card'}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px',
-                              fontSize: '0.72rem',
-                              fontWeight: 700,
-                              background: '#dcfce7',
-                              color: '#166534',
-                              padding: '2px 8px',
-                              borderRadius: '999px'
-                            }}>
-                              <CheckCircleIcon style={{ width: 12, height: 12 }} />
-                              {p.status || 'Succeeded'}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontSize: '0.75rem', color: '#71717a' }}>
-                              {p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
-                            </span>
-                          </td>
-                        </tr>
+
+                  {/* Pending UTR Queue */}
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '0.95rem' }}>Pending Driver UTR Approvals</h4>
+                  {settlements.filter(s => s.status === 'pending').length === 0 ? (
+                    <div style={{ padding: '2rem', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', color: '#64748b' }}>
+                      <CheckCircleIcon style={{ width: 28, height: 28, color: '#16a34a', margin: '0 auto 6px' }} />
+                      <p style={{ margin: 0, fontWeight: 700 }}>No pending UTRs! All balances settled.</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+                      {settlements.filter(s => s.status === 'pending').map(s => (
+                        <div key={s.id} style={{ background: '#fff', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <strong>{s.driverName}</strong>
+                            <span style={{ fontSize: '0.72rem', background: '#fef3c7', color: '#b45309', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Pending</span>
+                          </div>
+                          <div style={{ fontSize: '0.76rem', color: '#64748b' }}>
+                            {s.vehicleType} • {s.vehicleNo} • {s.driverPhone}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', background: '#f8fafc', padding: '8px', borderRadius: '8px' }}>
+                            <div>
+                              <small style={{ color: '#64748b', display: 'block' }}>UTR Number</small>
+                              <code style={{ fontWeight: 800 }}>{s.utrNumber}</code>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <small style={{ color: '#64748b', display: 'block' }}>Claimed Amount</small>
+                              <strong style={{ color: '#16a34a', fontSize: '1.05rem' }}>₹{s.amount}</strong>
+                            </div>
+                          </div>
+                          {s.proofImage && (
+                            <img src={s.proofImage} alt="Proof" style={{ width: '100%', maxHeight: '120px', objectFit: 'cover', borderRadius: '8px' }} />
+                          )}
+                          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                            <button
+                              type="button"
+                              style={{ flex: 1, padding: '7px', background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem' }}
+                              onClick={() => handleRejectSettlement(s, 'पैसे बैंक में प्राप्त नहीं हुए (Payment not received in bank)')}
+                            >
+                              Reject (पैसे नहीं आए)
+                            </button>
+                            <button
+                              type="button"
+                              style={{ flex: 1.5, padding: '7px', background: '#16a34a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 800, cursor: 'pointer', fontSize: '0.78rem' }}
+                              onClick={() => handleApproveSettlement(s)}
+                              disabled={approvingId === s.id}
+                            >
+                              {approvingId === s.id ? 'Approving...' : `Approve (₹${s.amount})`}
+                            </button>
+                          </div>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
+                    </div>
+                  )}
+
+                  {/* Settlements Ledger */}
+                  <h4 style={{ margin: '18px 0 10px 0', fontSize: '0.95rem' }}>Recent UTR Settlements Ledger</h4>
+                  <div className="adm-table-container">
+                    <table className="adm-table">
+                      <thead>
+                        <tr>
+                          <th>UTR Number</th>
+                          <th>Driver</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th>Date</th>
+                          <th>Admin Action / Note</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {settlements.map(s => (
+                          <tr key={s.id}>
+                            <td><code>{s.utrNumber}</code></td>
+                            <td>{s.driverName}</td>
+                            <td><strong style={{ color: '#16a34a' }}>₹{s.amount}</strong></td>
+                            <td>
+                              <span style={{
+                                padding: '2px 8px',
+                                borderRadius: '999px',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                background: s.status === 'approved' ? '#dcfce7' : s.status === 'rejected' ? '#fee2e2' : '#fef3c7',
+                                color: s.status === 'approved' ? '#166534' : s.status === 'rejected' ? '#991b1b' : '#b45309'
+                              }}>
+                                {s.status}
+                              </span>
+                            </td>
+                            <td>{s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-IN') : ''}</td>
+                            <td>
+                              <small>{s.rejectionReason || s.adminNotes || '—'}</small>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : (
+                /* STRIPE PAYMENTS */
+                <div className="adm-table-container">
+                  {payments.length === 0 ? (
+                    <div style={{ padding: '3rem 1rem', textAlign: 'center', color: '#71717a' }}>
+                      <CreditCardIcon style={{ width: 36, height: 36, margin: '0 auto 8px', color: '#a1a1aa' }} />
+                      <p style={{ margin: 0, fontWeight: 700 }}>No payments recorded yet</p>
+                      <span style={{ fontSize: '0.8rem' }}>When devotees complete Stripe checkout, transactions will appear here live.</span>
+                    </div>
+                  ) : (
+                    <table className="adm-table">
+                      <thead>
+                        <tr>
+                          <th>Transaction ID</th>
+                          <th>Devotee / Customer</th>
+                          <th>Package / Service</th>
+                          <th>Amount</th>
+                          <th>Method</th>
+                          <th>Status</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {payments.map((p, idx) => (
+                          <tr key={p.id || p.transaction_id || idx}>
+                            <td>
+                              <code style={{ fontSize: '0.78rem', background: '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>
+                                {(p.transaction_id || p.id || '').slice(0, 18)}...
+                              </code>
+                            </td>
+                            <td>
+                              <strong style={{ display: 'block', fontSize: '0.85rem' }}>{p.customer_name || 'Guest Traveler'}</strong>
+                              <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{p.customer_email || p.customer_phone || 'Direct'}</span>
+                            </td>
+                            <td>
+                              <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.item_title || 'Brij Yatra Package'}</span>
+                            </td>
+                            <td>
+                              <strong style={{ color: '#059669', fontSize: '0.92rem' }}>{formatINR(p.amount)}</strong>
+                            </td>
+                            <td>
+                              <span style={{ fontSize: '0.78rem', textTransform: 'capitalize' }}>
+                                {p.payment_method === 'stripe_card' ? `Card (•••• ${p.card_last4 || '4242'})` : p.payment_method || 'Card'}
+                              </span>
+                            </td>
+                            <td>
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '0.72rem',
+                                fontWeight: 700,
+                                background: '#dcfce7',
+                                color: '#166534',
+                                padding: '2px 8px',
+                                borderRadius: '999px'
+                              }}>
+                                <CheckCircleIcon style={{ width: 12, height: 12 }} />
+                                {p.status || 'Succeeded'}
+                              </span>
+                            </td>
+                            <td>
+                              <span style={{ fontSize: '0.75rem', color: '#71717a' }}>
+                                {p.created_at ? new Date(p.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

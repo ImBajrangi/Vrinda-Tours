@@ -5,7 +5,7 @@ import {
   XMarkIcon, LockClosedIcon, ClockIcon, ExclamationTriangleIcon 
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
-import { supabase } from '../../config/supabase';
+import { supabase, safeRemoveChannel } from '../../config/supabase';
 
 // Simple debounce helper to prevent rapid-fire mutation clicks
 function useDebounce() {
@@ -100,7 +100,7 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
 
     return () => {
       isMounted = false;
-      supabase.removeChannel(channel);
+      safeRemoveChannel(channel);
     };
   }, []);
 

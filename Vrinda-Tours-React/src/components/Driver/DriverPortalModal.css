@@ -1336,3 +1336,847 @@
 .dp-btn-accept-req:hover {
   background: #047857;
 }
+
+/* ==========================================================================
+   DRIVER COMMISSION DUE CARD & UTR SUBMISSION STYLES
+   ========================================================================== */
+
+.dp-commission-card {
+  margin: 0.85rem 1rem;
+  padding: 1.1rem;
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.dp-commission-card.has-due {
+  border-color: rgba(225, 29, 72, 0.25);
+  background: linear-gradient(145deg, #ffffff, #fff1f2);
+  box-shadow: 0 4px 24px rgba(225, 29, 72, 0.06);
+}
+
+.dp-commission-card.cleared {
+  border-color: rgba(22, 163, 74, 0.25);
+  background: linear-gradient(145deg, #ffffff, #f0fdf4);
+}
+
+.dp-comm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dp-comm-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dp-comm-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #0f172a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dp-comm-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #09090b;
+}
+
+.dp-comm-sub {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dp-comm-status-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+}
+
+.dp-comm-status-pill.due {
+  background: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+.dp-comm-status-pill.cleared {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.dp-comm-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+}
+
+.dp-comm-main-val {
+  display: flex;
+  flex-direction: column;
+}
+
+.dp-comm-currency {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #71717a;
+  display: none;
+}
+
+.dp-comm-num {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: #09090b;
+  line-height: 1.1;
+  font-family: inherit;
+}
+
+.has-due .dp-comm-num {
+  color: #e11d48;
+}
+
+.cleared .dp-comm-num {
+  color: #16a34a;
+}
+
+.dp-comm-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.dp-comm-stats-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: right;
+}
+
+.dp-mini-stat small {
+  display: block;
+  font-size: 0.68rem;
+  color: #71717a;
+  font-weight: 600;
+}
+
+.dp-mini-stat strong {
+  font-size: 0.88rem;
+  color: #09090b;
+}
+
+.dp-comm-pending-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  color: #92400e;
+}
+
+.dp-comm-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.dp-btn-pay-comm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+  transition: all 0.2s ease;
+}
+
+.has-due .dp-btn-pay-comm {
+  background: #e11d48;
+  box-shadow: 0 4px 16px rgba(225, 29, 72, 0.25);
+}
+
+.dp-btn-pay-comm:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.dp-comm-history-toggles {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.dp-comm-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dp-comm-toggle-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+/* Settlements History Accordion Box */
+.dp-settlements-history-box {
+  margin-top: 0.5rem;
+  padding: 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  animation: dpFadeIn 0.2s ease;
+}
+
+.dp-sh-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dp-sh-head h5 {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.dp-sh-add-btn {
+  background: none;
+  border: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.dp-sh-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.dp-sh-empty p {
+  margin: 0 0 4px 0;
+  font-weight: 700;
+  color: #334155;
+}
+
+.dp-sh-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.dp-sh-item {
+  padding: 0.65rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dp-sh-item.status-approved {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.dp-sh-item.status-rejected {
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+
+.dp-sh-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dp-sh-utr-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dp-sh-utr-code {
+  font-family: monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: #ffffff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+}
+
+.dp-sh-mode {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dp-sh-amount {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #09090b;
+}
+
+.dp-sh-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+}
+
+.dp-sh-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.dp-sh-pill.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.dp-sh-pill.approved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.dp-sh-pill.rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dp-sh-time {
+  color: #94a3b8;
+}
+
+.dp-sh-rejection-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 0.45rem 0.6rem;
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  font-size: 0.73rem;
+  color: #991b1b;
+}
+
+.dp-sh-approved-note {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+/* Ledger Item */
+.dp-sh-item.ledger-item {
+  background: #f8fafc;
+}
+
+/* ==========================================================================
+   PAY COMMISSION & UTR SUBMIT MODAL / DIALOG
+   ========================================================================== */
+
+.dp-pay-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: dpFadeIn 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .dp-pay-modal-overlay {
+    align-items: center;
+  }
+}
+
+.dp-pay-modal-card {
+  width: 100%;
+  max-width: 500px;
+  max-height: 92vh;
+  background: #ffffff;
+  border-radius: 28px 28px 0 0;
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: dpSlideUpMobile 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  .dp-pay-modal-card {
+    border-radius: 24px;
+    max-height: 88vh;
+    animation: dpSlideUpCorner 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+.dp-pay-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dp-pay-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dp-pay-modal-title h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #09090b;
+}
+
+.dp-pay-modal-title span {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+  display: block;
+}
+
+.dp-pay-close-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+}
+
+.dp-pay-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.dp-pay-modal-body {
+  padding: 1.15rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.dp-pay-due-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.15rem;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #ffffff;
+  border-radius: 18px;
+}
+
+.dp-pay-due-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+.dp-pay-due-amount {
+  margin: 2px 0 0 0;
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #34d399;
+}
+
+.dp-pay-due-tip {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  text-align: right;
+  max-width: 140px;
+}
+
+.dp-pay-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dp-pay-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.dp-step-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dp-pay-channels-grid {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+}
+
+@media (min-width: 440px) {
+  .dp-pay-channels-grid {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.dp-qr-card {
+  flex: 0 0 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.dp-qr-wrapper {
+  width: 110px;
+  height: 110px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dp-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.dp-qr-caption {
+  margin-top: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.dp-pay-details-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.dp-pay-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.dp-pdr-left small {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 0.03em;
+}
+
+.dp-pdr-left strong {
+  font-size: 0.85rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.dp-pdr-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.35rem 0.65rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dp-pdr-copy-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.dp-btn-launch-upi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.65rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.dp-btn-launch-upi:hover {
+  background: #dbeafe;
+}
+
+/* UTR FORM */
+.dp-utr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.dp-form-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dp-form-alert.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.dp-form-alert.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+}
+
+.dp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 440px) {
+  .dp-form-grid {
+    grid-template-columns: 1fr 1.3fr;
+  }
+}
+
+.dp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dp-form-group label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.dp-form-group input {
+  padding: 0.75rem 0.85rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dp-form-group input:focus {
+  border-color: #0f172a;
+}
+
+.dp-field-tip {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.dp-mode-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dp-mode-chip {
+  padding: 0.4rem 0.75rem;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dp-mode-chip.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.dp-proof-upload-box {
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 0.75rem;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.dp-proof-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.dp-proof-preview-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dp-proof-preview-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.dp-proof-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.4rem 0.75rem;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dp-btn-submit-utr {
+  margin-top: 0.5rem;
+  padding: 0.95rem;
+  background: #16a34a;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 0.92rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(22, 163, 74, 0.3);
+  transition: all 0.2s ease;
+}
+
+.dp-btn-submit-utr:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.dp-btn-submit-utr:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
