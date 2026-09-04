@@ -4,19 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About Us — Vrinda Vihar & Sacred Brij Pilgrimage Mission</title>
-  <meta name="title" content="About Us — Vrinda Vihar & Sacred Brij Pilgrimage Mission" />
+  <title>About Us — Vrinda Vihar &amp; Sacred Brij Pilgrimage Mission</title>
+  <meta name="title" content="About Us — Vrinda Vihar &amp; Sacred Brij Pilgrimage Mission" />
   <meta name="description"
     content="Discover the sacred mission of Vrinda Vihar by Vrindopnishad. Preserving 84 Kos Yatra heritage, connecting devotees worldwide with verified Brajwasi drivers, and zero-middleman ashram stays." />
   <meta name="keywords"
     content="About Vrinda Vihar, Vrindopnishad mission, Brij 84 Kos Yatra history, Vrindavan pilgrimage organization, Mathura spiritual travel, Brajwasi driver community" />
   <link rel="canonical" href="https://to.vrindopnishad.in/about.html" />
-  <meta name="theme-color" content="#0f172a" />
+  <meta name="theme-color" content="#0b0f19" />
 
-  <!-- Favicon Links -->
-  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  <!-- Favicon & Touch Icons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="msapplication-TileColor" content="#08090d" />
 
   <!-- OpenGraph & Twitter Cards -->
   <meta property="og:type" content="article" />
@@ -25,169 +27,132 @@
   <meta property="og:description"
     content="Preserving sacred Brij pilgrimage traditions through technology, verified local drivers, authentic ashram stays, and zero-middleman devotee empowerment." />
   <meta property="og:url" content="https://to.vrindopnishad.in/about.html" />
-  <meta property="og:image" content="./handdrawn_vrinda_hero.webp" />
+  <meta property="og:image" content="https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About Vrinda Vihar — Sacred Brij 84 Kos Pilgrimage Mission" />
+  <meta name="twitter:description" content="Preserving sacred Brij 84 Kos Yatra pilgrimage traditions and empowering local Brajwasi drivers." />
+  <meta name="twitter:image" content="https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp" />
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- External Stylesheet Fallbacks -->
+  <!-- Stylesheet Links -->
   <link rel="stylesheet" href="./modern-pages.css" />
-  <link rel="stylesheet" href="/modern-pages.css" />
+  <link rel="stylesheet" href="/styles/modern-pages.css" />
 
-  <!-- Embedded Zero-Latency Modern Design System -->
-  <style>
-    :root {
-      --bg-app: #f8fafc;
-      --bg-surface: #ffffff;
-      --bg-subtle: #f1f5f9;
-      --bg-muted: #e2e8f0;
-      --text-primary: #0f172a;
-      --text-secondary: #475569;
-      --text-muted: #64748b;
-      --text-inverse: #ffffff;
-      --brand-primary: #0f172a;
-      --brand-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%);
-      --brand-accent: #6366f1;
-      --brand-accent-subtle: #eef2ff;
-      --brand-accent-border: #c7d2fe;
-      --accent-gold: #f59e0b;
-      --accent-gold-subtle: #fef3c7;
-      --accent-emerald: #10b981;
-      --accent-emerald-subtle: #d1fae5;
-      --accent-rose: #f43f5e;
-      --accent-rose-subtle: #ffe4e6;
-      --border-subtle: rgba(15, 23, 42, 0.08);
-      --border-medium: rgba(15, 23, 42, 0.14);
-      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-      --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-      --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.08);
-      --radius-sm: 8px;
-      --radius-md: 14px;
-      --radius-lg: 20px;
-      --radius-full: 9999px;
-      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-heading: 'Outfit', var(--font-sans);
+  <!-- Auto-Responsive Light/Dark Theme Init (Zero FOUC) -->
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('vrinda_theme');
+        if (saved === 'light' || (!saved && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+    function toggleTheme() {
+      try {
+        var current = document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        var next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('vrinda_theme', next);
+      } catch (e) {}
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-    html { font-family: var(--font-sans); background: var(--bg-app); color: var(--text-primary); scroll-behavior: smooth; }
-    body {
-      min-height: 100vh; display: flex; flex-direction: column;
-      background: radial-gradient(circle at 10% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 35%), radial-gradient(circle at 90% 15%, rgba(245, 158, 11, 0.04) 0%, transparent 30%), var(--bg-app);
-      color: var(--text-primary); line-height: 1.65;
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function (e) {
+        if (!localStorage.getItem('vrinda_theme')) {
+          document.documentElement.setAttribute('data-theme', e.matches ? 'light' : 'dark');
+        }
+      });
     }
-    .page-nav-header { position: sticky; top: 0; z-index: 1000; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border-subtle); }
-    .page-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
-    .brand-link-group { display: flex; align-items: center; gap: 0.85rem; text-decoration: none; color: var(--text-primary); }
-    .brand-avatar { width: 36px; height: 36px; border-radius: var(--radius-sm); background: #0f172a; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
-    .brand-avatar svg { width: 20px; height: 20px; fill: #ffffff; }
-    .brand-title-wrap { display: flex; flex-direction: column; }
-    .brand-name { font-family: var(--font-heading); font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.1; }
-    .brand-sub { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase; }
-    .nav-pills-list { display: none; align-items: center; gap: 0.35rem; list-style: none; }
-    @media (min-width: 860px) { .nav-pills-list { display: flex; } }
-    .nav-pill-item a { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.85rem; border-radius: var(--radius-full); font-size: 0.84rem; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: all 0.15s; }
-    .nav-pill-item a:hover { color: var(--text-primary); background: var(--bg-subtle); }
-    .nav-pill-item a.active { color: var(--brand-primary); background: var(--bg-subtle); font-weight: 700; }
-    .nav-actions-group { display: flex; align-items: center; gap: 0.65rem; }
-    .btn-primary-sm { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.1rem; background: var(--brand-gradient); color: var(--text-inverse); border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 700; text-decoration: none; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.18); transition: transform 0.15s; }
-    .btn-primary-sm:hover { transform: translateY(-1px); }
-    .page-hero { padding: 4.5rem 1.5rem 3.5rem; max-width: 1040px; margin: 0 auto; text-align: center; }
-    .hero-pill-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.85rem; background: var(--bg-surface); border: 1px solid var(--border-medium); border-radius: var(--radius-full); font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; }
-    .pulsing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-emerald); box-shadow: 0 0 0 3px var(--accent-emerald-subtle); }
-    .page-hero h1 { font-family: var(--font-heading); font-size: clamp(2.3rem, 5vw, 3.6rem); font-weight: 900; letter-spacing: -0.035em; line-height: 1.12; color: var(--text-primary); margin-bottom: 1.25rem; }
-    .gradient-text { background: linear-gradient(135deg, #0f172a 20%, #475569 60%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-subtitle { font-size: clamp(1.05rem, 2vw, 1.22rem); color: var(--text-secondary); max-width: 760px; margin: 0 auto 2rem; font-weight: 450; line-height: 1.6; }
-    .hero-metrics-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.85rem; margin-top: 2rem; }
-    .metric-capsule { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1rem; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-full); box-shadow: var(--shadow-sm); font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); }
-    .metric-capsule strong { color: var(--text-primary); font-weight: 800; }
-    .page-container { max-width: 1140px; margin: 0 auto; padding: 0 1.5rem 5rem; width: 100%; }
-    .section-head { margin-bottom: 2rem; }
-    .section-tag { display: inline-block; font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--brand-accent); margin-bottom: 0.4rem; }
-    .section-head h2 { font-family: var(--font-heading); font-size: 1.85rem; font-weight: 800; letter-spacing: -0.02em; color: var(--text-primary); line-height: 1.25; }
-    .section-head p { color: var(--text-secondary); font-size: 0.98rem; margin-top: 0.35rem; }
-    .bento-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-    @media (min-width: 768px) { .bento-grid-2 { grid-template-columns: repeat(2, 1fr); } .bento-grid-3 { grid-template-columns: repeat(3, 1fr); } }
-    .bento-card { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.85rem; box-shadow: var(--shadow-sm); transition: transform 0.2s, box-shadow 0.2s; position: relative; display: flex; flex-direction: column; }
-    .bento-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-    .bento-icon-box { width: 46px; height: 46px; border-radius: var(--radius-md); background: var(--bg-subtle); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1.25rem; border: 1px solid var(--border-subtle); }
-    .bento-icon-box.accent-purple { background: var(--brand-accent-subtle); border-color: var(--brand-accent-border); }
-    .bento-icon-box.accent-emerald { background: var(--accent-emerald-subtle); border-color: #a7f3d0; }
-    .bento-icon-box.accent-gold { background: var(--accent-gold-subtle); border-color: #fde68a; }
-    .bento-icon-box.accent-rose { background: var(--accent-rose-subtle); border-color: #fecdd3; }
-    .bento-card h3 { font-family: var(--font-heading); font-size: 1.25rem; font-weight: 750; letter-spacing: -0.015em; color: var(--text-primary); margin-bottom: 0.6rem; }
-    .bento-card p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6; }
-    .bento-badge { position: absolute; top: 1.25rem; right: 1.25rem; font-size: 0.7rem; font-weight: 750; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.25rem 0.65rem; border-radius: var(--radius-full); background: var(--bg-subtle); color: var(--text-muted); }
-    .notion-callout { display: flex; gap: 1rem; padding: 1.25rem 1.4rem; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-subtle); border-left: 4px solid var(--brand-accent); box-shadow: var(--shadow-sm); margin: 1.5rem 0; font-size: 0.94rem; color: var(--text-secondary); line-height: 1.65; }
-    .callout-icon { font-size: 1.35rem; flex-shrink: 0; line-height: 1; margin-top: 2px; }
-    .callout-content strong { color: var(--text-primary); font-weight: 750; }
-    .page-master-footer { margin-top: auto; background: #ffffff; border-top: 1px solid var(--border-subtle); padding: 4.5rem 1.5rem 2.5rem; }
-    .footer-inner-wrap { max-width: 1140px; margin: 0 auto; }
-    .footer-grid-5 { display: grid; grid-template-columns: 1fr; gap: 3rem; margin-bottom: 3.5rem; }
-    @media (min-width: 768px) { .footer-grid-5 { grid-template-columns: 2fr 1fr 1fr 1fr; } }
-    .footer-brand-pane { display: flex; flex-direction: column; gap: 1.2rem; }
-    .footer-brand-logo { font-family: var(--font-heading); font-size: 1.45rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.03em; }
-    .footer-brand-p { font-size: 0.9rem; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
-    .footer-col h5 { font-family: var(--font-heading); font-size: 0.82rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-primary); margin-bottom: 1.25rem; }
-    .footer-links-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
-    .footer-links-list a { font-size: 0.88rem; color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
-    .footer-links-list a:hover { color: var(--brand-primary); }
-    .footer-bottom-bar { display: flex; flex-direction: column; gap: 1rem; align-items: center; justify-content: space-between; padding-top: 2rem; border-top: 1px solid var(--border-subtle); font-size: 0.82rem; color: var(--text-muted); }
-    @media (min-width: 768px) { .footer-bottom-bar { flex-direction: row; } }
-    .social-pill-group { display: flex; align-items: center; gap: 0.5rem; }
-    .social-pill { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-subtle); border: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; }
-  </style>
+  </script>
 
-  <!-- Schema.org JSON-LD -->
+  <!-- Schema.org JSON-LD (Organization & Breadcrumbs) -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About Vrinda Vihar — Brij 84 Kos Pilgrimage Mission",
-    "url": "https://to.vrindopnishad.in/about.html",
-    "description": "Preserving sacred Brij 84 Kos Yatra pilgrimage traditions and empowering local Brajwasi drivers.",
-    "mainEntity": {
-      "@type": "Organization",
-      "name": "Vrinda Vihar by Vrindopnishad",
-      "url": "https://to.vrindopnishad.in/",
-      "logo": "https://to.vrindopnishad.in/official-logo.svg",
-      "foundingLocation": {
-        "@type": "Place",
-        "name": "Vrindavan, Mathura, Uttar Pradesh, India"
-      },
-      "slogan": "Serving Shri Dham Vrindavan & Brij Pilgrims Worldwide"
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "About Vrinda Vihar — Brij 84 Kos Pilgrimage Mission",
+      "url": "https://to.vrindopnishad.in/about.html",
+      "description": "Preserving sacred Brij 84 Kos Yatra pilgrimage traditions and empowering local Brajwasi drivers.",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "Vrinda Vihar by Vrindopnishad",
+        "url": "https://to.vrindopnishad.in/",
+        "logo": "https://to.vrindopnishad.in/official-logo.svg",
+        "image": "https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp",
+        "telephone": "+91-76182-18181",
+        "email": "contact@vrindopnishad.in",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Raman Reti Road, Opposite ISKCON Temple",
+          "addressLocality": "Vrindavan, Mathura",
+          "addressRegion": "Uttar Pradesh",
+          "postalCode": "281121",
+          "addressCountry": "IN"
+        },
+        "slogan": "Serving Shri Dham Vrindavan & Brij Pilgrims Worldwide"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://to.vrindopnishad.in/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "About Us",
+          "item": "https://to.vrindopnishad.in/about.html"
+        }
+      ]
     }
-  }
+  ]
   </script>
 </head>
 
 <body>
-  <!-- 1. GLASS STICKY HEADER -->
-  <header class="page-nav-header">
-    <div class="page-nav-inner">
-      <a href="/" class="brand-link-group" title="Return to Vrinda Vihar Live Portal">
-        <div class="brand-avatar">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+  <!-- 1. LIQUID GLASS STICKY HEADER -->
+  <header class="sanctuary-nav-header">
+    <div class="sanctuary-nav-inner">
+      <a href="/" class="sanctuary-brand-link" title="Return to Vrinda Vihar Live Portal">
+        <div class="sanctuary-brand-icon" aria-label="Vrinda Vihar Sanctuary Mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+            <path d="M12 2C8 7.5 8 13.5 12 18.5C16 13.5 16 7.5 12 2Z" fill="url(#brandGlowAbout)" />
+            <circle cx="12" cy="20.5" r="1.5" fill="#e2b170" />
+            <defs>
+              <linearGradient id="brandGlowAbout" x1="12" y1="2" x2="12" y2="19" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#70cbe2" />
+                <stop offset="1" stop-color="#e2b170" />
+              </linearGradient>
+            </defs>
           </svg>
         </div>
-        <div class="brand-title-wrap">
-          <span class="brand-name">Vrinda.</span>
-          <span class="brand-sub">Pilgrim Authority</span>
+        <div class="sanctuary-brand-text">
+          <span class="sanctuary-brand-title">Vrinda.</span>
+          <span class="sanctuary-brand-badge">Pilgrim Sanctuary</span>
         </div>
       </a>
 
-      <ul class="nav-pills-list">
-        <li class="nav-pill-item"><a href="/brij-84-kos-yatra.html">84 Kos Guide</a></li>
-        <li class="nav-pill-item"><a href="/about.html" class="active">Our Mission</a></li>
-        <li class="nav-pill-item"><a href="/guidelines.html">Guidelines</a></li>
-        <li class="nav-pill-item"><a href="/help.html">24/7 Help</a></li>
-        <li class="nav-pill-item"><a href="/contact.html">Contact</a></li>
+      <ul class="sanctuary-nav-menu">
+        <li class="sanctuary-nav-item"><a href="/brij-84-kos-yatra.html">84 Kos Guide</a></li>
+        <li class="sanctuary-nav-item"><a href="/about.html" class="active">Our Mission</a></li>
+        <li class="sanctuary-nav-item"><a href="/guidelines.html">Guidelines</a></li>
+        <li class="sanctuary-nav-item"><a href="/help.html">24/7 Help</a></li>
+        <li class="sanctuary-nav-item"><a href="/contact.html">Contact</a></li>
       </ul>
 
-      <div class="nav-actions-group">
-        <a href="/" class="btn-primary-sm">
+      <div class="sanctuary-nav-actions">
+        <button class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <a href="/" class="btn-sanctuary-primary">
           <span>Open Live App</span>
           <span>→</span>
         </a>
@@ -195,77 +160,133 @@
     </div>
   </header>
 
-  <!-- 2. HERO SECTION -->
-  <section class="page-hero">
-    <div class="hero-pill-badge">
-      <span class="pulsing-dot"></span>
+  <!-- 2. SACRED HERO SECTION -->
+  <section class="sanctuary-hero">
+    <div class="sacred-aura-pill">
+      <span class="sacred-pulse-beacon"></span>
       <span>Vrindopnishad Sacred Trust • Est. Brij Dham</span>
     </div>
-    <h1>Serving Shri Radha Rani &amp; <br /><span class="gradient-text">Brij Pilgrims Worldwide</span></h1>
-    <p class="hero-subtitle">
-      Vrinda Vihar was founded with a singular sacred purpose: to eliminate middleman exploitation, empower native Brajwasi drivers, and restore the sublime sanctity of the 84 Kos Yatra through transparent technology.
+    <h1>Serving Shri Radha Rani &amp; <br class="hero-desktop-break" /><span class="gradient-divine-text">Brij Pilgrims Worldwide</span></h1>
+    <p class="hero-lead">
+      Vrinda Vihar was founded with a singular sacred purpose: to eliminate commercial exploitation, empower native Brajwasi drivers, and restore the sublime sanctity of the 84 Kos Yatra through transparent digital craftsmanship.
     </p>
 
-    <div class="hero-metrics-row">
-      <div class="metric-capsule">
-        <span>🕊️</span>
+    <div class="sanctuary-metrics-row">
+      <div class="sanctuary-metric-pill">
+        <span class="metric-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        </span>
         <span><strong>0%</strong> Middleman Commission</span>
       </div>
-      <div class="metric-capsule">
-        <span>🛺</span>
+      <div class="sanctuary-metric-pill">
+        <span class="metric-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+        </span>
         <span><strong>1,200+</strong> Verified Brajwasi Drivers</span>
       </div>
-      <div class="metric-capsule">
-        <span>🌿</span>
+      <div class="sanctuary-metric-pill">
+        <span class="metric-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16v0H5v0h0a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6"/><path d="M13 19v3"/><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.8"/></svg>
+        </span>
         <span><strong>12</strong> Sacred Forests Preserved</span>
       </div>
-      <div class="metric-capsule">
-        <span>⚡</span>
+      <div class="sanctuary-metric-pill">
+        <span class="metric-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </span>
         <span><strong>24/7</strong> Live GPS Pilgrim Safety</span>
       </div>
     </div>
+
+    <!-- Interactive Hero Discovery Search Bar -->
+    <a href="/" class="sanctuary-hero-search-bar" title="Search all sacred sites, darshan timings & guides">
+      <div class="sanctuary-hsb-left">
+        <span class="sanctuary-hsb-icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </span>
+        <span class="sanctuary-hsb-text">Search 84 Kos guides, temples, ashrams, drivers...</span>
+      </div>
+      <div class="sanctuary-hsb-right">
+        <span class="sanctuary-hsb-shortcut">⌘K</span>
+        <span class="sanctuary-hsb-btn">
+          <span>Explore</span>
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </span>
+      </div>
+    </a>
   </section>
 
-  <!-- 3. MAIN CONTENT BODY -->
-  <main class="page-container">
-    <!-- The 4 Core Pillars Bento -->
-    <div class="section-head">
-      <span class="section-tag">Ethos &amp; Foundation</span>
-      <h2>Our Four Sacred Pillars</h2>
-      <p>Built for devotees seeking authentic spiritual connection in the land of Krishna.</p>
+  <!-- 3. MAIN BENTO CONTAINER -->
+  <main class="sanctuary-container">
+    <!-- QuickNav Category Pill Bar -->
+    <div class="sanctuary-quicknav-bar">
+      <a href="#pillars" class="sanctuary-quicknav-pill">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span>Sacred Pillars</span>
+      </a>
+      <a href="#heritage" class="sanctuary-quicknav-pill">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>Living Heritage</span>
+      </a>
+      <a href="#initiatives" class="sanctuary-quicknav-pill">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>Devotee Initiatives</span>
+      </a>
+      <a href="/help.html" class="sanctuary-quicknav-pill">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        <span>24/7 Helpline</span>
+      </a>
     </div>
 
-    <div class="bento-grid bento-grid-2">
-      <div class="bento-card">
-        <span class="bento-badge">Pillar I</span>
-        <div class="bento-icon-box accent-purple">🤝</div>
+    <div id="pillars" class="sanctuary-section-header">
+      <span class="sanctuary-section-tag">Ethos &amp; Foundation</span>
+      <h2>Our Four Sacred Pillars</h2>
+      <p>Crafted for devotees seeking authentic spiritual immersion in the holy land of Krishna.</p>
+    </div>
+
+    <div class="sanctuary-bento-grid bento-grid-2">
+      <!-- Pillar 1 -->
+      <div class="sanctuary-bento-card">
+        <span class="card-corner-badge">Pillar I</span>
+        <div class="card-icon-squircle">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
         <h3>Direct Devotee-to-Driver Connectivity</h3>
         <p>
-          Traditional commercial aggregators take high cuts from local drivers and inflate fares for visiting devotees. Vrinda Vihar guarantees 100% transparent standard government tariffs where every single rupee goes directly into the hands of native Brajwasi drivers and their families.
+          Traditional aggregators take high cuts from local drivers and inflate fares for visiting devotees. Vrinda Vihar guarantees 100% transparent standard government tariffs where every single rupee goes directly into the hands of native Brajwasi drivers and their families.
         </p>
       </div>
 
-      <div class="bento-card">
-        <span class="bento-badge">Pillar II</span>
-        <div class="bento-icon-box accent-emerald">⚡</div>
+      <!-- Pillar 2 -->
+      <div class="sanctuary-bento-card">
+        <span class="card-corner-badge">Pillar II</span>
+        <div class="card-icon-squircle">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
         <h3>Eco-Mobility &amp; Silent E-Rickshaws</h3>
         <p>
           To safeguard the fragile heritage of Vrindavan's narrow gullies and sacred Parikrama paths from pollution and noise, our platform prioritizes verified electric rickshaws and green mobility solutions for silent, peaceful parikrama.
         </p>
       </div>
 
-      <div class="bento-card">
-        <span class="bento-badge">Pillar III</span>
-        <div class="bento-icon-box accent-gold">🏛️</div>
+      <!-- Pillar 3 -->
+      <div class="sanctuary-bento-card">
+        <span class="card-corner-badge">Pillar III</span>
+        <div class="card-icon-squircle">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
         <h3>Verified Ashrams &amp; Dharamshalas</h3>
         <p>
           We audit every listed ashram and guest house for hygienic sattvic dining, peaceful meditation environments, proximity to major temples like Shri Bankey Bihari and Shri Radha Raman, and guaranteed non-commercial pricing.
         </p>
       </div>
 
-      <div class="bento-card">
-        <span class="bento-badge">Pillar IV</span>
-        <div class="bento-icon-box accent-rose">🛡️</div>
+      <!-- Pillar 4 -->
+      <div class="sanctuary-bento-card">
+        <span class="card-corner-badge">Pillar IV</span>
+        <div class="card-icon-squircle">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
         <h3>24/7 Devotee Safety &amp; GPS Guidance</h3>
         <p>
           Our live tracking system offers one-tap emergency SOS, real-time aarti schedules, crowd advisory warnings, and an active multilingual helpline for families traveling with elderly pilgrims and children.
@@ -273,54 +294,163 @@
       </div>
     </div>
 
-    <!-- Origin Story Callout -->
-    <div class="notion-callout">
-      <div class="callout-icon">📜</div>
-      <div class="callout-content">
-        <strong>The Vrindopnishad Promise:</strong> Every technology feature—from our interactive offline vector map to our real-time darshan gallery—is designed as an offering of Seva (devotional service). We do not monetize spiritual darshans or sacred parikrama routes.
+    <!-- Sacred Vedic Callout -->
+    <div class="vedic-callout-sanctuary">
+      <div class="callout-avatar-icon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <div class="callout-body">
+        <strong>The Vrindopnishad Promise:</strong> Every technology feature—from our interactive offline vector map to our real-time darshan gallery—is designed as an offering of Seva (devotional service). We do not commercialize spiritual darshans or sacred parikrama routes.
       </div>
     </div>
 
-    <!-- Heritage & Impact Bento -->
-    <div class="section-head" style="margin-top: 4rem;">
-      <span class="section-tag">Impact &amp; Heritage</span>
+    <!-- Visual Heritage & Seva Gallery -->
+    <div id="heritage" class="sanctuary-section-header" style="margin-top: 4.5rem;">
+      <span class="sanctuary-section-tag">Sacred Living Heritage</span>
+      <h2>Scenes from the Holy Dham</h2>
+      <p>Immerse in the timeless devotion, sacred streets, and ancient temples of Brij Mandal.</p>
+    </div>
+
+    <div class="sanctuary-bento-grid bento-grid-3">
+      <div class="sanctuary-photo-card">
+        <div class="sanctuary-photo-media">
+          <img src="./user_hero_sunlit_street.webp" alt="Sunlit Sacred Streets of Vrindavan" loading="lazy" />
+          <span class="sanctuary-photo-badge">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Vrindavan Dham</span>
+          </span>
+        </div>
+        <div class="sanctuary-photo-body">
+          <div class="sanctuary-photo-title">Raman Reti &amp; Temple Lanes</div>
+          <p class="sanctuary-photo-desc">Morning parikrama echoing with Harinam and bells of ancient temples.</p>
+        </div>
+      </div>
+
+      <div class="sanctuary-photo-card">
+        <div class="sanctuary-photo-media">
+          <img src="./user_temple_ghat_cow.webp" alt="Yamuna Ghat and Sacred Gaushala Seva" loading="lazy" />
+          <span class="sanctuary-photo-badge">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+            <span>Gau Seva &amp; Ghats</span>
+          </span>
+        </div>
+        <div class="sanctuary-photo-body">
+          <div class="sanctuary-photo-title">Yamuna Shore Gaushalas</div>
+          <p class="sanctuary-photo-desc">Preserving the sacred cow protection ethos of Shri Krishna's pasturelands.</p>
+        </div>
+      </div>
+
+      <div class="sanctuary-photo-card">
+        <div class="sanctuary-photo-media">
+          <img src="./user_barsana_elephant_procession.webp" alt="Barsana and 84 Kos Yatra Caravan" loading="lazy" />
+          <span class="sanctuary-photo-badge">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10v.2A3 3 0 0 1 8.9 16v0H5v0h0a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z"/><path d="M7 16v6"/><path d="M13 19v3"/><path d="M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.8"/></svg>
+            <span>Brij 84 Kos</span>
+          </span>
+        </div>
+        <div class="sanctuary-photo-body">
+          <div class="sanctuary-photo-title">Barsana &amp; Nandgaon Yatras</div>
+          <p class="sanctuary-photo-desc">Spiritual processions across the sacred hill of Shri Radha Rani.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Impact & Initiatives Horizontal Bar Stack -->
+    <div id="initiatives" class="sanctuary-section-header" style="margin-top: 4.5rem;">
+      <span class="sanctuary-section-tag">Devotee Initiatives</span>
       <h2>Preserving 5,000+ Years of Brij Heritage</h2>
       <p>How technology empowers the sacred land without compromising its ancient soul.</p>
     </div>
 
-    <div class="bento-grid bento-grid-3">
-      <div class="bento-card">
-        <div class="bento-icon-box">📍</div>
-        <h3>150+ Mapped Holy Kunds &amp; Lilas</h3>
-        <p>Detailed geo-coordinates, historical narratives, and sacred timings for Radha Kund, Shyam Kund, Kusum Sarovar, and ancient hidden lilasthalis.</p>
-      </div>
-      <div class="bento-card">
-        <div class="bento-icon-box">🦚</div>
-        <h3>Protecting Native Brij Wildlife</h3>
-        <p>Guidelines on ethical monkey coexistence, cow seva at certified gaushalas, and preserving peacocks across the 12 sacred forests.</p>
-      </div>
-      <div class="bento-card">
-        <div class="bento-icon-box">🌐</div>
-        <h3>Global Devotee Community</h3>
-        <p>Enabling millions of Krishna devotees worldwide to experience live darshans, organize pilgrimages, and support Brajwasi livelihoods.</p>
-      </div>
+    <div class="sanctuary-bars-stack">
+      <!-- Bar 1 -->
+      <a href="/" class="sanctuary-bar-card">
+        <div class="sanctuary-bar-left">
+          <div class="sanctuary-bar-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="sanctuary-bar-info">
+            <div class="sanctuary-bar-title-row">
+              <span class="sanctuary-bar-title">150+ Mapped Holy Kunds &amp; Lilasthanas</span>
+              <span class="sanctuary-bar-tag">Verified Map</span>
+            </div>
+            <p class="sanctuary-bar-desc">
+              Detailed geo-coordinates, historical narratives, and sacred timings for Radha Kund, Shyam Kund, Kusum Sarovar, and ancient hidden lilasthalis.
+            </p>
+          </div>
+        </div>
+        <div class="sanctuary-bar-right">
+          <span class="sanctuary-bar-action">
+            <span>Explore Map</span>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Bar 2 -->
+      <a href="/guidelines.html" class="sanctuary-bar-card">
+        <div class="sanctuary-bar-left">
+          <div class="sanctuary-bar-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <div class="sanctuary-bar-info">
+            <div class="sanctuary-bar-title-row">
+              <span class="sanctuary-bar-title">Protecting Native Brij Wildlife &amp; Gaushalas</span>
+              <span class="sanctuary-bar-tag">Ahimsa Seva</span>
+            </div>
+            <p class="sanctuary-bar-desc">
+              Guidelines on ethical monkey coexistence, cow seva at certified gaushalas, and preserving peacocks across the 12 sacred forests.
+            </p>
+          </div>
+        </div>
+        <div class="sanctuary-bar-right">
+          <span class="sanctuary-bar-action">
+            <span>Read Guidelines</span>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      </a>
+
+      <!-- Bar 3 -->
+      <a href="/help.html" class="sanctuary-bar-card">
+        <div class="sanctuary-bar-left">
+          <div class="sanctuary-bar-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div class="sanctuary-bar-info">
+            <div class="sanctuary-bar-title-row">
+              <span class="sanctuary-bar-title">Global Devotee Community &amp; Live Darshan</span>
+              <span class="sanctuary-bar-tag">24/7 Seva</span>
+            </div>
+            <p class="sanctuary-bar-desc">
+              Enabling millions of Krishna devotees worldwide to experience live darshans, organize pilgrimages, and support Brajwasi livelihoods.
+            </p>
+          </div>
+        </div>
+        <div class="sanctuary-bar-right">
+          <span class="sanctuary-bar-action">
+            <span>Support Desk</span>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </div>
+      </a>
     </div>
   </main>
 
   <!-- 4. MASTER SUSTAINABLE FOOTER -->
-  <footer class="page-master-footer">
-    <div class="footer-inner-wrap">
-      <div class="footer-grid-5">
-        <div class="footer-brand-pane">
-          <span class="footer-brand-logo">Vrinda.</span>
-          <p class="footer-brand-p">
-            Authentic Brij pilgrimage packages, temple darshans, verified Brajwasi drivers, and sacred spiritual yatras across Mathura, Vrindavan, Barsana &amp; Govardhan.
+  <footer class="sanctuary-master-footer">
+    <div class="sanctuary-footer-wrap">
+      <div class="sanctuary-footer-grid">
+        <div class="sanctuary-footer-brand">
+          <span class="sanctuary-footer-logo">Vrinda<span>.</span></span>
+          <p class="sanctuary-footer-p">
+            Vrindopnishad Sanctuary — Authentic Brij pilgrimage packages, temple darshans, verified Brajwasi drivers, and sacred spiritual yatras across Mathura, Vrindavan, Barsana &amp; Govardhan.
           </p>
         </div>
 
-        <div class="footer-col">
+        <div class="sanctuary-footer-col">
           <h5>Brij Pilgrimage</h5>
-          <ul class="footer-links-list">
+          <ul class="sanctuary-footer-links">
             <li><a href="/brij-84-kos-yatra.html">84 Kos Yatra Guide</a></li>
             <li><a href="/#popular">Popular Brij Yatras</a></li>
             <li><a href="/#mission">Govardhan 21 km Parikrama</a></li>
@@ -328,9 +458,9 @@
           </ul>
         </div>
 
-        <div class="footer-col">
+        <div class="sanctuary-footer-col">
           <h5>Sacred Mission</h5>
-          <ul class="footer-links-list">
+          <ul class="sanctuary-footer-links">
             <li><a href="/about.html">About Vrinda Vihar</a></li>
             <li><a href="/guidelines.html">Pilgrim Guidelines</a></li>
             <li><a href="/#initiatives">Barsana &amp; Nandgaon</a></li>
@@ -338,9 +468,9 @@
           </ul>
         </div>
 
-        <div class="footer-col">
+        <div class="sanctuary-footer-col">
           <h5>Support &amp; Trust</h5>
-          <ul class="footer-links-list">
+          <ul class="sanctuary-footer-links">
             <li><a href="/help.html">24/7 Help Centre</a></li>
             <li><a href="/contact.html">Contact Operations</a></li>
             <li><a href="/terms.html">Terms &amp; Fair Fare</a></li>
@@ -349,13 +479,18 @@
         </div>
       </div>
 
-      <div class="footer-bottom-bar">
+      <div class="sanctuary-footer-bottom">
         <span>© 2026 Vrinda Vihar by Vrindopnishad. All rights reserved.</span>
-        <div class="social-pill-group">
-          <a href="https://www.instagram.com/vrindopnishad" target="_blank" rel="noopener noreferrer" class="social-pill" title="Instagram">📸</a>
-          <a href="https://www.youtube.com/@vrindopnishad" target="_blank" rel="noopener noreferrer" class="social-pill" title="YouTube">▶️</a>
-          <a href="https://www.facebook.com/vrindopnishad" target="_blank" rel="noopener noreferrer" class="social-pill" title="Facebook">📘</a>
-          <a href="https://www.pinterest.com/vrindopnishad" target="_blank" rel="noopener noreferrer" class="social-pill" title="Pinterest">📌</a>
+        <div class="sanctuary-social-group">
+          <a href="https://www.instagram.com/vrindopnishad" target="_blank" rel="noopener noreferrer" class="sanctuary-social-pill" title="Instagram">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="https://www.youtube.com/@vrindopnishad" target="_blank" rel="noopener noreferrer" class="sanctuary-social-pill" title="YouTube">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+          </a>
+          <a href="https://www.facebook.com/vrindopnishad" target="_blank" rel="noopener noreferrer" class="sanctuary-social-pill" title="Facebook">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          </a>
         </div>
       </div>
     </div>
