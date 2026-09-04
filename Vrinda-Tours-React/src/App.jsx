@@ -38,6 +38,7 @@ const RestaurantLandingPage = lazy(() => import('./components/Restaurant/Restaur
 const AgencyLandingPage = lazy(() => import('./components/Agency/AgencyLandingPage'));
 const PartnerHubModal = lazy(() => import('./components/PartnerHub/PartnerHubModal'));
 const HelpCenterModal = lazy(() => import('./components/HelpCenter/HelpCenterModal'));
+const InfoModal = lazy(() => import('./components/InfoPages/InfoModal'));
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -52,6 +53,7 @@ export default function App() {
   const [driversVisible, setDriversVisible] = useState(false);
   const [adminVisible, setAdminVisible] = useState(false);
   const [helpCenterVisible, setHelpCenterVisible] = useState(false);
+  const [infoModalTab, setInfoModalTab] = useState(null);
   const [driverPortalVisible, setDriverPortalVisible] = useState(false);
   const [partnerHubVisible, setPartnerHubVisible] = useState(false);
   const [activePartnerId, setActivePartnerId] = useState(() => sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id'));
@@ -75,6 +77,7 @@ export default function App() {
     driversVisible ||
     adminVisible ||
     helpCenterVisible ||
+    infoModalTab ||
     driverPortalVisible ||
     (activeRoute && isNavExpanded) ||
     (activeFilter === 'favourites' && !partnerLandingVisible)
@@ -739,6 +742,7 @@ export default function App() {
               onOpenAgencyPage={() => { setPartnerLandingVisible(false); setAgencyLandingVisible(true); }}
               onOpenAdmin={() => setAdminVisible(true)}
               onOpenHelpCenter={() => setHelpCenterVisible(true)}
+              onOpenInfoModal={(tab) => setInfoModalTab(tab || 'about')}
             />
           </ErrorBoundary>
         )}
@@ -747,6 +751,13 @@ export default function App() {
           <HelpCenterModal
             isOpen={helpCenterVisible}
             onClose={() => setHelpCenterVisible(false)}
+          />
+        )}
+
+        {infoModalTab && (
+          <InfoModal
+            initialTab={infoModalTab}
+            onClose={() => setInfoModalTab(null)}
           />
         )}
       </Suspense>

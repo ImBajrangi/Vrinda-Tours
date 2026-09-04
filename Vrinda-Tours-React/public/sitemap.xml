@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
   
-  <!-- Home & Interactive Map Portal -->
+  <!-- Home & Interactive Pilgrimage Portal -->
   <url>
     <loc>https://to.vrindopnishad.in/</loc>
     <lastmod>2026-09-04</lastmod>
@@ -16,12 +16,67 @@
     </image:image>
   </url>
 
+  <!-- Complete Brij 84 Kos Yatra Pilgrimage Guide (Cornerstone SEO) -->
+  <url>
+    <loc>https://to.vrindopnishad.in/brij-84-kos-yatra.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.98</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/handdrawn_84kos.webp</image:loc>
+      <image:title>Complete Brij 84 Kos Yatra Route &amp; Sacred Forests Guide</image:title>
+      <image:caption>12 Sacred Vans, 24 Upavans, Kunds, and Day-by-Day Parikrama Itineraries</image:caption>
+    </image:image>
+  </url>
+
+  <!-- About Vrinda Vihar & Sacred Mission -->
+  <url>
+    <loc>https://to.vrindopnishad.in/about.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.92</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/handdrawn_vrindavan.webp</image:loc>
+      <image:title>About Vrinda Vihar by Vrindopnishad</image:title>
+      <image:caption>Preserving the Sacred Brij 84 Kos Pilgrimage Mission</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Pilgrim Guidelines, Temple Etiquette & Safety -->
+  <url>
+    <loc>https://to.vrindopnishad.in/guidelines.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.94</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/handdrawn_govardhan.webp</image:loc>
+      <image:title>Brij Pilgrim Guidelines &amp; Temple Darshan Etiquette</image:title>
+      <image:caption>Dress code, monkey eyewear safety, Govardhan parikrama rules, and sattvic food</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 24/7 Pilgrim Help Centre & Emergency Directory -->
+  <url>
+    <loc>https://to.vrindopnishad.in/help.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.93</priority>
+  </url>
+
+  <!-- Contact Operations & Pilgrimage Desk -->
+  <url>
+    <loc>https://to.vrindopnishad.in/contact.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.90</priority>
+  </url>
+
   <!-- Brij 84 Kos Yatra Packages -->
   <url>
     <loc>https://to.vrindopnishad.in/#explore</loc>
     <lastmod>2026-09-04</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.98</priority>
+    <priority>0.96</priority>
     <image:image>
       <image:loc>https://to.vrindopnishad.in/handdrawn_84kos.webp</image:loc>
       <image:title>Brij 84 Kos Yatra Tour Packages &amp; Itineraries — Vrinda Vihar</image:title>
@@ -114,12 +169,20 @@
     <priority>0.90</priority>
   </url>
 
-  <!-- Privacy Policy -->
+  <!-- Terms of Service & Devotee Agreement -->
+  <url>
+    <loc>https://to.vrindopnishad.in/terms.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.80</priority>
+  </url>
+
+  <!-- Privacy Policy & DPDP Act 2023 Compliance -->
   <url>
     <loc>https://to.vrindopnishad.in/privacy.html</loc>
     <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.50</priority>
+    <priority>0.80</priority>
   </url>
 
 </urlset>

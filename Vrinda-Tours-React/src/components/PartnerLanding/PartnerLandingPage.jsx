@@ -914,7 +914,8 @@ export default function PartnerLandingPage({
   onOpenRestaurantPage,
   onOpenAgencyPage,
   onOpenAdmin,
-  onOpenHelpCenter
+  onOpenHelpCenter,
+  onOpenInfoModal
 }) {
   // Hero Step Slider State
   const [activeStep, setActiveStep] = useState(1);
@@ -4167,6 +4168,31 @@ export default function PartnerLandingPage({
                           className="tp-footer-admin-btn"
                           onClick={() => {
                             if (onOpenAdmin) onOpenAdmin();
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            font: 'inherit',
+                            color: 'inherit',
+                            cursor: 'pointer',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {link.label}
+                        </button>
+                      ) : link.tab ? (
+                        <button
+                          type="button"
+                          className="tp-footer-admin-btn"
+                          onClick={() => {
+                            if (link.tab === 'help' && onOpenHelpCenter) {
+                              onOpenHelpCenter();
+                            } else if (onOpenInfoModal) {
+                              onOpenInfoModal(link.tab);
+                            } else {
+                              window.location.href = link.href;
+                            }
                           }}
                           style={{
                             background: 'none',
