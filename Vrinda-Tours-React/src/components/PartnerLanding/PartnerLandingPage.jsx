@@ -1836,6 +1836,13 @@ export default function PartnerLandingPage({
       syncPilgrimToSupabase(loggedUser, refCodeEntered).catch(console.error);
 
       setAuthSuccessMsg(bonus > 0 ? `Welcome back, ${name}! +500 Referral Points added.` : `Welcome back, ${name}!`);
+      setFloatingToast({
+        id: `login_success_${Date.now()}`,
+        icon: <CheckCircle2 size={16} color="#10b981" />,
+        highlight: true,
+        title: `Welcome, ${name}!`,
+        desc: bonus > 0 ? '+500 Points Added' : null
+      });
       setTimeout(() => {
         setIsAuthModalOpen(false);
         setAuthSuccessMsg('');
@@ -1909,6 +1916,13 @@ export default function PartnerLandingPage({
     setCachedData('traveler_user', completedUser);
     setBookingPhone(sanitizedPhone);
     setAuthSuccessMsg(`Welcome, ${completedUser.name}!`);
+    setFloatingToast({
+      id: `phone_verified_${Date.now()}`,
+      icon: <CheckCircle2 size={16} color="#10b981" />,
+      highlight: true,
+      title: 'Phone Verified',
+      desc: 'Live GPS Alerts Active'
+    });
     setTimeout(() => {
       setIsAuthModalOpen(false);
       setAuthSuccessMsg('');
@@ -2021,6 +2035,13 @@ export default function PartnerLandingPage({
     setBookingName('');
     setBookingEmail('');
     setBookingPhone('');
+    setFloatingToast({
+      id: `logout_${Date.now()}`,
+      icon: <LogOut size={16} color="#e11d48" />,
+      highlight: false,
+      title: 'Signed Out Successfully',
+      desc: null
+    });
   };
 
   // Newsletter State
@@ -2121,6 +2142,14 @@ export default function PartnerLandingPage({
       console.warn('Booking inquiry save error:', err);
     }
 
+    setFloatingToast({
+      id: `booking_${Date.now()}`,
+      icon: <CheckCircle2 size={16} color="#10b981" />,
+      highlight: true,
+      title: 'Reservation Dispatched',
+      desc: destinationTitle
+    });
+
     setTimeout(() => {
       setSelectedItem(null);
       setBookingSuccess(false);
@@ -2142,6 +2171,13 @@ export default function PartnerLandingPage({
     if (!newsletterEmail) return;
     setNewsletterSubscribed(true);
     setCachedData('newsletter_email', newsletterEmail);
+    setFloatingToast({
+      id: `newsletter_${Date.now()}`,
+      icon: <Sparkles size={16} color="#10b981" />,
+      highlight: true,
+      title: 'Subscribed to Sacred Yatra Updates',
+      desc: null
+    });
     setTimeout(() => {
       setNewsletterEmail('');
     }, 2500);
@@ -5272,6 +5308,13 @@ export default function PartnerLandingPage({
                 const link = cat.getLink(myRefCode);
                 navigator.clipboard?.writeText(link);
                 setCopiedRefTarget(cat.id);
+                setFloatingToast({
+                  id: `copy_link_${Date.now()}`,
+                  icon: <CheckCircle2 size={16} color="#10b981" />,
+                  highlight: true,
+                  title: 'Invite Link Copied',
+                  desc: 'Share with friends & earn 500 Pts'
+                });
                 setTimeout(() => setCopiedRefTarget(''), 2200);
               };
 
@@ -5282,6 +5325,13 @@ export default function PartnerLandingPage({
                   url: activeLink
                 });
                 setCopiedRefTarget(activeCategoryConfig.id);
+                setFloatingToast({
+                  id: `share_link_${Date.now()}`,
+                  icon: <CheckCircle2 size={16} color="#10b981" />,
+                  highlight: true,
+                  title: 'Invite Link Shared',
+                  desc: null
+                });
                 setTimeout(() => setCopiedRefTarget(''), 2200);
               };
 
@@ -5303,6 +5353,13 @@ export default function PartnerLandingPage({
                         onClick={() => {
                           navigator.clipboard?.writeText(myRefCode);
                           setCopiedRefTarget('CODE');
+                          setFloatingToast({
+                            id: `copy_code_${Date.now()}`,
+                            icon: <CheckCircle2 size={16} color="#10b981" />,
+                            highlight: true,
+                            title: 'Referral Code Copied',
+                            desc: myRefCode
+                          });
                           setTimeout(() => setCopiedRefTarget(''), 2200);
                         }}
                         style={{
