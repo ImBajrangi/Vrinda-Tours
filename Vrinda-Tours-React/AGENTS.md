@@ -115,3 +115,5 @@ the more the text the less it looks good to use
 
 Never use fallback role strings to deduce authentication state; always require a non-preview, persisted session ID to prevent merchant UI leakage to public visitors
 
+- For all toast, notification bar, and modal transitions, always enforce two-phase exit animations with hardware-accelerated transforms (`transform`, `opacity`, `filter`) using Apple HIG cubic-bezier spring easing before unmounting from state.
+

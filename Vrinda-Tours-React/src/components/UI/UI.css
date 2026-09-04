@@ -2,83 +2,304 @@
    Modern Minimalist UI Components (Collision-Free Architecture & Glass Tokens)
    ========================================================================== */
 
-/* Toast Notification (Grounded & Dynamic Island-Grade Clearance) */
+/* ==========================================================================
+   Apple Dynamic Island Morphing Toast (Cute, Bold, Information-Only Capsule)
+   ========================================================================== */
+
+.dynamic-island-toast,
 .toast {
-  position: fixed;
-  top: calc(140px + env(safe-area-inset-top, 0px));
-  left: 50%;
-  transform: translateX(-50%) translateY(-10px) scale(0.96);
-  z-index: 9999;
-  background: rgba(13, 17, 28, 0.94);
-  color: #ffffff;
-  padding: 0.55rem 1rem 0.55rem 0.65rem;
-  border-radius: 12px;
-  box-shadow: 0 20px 44px -10px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  max-width: 90vw;
-  width: max-content;
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  user-select: none;
-  backdrop-filter: blur(24px) saturate(190%);
-  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  position: fixed !important;
+  top: max(80px, calc(var(--tp-nav-height, 64px) + 16px)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 999999 !important;
+  background: rgba(18, 20, 26, 0.88) !important;
+  color: #ffffff !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 18px 0 8px !important;
+  border-radius: 9999px !important;
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  max-width: min(540px, calc(100vw - 24px)) !important;
+  width: max-content !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  animation: appleDynamicIslandEnter 0.54s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  transform-origin: 50% 0% !important;
+  will-change: transform, opacity !important;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.24s ease, border-color 0.24s ease !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", -apple-system, sans-serif !important;
 }
 
-.toast.visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0) scale(1);
-}
-
+.dynamic-island-toast:hover,
 .toast:hover {
-  background: rgba(18, 24, 38, 0.96);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 24px 48px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transform: translateX(-50%) translateY(-2px) scale(1.03) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow: 
+    0 12px 28px -4px rgba(0, 0, 0, 0.26),
+    0 4px 10px -2px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
 }
 
+.dynamic-island-toast:active,
 .toast:active {
-  transform: translateX(-50%) scale(0.97);
+  transform: translateX(-50%) scale(0.96) !important;
 }
 
-.toast-icon-badge {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+/* Morph Exit Stage */
+.dynamic-island-toast.stage-exiting,
+.toast.stage-exiting {
+  animation: appleDynamicIslandExit 0.28s cubic-bezier(0.32, 0, 0.67, 0) forwards !important;
+  pointer-events: none !important;
 }
 
-.toast.error .toast-icon-badge {
-  background: rgba(239, 68, 68, 0.16);
-  border-color: rgba(239, 68, 68, 0.35);
-  color: #f87171;
+@keyframes appleBottomCapsuleEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(32px) scale(0.65, 0.65);
+    filter: blur(8px);
+  }
+  42% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px) scale(1.04, 0.96);
+    filter: blur(0px);
+  }
+  68% {
+    transform: translateX(-50%) translateY(2.5px) scale(0.985, 1.015);
+  }
+  86% {
+    transform: translateX(-50%) translateY(-1px) scale(1.008, 0.992);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
+  }
 }
 
-.toast.success .toast-icon-badge {
-  background: rgba(16, 185, 129, 0.16);
-  border-color: rgba(16, 185, 129, 0.35);
-  color: #34d399;
+@keyframes appleDynamicIslandEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-38px) scale(0.35, 0.35);
+    filter: blur(10px);
+  }
+  42% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(8px) scale(1.08, 0.90);
+    filter: blur(0px);
+  }
+  68% {
+    transform: translateX(-50%) translateY(-4px) scale(0.96, 1.04);
+  }
+  86% {
+    transform: translateX(-50%) translateY(1.5px) scale(1.015, 0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
+  }
 }
 
-.toast-message {
-  color: #ffffff;
-  font-size: 0.84rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+@keyframes appleDynamicIslandExit {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
+  }
+  28% {
+    opacity: 0.95;
+    transform: translateX(-50%) translateY(3px) scale(1.04, 0.96);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-38px) scale(0.35, 0.35);
+    filter: blur(10px);
+  }
+}
+
+/* Cute Bold Left Glyph Capsule with Map-Style Live Radar Ring */
+.dynamic-island-icon-wrap {
+  position: relative !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 0.5px 1px rgba(255, 255, 255, 0.25) !important;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+}
+
+.dynamic-island-icon-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  opacity: 0;
+  animation: appleLiveAura 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+.dynamic-island-icon-wrap.type-success {
+  background: rgba(16, 185, 129, 0.20) !important;
+  border-color: rgba(16, 185, 129, 0.40) !important;
+  color: #34d399 !important;
+}
+
+.dynamic-island-icon-wrap.type-error {
+  background: rgba(239, 68, 68, 0.20) !important;
+  border-color: rgba(239, 68, 68, 0.40) !important;
+  color: #f87171 !important;
+}
+
+.dynamic-island-icon-wrap.type-warning {
+  background: rgba(245, 158, 11, 0.20) !important;
+  border-color: rgba(245, 158, 11, 0.40) !important;
+  color: #fbbf24 !important;
+}
+
+.dynamic-island-icon-wrap.type-info {
+  background: rgba(6, 182, 212, 0.20) !important;
+  border-color: rgba(6, 182, 212, 0.40) !important;
+  color: #38bdf8 !important;
+}
+
+/* Ambient Type Glow Halos */
+.dynamic-island-toast.success,
+.toast.success {
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(16, 185, 129, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dynamic-island-toast.error,
+.toast.error {
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(239, 68, 68, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dynamic-island-toast.warning,
+.toast.warning {
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(245, 158, 11, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dynamic-island-toast.info,
+.toast.info {
+  box-shadow: 
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(6, 182, 212, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* SF Pro Bold Typography Hierarchy */
+.dynamic-island-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
+}
+
+.dynamic-island-title {
+  color: #ffffff !important;
+  font-size: 0.88rem !important; /* 14.1px */
+  font-weight: 700 !important;
+  letter-spacing: -0.015em !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
+  line-height: 1 !important;
+}
+
+.dynamic-island-desc {
+  font-size: 0.8125rem !important; /* 13px */
+  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.01em !important;
+  flex-shrink: 1 !important;
+}
+
+@media (max-width: 640px) {
+  .dynamic-island-toast,
+  .toast {
+    top: max(68px, calc(56px + env(safe-area-inset-top, 8px))) !important;
+    max-width: calc(100vw - 20px) !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 14px 0 6px !important;
+    gap: 8px !important;
+  }
+
+  .dynamic-island-title {
+    font-size: 0.84rem !important;
+  }
+
+  .dynamic-island-desc {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dynamic-island-toast,
+  .toast {
+    top: max(68px, calc(56px + env(safe-area-inset-top, 8px))) !important;
+    max-width: calc(100vw - 20px) !important;
+    min-width: 0 !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 5px 0 5px !important;
+    gap: 6px !important;
+  }
+
+  .dynamic-island-title {
+    font-size: 0.78rem !important;
+  }
+
+  .dynamic-island-desc {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================

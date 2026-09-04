@@ -565,52 +565,39 @@ export default function App() {
           <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
         )}
 
-        {/* Persistent Live Ride Floating Activity Pill (Adaptive Dynamic Island / Minimized Capsule) */}
-        {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !rideRequest && !activeRide && (
+        {/* Persistent Live Ride Floating Activity Pill (Apple Dynamic Island Capsule) */}
+        {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !rideRequest && !activeRide && !partnerLandingVisible && (
           <div 
-            className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''}`}
+            className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''} ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'status-amber' : 'status-emerald'}`}
             onClick={() => setRideRequest({ destination: { name: persistedRide.destName, lat: persistedRide.destLat, lng: persistedRide.destLng } })}
-            title="Tap to view live ride status & driver details"
+            title="Tap to view live ride status"
             role="button"
             tabIndex={0}
           >
-            <div className="vt-flr-pulse-wrap">
+            <div className={`vt-flr-pulse-wrap ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>
               <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
               <span className={`vt-flr-radar-ring ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
             </div>
             <div className="vt-flr-info">
               <strong className="vt-flr-title">
                 {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? (isCapsuleDocked ? 'Searching Sarathi...' : 'Searching for Sarathi...') 
+                  ? 'Searching Sarathi...' 
                   : persistedRide.status === 'driver_arrived' 
-                  ? (isCapsuleDocked ? 'Driver Arrived!' : 'Driver Arrived at Pickup!') 
-                  : (isCapsuleDocked ? `Sarathi • ${persistedRide.driver?.name || 'Driver'}` : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`)}
+                  ? 'Driver Arrived!' 
+                  : 'Sarathi on the way'}
               </strong>
+              <span className="vt-flr-dot-sep">•</span>
               <span className="vt-flr-sub">
                 {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? (isCapsuleDocked ? `${persistedRide.destName || 'Destination'}` : `To ${persistedRide.destName || 'Destination'} • Tap to view`) 
-                  : (isCapsuleDocked ? `PIN: ${persistedRide.safetyPin || '9653'}` : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`)}
+                  ? `${persistedRide.destName || 'Pickup Location'}`
+                  : persistedRide.status === 'driver_arrived' 
+                  ? `PIN: ${persistedRide.safetyPin || '9653'}` 
+                  : `${persistedRide.driver?.name || 'Sarathi'}`}
               </span>
             </div>
-            <div className="vt-flr-action-cluster">
-              <div className="vt-flr-action-badge">
-                <span>{isCapsuleDocked ? 'Live' : 'View Live'}</span>
-                <ChevronRight size={13} />
-              </div>
-              {!isAnyModalActive && (
-                <button
-                  type="button"
-                  className="vt-flr-min-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLiveRideCapsuleMinimized((prev) => !prev);
-                  }}
-                  title={isCapsuleDocked ? "Expand activity capsule" : "Minimize activity capsule"}
-                  aria-label="Toggle capsule size"
-                >
-                  <Minus size={13} />
-                </button>
-              )}
+            <div className="vt-flr-trailing">
+              <span className={`vt-flr-live-tag ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>Live</span>
+              <ChevronRight size={13} className="vt-flr-chevron" />
             </div>
           </div>
         )}

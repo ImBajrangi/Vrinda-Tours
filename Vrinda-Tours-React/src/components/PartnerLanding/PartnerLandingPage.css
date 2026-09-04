@@ -3561,39 +3561,70 @@
 }
 
 /* Floating Profile Dropdown Card (Apple/Linear-Grade Glassmorphism) */
-/* Floating Profile Dropdown Card (Apple/Linear-Grade Glassmorphism) */
+/* Floating Profile Dropdown Card (Apple/Linear-Grade Compact Elegance) */
 .tp-profile-dropdown {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   left: auto;
-  width: 318px;
-  max-width: calc(100vw - 24px);
+  width: 360px;
+  max-width: calc(100vw - 20px);
+  max-height: min(88vh, 640px);
   background: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
   border: 1px solid rgba(226, 232, 240, 0.95);
   border-radius: 20px;
-  box-shadow: 0 20px 48px -10px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
-  padding: 10px;
+  box-shadow:
+    0 20px 48px -8px rgba(15, 23, 42, 0.16),
+    0 6px 16px -2px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+  padding: 12px 12px 10px;
   z-index: 9999;
   animation: tpDropdownIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: top right;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.30) transparent;
+}
+
+.tp-profile-dropdown::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tp-profile-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 8px 0;
+}
+
+.tp-profile-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.30);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.tp-profile-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
 }
 
 @media (max-width: 768px) {
   .tp-profile-dropdown {
     right: 0;
     left: auto;
-    width: min(310px, calc(100vw - 24px));
+    width: min(348px, calc(100vw - 20px));
+    max-height: min(84vh, 580px);
+    padding: 10px 10px 8px;
   }
 }
 
 @keyframes tpDropdownIn {
   0% {
     opacity: 0;
-    transform: translateY(-6px) scale(0.96);
+    transform: translateY(-6px) scale(0.97);
   }
 
   100% {
@@ -3606,7 +3637,7 @@
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 3px 4px 8px;
+  padding: 2px 4px 8px;
 }
 
 .tp-profile-avatar-wrap {
@@ -3615,24 +3646,24 @@
 }
 
 .tp-profile-dropdown-avatar {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffffff;
-  box-shadow: 0 0 0 1.5px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08), 0 3px 8px rgba(0, 0, 0, 0.06);
 }
 
 .tp-profile-status-dot {
   position: absolute;
-  bottom: 1px;
-  right: 1px;
+  bottom: 0px;
+  right: 0px;
   width: 9px;
   height: 9px;
   background: #10b981;
   border: 2px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.45);
 }
 
 .tp-profile-dropdown-user-info {
@@ -3645,17 +3676,18 @@
   font-weight: 800;
   color: #0f172a;
   margin: 0;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .tp-profile-dropdown-email {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: #64748b;
   font-weight: 500;
-  margin: 1px 0 4px;
+  margin: 1.5px 0 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3664,22 +3696,22 @@
 .tp-profile-tag-cluster {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 
 .tp-profile-dropdown-badge {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  font-size: 0.64rem;
+  gap: 3.5px;
+  font-size: 0.65rem;
   font-weight: 700;
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   color: #475569;
   padding: 1.5px 7px;
   border-radius: 999px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .tp-profile-dropdown-divider {
@@ -3691,7 +3723,7 @@
 .tp-profile-dropdown-menu {
   display: flex;
   flex-direction: column;
-  gap: 1.5px;
+  gap: 2px;
 }
 
 .tp-profile-dropdown-item {
@@ -3699,12 +3731,12 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 6px 7px;
+  padding: 6.5px 8px;
   background: transparent;
   border: none;
   border-radius: 9px;
   color: #334155;
-  font-size: 0.81rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -3719,7 +3751,7 @@
 .tp-profile-item-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   min-width: 0;
 }
 
@@ -3733,9 +3765,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: #f1f5f9;
   color: #475569;
   flex-shrink: 0;
@@ -3745,6 +3777,7 @@
 .tp-profile-dropdown-item:hover .tp-profile-item-icon-wrap {
   background: #e2e8f0;
   color: #0f172a;
+  transform: scale(1.05);
 }
 
 .tp-profile-item-icon-wrap.fav {
@@ -3798,7 +3831,7 @@
   justify-content: center;
   font-size: 0.68rem;
   font-weight: 750;
-  padding: 1px 6px;
+  padding: 1.5px 6.5px;
   border-radius: 999px;
   background: #f1f5f9;
   color: #64748b;
@@ -3820,7 +3853,7 @@
   background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
   color: #db2777;
   border: 1px solid #fbcfe8;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .tp-profile-role-badge {
@@ -3828,9 +3861,9 @@
   align-items: center;
   font-size: 0.65rem;
   font-weight: 750;
-  padding: 1px 6px;
+  padding: 1.5px 6.5px;
   border-radius: 999px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .tp-profile-role-badge.admin {
@@ -3863,28 +3896,32 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 6px 7px;
+  padding: 6px 8px;
   border-radius: 9px;
-  background: rgba(241, 245, 249, 0.45);
+  background: rgba(241, 245, 249, 0.55);
   transition: all 0.15s ease;
 }
 
 .tp-profile-plan-row:hover {
-  background: rgba(241, 245, 249, 0.85);
+  background: rgba(241, 245, 249, 0.90);
 }
 
 .tp-profile-plan-label {
-  font-size: 0.81rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 650;
   color: #334155;
 }
 
 .tp-profile-plan-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 0.72rem;
-  font-weight: 650;
-  color: #64748b;
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 1.5px 7px;
+  border-radius: 999px;
   letter-spacing: 0.01em;
 }
 
@@ -3897,12 +3934,12 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 6px 7px;
+  padding: 6.5px 8px;
   background: transparent;
   border: none;
   border-radius: 9px;
   color: #e11d48;
-  font-size: 0.81rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -3911,24 +3948,20 @@
 
 .tp-profile-dropdown-logout-btn:hover {
   background: #fff1f2;
+  color: #be123c;
 }
 
 .tp-profile-logout-icon-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: #ffe4e6;
   color: #e11d48;
   flex-shrink: 0;
   transition: all 0.15s ease;
-}
-
-.tp-profile-dropdown-logout-btn:hover {
-  background: #fff1f2;
-  color: #be123c;
 }
 
 .tp-profile-dropdown-logout-btn:hover .tp-profile-logout-icon-wrap {
@@ -3937,31 +3970,31 @@
   transform: scale(1.05);
 }
 
-/* Incomplete Profile Card in Dropdown */
+/* Incomplete Profile Card in Dropdown (Space-Efficient Compact) */
 .tp-profile-incomplete-card {
   background: #fffbeb;
   border: 1px solid #fef3c7;
   border-radius: 12px;
-  padding: 8px 10px;
-  margin: 4px 0 6px;
+  padding: 8px 11px 9px;
+  margin: 6px 0 7px;
 }
 
 .tp-profile-incomplete-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .tp-incomplete-badge {
   font-size: 0.72rem;
   font-weight: 800;
   color: #b45309;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .tp-incomplete-pct {
-  font-size: 0.7rem;
+  font-size: 0.70rem;
   font-weight: 800;
   color: #d97706;
 }
@@ -3972,7 +4005,7 @@
   background: #fde68a;
   border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .tp-profile-progress-fill {
@@ -3983,10 +4016,10 @@
 }
 
 .tp-profile-incomplete-desc {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: #78350f;
   line-height: 1.35;
-  margin: 0 0 8px;
+  margin: 0 0 7px;
 }
 
 .tp-btn-complete-profile {
@@ -4001,7 +4034,7 @@
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -4012,7 +4045,7 @@
 }
 
 .tp-profile-verified-card {
-  padding: 4px 0 6px;
+  padding: 3px 0 5px;
 }
 
 .tp-profile-verified-banner {
@@ -4023,14 +4056,14 @@
   border: 1px solid #bbf7d0;
   border-radius: 10px;
   padding: 6px 10px;
-  box-shadow: 0 1px 2px rgba(22, 163, 74, 0.04);
+  box-shadow: 0 1px 2px rgba(22, 163, 74, 0.03);
 }
 
 .tp-profile-verified-left {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.73rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: #15803d;
 }
@@ -4041,7 +4074,7 @@
 }
 
 .tp-profile-verified-badge {
-  font-size: 0.64rem;
+  font-size: 0.66rem;
   font-weight: 800;
   color: #15803d;
   background: #dcfce7;
@@ -4052,329 +4085,366 @@
 }
 
 /* ==========================================================================
-   Floating Interactive Luxury Toast (Sonner/Linear Glassmorphic Standard)
+   Apple Dynamic Island Morphing UI/UX (Cute, Bold, Information-Only Capsule)
    ========================================================================== */
 
+.tp-dynamic-island,
 .tp-floating-toast {
   position: fixed !important;
-  bottom: max(24px, env(safe-area-inset-bottom)) !important;
-  right: 24px !important;
-  left: auto !important;
-  width: auto;
-  min-width: 320px;
-  max-width: min(460px, calc(100vw - 32px));
-  background: rgba(13, 17, 28, 0.94);
-  color: #ffffff;
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  box-shadow: 
-    0 24px 48px -12px rgba(0, 0, 0, 0.6),
-    0 4px 12px -2px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  padding: 10px 14px 10px 12px;
+  top: max(80px, calc(var(--tp-nav-height, 64px) + 16px)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  width: max-content !important;
+  max-width: min(540px, calc(100vw - 24px)) !important;
+  background: rgba(18, 20, 26, 0.88) !important;
+  color: #ffffff !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 9999px !important;
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  padding: 0 18px 0 8px !important;
   z-index: 99999999 !important;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  animation: tpToastSpringIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  box-sizing: border-box;
-  pointer-events: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
   touch-action: manipulation !important;
-  user-select: none;
-  -webkit-user-select: none;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  overflow: hidden !important;
+  animation: appleDynamicIslandEnter 0.54s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  transform-origin: 50% 0% !important;
+  will-change: transform, opacity !important;
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.24s ease, border-color 0.24s ease !important;
+  box-sizing: border-box !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", -apple-system, sans-serif !important;
 }
 
+.tp-dynamic-island:hover,
 .tp-floating-toast:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  box-shadow: 
-    0 28px 56px -12px rgba(0, 0, 0, 0.72),
-    0 6px 16px -2px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  transform: translateX(-50%) scale(1.03) !important;
+  border-color: rgba(255, 255, 255, 0.26) !important;
+  box-shadow:
+    0 12px 28px -4px rgba(0, 0, 0, 0.26),
+    0 4px 10px -2px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
 }
 
-@keyframes tpToastSpringIn {
-  from {
+.tp-dynamic-island:active,
+.tp-floating-toast:active {
+  transform: translateX(-50%) scale(0.96) !important;
+}
+
+/* Morph Exit Stage (Apple Spring Collapse into Notch) */
+.tp-dynamic-island.stage-exiting,
+.tp-floating-toast.stage-exiting {
+  animation: appleDynamicIslandExit 0.28s cubic-bezier(0.32, 0, 0.67, 0) forwards !important;
+  pointer-events: none !important;
+}
+
+@keyframes appleBottomCapsuleEnter {
+  0% {
     opacity: 0;
-    transform: translateY(24px) scale(0.95);
+    transform: translateX(-50%) translateY(32px) scale(0.65, 0.65);
+    filter: blur(8px);
   }
 
-  to {
+  42% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateX(-50%) translateY(-6px) scale(1.04, 0.96);
+    filter: blur(0px);
+  }
+
+  68% {
+    transform: translateX(-50%) translateY(2.5px) scale(0.985, 1.015);
+  }
+
+  86% {
+    transform: translateX(-50%) translateY(-1px) scale(1.008, 0.992);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
   }
 }
 
-@media (max-width: 640px) {
-  .tp-floating-toast {
-    left: 50% !important;
-    right: auto !important;
-    bottom: max(16px, env(safe-area-inset-bottom)) !important;
-    width: calc(100vw - 24px) !important;
-    max-width: 420px !important;
-    min-width: 0 !important;
-    padding: 9px 12px 9px 10px !important;
-    transform: translateX(-50%) !important;
-    animation: tpToastMobileSpringIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+@keyframes appleDynamicIslandEnter {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-38px) scale(0.35, 0.35);
+    filter: blur(10px);
   }
 
-  @keyframes tpToastMobileSpringIn {
-    from {
-      opacity: 0;
-      transform: translateX(-50%) translateY(24px) scale(0.95);
-    }
+  42% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(8px) scale(1.08, 0.90);
+    filter: blur(0px);
+  }
 
-    to {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0) scale(1);
-    }
+  68% {
+    transform: translateX(-50%) translateY(-4px) scale(0.96, 1.04);
+  }
+
+  86% {
+    transform: translateX(-50%) translateY(1.5px) scale(1.015, 0.985);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
   }
 }
 
-.tp-toast-main-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-  min-width: 0;
+@keyframes appleDynamicIslandExit {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1, 1);
+    filter: blur(0px);
+  }
+
+  28% {
+    opacity: 0.95;
+    transform: translateX(-50%) translateY(3px) scale(1.04, 0.96);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-38px) scale(0.35, 0.35);
+    filter: blur(10px);
+  }
 }
 
+/* Cute Bold Left Glyph Bubble */
+.tp-island-glyph-wrap,
 .tp-toast-icon-wrap {
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #34d399;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  position: relative !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: inset 0 0.5px 1px rgba(255, 255, 255, 0.25) !important;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+}
+
+.tp-island-glyph-wrap::after,
+.tp-toast-icon-wrap::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  opacity: 0;
+  animation: appleLiveAura 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
   pointer-events: none;
-  transition: all 0.2s ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.tp-toast-icon-wrap.highlight {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.22);
+@keyframes appleLiveAura {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.65;
+  }
+
+  60% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
 }
 
-/* Role-Themed Refined Glowing Beacons */
+.tp-dynamic-island:hover .tp-island-glyph-wrap {
+  transform: scale(1.10);
+}
+
+/* Cute Candy Ambient Glows */
+.tp-dynamic-island.role-admin,
+.tp-floating-toast.role-admin {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(245, 158, 11, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-admin .tp-island-glyph-wrap,
 .tp-floating-toast.role-admin .tp-toast-icon-wrap {
-  background: rgba(245, 158, 11, 0.14);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #fbbf24;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(245, 158, 11, 0.15);
+  background: rgba(245, 158, 11, 0.20) !important;
+  border-color: rgba(245, 158, 11, 0.40) !important;
+  color: #fbbf24 !important;
 }
 
+.tp-dynamic-island.role-driver,
+.tp-floating-toast.role-driver {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(16, 185, 129, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-driver .tp-island-glyph-wrap,
 .tp-floating-toast.role-driver .tp-toast-icon-wrap {
-  background: rgba(16, 185, 129, 0.14);
-  border-color: rgba(16, 185, 129, 0.35);
-  color: #34d399;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.20) !important;
+  border-color: rgba(16, 185, 129, 0.40) !important;
+  color: #34d399 !important;
 }
 
+.tp-dynamic-island.role-hotel,
+.tp-floating-toast.role-hotel {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(168, 85, 247, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-hotel .tp-island-glyph-wrap,
 .tp-floating-toast.role-hotel .tp-toast-icon-wrap {
-  background: rgba(168, 85, 247, 0.14);
-  border-color: rgba(168, 85, 247, 0.35);
-  color: #c084fc;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(168, 85, 247, 0.15);
+  background: rgba(168, 85, 247, 0.20) !important;
+  border-color: rgba(168, 85, 247, 0.40) !important;
+  color: #c084fc !important;
 }
 
+.tp-dynamic-island.role-restaurant,
+.tp-dynamic-island.role-restaurant_staff,
+.tp-floating-toast.role-restaurant,
+.tp-floating-toast.role-restaurant_staff {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(249, 115, 22, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-restaurant .tp-island-glyph-wrap,
+.tp-dynamic-island.role-restaurant_staff .tp-island-glyph-wrap,
 .tp-floating-toast.role-restaurant .tp-toast-icon-wrap,
 .tp-floating-toast.role-restaurant_staff .tp-toast-icon-wrap {
-  background: rgba(249, 115, 22, 0.14);
-  border-color: rgba(249, 115, 22, 0.35);
-  color: #fb923c;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(249, 115, 22, 0.15);
+  background: rgba(249, 115, 22, 0.20) !important;
+  border-color: rgba(249, 115, 22, 0.40) !important;
+  color: #fb923c !important;
 }
 
+.tp-dynamic-island.role-agency,
+.tp-floating-toast.role-agency {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(56, 189, 248, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-agency .tp-island-glyph-wrap,
 .tp-floating-toast.role-agency .tp-toast-icon-wrap {
-  background: rgba(56, 189, 248, 0.14);
-  border-color: rgba(56, 189, 248, 0.35);
-  color: #38bdf8;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.20) !important;
+  border-color: rgba(56, 189, 248, 0.40) !important;
+  color: #38bdf8 !important;
 }
 
+.tp-dynamic-island.role-pilgrim,
+.tp-floating-toast.role-pilgrim {
+  box-shadow:
+    0 8px 24px -4px rgba(0, 0, 0, 0.20),
+    0 0 18px rgba(20, 184, 166, 0.15),
+    0 2px 8px -2px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.tp-dynamic-island.role-pilgrim .tp-island-glyph-wrap,
 .tp-floating-toast.role-pilgrim .tp-toast-icon-wrap {
-  background: rgba(20, 184, 166, 0.14);
-  border-color: rgba(20, 184, 166, 0.35);
-  color: #2dd4bf;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(20, 184, 166, 0.15);
+  background: rgba(20, 184, 166, 0.20) !important;
+  border-color: rgba(20, 184, 166, 0.40) !important;
+  color: #2dd4bf !important;
 }
 
+/* SF Pro Bold Typography Hierarchy */
+.tp-island-content,
 .tp-toast-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  white-space: nowrap !important;
 }
 
+.tp-island-title,
 .tp-toast-title {
-  font-size: 0.84rem;
-  font-weight: 700;
-  color: #f8fafc;
-  margin: 0;
-  letter-spacing: -0.015em;
-  line-height: 1.25;
-  white-space: nowrap;
+  font-size: 0.88rem !important;
+  /* 14.1px */
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.015em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  overflow: visible !important;
 }
 
+.tp-island-dot {
+  color: rgba(255, 255, 255, 0.40) !important;
+  font-size: 0.80rem !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.tp-island-sub,
 .tp-toast-desc {
-  font-size: 0.73rem;
-  font-weight: 500;
-  color: #94a3b8;
-  line-height: 1.35;
-  margin: 2px 0 0;
-  max-width: 240px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.8125rem !important;
+  /* 13px */
+  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  letter-spacing: -0.01em !important;
+  flex-shrink: 1 !important;
 }
 
 @media (max-width: 640px) {
-  .tp-toast-desc {
-    max-width: 175px;
-  }
-}
 
-.tp-toast-actions-stack {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.tp-toast-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.09);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.tp-toast-cta:hover {
-  background: #ffffff;
-  color: #09090b;
-  border-color: #ffffff;
-  transform: translateY(-0.5px);
-  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
-}
-
-.tp-toast-cta:active {
-  transform: scale(0.96);
-}
-
-.tp-toast-cta-arrow {
-  transition: transform 0.18s ease;
-}
-
-.tp-toast-cta:hover .tp-toast-cta-arrow {
-  transform: translateX(2px);
-}
-
-.tp-toast-close-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: transparent;
-  border: none;
-  color: #64748b;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  padding: 0;
-  transition: all 0.18s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tp-toast-close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.tp-toast-close-btn:active {
-  transform: scale(0.92);
-}
-
-/* Delicate Hairline Progress Track */
-.tp-toast-progress-track {
-  position: absolute;
-  bottom: 0;
-  left: 14px;
-  right: 14px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.tp-toast-progress-bar {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #10b981, #06b6d4);
-  border-radius: 999px;
-  animation: tpToastProgress 5.5s linear forwards;
-}
-
-.tp-floating-toast.role-admin .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-
-.tp-floating-toast.role-driver .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #10b981, #34d399);
-}
-
-.tp-floating-toast.role-hotel .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #8b5cf6, #c084fc);
-}
-
-.tp-floating-toast.role-restaurant .tp-toast-progress-bar,
-.tp-floating-toast.role-restaurant_staff .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #f97316, #fb923c);
-}
-
-.tp-floating-toast.role-agency .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
-}
-
-.tp-floating-toast.role-pilgrim .tp-toast-progress-bar {
-  background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-}
-
-.tp-floating-toast:hover .tp-toast-progress-bar {
-  animation-play-state: paused;
-}
-
-@keyframes tpToastProgress {
-  from {
-    width: 100%;
+  .tp-dynamic-island,
+  .tp-floating-toast {
+    top: max(68px, calc(56px + env(safe-area-inset-top, 8px))) !important;
+    max-width: calc(100vw - 20px) !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    gap: 8px !important;
+    padding: 0 14px 0 6px !important;
   }
 
-  to {
-    width: 0%;
+  .tp-island-title,
+  .tp-toast-title {
+    font-size: 0.84rem !important;
   }
 }
 
@@ -9228,10 +9298,10 @@
 .tp-role-quick-strip {
   background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
   border: 1px solid rgba(226, 232, 240, 0.95);
-  border-radius: 16px;
-  padding: 10px 10px 9px;
-  margin: 6px 0 8px;
-  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  border-radius: 14px;
+  padding: 8px 8px 8px;
+  margin: 6px 0 7px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
   position: relative;
 }
 
@@ -9239,29 +9309,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
-  padding: 0 2px;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding: 0 3px;
 }
 
 .tp-role-strip-title {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
 }
 
 .tp-role-shield-badge {
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: 1px solid;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s ease;
 }
 
 .tp-role-title-text {
@@ -9290,16 +9360,16 @@
 .tp-btn-switch-role-link {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2.5px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 750;
   color: #4f46e5;
   cursor: pointer;
-  padding: 3px 8px;
+  padding: 2.5px 7px;
   border-radius: 9999px;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
   white-space: nowrap;
   flex-shrink: 0;
@@ -9309,15 +9379,14 @@
   background: #eef2ff;
   color: #3730a3;
   border-color: #c7d2fe;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.12);
 }
 
 .tp-btn-switch-role-link .tp-btn-chevron-arrow {
-  transition: transform 0.18s ease;
+  transition: transform 0.15s ease;
 }
 
 .tp-btn-switch-role-link:hover .tp-btn-chevron-arrow {
-  transform: translateX(2px);
+  transform: translateX(1.5px);
 }
 
 .tp-role-quick-pills {
@@ -9332,45 +9401,76 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 8px 4px 7px;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  padding: 7px 4px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.90);
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.15s ease, background 0.15s ease;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   outline: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   text-align: center;
+  will-change: transform;
 }
 
 .tp-role-quick-pill .tp-role-pill-icon-wrap {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: 2px;
+  transition: transform 0.2s ease, background 0.15s ease;
+  margin-bottom: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-.tp-role-quick-pill .tp-role-pill-icon {
-  font-size: 1.15rem;
-  line-height: 1;
-  display: inline-block;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.04));
+/* Pastel candy bubbles per role */
+.tp-role-pill-pilgrim .tp-role-pill-icon-wrap {
+  background: #f0fdfa;
+  border-color: #ccfbf1;
+  color: #0d9488;
+}
+
+.tp-role-pill-driver .tp-role-pill-icon-wrap {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+  color: #16a34a;
+}
+
+.tp-role-pill-restaurant .tp-role-pill-icon-wrap {
+  background: #fff7ed;
+  border-color: #ffedd5;
+  color: #ea580c;
+}
+
+.tp-role-pill-hotel .tp-role-pill-icon-wrap {
+  background: #eff6ff;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+
+.tp-role-pill-agency .tp-role-pill-icon-wrap {
+  background: #f5f3ff;
+  border-color: #ede9fe;
+  color: #7c3aed;
+}
+
+.tp-role-pill-admin .tp-role-pill-icon-wrap {
+  background: #fffbeb;
+  border-color: #fef3c7;
+  color: #d97706;
 }
 
 .tp-role-quick-pill .tp-role-pill-label {
-  font-size: 0.69rem;
+  font-size: 0.70rem;
   font-weight: 700;
   color: #475569;
-  margin-top: 2px;
+  margin-top: 1px;
   line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
@@ -9380,38 +9480,41 @@
   transition: color 0.15s ease;
 }
 
+/* Cute subtle hover physics */
 .tp-role-quick-pill:hover:not(.active) {
-  border-color: #94a3b8;
-  background: #f8fafc;
-  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  transform: scale(1.02);
+  border-color: rgba(99, 102, 241, 0.35);
+  background: #ffffff;
+  box-shadow: 0 4px 10px -2px rgba(15, 23, 42, 0.08), inset 0 1px 1px #ffffff;
 }
 
 .tp-role-quick-pill:hover:not(.active) .tp-role-pill-icon-wrap {
   transform: scale(1.08);
-  background: #f1f5f9;
-  border-color: #e2e8f0;
 }
 
 .tp-role-quick-pill:hover:not(.active) .tp-role-pill-label {
   color: #0f172a;
 }
 
+/* Squishy press */
 .tp-role-quick-pill:active {
-  transform: scale(0.97);
+  transform: scale(0.94) !important;
 }
 
+/* Active Selected iOS Liquid Bubble */
 .tp-role-quick-pill.active {
-  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-  border-color: #0f172a;
-  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(15, 23, 42, 0.1);
+  background: #0f172a !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+  animation: iosBubblePop 0.30s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .tp-role-quick-pill.active .tp-role-pill-icon-wrap {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  color: #ffffff !important;
+  transform: scale(1.04);
 }
 
 .tp-role-quick-pill.active svg {
@@ -9420,22 +9523,21 @@
 }
 
 .tp-role-quick-pill.active .tp-role-pill-label {
-  color: #ffffff;
-  font-weight: 800;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  color: #ffffff !important;
+  font-weight: 750 !important;
 }
 
 .tp-role-pill-indicator {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 4px;
+  right: 4px;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #38bdf8;
-  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.9);
   border: 1px solid #0f172a;
-  animation: tpPulseIndicator 2s infinite ease-in-out;
+  animation: iosBubbleBeaconPulse 2s infinite ease-in-out;
 }
 
 /* Role-specific active indicator beacon accents */
@@ -9469,7 +9571,21 @@
   box-shadow: 0 0 8px #fbbf24;
 }
 
-@keyframes tpPulseIndicator {
+@keyframes iosBubblePop {
+  0% {
+    transform: scale(0.92);
+  }
+
+  65% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes iosBubbleBeaconPulse {
 
   0%,
   100% {
@@ -9478,8 +9594,8 @@
   }
 
   50% {
-    transform: scale(1.2);
-    opacity: 0.85;
+    transform: scale(1.25);
+    opacity: 0.75;
   }
 }
 
@@ -9598,7 +9714,7 @@
 .tp-mobile-role-pills {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  gap: 7px;
 }
 
 .tp-mobile-role-pill {
@@ -9607,43 +9723,37 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 8px 4px 7px;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
+  padding: 10px 4px 8px;
+  border-radius: 16px;
+  border: 1.5px solid rgba(226, 232, 240, 0.88);
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, background 0.25s ease;
+  box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   outline: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   text-align: center;
+  will-change: transform, box-shadow;
 }
 
 .tp-mobile-role-pill .tp-role-pill-icon-wrap {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-bottom: 2px;
-}
-
-.tp-mobile-role-pill .tp-role-pill-icon {
-  font-size: 1.15rem;
-  line-height: 1;
-  display: inline-block;
-  transition: transform 0.2s ease;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.04));
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.25s ease, box-shadow 0.3s ease;
+  margin-bottom: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03), inset 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
 .tp-mobile-role-pill .tp-role-pill-label {
-  font-size: 0.69rem;
-  font-weight: 700;
+  font-size: 0.70rem;
+  font-weight: 750;
   color: #475569;
   margin-top: 2px;
   line-height: 1.15;
@@ -9651,28 +9761,49 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-  letter-spacing: -0.01em;
-  transition: color 0.15s ease;
+  letter-spacing: -0.015em;
+  transition: color 0.2s ease, font-weight 0.2s ease;
 }
 
-.tp-mobile-role-pill:hover:not(.active),
-.tp-mobile-role-pill:active:not(.active) {
+.tp-mobile-role-pill:hover:not(.active) {
+  /* transform: translateY(-3.5px) scale(1.06); */
+  border-color: rgba(99, 102, 241, 0.35);
   background: #ffffff;
-  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.12), 0 4px 8px -2px rgba(15, 23, 42, 0.05), inset 0 1px 1px #ffffff;
+}
+
+.tp-mobile-role-pill:hover:not(.active) .tp-role-pill-icon-wrap {
+  transform: scale(1.22) rotate(-4deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tp-mobile-role-pill:hover:not(.active) .tp-role-pill-label {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.tp-mobile-role-pill:active {
+  /* transform: scale(0.90) translateY(1.5px) !important; */
+  transition: transform 0.09s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.tp-mobile-role-pill:active .tp-role-pill-icon-wrap {
+  transform: scale(0.92);
 }
 
 .tp-mobile-role-pill.active {
-  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
-  border-color: #0f172a;
-  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(15, 23, 42, 0.1);
+  background: linear-gradient(150deg, #0f172a 0%, #1e293b 100%) !important;
+  border-color: #0f172a !important;
+  box-shadow: 0 10px 26px -4px rgba(15, 23, 42, 0.38), 0 4px 10px -2px rgba(15, 23, 42, 0.18), inset 0 1.5px 1px rgba(255, 255, 255, 0.35), inset 0 -1px 1px rgba(0, 0, 0, 0.4) !important;
+  animation: iosBubblePop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .tp-mobile-role-pill.active .tp-role-pill-icon-wrap {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.28);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  color: #ffffff !important;
+  transform: scale(1.08);
 }
 
 .tp-mobile-role-pill.active svg {
@@ -9681,9 +9812,9 @@
 }
 
 .tp-mobile-role-pill.active .tp-role-pill-label {
-  color: #ffffff;
-  font-weight: 800;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* Dynamic Mobile CTAs */

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Compass, Calendar, Clock, Users, MapPin, Search, Star,
@@ -1242,21 +1242,11 @@ export default function PartnerLandingPage({
     const cfg = ROLE_CONFIGS[newRoleKey] || ROLE_CONFIGS.pilgrim;
     setFloatingToast({
       id: `role_switch_${newRoleKey}_${Date.now()}`,
-      icon: getToastRoleSVG(newRoleKey, 16),
+      icon: getToastRoleSVG(newRoleKey, 17),
       roleKey: newRoleKey,
       highlight: true,
-      title: `Switched to ${cfg.shortLabel || cfg.label}`,
-      desc: cfg.description || 'Workspace tools ready',
-      ctaText: newRoleKey !== 'pilgrim' ? 'Open Workspace' : 'Explore Tours',
-      onCta: () => {
-        setFloatingToast(null);
-        if (newRoleKey === 'admin' && onOpenAdmin) onOpenAdmin();
-        else if (newRoleKey === 'driver' && onOpenDriverPortal) onOpenDriverPortal();
-        else if (newRoleKey === 'restaurant' && onOpenRestaurantPage) onOpenRestaurantPage();
-        else if (newRoleKey === 'hotel' && onOpenHotelPage) onOpenHotelPage();
-        else if (newRoleKey === 'agency' && onOpenAgencyPage) onOpenAgencyPage();
-        else if (onOpenPartnerHub) onOpenPartnerHub(newRoleKey);
-      }
+      title: `${cfg.shortLabel || cfg.label} Active`,
+      desc: null
     });
   };
 
@@ -1270,7 +1260,71 @@ export default function PartnerLandingPage({
   const [authError, setAuthError] = useState('');
   const [authSuccessMsg, setAuthSuccessMsg] = useState('');
   const [pendingGoogleUser, setPendingGoogleUser] = useState(null);
-  const [floatingToast, setFloatingToast] = useState(null);
+  const [floatingToast, setFloatingToastState] = useState(null);
+  const [toastStage, setToastStage] = useState('visible'); // 'visible' | 'exiting'
+  const toastTimerRef = useRef(null);
+  const toastTouchStartY = useRef(null);
+
+  const dismissFloatingToast = useCallback(() => {
+    setToastStage('exiting');
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setTimeout(() => {
+      setFloatingToastState(null);
+      setToastStage('visible');
+    }, 280);
+  }, []);
+
+  const setFloatingToast = useCallback((toastData) => {
+    if (!toastData) {
+      dismissFloatingToast();
+      return;
+    }
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToastStage('visible');
+    setFloatingToastState(toastData);
+
+    const duration = toastData.duration || 5200;
+    toastTimerRef.current = setTimeout(() => {
+      dismissFloatingToast();
+    }, duration);
+  }, [dismissFloatingToast]);
+
+  const handleToastMouseEnter = useCallback(() => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+  }, []);
+
+  const handleToastMouseLeave = useCallback(() => {
+    if (toastStage === 'visible' && floatingToast) {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => {
+        dismissFloatingToast();
+      }, 3200);
+    }
+  }, [toastStage, floatingToast, dismissFloatingToast]);
+
+  const handleToastTouchStart = useCallback((e) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    if (e.touches && e.touches[0]) {
+      toastTouchStartY.current = e.touches[0].clientY;
+    }
+  }, []);
+
+  const handleToastTouchEnd = useCallback((e) => {
+    if (toastTouchStartY.current !== null && e.changedTouches && e.changedTouches[0]) {
+      const deltaY = e.changedTouches[0].clientY - toastTouchStartY.current;
+      if (deltaY < -15) { // Swiped up towards notch
+        dismissFloatingToast();
+        return;
+      }
+    }
+    if (toastStage === 'visible' && floatingToast) {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => {
+        dismissFloatingToast();
+      }, 3200);
+    }
+  }, [toastStage, floatingToast, dismissFloatingToast]);
+
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
   const [selectedRefCategory, setSelectedRefCategory] = useState('pilgrim');
@@ -1308,15 +1362,6 @@ export default function PartnerLandingPage({
     isMobileMenuOpen
   );
   const isCapsuleDocked = isAnyModalActive || isLiveRideCapsuleMinimized;
-
-  // Auto-dismiss floating toasts gracefully after 5.5 seconds
-  useEffect(() => {
-    if (!floatingToast) return;
-    const timer = setTimeout(() => {
-      setFloatingToast(null);
-    }, 5500);
-    return () => clearTimeout(timer);
-  }, [floatingToast]);
 
   // Fetch live referral stats from Supabase when user opens the referral modal
   useEffect(() => {
@@ -1376,9 +1421,11 @@ export default function PartnerLandingPage({
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside, { passive: true });
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
@@ -1486,24 +1533,7 @@ export default function PartnerLandingPage({
         icon: <Heart size={18} fill={isFav ? 'none' : '#ef4444'} color="#ef4444" />,
         highlight: !isFav,
         title: isFav ? 'Removed from Saved' : 'Saved to Favourites',
-        desc: isFav
-          ? 'Removed from your saved list.'
-          : 'Added to your sacred yatra list.',
-        ctaText: isFav ? 'Undo' : 'View Saved',
-        onCta: () => {
-          if (isFav) {
-            setFavoriteIds((currentRaw) => {
-              const current = Array.isArray(currentRaw) ? currentRaw : [];
-              const reAdded = [...current, itemId];
-              setCachedData('traveler_favorites', reAdded);
-              return reAdded;
-            });
-          } else {
-            const el = document.getElementById('gallery') || document.getElementById('popular');
-            el?.scrollIntoView({ behavior: 'smooth' });
-          }
-          setFloatingToast(null);
-        }
+        desc: null
       });
 
       return updated;
@@ -1613,31 +1643,16 @@ export default function PartnerLandingPage({
           id: 'register_prompt',
           icon: <Sparkles size={18} color="#10b981" />,
           highlight: true,
-          title: 'Get 15% Off Your Yatra',
-          desc: 'Instant member vouchers & live darshan passes.',
-          ctaText: 'Claim 15%',
-          onCta: () => {
-            setAuthMode('signup');
-            setSignupStep(1);
-            setIsAuthModalOpen(true);
-            setFloatingToast(null);
-          }
+          title: '15% Off Yatra Passes Active',
+          desc: null
         });
       } else if (!currentUser.phone) {
         setFloatingToast({
           id: 'phone_prompt',
           icon: <Phone size={18} color="#38bdf8" />,
           highlight: true,
-          title: 'Add Mobile Number',
-          desc: 'Receive live cab arrival & booking alerts.',
-          ctaText: 'Add Number',
-          onCta: () => {
-            setPendingGoogleUser(currentUser);
-            setAuthPhoneInput(currentUser.phone || '');
-            setAuthMode('phone_prompt');
-            setIsAuthModalOpen(true);
-            setFloatingToast(null);
-          }
+          title: 'Live Cab Alerts Active',
+          desc: null
         });
       } else if (currentUser.isAnonymous) {
         setFloatingToast({
@@ -1645,14 +1660,7 @@ export default function PartnerLandingPage({
           icon: <UserCheck size={18} color="#a855f7" />,
           highlight: false,
           title: 'Sync Your Bookings',
-          desc: 'Save your yatra history across all devices.',
-          ctaText: 'Create Account',
-          onCta: () => {
-            setAuthMode('signup');
-            setSignupStep(1);
-            setIsAuthModalOpen(true);
-            setFloatingToast(null);
-          }
+          desc: null
         });
       }
     }, 2800);
@@ -2201,7 +2209,8 @@ export default function PartnerLandingPage({
                     className={`tp-nav-role-mini-tag ${activeRoleConfig.badgeClass}`}
                     style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg }}
                   >
-                    {activeRoleConfig.icon} {activeRoleConfig.navLabel || activeRoleConfig.shortLabel}
+                    {renderRoleIcon(activeUserRole, 11)}
+                    <span>{activeRoleConfig.navLabel || activeRoleConfig.shortLabel}</span>
                   </span>
                   <ChevronDown size={13} className={`tp-nav-user-chevron ${isProfileMenuOpen ? 'open' : ''}`} />
                 </button>
@@ -2235,7 +2244,8 @@ export default function PartnerLandingPage({
                             className={`tp-role-tag ${activeRoleConfig.badgeClass}`}
                             style={{ color: activeRoleConfig.color, background: activeRoleConfig.accentBg, borderColor: activeRoleConfig.borderColor }}
                           >
-                            {activeRoleConfig.tag}
+                            {renderRoleIcon(activeUserRole, 11)}
+                            <span>{activeRoleConfig.tag}</span>
                           </span>
                           <span className="tp-profile-dropdown-badge">
                             <Sparkles size={10} /> {currentUser.authProvider === 'google' ? 'Google' : currentUser.isAnonymous ? 'Guest' : 'Verified'}
@@ -5440,58 +5450,33 @@ export default function PartnerLandingPage({
         document.body
       )}
 
-      {/* Floating Interactive Luxury Toast (Mounted via Portal to Screen Body) */}
+      {/* Floating Dynamic Island Morphing Luxury Capsule (Information Only) */}
       {floatingToast && (floatingToast.title || floatingToast.message || floatingToast.desc) && !isAnyModalActive && typeof document !== 'undefined' && createPortal(
         <aside
-          className={`tp-floating-toast ${floatingToast.roleKey ? `role-${floatingToast.roleKey}` : ''}`}
+          key={floatingToast.id || 'apple_dynamic_island'}
+          className={`tp-dynamic-island tp-floating-toast ${floatingToast.roleKey ? `role-${floatingToast.roleKey}` : ''} stage-${toastStage}`}
           role="status"
           aria-live="polite"
-          onClick={(e) => e.stopPropagation()}
+          onMouseEnter={handleToastMouseEnter}
+          onMouseLeave={handleToastMouseLeave}
+          onTouchStart={handleToastTouchStart}
+          onTouchEnd={handleToastTouchEnd}
+          onClick={dismissFloatingToast}
         >
-          <div className="tp-toast-main-content">
-            <div className={`tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
-              {floatingToast.icon || <Sparkles size={16} color="#10b981" />}
-            </div>
-            <div className="tp-toast-body">
-              <span className="tp-toast-title">{floatingToast.title || floatingToast.message}</span>
-              {floatingToast.desc && <p className="tp-toast-desc">{floatingToast.desc}</p>}
-            </div>
+          {/* Dynamic Glowing Glyph */}
+          <div className={`tp-island-glyph-wrap tp-toast-icon-wrap ${floatingToast.highlight ? 'highlight' : ''}`}>
+            {floatingToast.icon || <Sparkles size={16} color="#10b981" />}
           </div>
 
-          <div className="tp-toast-actions-stack">
-            {floatingToast.ctaText && (
-              <button
-                type="button"
-                className="tp-toast-cta"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (typeof floatingToast.onCta === 'function') {
-                    floatingToast.onCta();
-                  }
-                }}
-              >
-                <span>{floatingToast.ctaText}</span>
-                <ArrowRight size={12} className="tp-toast-cta-arrow" />
-              </button>
+          {/* Dynamic Island Single-Line Text */}
+          <div className="tp-island-content tp-toast-body">
+            <span className="tp-island-title tp-toast-title">{floatingToast.title || floatingToast.message}</span>
+            {floatingToast.desc && (
+              <>
+                <span className="tp-island-dot">•</span>
+                <span className="tp-island-sub tp-toast-desc">{floatingToast.desc}</span>
+              </>
             )}
-            <button
-              type="button"
-              className="tp-toast-close-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setFloatingToast(null);
-                sessionStorage.setItem('vrinda_toast_dismissed', 'true');
-              }}
-              aria-label="Close notification"
-            >
-              <X size={14} />
-            </button>
-          </div>
-
-          <div className="tp-toast-progress-track">
-            <div className="tp-toast-progress-bar" />
           </div>
         </aside>,
         document.body
@@ -5515,57 +5500,44 @@ export default function PartnerLandingPage({
         document.body
       )}
 
-      {/* Persistent Live Ride Floating Activity Pill (Adaptive Dynamic Island / Minimized Capsule) */}
+      {/* Persistent Live Ride Floating Activity Pill (Apple Dynamic Island Capsule) */}
       {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !isInstantRideModalOpen && typeof document !== 'undefined' && createPortal(
         <div
-          className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''}`}
+          className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''} ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'status-amber' : 'status-emerald'}`}
           onClick={() => {
             if (persistedRide.destName) {
               setRideDestination({ name: persistedRide.destName, lat: persistedRide.destLat, lng: persistedRide.destLng });
             }
             setIsInstantRideModalOpen(true);
           }}
-          title="Tap to view live ride status & driver details"
+          title="Tap to view live ride status"
           role="button"
           tabIndex={0}
         >
-          <div className="vt-flr-pulse-wrap">
+          <div className={`vt-flr-pulse-wrap ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>
             <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
             <span className={`vt-flr-radar-ring ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
           </div>
           <div className="vt-flr-info">
             <strong className="vt-flr-title">
               {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                ? (isCapsuleDocked ? 'Searching Sarathi...' : 'Searching for Sarathi...')
+                ? 'Searching Sarathi...'
                 : persistedRide.status === 'driver_arrived'
-                  ? (isCapsuleDocked ? 'Driver Arrived!' : 'Driver Arrived at Pickup!')
-                  : (isCapsuleDocked ? `Sarathi • ${persistedRide.driver?.name || 'Driver'}` : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`)}
+                  ? 'Driver Arrived!'
+                  : 'Sarathi on the way'}
             </strong>
+            <span className="vt-flr-dot-sep">•</span>
             <span className="vt-flr-sub">
               {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                ? (isCapsuleDocked ? `${persistedRide.destName || 'Destination'}` : `To ${persistedRide.destName || 'Destination'} • Tap to view`)
-                : (isCapsuleDocked ? `PIN: ${persistedRide.safetyPin || '9653'}` : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`)}
+                ? `${persistedRide.destName || 'Pickup Location'}`
+                : persistedRide.status === 'driver_arrived'
+                  ? `PIN: ${persistedRide.safetyPin || '9653'}`
+                  : `${persistedRide.driver?.name || 'Sarathi'}`}
             </span>
           </div>
-          <div className="vt-flr-action-cluster">
-            <div className="vt-flr-action-badge">
-              <span>{isCapsuleDocked ? 'Live' : 'View Live'}</span>
-              <ChevronRight size={13} />
-            </div>
-            {!isAnyModalActive && (
-              <button
-                type="button"
-                className="vt-flr-min-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsLiveRideCapsuleMinimized((prev) => !prev);
-                }}
-                title={isCapsuleDocked ? "Expand activity capsule" : "Minimize activity capsule"}
-                aria-label="Toggle capsule size"
-              >
-                <Minus size={13} />
-              </button>
-            )}
+          <div className="vt-flr-trailing">
+            <span className={`vt-flr-live-tag ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>Live</span>
+            <ChevronRight size={13} className="vt-flr-chevron" />
           </div>
         </div>,
         document.body
