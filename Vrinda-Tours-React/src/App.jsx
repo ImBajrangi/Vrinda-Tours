@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
-import { Navigation, ChevronRight, Minus } from 'lucide-react';
+import { Navigation, ChevronRight, Minus, Car } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
 import MapView from './components/Map/MapView';
@@ -574,30 +574,35 @@ export default function App() {
             role="button"
             tabIndex={0}
           >
-            <div className={`vt-flr-pulse-wrap ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>
-              <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
-              <span className={`vt-flr-radar-ring ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
-            </div>
             <div className="vt-flr-info">
-              <strong className="vt-flr-title">
+              <span className={`vt-flr-title ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'shimmering' : ''}`}>
                 {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? 'Searching Sarathi...' 
+                  ? 'Finding Sarathi' 
                   : persistedRide.status === 'driver_arrived' 
-                  ? 'Driver Arrived!' 
+                  ? 'Sarathi Arrived' 
                   : 'Sarathi on the way'}
-              </strong>
-              <span className="vt-flr-dot-sep">•</span>
-              <span className="vt-flr-sub">
-                {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? `${persistedRide.destName || 'Pickup Location'}`
-                  : persistedRide.status === 'driver_arrived' 
-                  ? `PIN: ${persistedRide.safetyPin || '9653'}` 
-                  : `${persistedRide.driver?.name || 'Sarathi'}`}
               </span>
+              {persistedRide.status === 'driver_arrived' ? (
+                <>
+                  <span className="vt-flr-dot-sep">•</span>
+                  <span className="vt-flr-pin-badge">PIN {persistedRide.safetyPin || '9653'}</span>
+                </>
+              ) : persistedRide.destName ? (
+                <>
+                  <span className="vt-flr-dot-sep">•</span>
+                  <span className="vt-flr-sub">
+                    {persistedRide.destName.replace(/^Shri\s+/i, '').replace(/\s+(Mandir|Temple|Ashram|Dham|Bhojnalaya)$/i, '').trim()}
+                  </span>
+                </>
+              ) : null}
             </div>
             <div className="vt-flr-trailing">
-              <span className={`vt-flr-live-tag ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>Live</span>
-              <ChevronRight size={13} className="vt-flr-chevron" />
+              <div className={`vt-flr-wave-bars ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} title="Live Active">
+                <span className="vt-flr-wave-bar" />
+                <span className="vt-flr-wave-bar" />
+                <span className="vt-flr-wave-bar" />
+              </div>
+              <ChevronRight size={13} strokeWidth={2.4} className="vt-flr-chevron" />
             </div>
           </div>
         )}
@@ -779,7 +784,7 @@ export default function App() {
       </div>
 
       {toast && (
-        <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />
+        <Toast {...toast} onDismiss={() => setToast(null)} />
       )}
     </main>
   );

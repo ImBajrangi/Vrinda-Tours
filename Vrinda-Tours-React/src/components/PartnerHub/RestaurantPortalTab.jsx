@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Utensils, Star, Phone, MessageCircle, CheckCircle2, 
   Clock, Users, Sparkles, LogOut, Flame, ShieldCheck, Lock,
@@ -379,100 +380,199 @@ export default function RestaurantPortalTab({ partner, onLogout }) {
         ))}
       </div>
 
-      {/* Add Dish Modal Dialog */}
-      {showAddDishModal && (
-        <div className="tp-modal-overlay" style={{ zIndex: 10000 }} onClick={() => setShowAddDishModal(false)}>
+      {/* Add Dish Modal Dialog rendered cleanly to body */}
+      {showAddDishModal && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="ph-sub-modal-backdrop" 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+          onClick={() => setShowAddDishModal(false)}
+        >
           <div 
-            className="tp-modal-card" 
-            style={{ maxWidth: '380px', padding: '18px', borderRadius: '18px', background: '#ffffff' }}
+            className="ph-sub-modal-card" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '380px', 
+              padding: '22px', 
+              borderRadius: '22px', 
+              background: '#ffffff',
+              boxShadow: '0 24px 55px -10px rgba(0, 0, 0, 0.35)',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '14px',
+              animation: 'phModalPop 0.28s cubic-bezier(0.34, 1.45, 0.64, 1)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#0f172a' }}>Add Special Prasad Dish</h4>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ea580c' }}>
+                  <Utensils size={17} />
+                </div>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Add Special Prasad Dish</h4>
+                  <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Live on devotee dining menu</span>
+                </div>
+              </div>
               <button 
                 type="button" 
                 onClick={() => setShowAddDishModal(false)}
-                style={{ background: '#f1f5f9', border: 'none', borderRadius: '999px', width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                style={{ background: '#f1f5f9', border: 'none', borderRadius: '999px', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
-            <form onSubmit={handleAddDishSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+            <form onSubmit={handleAddDishSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '11px', margin: 0 }}>
               <div>
-                <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Dish Name *</label>
+                <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>
+                  Dish Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
                 <input 
                   type="text" 
                   placeholder="e.g. Malpua with Rabri" 
                   value={newDishName}
                   onChange={(e) => setNewDishName(e.target.value)}
                   required
-                  style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  autoFocus
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box', outline: 'none', color: '#0f172a' }}
                 />
               </div>
               <div>
-                <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Price (₹)</label>
+                <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>Price (₹)</label>
                 <input 
                   type="text" 
                   placeholder="e.g. 150" 
                   value={newDishPrice}
                   onChange={(e) => setNewDishPrice(e.target.value)}
-                  style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box', outline: 'none', color: '#0f172a' }}
                 />
               </div>
               <div>
-                <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '4px' }}>Description</label>
+                <label style={{ fontSize: '0.76rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '4px' }}>Description</label>
                 <input 
                   type="text" 
                   placeholder="e.g. Pure desi ghee fresh preparation" 
                   value={newDishSub}
                   onChange={(e) => setNewDishSub(e.target.value)}
-                  style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.8rem' }}
+                  style={{ width: '100%', padding: '9px 12px', borderRadius: '10px', border: '1.5px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box', outline: 'none', color: '#0f172a' }}
                 />
               </div>
               <button 
                 type="submit" 
-                style={{ marginTop: '6px', background: '#ea580c', color: '#ffffff', border: 'none', borderRadius: '999px', padding: '9px', fontWeight: 750, fontSize: '0.8rem', cursor: 'pointer' }}
+                style={{ 
+                  marginTop: '4px', 
+                  background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  borderRadius: '12px', 
+                  padding: '12px', 
+                  fontWeight: 800, 
+                  fontSize: '0.88rem', 
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 18px -4px rgba(234, 88, 12, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  whiteSpace: 'nowrap'
+                }}
               >
-                + Add to Live Menu
+                <Plus size={15} strokeWidth={2.5} />
+                <span>+ Add to Live Menu</span>
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* QR Code Stand Modal */}
-      {showQrModal && (
-        <div className="tp-modal-overlay" style={{ zIndex: 10000 }} onClick={() => setShowQrModal(false)}>
+      {/* QR Code Stand Modal rendered cleanly to body */}
+      {showQrModal && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="ph-sub-modal-backdrop" 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+          onClick={() => setShowQrModal(false)}
+        >
           <div 
-            className="tp-modal-card" 
-            style={{ maxWidth: '340px', padding: '20px', borderRadius: '20px', background: '#ffffff', textAlign: 'center' }}
+            className="ph-sub-modal-card" 
+            style={{ 
+              width: '100%', 
+              maxWidth: '350px', 
+              padding: '22px', 
+              borderRadius: '24px', 
+              background: '#ffffff', 
+              textAlign: 'center',
+              boxShadow: '0 24px 55px -10px rgba(0, 0, 0, 0.35)',
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+              animation: 'phModalPop 0.28s cubic-bezier(0.34, 1.45, 0.64, 1)'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>Table Direct UPI Stand</h4>
+            <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ea580c' }}>
+                  <QrCode size={17} />
+                </div>
+                <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0f172a' }}>Table Direct UPI Stand</h4>
+              </div>
               <button 
                 type="button" 
                 onClick={() => setShowQrModal(false)}
-                style={{ background: '#f1f5f9', border: 'none', borderRadius: '999px', width: '26px', height: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                style={{ background: '#f1f5f9', border: 'none', borderRadius: '999px', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}
               >
-                <X size={14} />
+                <X size={15} />
               </button>
             </div>
-            <p style={{ fontSize: '0.74rem', color: '#64748b', margin: '0 0 12px' }}>
+            <p style={{ fontSize: '0.74rem', color: '#64748b', margin: '2px 0 6px', lineHeight: 1.45 }}>
               Pilgrims scan to pay 100% directly to your restaurant bank account with 0% platform fee.
             </p>
-            <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '14px', display: 'inline-block', marginBottom: '12px' }}>
+            <div style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '16px', padding: '14px', display: 'inline-block' }}>
               <img 
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${encodeURIComponent(partner?.metadata?.upiId || 'brijwasin.dining@upi')}%26pn=${encodeURIComponent(partner?.name || 'Brijwasin Dining')}%26cu=INR`} 
                 alt="Direct UPI QR" 
-                style={{ width: '160px', height: '160px', display: 'block' }}
+                style={{ width: '160px', height: '160px', display: 'block', borderRadius: '8px' }}
               />
             </div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0f172a' }}>
-              UPI ID: {partner?.metadata?.upiId || 'brijwasin.dining@upi'}
+            <div style={{ background: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '12px', padding: '8px 14px', width: '100%', boxSizing: 'border-box' }}>
+              <span style={{ fontSize: '0.7rem', color: '#9a3412', fontWeight: 600, display: 'block' }}>UPI ID</span>
+              <strong style={{ fontSize: '0.82rem', color: '#ea580c', wordBreak: 'break-all' }}>
+                {partner?.metadata?.upiId || 'brijwasin.dining@upi'}
+              </strong>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

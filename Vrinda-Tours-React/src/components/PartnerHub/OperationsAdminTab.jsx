@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   ShieldCheckIcon, PlusIcon, TrashIcon, PhoneIcon, 
   MapPinIcon, CheckCircleIcon, MagnifyingGlassIcon, 
@@ -18,6 +19,75 @@ function useDebounce() {
   }, []);
   return debounce;
 }
+
+const DEFAULT_INITIAL_PARTNERS = [
+  {
+    id: 'partner_driver_01',
+    name: 'Radhe Shyam Sharma',
+    phone: '+91 98765 43210',
+    category: 'driver',
+    role_details: 'E-Rickshaw Fleet • UP-85-AB-1008',
+    verified: true,
+    category_locked: true,
+    rating: '4.9',
+    status: 'Verified Sarathi Driver'
+  },
+  {
+    id: 'partner_driver_02',
+    name: 'Gopal Das',
+    phone: '+91 98234 56789',
+    category: 'driver',
+    role_details: 'Auto Rickshaw • UP-85-CD-2024',
+    verified: false,
+    category_locked: false,
+    rating: '5.0',
+    status: 'Pending Admin Verification'
+  },
+  {
+    id: 'partner_stay_01',
+    name: 'MVT Ashram & Guesthouse',
+    phone: '+91 98111 22334',
+    category: 'hotel',
+    role_details: 'Vrindavan Raman Reti • 42 AC Rooms',
+    verified: true,
+    category_locked: true,
+    rating: '4.9',
+    status: 'Verified Stay Desk'
+  },
+  {
+    id: 'partner_stay_02',
+    name: 'Brij Heritage Guest House',
+    phone: '+91 98333 44556',
+    category: 'hotel',
+    role_details: 'Govardhan Parikrama Marg • 18 Rooms',
+    verified: false,
+    category_locked: false,
+    rating: '4.8',
+    status: 'Pending Admin Verification'
+  },
+  {
+    id: 'partner_dining_01',
+    name: "Govinda's Sattvic Bhojnalaya",
+    phone: '+91 98444 55667',
+    category: 'restaurant',
+    role_details: 'Pure Sattvic Dining • Iskcon Temple Road',
+    verified: true,
+    category_locked: true,
+    rating: '4.95',
+    status: 'Verified Dining Desk'
+  },
+  {
+    id: 'partner_agency_01',
+    name: 'Brij 84 Kos Sacred Yatra Tours',
+    phone: '+91 98555 66778',
+    category: 'agency',
+    role_details: 'Govardhan, Barsana & Nandgaon Guided Tours',
+    verified: true,
+    category_locked: true,
+    rating: '5.0',
+    status: 'Verified Yatra Desk'
+  }
+];
 
 export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
   // Auth guard — if not admin, show unauthorized message
@@ -48,9 +118,18 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
 
   const debounce = useDebounce();
 
-  // Multi-Category Partners with Supabase sync
-  const [allPartners, setAllPartners] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Multi-Category Partners with local cache & Supabase sync
+  const [allPartners, setAllPartners] = useState(() => {
+    try {
+      const cached = localStorage.getItem('vrinda_admin_partners');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return DEFAULT_INITIAL_PARTNERS;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
   // Realtime Supabase Fetch & Subscription with unique channel name
   useEffect(() => {
@@ -62,8 +141,11 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && data && isMounted) {
+        if (!error && data && data.length > 0 && isMounted) {
           setAllPartners(data);
+          try {
+            localStorage.setItem('vrinda_admin_partners', JSON.stringify(data));
+          } catch {}
         }
       } catch (err) {
         console.warn('[OperationsAdminTab] Partners fetch warning:', err);
@@ -83,11 +165,23 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
         { event: '*', schema: 'public', table: 'partners' },
         (payload) => {
           if (payload.eventType === 'INSERT' && isMounted) {
-            setAllPartners(prev => [payload.new, ...prev.filter(p => p.id !== payload.new.id)]);
+            setAllPartners(prev => {
+              const updated = [payload.new, ...prev.filter(p => p.id !== payload.new.id)];
+              try { localStorage.setItem('vrinda_admin_partners', JSON.stringify(updated)); } catch {}
+              return updated;
+            });
           } else if (payload.eventType === 'UPDATE' && isMounted) {
-            setAllPartners(prev => prev.map(p => p.id === payload.new.id ? payload.new : p));
+            setAllPartners(prev => {
+              const updated = prev.map(p => p.id === payload.new.id ? payload.new : p);
+              try { localStorage.setItem('vrinda_admin_partners', JSON.stringify(updated)); } catch {}
+              return updated;
+            });
           } else if (payload.eventType === 'DELETE' && isMounted) {
-            setAllPartners(prev => prev.filter(p => p.id !== payload.old.id));
+            setAllPartners(prev => {
+              const updated = prev.filter(p => p.id !== payload.old.id);
+              try { localStorage.setItem('vrinda_admin_partners', JSON.stringify(updated)); } catch {}
+              return updated;
+            });
           }
         }
       )
@@ -395,16 +489,38 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
       </div>
 
       {/* Add Partner Form Modal */}
-      {showAddModal && (
+      {showAddModal && typeof document !== 'undefined' && createPortal(
         <div 
           className="ph-sub-modal-backdrop"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
           onClick={() => setShowAddModal(false)}
         >
           <div 
             className="ph-sub-modal-card"
+            style={{
+              width: '100%',
+              maxWidth: '380px',
+              padding: '22px',
+              borderRadius: '22px',
+              background: '#ffffff',
+              boxShadow: '0 24px 55px -10px rgba(0, 0, 0, 0.35)',
+              boxSizing: 'border-box'
+            }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
               <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800 }}>Register Brij Partner</h4>
               <button 
                 className="ph-close-btn" 
@@ -471,19 +587,33 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
               </button>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Custom Confirmation Modal — replaces native window.confirm */}
-      {deletingId && (
+      {deletingId && typeof document !== 'undefined' && createPortal(
         <div 
           className="ph-sub-modal-backdrop"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            zIndex: 9999999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
           onClick={() => setDeletingId(null)}
         >
           <div 
             className="ph-sub-modal-card"
             onClick={e => e.stopPropagation()}
-            style={{ textAlign: 'center', maxWidth: '340px' }}
+            style={{ textAlign: 'center', maxWidth: '340px', padding: '22px', borderRadius: '22px', background: '#ffffff', boxShadow: '0 24px 55px -10px rgba(0, 0, 0, 0.35)', boxSizing: 'border-box' }}
           >
             <ExclamationTriangleIcon style={{ width: 36, height: 36, color: '#ef4444', margin: '0 auto 8px' }} />
             <h4 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 800 }}>Remove Partner?</h4>
@@ -507,7 +637,8 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

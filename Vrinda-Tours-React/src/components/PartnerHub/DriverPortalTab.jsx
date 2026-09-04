@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Zap, Star, Navigation, Phone, CheckCircle2, 
   MapPin, Clock, ShieldCheck, Compass, LogOut, Lock, Car,
@@ -408,7 +409,7 @@ export default function DriverPortalTab({ partner, onLogout }) {
       </div>
 
       {/* Pay Modal for PartnerHub */}
-      {showPayModal && (
+      {showPayModal && typeof document !== 'undefined' && createPortal(
         <div className="ph-pay-modal-overlay" onClick={() => setShowPayModal(false)}>
           <div className="ph-pay-modal-card" onClick={e => e.stopPropagation()}>
             <div className="ph-pay-modal-header">
@@ -473,7 +474,8 @@ export default function DriverPortalTab({ partner, onLogout }) {
               </form>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Live Dispatch Queue */}

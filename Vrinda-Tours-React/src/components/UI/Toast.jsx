@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { CheckCircle2, AlertCircle, Info, AlertTriangle, X, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Info, AlertTriangle, Heart, HeartOff, Check } from 'lucide-react';
+import AnimatedIcon from './AnimatedIcon';
 import './UI.css';
 
 export default function Toast({ 
@@ -78,21 +79,6 @@ export default function Toast({
 
   if (!message && !title && stage !== 'exiting') return null;
 
-  const getIcon = () => {
-    if (icon) return icon;
-    switch (type) {
-      case 'success':
-        return <CheckCircle2 size={14} strokeWidth={2.5} />;
-      case 'error':
-        return <AlertCircle size={14} strokeWidth={2.5} />;
-      case 'warning':
-        return <AlertTriangle size={14} strokeWidth={2.5} />;
-      case 'info':
-      default:
-        return <Info size={14} strokeWidth={2.5} />;
-    }
-  };
-
   const rawTitle = title || message || '';
   const cleanTitle = String(rawTitle)
     .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')
@@ -106,9 +92,45 @@ export default function Toast({
         .trim()
     : null;
 
+  const titleLower = cleanTitle.toLowerCase();
+  const isFavAction = titleLower.includes('favourite') || titleLower.includes('favorite') || titleLower.includes('saved');
+  const isFavRemove = isFavAction && (titleLower.includes('remove') || titleLower.includes('unsaved'));
+  const isFavAdd = isFavAction && !isFavRemove;
+
+  const getEffectiveType = () => {
+    if (isFavAdd) return 'fav-add';
+    if (isFavRemove) return 'fav-remove';
+    return type;
+  };
+
+  const effectiveType = getEffectiveType();
+
+  const getIcon = () => {
+    if (icon) return icon;
+    if (isFavAdd) {
+      return <Heart size={16} strokeWidth={2.5} color="#fb7185" fill="#f43f5e" />;
+    }
+    if (isFavRemove) {
+      return <HeartOff size={16} strokeWidth={2.5} color="#fca5a5" />;
+    }
+    switch (type) {
+      case 'success':
+        return <Check size={16} strokeWidth={3} color="#4ade80" />;
+      case 'error':
+        return <AlertCircle size={16} strokeWidth={2.5} color="#f87171" />;
+      case 'warning':
+        return <AlertTriangle size={16} strokeWidth={2.5} color="#fbbf24" />;
+      case 'loading':
+        return <AnimatedIcon name="loading" size={18} strokeColor="#38bdf8" speed={1.2} loop={true} />;
+      case 'info':
+      default:
+        return <Info size={16} strokeWidth={2.75} color="#38bdf8" />;
+    }
+  };
+
   return (
     <aside
-      className={`dynamic-island-toast toast tp-dynamic-island ${type} stage-${stage}`}
+      className={`dynamic-island-toast toast tp-dynamic-island ${type} type-${effectiveType} stage-${stage}`}
       role={type === 'error' ? 'alert' : 'status'}
       aria-live="polite"
       onMouseEnter={handleMouseEnter}
@@ -117,7 +139,7 @@ export default function Toast({
       onTouchEnd={handleTouchEnd}
       onClick={triggerDismiss}
     >
-      <div className={`dynamic-island-icon-wrap tp-island-glyph-wrap type-${type}`}>
+      <div className={`dynamic-island-icon-wrap tp-island-glyph-wrap type-${effectiveType}`}>
         {getIcon()}
       </div>
 

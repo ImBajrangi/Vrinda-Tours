@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import AnimatedIcon from '../UI/AnimatedIcon';
+import MorphingIcon from '../UI/MorphingIcon';
 import {
   Compass, Calendar, Clock, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
-  X, Menu, Plane, Building2, Bus, Car, Mail, Send, ChevronRight, ChevronDown,
-  Sparkles, ShieldCheck, Heart, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Github, Globe,
+  X, Menu, Plane, Building2, Bus, Car, Navigation, Mail, Send, ChevronRight, ChevronDown,
+  Sparkles, ShieldCheck, Heart, HeartOff, Share2, Phone, Twitter, Facebook, Instagram, Youtube, Globe,
   CreditCard, LayoutGrid, Ticket, Leaf, Sprout, Waves, Linkedin,
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
   Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
@@ -1530,7 +1532,11 @@ export default function PartnerLandingPage({
 
       setFloatingToast({
         id: `fav_${itemId}_${Date.now()}`,
-        icon: <Heart size={18} fill={isFav ? 'none' : '#ef4444'} color="#ef4444" />,
+        icon: isFav ? (
+          <HeartOff size={18} strokeWidth={2.5} color="#fca5a5" />
+        ) : (
+          <Heart size={18} strokeWidth={2.5} fill="#f43f5e" color="#fb7185" />
+        ),
         highlight: !isFav,
         title: isFav ? 'Removed from Saved' : 'Saved to Favourites',
         desc: null
@@ -1631,42 +1637,6 @@ export default function PartnerLandingPage({
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // Proactive registration & complete profile toast notification
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const dismissed = sessionStorage.getItem('vrinda_toast_dismissed');
-      if (dismissed) return;
-
-      if (!currentUser) {
-        setFloatingToast({
-          id: 'register_prompt',
-          icon: <Sparkles size={18} color="#10b981" />,
-          highlight: true,
-          title: '15% Off Yatra Passes Active',
-          desc: null
-        });
-      } else if (!currentUser.phone) {
-        setFloatingToast({
-          id: 'phone_prompt',
-          icon: <Phone size={18} color="#38bdf8" />,
-          highlight: true,
-          title: 'Live Cab Alerts Active',
-          desc: null
-        });
-      } else if (currentUser.isAnonymous) {
-        setFloatingToast({
-          id: 'guest_prompt',
-          icon: <UserCheck size={18} color="#a855f7" />,
-          highlight: false,
-          title: 'Sync Your Bookings',
-          desc: null
-        });
-      }
-    }, 2800);
-
-    return () => clearTimeout(timer);
-  }, [currentUser]);
 
   // Auto-fill traveler data from User Profile cache whenever item selected or user changes
   useEffect(() => {
@@ -1838,7 +1808,7 @@ export default function PartnerLandingPage({
       setAuthSuccessMsg(bonus > 0 ? `Welcome back, ${name}! +500 Referral Points added.` : `Welcome back, ${name}!`);
       setFloatingToast({
         id: `login_success_${Date.now()}`,
-        icon: <CheckCircle2 size={16} color="#10b981" />,
+        icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
         highlight: true,
         title: `Welcome, ${name}!`,
         desc: bonus > 0 ? '+500 Points Added' : null
@@ -2144,7 +2114,7 @@ export default function PartnerLandingPage({
 
     setFloatingToast({
       id: `booking_${Date.now()}`,
-      icon: <CheckCircle2 size={16} color="#10b981" />,
+      icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
       highlight: true,
       title: 'Reservation Dispatched',
       desc: destinationTitle
@@ -2173,7 +2143,7 @@ export default function PartnerLandingPage({
     setCachedData('newsletter_email', newsletterEmail);
     setFloatingToast({
       id: `newsletter_${Date.now()}`,
-      icon: <Sparkles size={16} color="#10b981" />,
+      icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
       highlight: true,
       title: 'Subscribed to Sacred Yatra Updates',
       desc: null
@@ -2815,7 +2785,7 @@ export default function PartnerLandingPage({
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle Navigation Menu"
             >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              <MorphingIcon icon={isMobileMenuOpen ? "x" : "menu"} size={20} color="currentColor" spring="bouncy" />
             </button>
           </div>
         </div>
@@ -4829,7 +4799,7 @@ export default function PartnerLandingPage({
                       tabIndex={-1}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      <MorphingIcon icon={showPassword ? "eyeOff" : "eye"} size={16} spring="bouncy" />
                     </button>
                   </div>
 
@@ -4911,7 +4881,7 @@ export default function PartnerLandingPage({
                           onClick={() => setShowPassword(!showPassword)}
                           tabIndex={-1}
                         >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                          <MorphingIcon icon={showPassword ? "eyeOff" : "eye"} size={16} spring="bouncy" />
                         </button>
                       </div>
 
@@ -5310,7 +5280,7 @@ export default function PartnerLandingPage({
                 setCopiedRefTarget(cat.id);
                 setFloatingToast({
                   id: `copy_link_${Date.now()}`,
-                  icon: <CheckCircle2 size={16} color="#10b981" />,
+                  icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
                   highlight: true,
                   title: 'Invite Link Copied',
                   desc: 'Share with friends & earn 500 Pts'
@@ -5327,7 +5297,7 @@ export default function PartnerLandingPage({
                 setCopiedRefTarget(activeCategoryConfig.id);
                 setFloatingToast({
                   id: `share_link_${Date.now()}`,
-                  icon: <CheckCircle2 size={16} color="#10b981" />,
+                  icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
                   highlight: true,
                   title: 'Invite Link Shared',
                   desc: null
@@ -5355,7 +5325,7 @@ export default function PartnerLandingPage({
                           setCopiedRefTarget('CODE');
                           setFloatingToast({
                             id: `copy_code_${Date.now()}`,
-                            icon: <CheckCircle2 size={16} color="#10b981" />,
+                            icon: <AnimatedIcon name="checkmark" size={17} strokeColor="#10b981" speed={1.2} />,
                             highlight: true,
                             title: 'Referral Code Copied',
                             desc: myRefCode
@@ -5376,7 +5346,7 @@ export default function PartnerLandingPage({
                           color: '#334155'
                         }}
                       >
-                        {copiedRefTarget === 'CODE' ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
+                        <MorphingIcon icon={copiedRefTarget === 'CODE' ? "check" : "copy"} size={12} color={copiedRefTarget === 'CODE' ? '#10b981' : 'currentColor'} spring="bouncy" />
                         <span>{copiedRefTarget === 'CODE' ? 'Copied' : 'Copy'}</span>
                       </button>
                     </div>
@@ -5420,7 +5390,7 @@ export default function PartnerLandingPage({
                         className="tp-ref-copy-btn"
                         onClick={() => handleCopyCategoryLink(activeCategoryConfig)}
                       >
-                        {copiedRefTarget === activeCategoryConfig.id ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                        <MorphingIcon icon={copiedRefTarget === activeCategoryConfig.id ? "check" : "copy"} size={14} color={copiedRefTarget === activeCategoryConfig.id ? '#10b981' : 'currentColor'} spring="bouncy" />
                         <span>{copiedRefTarget === activeCategoryConfig.id ? 'Copied' : 'Copy'}</span>
                       </button>
                     </div>
@@ -5464,7 +5434,7 @@ export default function PartnerLandingPage({
                                 onClick={() => handleCopyCategoryLink(cat)}
                                 title="Copy Link"
                               >
-                                {isCopied ? <Check size={13} color="#10b981" /> : <Copy size={13} />}
+                                <MorphingIcon icon={isCopied ? "check" : "copy"} size={13} color={isCopied ? '#10b981' : 'currentColor'} spring="bouncy" />
                               </button>
                               <a
                                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cat.whatsappMsg(myRefCode))}`}
@@ -5559,7 +5529,7 @@ export default function PartnerLandingPage({
 
       {/* Persistent Live Ride Floating Activity Pill (Apple Dynamic Island Capsule) */}
       {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !isInstantRideModalOpen && typeof document !== 'undefined' && createPortal(
-        <div
+        <div 
           className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''} ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'status-amber' : 'status-emerald'}`}
           onClick={() => {
             if (persistedRide.destName) {
@@ -5571,30 +5541,35 @@ export default function PartnerLandingPage({
           role="button"
           tabIndex={0}
         >
-          <div className={`vt-flr-pulse-wrap ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>
-            <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
-            <span className={`vt-flr-radar-ring ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
-          </div>
           <div className="vt-flr-info">
-            <strong className="vt-flr-title">
+            <span className={`vt-flr-title ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'shimmering' : ''}`}>
               {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                ? 'Searching Sarathi...'
+                ? 'Finding Sarathi'
                 : persistedRide.status === 'driver_arrived'
-                  ? 'Driver Arrived!'
+                  ? 'Sarathi Arrived'
                   : 'Sarathi on the way'}
-            </strong>
-            <span className="vt-flr-dot-sep">•</span>
-            <span className="vt-flr-sub">
-              {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                ? `${persistedRide.destName || 'Pickup Location'}`
-                : persistedRide.status === 'driver_arrived'
-                  ? `PIN: ${persistedRide.safetyPin || '9653'}`
-                  : `${persistedRide.driver?.name || 'Sarathi'}`}
             </span>
+            {persistedRide.status === 'driver_arrived' ? (
+              <>
+                <span className="vt-flr-dot-sep">•</span>
+                <span className="vt-flr-pin-badge">PIN {persistedRide.safetyPin || '9653'}</span>
+              </>
+            ) : persistedRide.destName ? (
+              <>
+                <span className="vt-flr-dot-sep">•</span>
+                <span className="vt-flr-sub">
+                  {persistedRide.destName.replace(/^Shri\s+/i, '').replace(/\s+(Mandir|Temple|Ashram|Dham|Bhojnalaya)$/i, '').trim()}
+                </span>
+              </>
+            ) : null}
           </div>
           <div className="vt-flr-trailing">
-            <span className={`vt-flr-live-tag ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`}>Live</span>
-            <ChevronRight size={13} className="vt-flr-chevron" />
+            <div className={`vt-flr-wave-bars ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} title="Live Active">
+              <span className="vt-flr-wave-bar" />
+              <span className="vt-flr-wave-bar" />
+              <span className="vt-flr-wave-bar" />
+            </div>
+            <ChevronRight size={13} strokeWidth={2.4} className="vt-flr-chevron" />
           </div>
         </div>,
         document.body

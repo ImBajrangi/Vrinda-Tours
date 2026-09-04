@@ -97,23 +97,28 @@ export default function PartnerHubModal({
     return propPartnerId || sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id');
   });
 
-  // Check admin on mount from storage or props
-  const [isAdminUser, setIsAdminUser] = useState(() => {
+  // Helper to verify admin authorization from props or storage
+  const isSuperAdminAuthorized = () => {
     try {
-      const isStoredAdmin = sessionStorage.getItem('vt_is_admin') === 'true' || 
-                            localStorage.getItem('vt_admin_session') === 'true' ||
-                            localStorage.getItem('vt_user_role') === 'admin' ||
-                            authorizedRole === 'admin' || 
-                            initialRole === 'admin';
-      return isStoredAdmin;
+      return (
+        authorizedRole === 'admin' ||
+        initialRole === 'admin' ||
+        propPartnerId === 'admin' ||
+        sessionStorage.getItem('vt_is_admin') === 'true' ||
+        localStorage.getItem('vt_admin_session') === 'true' ||
+        localStorage.getItem('vt_user_role') === 'admin'
+      );
     } catch {
       return false;
     }
-  });
+  };
+
+  // Check admin on mount from storage or props
+  const [isAdminUser, setIsAdminUser] = useState(isSuperAdminAuthorized);
 
   const [activeRole, setActiveRole] = useState(() => {
     // If admin is active or authorized as admin, default directly to admin dashboard
-    if (authorizedRole === 'admin' || initialRole === 'admin' || sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin') {
+    if (isSuperAdminAuthorized()) {
       return 'admin';
     }
     const passed = authorizedRole || initialRole || sessionStorage.getItem('vt_partner_role') || 'driver';
@@ -131,16 +136,16 @@ export default function PartnerHubModal({
   useEffect(() => {
     const checkAdmin = async () => {
       try {
+        const isStorageAdmin = isSuperAdminAuthorized();
         const { data: { session } } = await supabase.auth.getSession();
         const email = session?.user?.email?.toLowerCase();
         const isEmailAdmin = email ? (ADMIN_EMAILS.includes(email) || email.endsWith('@vrindatours.com') || email.endsWith('@vrindavihar.in') || email.endsWith('@vrinda.tours')) : false;
-        const isStorageAdmin = sessionStorage.getItem('vt_is_admin') === 'true' || 
-                               localStorage.getItem('vt_admin_session') === 'true' ||
-                               localStorage.getItem('vt_user_role') === 'admin' ||
-                               authorizedRole === 'admin';
         const isAdm = isEmailAdmin || isStorageAdmin;
         
         setIsAdminUser(isAdm);
+        if (isAdm) {
+          sessionStorage.setItem('vt_is_admin', 'true');
+        }
         
         // If user is Admin and not inspecting a specific partner account, default to admin operations tab
         if (isAdm && (!propPartnerId || propPartnerId === 'admin') && (!sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_partner_id') === 'admin')) {
@@ -155,14 +160,14 @@ export default function PartnerHubModal({
     checkAdmin();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const isStorageAdmin = isSuperAdminAuthorized();
       const email = session?.user?.email?.toLowerCase();
       const isEmailAdmin = email ? (ADMIN_EMAILS.includes(email) || email.endsWith('@vrindatours.com') || email.endsWith('@vrindavihar.in') || email.endsWith('@vrinda.tours')) : false;
-      const isStorageAdmin = sessionStorage.getItem('vt_is_admin') === 'true' || 
-                             localStorage.getItem('vt_admin_session') === 'true' ||
-                             localStorage.getItem('vt_user_role') === 'admin' ||
-                             authorizedRole === 'admin';
       const isAdm = isEmailAdmin || isStorageAdmin;
       setIsAdminUser(isAdm);
+      if (isAdm) {
+        sessionStorage.setItem('vt_is_admin', 'true');
+      }
       if (isAdm && (!propPartnerId || propPartnerId === 'admin') && (!sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_partner_id') === 'admin')) {
         if (!authorizedRole || authorizedRole === 'admin') {
           setActiveRole('admin');
@@ -171,7 +176,7 @@ export default function PartnerHubModal({
     });
 
     return () => subscription?.unsubscribe();
-  }, [propPartnerId, authorizedRole]);
+  }, [propPartnerId, authorizedRole, initialRole]);
 
   // Update activeRole if authorizedRole prop updates
   useEffect(() => {
@@ -248,7 +253,7 @@ export default function PartnerHubModal({
   const isVerified = Boolean(partnerData?.verified);
   const isCategoryLocked = Boolean((partnerData?.verified || partnerData?.category_locked) && !isAdminUser);
 
-  const isFullAdmin = Boolean(isAdminUser || activeRole === 'admin' || authorizedRole === 'admin');
+  const isFullAdmin = Boolean(isAdminUser || activeRole === 'admin' || authorizedRole === 'admin' || isSuperAdminAuthorized());
 
   // Authenticated Partner Session: Only active if a real partner profile is loaded matching active desk
   const hasAuthenticatedPartnerSession = Boolean(
@@ -262,9 +267,10 @@ export default function PartnerHubModal({
   const currentTheme = ROLE_THEMES[activeRole] || ROLE_THEMES.driver;
 
   const handleRoleSelect = (role) => {
+    setLockNotice('');
     // Operations admin — only accessible to whitelisted admin emails / authorized sessions
     if (role === 'admin') {
-      if (!isAdminUser) {
+      if (!isAdminUser && !isFullAdmin) {
         setLockNotice('Admin access is restricted. Sign in with an authorized admin account.');
         setTimeout(() => setLockNotice(''), 4000);
         return;
@@ -274,7 +280,7 @@ export default function PartnerHubModal({
       return;
     }
 
-    if (isCategoryLocked && partnerData?.category && role !== normalizeRole(partnerData.category)) {
+    if (isCategoryLocked && partnerData?.category && role !== normalizeRole(partnerData.category) && !isFullAdmin) {
       setLockNotice(`Category is locked. This account is verified by Admin as a ${partnerData.category.toUpperCase()}. Sign out to switch desks.`);
       setTimeout(() => setLockNotice(''), 4000);
       return;

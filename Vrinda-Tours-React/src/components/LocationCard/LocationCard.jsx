@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import { 
   Car, Navigation, Share2, BedDouble, UtensilsCrossed, 
   X, ArrowLeft, Star, Clock, Landmark, Sparkles, Home, Info,
-  Phone, ArrowRight, Calendar, Users, MessageCircle, Check, Heart
+  Phone, ArrowRight, Calendar, Users, MessageCircle, Check, Heart, HeartOff
 } from 'lucide-react';
 import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
 import { openWhatsApp, generateHotelMessage, generateRestaurantMessage } from '../../utils/whatsapp';
@@ -165,7 +165,10 @@ export default function LocationCard({
     if (onToast) {
       onToast({
         message: newFav ? 'Added to Favourites' : 'Removed from Favourites',
-        type: newFav ? 'success' : 'info'
+        type: newFav ? 'success' : 'info',
+        icon: newFav 
+          ? <Heart size={16} strokeWidth={2.5} color="#fb7185" fill="#f43f5e" /> 
+          : <HeartOff size={16} strokeWidth={2.5} color="#fca5a5" />
       });
     }
   };
