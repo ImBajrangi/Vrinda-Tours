@@ -262,10 +262,10 @@ export default function NavigationBanner({
                         >
                           <img 
                             className="nav-rec-thumb"
-                            src={place.image || '/vrinda-vihar/radha-rani-temple-barsana.jpg'} 
+                            src={place.image || '/vrinda-vihar/radha-rani-temple-barsana.webp'} 
                             alt={place.name} 
                             loading="lazy"
-                            onError={(e) => { e.target.src = '/vrinda-vihar/radha-rani-temple-barsana.jpg'; }}
+                            onError={(e) => { e.target.src = '/vrinda-vihar/radha-rani-temple-barsana.webp'; }}
                           />
 
                           <div className="nav-rec-details">
