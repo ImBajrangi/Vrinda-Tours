@@ -167,12 +167,12 @@ export const tripPackages = [
   {
     id: 'pkg_vrindavan_express',
     title: 'Bankey Bihari & Vrindavan Darshan',
-    tagline: 'VIP Darshan • Nidhivan • Prem Mandir',
+    tagline: 'Darshan • Nidhivan • Prem Mandir',
     location: 'Vrindavan Dham',
     category: '1-day',
     badge: '⭐ Popular',
     duration: '1 Day',
-    keyTag: 'VIP Passes & Cab Included',
+    keyTag: 'Passes & Cab Included',
     price: '₹2,499',
     originalPrice: '₹3,200',
     priceUnit: '/person',
@@ -180,13 +180,13 @@ export const tripPackages = [
     rating: 5.0,
     reviewsCount: 482,
     image: '/vrinda-vihar/bihari-ji.webp',
-    description: 'Complete hassle-free Vrindavan pilgrimage with dedicated Brajwasi guide, VIP darshan passes at Bankey Bihari Ji, historic Nidhivan Parikrama, and evening musical fountain at Prem Mandir.',
+    description: 'Complete hassle-free Vrindavan pilgrimage with dedicated Brajwasi guide, darshan passes at Bankey Bihari Ji, historic Nidhivan Parikrama, and evening musical fountain at Prem Mandir.',
     highlights: [
-      'VIP Priority Darshan at Shri Bankey Bihari Ji',
+      'Priority Darshan at Shri Bankey Bihari Ji',
       'Guided walkthrough of mystical Nidhivan & Seva Kunj',
       'Illuminated evening darshan & light show at Prem Mandir'
     ],
-    features: ['E-Rickshaw/Cab', 'VIP Passes', 'Local Guide', 'Prasadam'],
+    features: ['E-Rickshaw/Cab', 'Passes', 'Local Guide', 'Prasadam'],
     pointsReward: 350,
     feasibility: 'Best for First-Time Devotees & Families'
   },
@@ -196,7 +196,7 @@ export const tripPackages = [
     tagline: 'Radha Rani Temple • Mor Kuti • Nand Bhawan',
     location: 'Barsana & Nandgaon',
     category: '1-day',
-    badge: '🦚 Best Seller',
+    badge: 'Best Seller',
     duration: '1 Day',
     keyTag: 'Ropeway Assist & AC Cab',
     price: '₹3,499',
@@ -222,7 +222,7 @@ export const tripPackages = [
     tagline: '21km Parikrama • Mansi Ganga • Daan Ghati',
     location: 'Govardhan Dham',
     category: 'parikrama',
-    badge: '🏔️ Parikrama',
+    badge: 'Parikrama Special',
     duration: '1-2 Days',
     keyTag: 'Silent Eco E-Cart & Guide',
     price: '₹1,899',
@@ -248,7 +248,7 @@ export const tripPackages = [
     tagline: 'Radha Raman • Radha Vallabh • Gopeshwar',
     location: 'Old Vrindavan',
     category: '1-day',
-    badge: '🕉️ Heritage',
+    badge: 'Heritage',
     duration: '1 Day',
     keyTag: 'Riverboat Aarti & Heritage Walk',
     price: '₹2,199',
@@ -264,7 +264,7 @@ export const tripPackages = [
       'Samadhi sthals of Six Goswamis and heritage alleys',
       'Mesmerizing Yamuna Riverboat Aarti at sunset at Keshi Ghat'
     ],
-    features: ['Riverboat Aarti', 'Goswami Temples', 'VIP Charnamrit', 'Local Guide'],
+    features: ['Riverboat Aarti', 'Goswami Temples', 'Charnamrit', 'Local Guide'],
     pointsReward: 300,
     feasibility: 'Deep Devotional & Photographic Experience'
   },
@@ -274,7 +274,7 @@ export const tripPackages = [
     tagline: 'All 5 Dhams • AC Stay • Satvik Meals',
     location: 'All Brij Dhams',
     category: 'multi-day',
-    badge: '👑 All-Inclusive',
+    badge: 'All-Inclusive',
     duration: '3D / 2N',
     keyTag: 'AC Luxury Stay & All Meals',
     price: '₹7,999',
@@ -290,7 +290,7 @@ export const tripPackages = [
       '2 Nights Luxury Ashram / 3-Star AC Hotel Stay included',
       'All satvik meals (Breakfast, Lunch, Dinner) curated by Brij chefs'
     ],
-    features: ['3-Star AC Stay', 'All Satvik Meals', 'Dedicated Innova', 'All VIP Passes'],
+    features: ['3-Star AC Stay', 'All Satvik Meals', 'Dedicated Innova', 'All Passes'],
     pointsReward: 1200,
     feasibility: 'All-in-One Comprehensive Devotional Tour'
   }
@@ -1506,125 +1506,138 @@ export const ROLE_CONFIGS = {
   admin: {
     id: 'admin',
     label: 'Super Admin',
-    shortLabel: 'Super Admin',
+    shortLabel: 'Admin',
     navLabel: 'Admin',
-    tag: '👑 Super Admin',
+    tag: 'Super Admin',
     badgeClass: 'tp-role-admin',
-    icon: '👑',
-    authority: 'Full Platform Authority & Financials',
+    icon: 'crown',
+    authority: 'Full Platform Admin',
     color: '#d97706',
     accentBg: '#fffbeb',
     borderColor: '#fde68a',
-    description: 'System Administrator & Operations Manager with database, partner audit, and financial Stripe GMV control.'
+    description: 'Platform ops & financial audit'
   },
   driver: {
     id: 'driver',
     label: 'Sarathi Driver Partner',
-    shortLabel: 'Sarathi Driver',
+    shortLabel: 'Driver',
     navLabel: 'Driver',
-    tag: '🛺 Sarathi Driver',
+    tag: 'Sarathi Driver',
     badgeClass: 'tp-role-driver',
-    icon: '🛺',
-    authority: 'Driver Companion & Ride Dispatch Desk',
-    color: '#036b4aff',
-    accentBg: '#ecfdf5',
-    borderColor: '#a7f3d0',
-    description: 'Verified Brij E-Rickshaw & Fleet Driver with real-time GPS ride dispatch, passenger tracking, and daily trip earnings.'
+    icon: 'car',
+    authority: 'Ride Dispatch Desk',
+    color: '#0f172a',
+    accentBg: '#f8fafc',
+    borderColor: '#e2e8f0',
+    description: 'GPS ride dispatch & earnings'
   },
   restaurant: {
     id: 'restaurant',
     label: 'Restaurant Partner / Owner',
-    shortLabel: 'Restaurant Owner',
+    shortLabel: 'Restaurant',
     navLabel: 'Dining',
-    tag: '🍲 Restaurant Owner',
+    tag: 'Restaurant Owner',
     badgeClass: 'tp-role-restaurant',
-    icon: '🍲',
-    authority: 'Dining Partner Desk & Table Bookings',
+    icon: 'utensils',
+    authority: 'Dining & Table Bookings',
     color: '#ea580c',
     accentBg: '#fff7ed',
     borderColor: '#fed7aa',
-    description: 'Brij food outlet, thali house, or sweet shop owner managing table reservations and devotee prasadam orders.'
+    description: 'Table bookings & prasadam menu'
   },
   restaurant_staff: {
     id: 'restaurant_staff',
     label: 'Restaurant Staff / Kitchen',
     shortLabel: 'Dining Staff',
     navLabel: 'Staff',
-    tag: '👨‍🍳 Restaurant Staff',
+    tag: 'Restaurant Staff',
     badgeClass: 'tp-role-restaurant-staff',
-    icon: '👨‍🍳',
-    authority: 'Order Fulfillment & Kitchen Queue',
+    icon: 'chef-hat',
+    authority: 'Kitchen Queue',
     color: '#c2410c',
     accentBg: '#ffedd5',
     borderColor: '#fdba74',
-    description: 'Kitchen & dining service staff executing real-time prasadam orders and table check-ins.'
+    description: 'Kitchen queue & order fulfillment'
   },
   hotel: {
     id: 'hotel',
     label: 'Hotel & Ashram Stay Owner',
-    shortLabel: 'Hotel Owner',
+    shortLabel: 'Hotel',
     navLabel: 'Hotel',
-    tag: '🛏️ Hotel Partner',
+    tag: 'Hotel Partner',
     badgeClass: 'tp-role-hotel',
-    icon: '🛏️',
-    authority: 'Ashram Stay Desk & Room Inventory',
+    icon: 'bed',
+    authority: 'Ashram Stay Desk',
     color: '#2563eb',
     accentBg: '#eff6ff',
     borderColor: '#bfdbfe',
-    description: 'Ashram, dharamshala, or hotel operator managing room inventory, pilgrim check-ins, and tariffs.'
+    description: 'Room inventory & check-ins'
   },
   hotel_staff: {
     id: 'hotel_staff',
     label: 'Ashram / Hotel Desk Staff',
-    shortLabel: 'Stay Staff',
+    shortLabel: 'Desk Staff',
     navLabel: 'Staff',
-    tag: '🏨 Ashram Desk Staff',
+    tag: 'Desk Staff',
     badgeClass: 'tp-role-hotel-staff',
-    icon: '🏨',
-    authority: 'Front Desk & Guest Verification',
+    icon: 'building',
+    authority: 'Front Desk',
     color: '#1d4ed8',
     accentBg: '#dbeafe',
     borderColor: '#93c5fd',
-    description: 'Front desk operations staff verifying devotee vouchers and managing room availability.'
+    description: 'Front desk & voucher verification'
   },
   agency: {
     id: 'agency',
     label: 'Tour Agency & Yatra Guide',
     shortLabel: 'Tour Agency',
     navLabel: 'Agency',
-    tag: '🚩 Tour Agency Partner',
+    tag: 'Tour Agency',
     badgeClass: 'tp-role-agency',
-    icon: '🚩',
-    authority: 'Yatra Itineraries & Group Bookings',
+    icon: 'compass',
+    authority: 'Yatra Itineraries',
     color: '#7c3aed',
     accentBg: '#f5f3ff',
     borderColor: '#ddd6fe',
-    description: 'Licensed tour agency or local Brajwasi guide offering customized parikrama, temple tours, and yatra packages.'
+    description: 'Yatra packages & custom tours'
   },
   pilgrim: {
     id: 'pilgrim',
     label: 'Devotee Pilgrim',
     shortLabel: 'Devotee',
     navLabel: 'Devotee',
-    tag: '🙏 Devotee Pilgrim',
+    tag: 'Devotee Pilgrim',
     badgeClass: 'tp-role-pilgrim',
-    icon: '🙏',
-    authority: 'Devotee Services, Bookings & Rewards',
+    icon: 'sparkles',
+    authority: 'Pilgrim Hub',
     color: '#0d9488',
     accentBg: '#f0fdfa',
     borderColor: '#99f6e4',
-    description: 'Devotee traveler accessing live sacred map, Darshan gallery, yatra bookings, and referral rewards.'
+    description: 'Sacred map, darshan & bookings'
   }
 };
 
 export const resolveUserRole = (user) => {
-  if (!user) return 'pilgrim';
+  try {
+    if (sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true') {
+      return 'admin';
+    }
+  } catch {}
+
+  if (!user) {
+    try {
+      const savedRole = localStorage.getItem('vt_user_role');
+      if (savedRole && ROLE_CONFIGS[savedRole]) return savedRole;
+    } catch {}
+    return 'pilgrim';
+  }
+
   const email = (user.email || '').toLowerCase();
-  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindatours.com,admin@vrindatours.com')
+  const adminEmails = (import.meta.env.VITE_ADMIN_EMAILS || 'sakhi@vrindavihar.in,sakhi@vrindatours.com,admin@vrindatours.com,admin@vrinda.tours,admin@vrindavihar.in')
     .split(',')
     .map(e => e.trim().toLowerCase())
     .filter(Boolean);
-  if (email && (adminEmails.includes(email) || email.endsWith('@vrindatours.com'))) {
+  if (email && (adminEmails.includes(email) || email.endsWith('@vrindatours.com') || email.endsWith('@vrindavihar.in') || email.endsWith('@vrinda.tours'))) {
     return 'admin';
   }
   try {

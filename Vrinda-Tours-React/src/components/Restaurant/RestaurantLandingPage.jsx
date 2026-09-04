@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  UtensilsCrossed, Shield, CheckCircle2, ChevronRight, ChevronDown, Phone, User, 
-  MapPin, Navigation, ArrowRight, X, Sparkles, 
+import {
+  UtensilsCrossed, Shield, CheckCircle2, ChevronRight, ChevronDown, Phone, User,
+  MapPin, Navigation, ArrowRight, X, Sparkles,
   Clock, TrendingUp, Check, ShieldCheck, AlertCircle, LogIn, HeartHandshake,
   Zap, ArrowUpRight, ArrowLeft, CheckSquare, Award, BadgePercent, Sparkle,
   Mail, Lock, Eye, EyeOff, Compass, Cake, Coffee, Soup, Store, Car, Building2,
@@ -106,8 +106,8 @@ const OPERATING_ZONES = [
   }
 ];
 
-export default function RestaurantLandingPage({ 
-  onClose, 
+export default function RestaurantLandingPage({
+  onClose,
   onOpenRestaurantCompanion,
   onOpenDriverPage,
   onOpenHotelPage,
@@ -117,7 +117,7 @@ export default function RestaurantLandingPage({
   const [currentStep, setCurrentStep] = useState(1); // 1: Personal/Auth, 2: Cuisine & Setup, 3: Zone & Confirm
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [regSessionId] = useState(() => 'rreg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
-  
+
   // Registration Form State
   const [regForm, setRegForm] = useState({
     name: '',
@@ -164,16 +164,16 @@ export default function RestaurantLandingPage({
     const refCode = localStorage.getItem('vrinda_referrer_code') || '';
     const shareUrl = `${window.location.origin}/?join=dining&mode=register${refCode ? `&ref=${refCode}` : ''}`;
     const shareText = `Radhe Radhe! 🍽️ Partner your Bhojnalaya or Sweets shop on Vrinda Vihar with 0% listing fee & direct pilgrim orders:\n\n${shareUrl}`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Dining & Bhojnalaya Desk - Vrinda Vihar', text: shareText, url: shareUrl });
         setCopiedPageShare(true);
         setTimeout(() => setCopiedPageShare(false), 2000);
         return;
-      } catch (e) {}
+      } catch (e) { }
     }
-    
+
     navigator.clipboard?.writeText(shareUrl);
     setCopiedPageShare(true);
     setTimeout(() => setCopiedPageShare(false), 2000);
@@ -205,8 +205,8 @@ export default function RestaurantLandingPage({
           setCurrentStep(1);
           setShowLoginModal(false);
           return;
-        } 
-        
+        }
+
         if (mode === 'login' || mode === 'signin' || hash.includes('login') || hash.includes('signin')) {
           setShowLoginModal(true);
           return;
@@ -216,7 +216,7 @@ export default function RestaurantLandingPage({
         if (sectionId && sectionId !== 'restaurant' && sectionId !== 'dining' && sectionId !== 'food' && sectionId !== 'landing') {
           scrollToSection(sectionId);
         }
-      } catch (e) {}
+      } catch (e) { }
     };
 
     handleUrlState();
@@ -284,16 +284,16 @@ export default function RestaurantLandingPage({
         if (!rawPending) return;
 
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session?.user && isMounted) {
           sessionStorage.removeItem('vt_pending_restaurant_reg');
 
           const user = session.user;
           const googleName = user.user_metadata?.full_name || user.user_metadata?.name || 'Restaurant Partner';
           const googleEmail = user.email || '';
-          
+
           let pendingData = {};
-          try { pendingData = JSON.parse(rawPending); } catch (e) {}
+          try { pendingData = JSON.parse(rawPending); } catch (e) { }
 
           if (pendingData.intent === 'step1_google_login' || !pendingData.completed) {
             setRegForm(prev => ({
@@ -343,7 +343,7 @@ export default function RestaurantLandingPage({
     try {
       const phoneValidation = validatePhoneNumber(regForm.phone);
       const cleanPhone = phoneValidation.clean || regForm.phone;
-      
+
       const payload = {
         id: regSessionId,
         step: stepNumber,
@@ -366,7 +366,7 @@ export default function RestaurantLandingPage({
 
       try {
         localStorage.setItem('vt_restaurant_reg_' + regSessionId, JSON.stringify(payload));
-      } catch (e) {}
+      } catch (e) { }
 
       const { error } = await supabase.from('restaurant_registrations').upsert(payload);
       if (error) {
@@ -417,7 +417,7 @@ export default function RestaurantLandingPage({
   const handleStep1Next = async (e) => {
     e.preventDefault();
     setRegError('');
-    
+
     if (!regForm.name.trim() || regForm.name.trim().length < 2) {
       setRegError('Please enter restaurant or owner legal name');
       return;
@@ -541,7 +541,7 @@ export default function RestaurantLandingPage({
 
       sessionStorage.setItem('vt_partner_id', newRestaurantId);
       sessionStorage.setItem('vt_partner_role', 'restaurant');
-      
+
       setRegSuccess(true);
       setTimeout(() => {
         if (onOpenRestaurantCompanion) {
@@ -607,7 +607,7 @@ export default function RestaurantLandingPage({
 
   return (
     <div className="dmd-root">
-      
+
       {/* 0. AUTO-CONTINUOUS TICKER / ANNOUNCEMENT BAR */}
       <div className="dmd-announcement-bar">
         <div className="dmd-announcement-track-wrap">
@@ -674,11 +674,11 @@ export default function RestaurantLandingPage({
       {/* TOP NAVIGATION BAR */}
       <header className="dmd-top-nav">
         <div className="dmd-nav-container">
-          
+
           {/* Left: Brand + Category Dropdown Switcher */}
           <div className="dmd-brand-block" ref={portalDropdownRef}>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-brand-pill-btn"
               onClick={() => setPortalDropdownOpen(prev => !prev)}
               aria-expanded={portalDropdownOpen}
@@ -698,9 +698,9 @@ export default function RestaurantLandingPage({
               <div className="dmd-portal-popover">
                 <div className="dmd-popover-head">Switch Partner Portal</div>
                 <div className="dmd-popover-list">
-                  <button 
-                    type="button" 
-                    className="dmd-popover-item" 
+                  <button
+                    type="button"
+                    className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenDriverPage) onOpenDriverPage(); }}
                   >
                     <div className="dmd-popover-icon-box">
@@ -712,8 +712,8 @@ export default function RestaurantLandingPage({
                     </div>
                   </button>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenHotelPage) onOpenHotelPage(); }}
                   >
@@ -737,8 +737,8 @@ export default function RestaurantLandingPage({
                     <Check size={14} className="dmd-popover-check" />
                   </button>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenAgencyPage) onOpenAgencyPage(); }}
                   >
@@ -757,43 +757,43 @@ export default function RestaurantLandingPage({
 
           {/* Center: Clean Editorial Navigation Links */}
           <nav className="dmd-nav-center">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`dmd-nav-link ${activeView === 'landing' ? 'active' : ''}`}
               onClick={() => { setActiveView('landing'); if (mainBodyRef.current) mainBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               Overview
             </button>
-            <a 
-              href="#cuisines" 
+            <a
+              href="#cuisines"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('cuisines'); }}
             >
               Cuisines
             </a>
-            <a 
-              href="#benefits" 
+            <a
+              href="#benefits"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('benefits'); }}
             >
               Benefits
             </a>
-            <a 
-              href="#territories" 
+            <a
+              href="#territories"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('territories'); }}
             >
               Territories
             </a>
-            <a 
-              href="#faq" 
+            <a
+              href="#faq"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('faq'); }}
             >
               FAQ
             </a>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`dmd-nav-link-pill ${activeView === 'wizard' ? 'active' : ''}`}
               onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
             >
@@ -804,9 +804,9 @@ export default function RestaurantLandingPage({
 
           {/* Right: Actions */}
           <div className="dmd-nav-right">
-            <button 
-              type="button" 
-              className="dmd-nav-btn-icon" 
+            <button
+              type="button"
+              className="dmd-nav-btn-icon"
               onClick={handleShareCurrentPage}
               title="Share Dining Desk registration link"
               aria-label="Share Registration link"
@@ -815,9 +815,9 @@ export default function RestaurantLandingPage({
               {copiedPageShare ? <Check size={15} /> : <Share2 size={15} />}
               <span className="dmd-btn-text-desktop">{copiedPageShare ? 'Copied!' : 'Share'}</span>
             </button>
-            <button 
-              type="button" 
-              className="dmd-nav-btn-icon" 
+            <button
+              type="button"
+              className="dmd-nav-btn-icon"
               onClick={onClose}
               title="Go to Devotee / User Landing Page"
               aria-label="Pilgrim User App"
@@ -825,15 +825,15 @@ export default function RestaurantLandingPage({
               <Compass size={15} />
               <span className="dmd-btn-text-desktop">User App</span>
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-signin"
               onClick={() => setShowLoginModal(true)}
             >
               Sign In
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-primary dmd-btn-register-cta"
               onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
             >
@@ -846,12 +846,12 @@ export default function RestaurantLandingPage({
 
       {/* MAIN BODY */}
       <main className="dmd-main-body" ref={mainBodyRef} onScroll={handleBodyScroll}>
-        
+
         {/* VIEW 1: FULL-WIDTH RESPONSIVE STEPPED WIZARD */}
         {activeView === 'wizard' ? (
           <section className="dmd-wizard-section">
             <div className="dmd-wizard-container">
-              
+
               {/* Stepper Progress Header */}
               <div className="dmd-stepper-header">
                 <div className="dmd-stepper-steps">
@@ -874,11 +874,11 @@ export default function RestaurantLandingPage({
 
               {/* Wizard Multi-Column Layout */}
               <div className="dmd-wizard-grid">
-                
+
                 {/* Left Dynamic WOW Summary Card */}
                 <div className="dmd-wizard-summary-col">
                   <div className="dmd-summary-card dmd-wow-card">
-                    
+
                     {/* Live Restaurant ID Hologram */}
                     <div className="dmd-id-card-live">
                       <div className="dmd-id-card-top">
@@ -928,7 +928,7 @@ export default function RestaurantLandingPage({
 
                 {/* Right Interactive Form Column */}
                 <div className="dmd-wizard-form-col">
-                  
+
                   {/* STEP 1: PERSONAL / AUTH PROFILE */}
                   {currentStep === 1 && (
                     <div className="dmd-step-card dmd-fade-in">
@@ -971,10 +971,10 @@ export default function RestaurantLandingPage({
                           <label className="dmd-label">Dining Outlet / Restaurant Name</label>
                           <div className="dmd-input-wrap">
                             <UtensilsCrossed size={18} className="dmd-input-icon" />
-                            <input 
-                              type="text" 
-                              required 
-                              placeholder="e.g. Shri Brijwasi Sattvic Bhojnalaya" 
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Shri Brijwasi Sattvic Bhojnalaya"
                               className="dmd-input dmd-input-large"
                               value={regForm.name}
                               onChange={e => setRegForm({ ...regForm, name: e.target.value })}
@@ -986,10 +986,10 @@ export default function RestaurantLandingPage({
                           <label className="dmd-label">Email Address</label>
                           <div className="dmd-input-wrap">
                             <Mail size={18} className="dmd-input-icon" />
-                            <input 
-                              type="email" 
-                              required 
-                              placeholder="contact@brijwasidining.com" 
+                            <input
+                              type="email"
+                              required
+                              placeholder="contact@brijwasidining.com"
                               className="dmd-input dmd-input-large"
                               value={regForm.email}
                               onChange={e => setRegForm({ ...regForm, email: e.target.value })}
@@ -1002,16 +1002,16 @@ export default function RestaurantLandingPage({
                             <label className="dmd-label">Password</label>
                             <div className="dmd-input-wrap">
                               <Lock size={18} className="dmd-input-icon" />
-                              <input 
-                                type={showPassword ? 'text' : 'password'} 
-                                required 
-                                placeholder="Min. 6 characters" 
+                              <input
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                placeholder="Min. 6 characters"
                                 className="dmd-input dmd-input-large"
                                 value={regForm.password}
                                 onChange={e => setRegForm({ ...regForm, password: e.target.value })}
                               />
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="dmd-eye-toggle-btn"
                                 onClick={() => setShowPassword(!showPassword)}
                               >
@@ -1025,10 +1025,10 @@ export default function RestaurantLandingPage({
                           <label className="dmd-label">Order Mobile / WhatsApp</label>
                           <div className="dmd-input-wrap dmd-phone-input-wrap">
                             <span className="dmd-phone-prefix">+91</span>
-                            <input 
-                              type="tel" 
-                              required 
-                              placeholder="98765 43210" 
+                            <input
+                              type="tel"
+                              required
+                              placeholder="98765 43210"
                               className="dmd-input dmd-input-large dmd-input-phone"
                               value={regForm.phone}
                               maxLength={12}
@@ -1039,8 +1039,8 @@ export default function RestaurantLandingPage({
                         </div>
 
                         <div className="dmd-form-actions">
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large dmd-btn-full"
                             disabled={isSubmitting}
                           >
@@ -1062,13 +1062,13 @@ export default function RestaurantLandingPage({
                       </div>
 
                       <form onSubmit={handleStep2Next} className="dmd-step-form">
-                        
+
                         <div className="dmd-form-group">
                           <label className="dmd-label">Cuisine Category</label>
                           <div className="dmd-catalog-card-selector">
                             {RESTAURANT_TYPES.map(r => (
-                              <div 
-                                key={r.id} 
+                              <div
+                                key={r.id}
                                 className={`dmd-catalog-option-card ${regForm.restaurantType === r.id ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, restaurantType: r.id })}
                               >
@@ -1090,9 +1090,9 @@ export default function RestaurantLandingPage({
                           <label className="dmd-label">Seating Capacity</label>
                           <div className="dmd-chip-group">
                             {SEATING_CAPACITIES.map(sc => (
-                              <button 
-                                type="button" 
-                                key={sc} 
+                              <button
+                                type="button"
+                                key={sc}
                                 className={`dmd-select-chip ${regForm.seatingCapacity === sc ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, seatingCapacity: sc })}
                               >
@@ -1123,16 +1123,16 @@ export default function RestaurantLandingPage({
                         </div>
 
                         <div className="dmd-form-actions dmd-btn-row">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="dmd-btn-secondary dmd-btn-large"
                             onClick={() => setCurrentStep(1)}
                           >
                             <ArrowLeft size={18} />
                             <span>Back</span>
                           </button>
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large"
                           >
                             <span>Continue</span>
@@ -1161,12 +1161,12 @@ export default function RestaurantLandingPage({
                       )}
 
                       <form onSubmit={handleFinalSubmit} className="dmd-step-form">
-                        
+
                         <div className="dmd-form-group">
                           <label className="dmd-label">Select Territory</label>
                           <div className="dmd-zone-card-list">
                             {OPERATING_ZONES.map(z => (
-                              <div 
+                              <div
                                 key={z.id}
                                 className={`dmd-zone-item-card ${regForm.zone === z.name ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, zone: z.name })}
@@ -1201,16 +1201,16 @@ export default function RestaurantLandingPage({
                         </div>
 
                         <div className="dmd-form-actions dmd-btn-row">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="dmd-btn-secondary dmd-btn-large"
                             onClick={() => setCurrentStep(2)}
                           >
                             <ArrowLeft size={18} />
                             <span>Back</span>
                           </button>
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large dmd-btn-submit"
                             disabled={isSubmitting}
                           >
@@ -1242,7 +1242,7 @@ export default function RestaurantLandingPage({
             <section className="dmd-hero-section">
               <div className="dmd-container">
                 <div className="dmd-hero-grid">
-                  
+
                   {/* Left Hero Content */}
                   <div className="dmd-hero-content">
                     <span className="dmd-eyebrow">
@@ -1274,16 +1274,16 @@ export default function RestaurantLandingPage({
                     </div>
 
                     <div className="dmd-hero-actions">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-primary dmd-btn-large"
                         onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                       >
                         <span>Pre-Register Free</span>
                         <ArrowRight size={18} />
                       </button>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-secondary dmd-btn-large"
                         onClick={() => setShowLoginModal(true)}
                       >
@@ -1308,7 +1308,7 @@ export default function RestaurantLandingPage({
 
                       {/* Fogged / Blurred Dining Ticket */}
                       <div className="dmd-ticket-wrap-fog">
-                        
+
                         <div className="dmd-dispatch-ticket dmd-fogged-ticket">
                           {/* Outlet Info */}
                           <div className="dmd-route-stop">
@@ -1335,7 +1335,7 @@ export default function RestaurantLandingPage({
                               <div className="dmd-marker-square" />
                             </div>
                             <div className="dmd-stop-details">
-                              <div className="dmd-stop-name">VIP Devotee Table Reservation</div>
+                              <div className="dmd-stop-name">Devotee Table Reservation</div>
                               <div className="dmd-stop-sub">Pure Sattvic • 100% No Onion / Garlic</div>
                             </div>
                           </div>
@@ -1362,8 +1362,8 @@ export default function RestaurantLandingPage({
 
                       </div>
 
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-primary dmd-btn-full dmd-btn-large dmd-btn-bouncing-cta dmd-btn-exciting-row"
                         onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                       >
@@ -1376,7 +1376,7 @@ export default function RestaurantLandingPage({
                           <ArrowRight size={18} />
                         </div>
                       </button>
-                      
+
                       <div className="dmd-zero-cost-note">
                         <CheckCircle2 size={14} />
                         <span>₹0 Fee • No Payment Needed</span>
@@ -1399,8 +1399,8 @@ export default function RestaurantLandingPage({
 
                 <div className="dmd-fleet-grid">
                   {RESTAURANT_TYPES.map(r => (
-                    <div 
-                      key={r.id} 
+                    <div
+                      key={r.id}
                       className="dmd-fleet-card dmd-fleet-spring"
                       onClick={() => {
                         setRegForm(prev => ({ ...prev, restaurantType: r.id }));
@@ -1481,8 +1481,8 @@ export default function RestaurantLandingPage({
 
                 <div className="dmd-territories-grid">
                   {OPERATING_ZONES.map(z => (
-                    <div 
-                      key={z.id} 
+                    <div
+                      key={z.id}
                       className="dmd-territory-card"
                       onClick={() => {
                         setRegForm(prev => ({ ...prev, zone: z.name }));
@@ -1533,8 +1533,8 @@ export default function RestaurantLandingPage({
                       a: "Devotees reserve tables directly on Vrinda.Tours with instant WhatsApp notification sent to your manager's phone."
                     }
                   ].map((faq, idx) => (
-                    <div 
-                      key={idx} 
+                    <div
+                      key={idx}
                       className={`dmd-faq-item ${openFaqIndex === idx ? 'open' : ''}`}
                       onClick={() => setOpenFaqIndex(openFaqIndex === idx ? -1 : idx)}
                     >
@@ -1564,16 +1564,16 @@ export default function RestaurantLandingPage({
                   <p className="dmd-footer-copy">© 2026 Vrinda Vihar &amp; Sacred Braj Dham Seva · 100% Commission-Free Seva.</p>
                 </div>
                 <div className="dmd-footer-right">
-                  <button 
-                    type="button" 
-                    className="dmd-btn-user-link" 
+                  <button
+                    type="button"
+                    className="dmd-btn-user-link"
                     onClick={onClose}
                   >
                     <Compass size={14} />
                     <span>Return to User App</span>
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-btn-primary"
                     onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                   >
@@ -1604,8 +1604,8 @@ export default function RestaurantLandingPage({
               <div className="dmd-id-phone">+91 {regForm.phone}</div>
               <div className="dmd-id-role">{regForm.restaurantType} • {regForm.zone}</div>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-primary dmd-btn-large dmd-btn-full"
               onClick={() => {
                 setRegSuccess(false);
@@ -1624,8 +1624,8 @@ export default function RestaurantLandingPage({
       {showLoginModal && (
         <div className="dmd-modal-backdrop">
           <div className="dmd-modal-dialog">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-modal-close-btn"
               onClick={() => setShowLoginModal(false)}
             >
@@ -1646,15 +1646,15 @@ export default function RestaurantLandingPage({
             )}
 
             <div className="dmd-login-mode-tabs">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`dmd-login-tab-btn ${loginMode === 'phone' ? 'active' : ''}`}
                 onClick={() => setLoginMode('phone')}
               >
                 Mobile / OTP
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`dmd-login-tab-btn ${loginMode === 'email' ? 'active' : ''}`}
                 onClick={() => setLoginMode('email')}
               >
@@ -1668,10 +1668,10 @@ export default function RestaurantLandingPage({
                   <label className="dmd-label">Registered 10-Digit Mobile Number</label>
                   <div className="dmd-input-wrap dmd-phone-input-wrap">
                     <span className="dmd-phone-prefix">+91</span>
-                    <input 
-                      type="tel" 
-                      required 
-                      placeholder="98765 43210" 
+                    <input
+                      type="tel"
+                      required
+                      placeholder="98765 43210"
                       className="dmd-input dmd-input-large dmd-input-phone"
                       value={loginPhone}
                       maxLength={12}
@@ -1685,10 +1685,10 @@ export default function RestaurantLandingPage({
                     <label className="dmd-label">Registered Email</label>
                     <div className="dmd-input-wrap">
                       <Mail size={18} className="dmd-input-icon" />
-                      <input 
-                        type="email" 
-                        required 
-                        placeholder="contact@bhojnalaya.com" 
+                      <input
+                        type="email"
+                        required
+                        placeholder="contact@bhojnalaya.com"
                         className="dmd-input dmd-input-large"
                         value={loginEmail}
                         onChange={e => setLoginEmail(e.target.value)}
@@ -1699,16 +1699,16 @@ export default function RestaurantLandingPage({
                     <label className="dmd-label">Password</label>
                     <div className="dmd-input-wrap">
                       <Lock size={18} className="dmd-input-icon" />
-                      <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        required 
-                        placeholder="Enter password" 
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Enter password"
                         className="dmd-input dmd-input-large"
                         value={loginPassword}
                         onChange={e => setLoginPassword(e.target.value)}
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-eye-toggle-btn"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -1719,8 +1719,8 @@ export default function RestaurantLandingPage({
                 </>
               )}
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="dmd-btn-primary dmd-btn-large dmd-btn-full"
                 disabled={isLoggingIn}
               >
@@ -1730,8 +1730,8 @@ export default function RestaurantLandingPage({
 
             <div className="dmd-modal-footer-note">
               <span>New to Vrinda Dining? </span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="dmd-link-btn"
                 onClick={() => {
                   setShowLoginModal(false);

@@ -1,32 +1,59 @@
-# Robots.txt for Vrinda Vihar (to.vrindopnishad.in) & Brij 84 Kos Yatra
-# Comprehensive indexing policy for Search Engines & AI Assistants
+# Robots.txt for Vrinda Vihar (to.vrindopnishad.in) — Brij 84 Kos Yatra & Mathura Vrindavan Tour
+# Comprehensive indexing policy for Search Engines & AI Search Crawlers
 
 User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api/
 
-# AI Crawlers & LLM Assistants (Perplexity, ChatGPT, Claude, Gemini, Apple Intelligence)
+# Google Search & Google Extended
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Bing & Microsoft Copilot
+User-agent: Bingbot
+Allow: /
+
+# OpenAI / ChatGPT Search
 User-agent: GPTBot
 Allow: /
 
 User-agent: ChatGPT-User
 Allow: /
 
+# Perplexity AI Search
 User-agent: PerplexityBot
 Allow: /
 
+# Anthropic Claude
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Google-Extended
+# Apple Search & Siri
+User-agent: Applebot
 Allow: /
 
 User-agent: Applebot-Extended
 Allow: /
 
+# Common Crawl & Other Engines
 User-agent: CCBot
 Allow: /
 
-# Sitemap Location
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Canonical XML Sitemap
 Sitemap: https://to.vrindopnishad.in/sitemap.xml

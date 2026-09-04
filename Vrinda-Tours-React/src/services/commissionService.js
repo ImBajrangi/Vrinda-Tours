@@ -498,6 +498,72 @@ export function subscribeToDriverSettlements(driverId, onUpdate) {
 }
 
 /**
+ * Subscribe to a specific driver's due balance and metrics in real-time
+ */
+export function subscribeToDriverDue(driverId, onUpdate) {
+  if (!driverId) return () => {};
+
+  let isUnsubscribed = false;
+
+  const emitLocal = () => {
+    if (isUnsubscribed) return;
+    const duesMap = getCachedDriverDues();
+    const current = duesMap[driverId] || {
+      commissionDue: 0,
+      totalCashCollected: 0,
+      totalCommissionPaid: 0,
+      ridesCount: 0,
+      ridesHistory: []
+    };
+    onUpdate(current);
+  };
+
+  emitLocal();
+
+  const handleLocal = (e) => {
+    if (isUnsubscribed) return;
+    if (e.detail?.driverId === driverId || !e.detail?.driverId) {
+      emitLocal();
+    }
+  };
+  window.addEventListener('vt:commission-updated', handleLocal);
+
+  let unsubFirestore = () => {};
+  try {
+    const driverRef = doc(firestore, 'drivers', driverId);
+    unsubFirestore = onSnapshot(driverRef, (docSnap) => {
+      if (isUnsubscribed) return;
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const duesMap = getCachedDriverDues();
+        const updated = {
+          commissionDue: data.commissionDue || 0,
+          totalCashCollected: data.totalCashCollected || 0,
+          totalCommissionPaid: data.totalCommissionPaid || 0,
+          ridesCount: data.ridesCompletedCount || 0,
+          ridesHistory: data.commissionRideHistory || []
+        };
+        duesMap[driverId] = updated;
+        saveCachedDriverDues(duesMap);
+        onUpdate(updated);
+      } else {
+        emitLocal();
+      }
+    }, () => {
+      emitLocal();
+    });
+  } catch (e) {
+    emitLocal();
+  }
+
+  return () => {
+    isUnsubscribed = true;
+    window.removeEventListener('vt:commission-updated', handleLocal);
+    unsubFirestore();
+  };
+}
+
+/**
  * Subscribe to all settlements for Admin Console in real-time
  */
 export function subscribeToAllSettlements(onUpdate) {

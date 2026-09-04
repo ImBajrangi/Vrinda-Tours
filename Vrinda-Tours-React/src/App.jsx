@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, lazy, Suspense } from 'react';
-import { Navigation, ChevronRight } from 'lucide-react';
+import { Navigation, ChevronRight, Minus } from 'lucide-react';
 import { locations } from './data/locations';
 import { useGeolocation } from './hooks/useGeolocation';
 import MapView from './components/Map/MapView';
@@ -22,6 +22,7 @@ import { locations as initialData } from './data/locations';
 import AnnouncementBanner from './components/UI/AnnouncementBanner';
 import ErrorBoundary from './components/UI/ErrorBoundary';
 import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
+import { updatePageSEO } from './utils/seoHelper';
 
 // Lazy-loaded secondary modals and partner portals on-demand
 const HotelBooking = lazy(() => import('./components/BookingSheets/HotelBooking'));
@@ -63,6 +64,22 @@ export default function App() {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [toast, setToast] = useState(null);
   const [persistedRide, setPersistedRide] = useState(() => getPersistedLocalRide());
+  const [isLiveRideCapsuleMinimized, setIsLiveRideCapsuleMinimized] = useState(false);
+
+  // Active modal/overlay detection to prevent floating capsules from overlapping bottom sheets/cards
+  const isAnyModalActive = Boolean(
+    activeLocation ||
+    hotelBooking ||
+    restaurantBooking ||
+    partnerHubVisible ||
+    driversVisible ||
+    adminVisible ||
+    helpCenterVisible ||
+    driverPortalVisible ||
+    (activeRoute && isNavExpanded) ||
+    (activeFilter === 'favourites' && !partnerLandingVisible)
+  );
+  const isCapsuleDocked = isAnyModalActive || isLiveRideCapsuleMinimized;
 
   // Listen to background ride events & storage changes
   useEffect(() => {
@@ -107,6 +124,51 @@ export default function App() {
     return () => unsub();
   }, [persistedRide?.id]);
 
+  // Dynamic SEO & Title Metadata Updates on User Navigation
+  useEffect(() => {
+    if (activeLocation) {
+      updatePageSEO({
+        title: `${activeLocation.name} — Vrindavan Darshan, Map & Travel Guide`,
+        description: activeLocation.description || `Explore ${activeLocation.name} in sacred Brij Dham with Vrinda Vihar interactive map, verified drivers, and travel tips.`,
+        image: activeLocation.image,
+        url: `/#${encodeURIComponent(activeLocation.name)}`
+      });
+    } else if (hotelBooking) {
+      updatePageSEO({
+        title: `Book ${hotelBooking.name} — Verified Vrindavan Ashram & Stay`,
+        description: `Reserve your devotee room at ${hotelBooking.name} in Vrindavan with 0% middleman fees and pure sattvic amenities on Vrinda Vihar.`,
+        image: hotelBooking.image,
+        url: '/#stays'
+      });
+    } else if (restaurantBooking) {
+      updatePageSEO({
+        title: `${restaurantBooking.name} — Pure Sattvic Bhojanalaya Vrindavan`,
+        description: `Experience authentic Vaishnava sattvic dining at ${restaurantBooking.name} in Vrindavan.`,
+        image: restaurantBooking.image,
+        url: '/#dining'
+      });
+    } else if (rideRequest) {
+      updatePageSEO({
+        title: `Book E-Rickshaw to ${rideRequest.destination?.name || 'Temple'} | Vrinda Vihar`,
+        description: `Instant verified Sarathi electric rickshaw dispatch in Vrindavan for pilgrim travel to ${rideRequest.destination?.name || 'sacred temples'}.`,
+        url: '/#rides'
+      });
+    } else if (activeFilter && activeFilter !== 'all') {
+      const filterName = activeFilter === 'Temple' ? 'Temples & Mandirs' : 
+                         activeFilter === 'Holy Site' ? 'Sacred Kunds & Holy Sites' : 
+                         activeFilter === 'Hotel' ? 'Verified Ashrams & Stays' : 
+                         activeFilter === 'Restaurant' || activeFilter === 'Dining' ? 'Sattvic Dining & Bhojanalayas' : 
+                         activeFilter === 'favourites' ? 'My Saved Favourite Sacred Sites' : activeFilter;
+      updatePageSEO({
+        title: `${filterName} in Mathura & Vrindavan — Brij Pilgrimage Map`,
+        description: `Explore all ${filterName.toLowerCase()} across Vrindavan, Mathura, Barsana and Govardhan on Vrinda Vihar interactive guide.`,
+        url: `/#${activeFilter}`
+      });
+    } else {
+      updatePageSEO();
+    }
+  }, [activeLocation, hotelBooking, restaurantBooking, rideRequest, activeFilter]);
+
   const handleOpenPartnerDashboard = useCallback((id, role) => {
     setDriverLandingVisible(false);
     setHotelLandingVisible(false);
@@ -115,16 +177,32 @@ export default function App() {
     setPartnerLandingVisible(false);
     setDriverPortalVisible(false);
     
+    let effectiveRole = role;
+    if (!effectiveRole) {
+      try {
+        const isAdmin = sessionStorage.getItem('vt_is_admin') === 'true' || 
+                        localStorage.getItem('vt_admin_session') === 'true' ||
+                        localStorage.getItem('vt_user_role') === 'admin';
+        if (isAdmin) {
+          effectiveRole = 'admin';
+        } else {
+          effectiveRole = activePartnerRole || sessionStorage.getItem('vt_partner_role') || 'driver';
+        }
+      } catch {
+        effectiveRole = activePartnerRole || 'driver';
+      }
+    }
+    
     if (id) {
       setActivePartnerId(id);
       sessionStorage.setItem('vt_partner_id', id);
     }
-    if (role) {
-      setActivePartnerRole(role);
-      sessionStorage.setItem('vt_partner_role', role);
+    if (effectiveRole) {
+      setActivePartnerRole(effectiveRole);
+      sessionStorage.setItem('vt_partner_role', effectiveRole);
     }
     setPartnerHubVisible(true);
-  }, []);
+  }, [activePartnerRole]);
 
   const { position, loading, requestLocation } = useGeolocation();
   const { drivers, firebaseReady } = useFirebaseDrivers();
@@ -481,33 +559,52 @@ export default function App() {
           <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
         )}
 
-        {/* Persistent Live Ride Floating Activity Pill (Minimizable Dynamic Island) */}
+        {/* Persistent Live Ride Floating Activity Pill (Adaptive Dynamic Island / Minimized Capsule) */}
         {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !rideRequest && !activeRide && (
           <div 
-            className="vt-floating-live-ride-pill"
+            className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''}`}
             onClick={() => setRideRequest({ destination: { name: persistedRide.destName, lat: persistedRide.destLat, lng: persistedRide.destLng } })}
             title="Tap to view live ride status & driver details"
+            role="button"
+            tabIndex={0}
           >
             <div className="vt-flr-pulse-wrap">
               <span className={`vt-flr-dot ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
+              <span className={`vt-flr-radar-ring ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'amber' : 'emerald'}`} />
             </div>
             <div className="vt-flr-info">
               <strong className="vt-flr-title">
                 {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? 'Searching for Sarathi...' 
+                  ? (isCapsuleDocked ? 'Searching Sarathi...' : 'Searching for Sarathi...') 
                   : persistedRide.status === 'driver_arrived' 
-                  ? 'Driver Arrived at Pickup!' 
-                  : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`}
+                  ? (isCapsuleDocked ? 'Driver Arrived!' : 'Driver Arrived at Pickup!') 
+                  : (isCapsuleDocked ? `Sarathi • ${persistedRide.driver?.name || 'Driver'}` : `Sarathi on the way • ${persistedRide.driver?.name || 'Driver'}`)}
               </strong>
               <span className="vt-flr-sub">
                 {persistedRide.status === 'searching' || persistedRide.status === 'requested'
-                  ? `To ${persistedRide.destName || 'Destination'} • Tap to view` 
-                  : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`}
+                  ? (isCapsuleDocked ? `${persistedRide.destName || 'Destination'}` : `To ${persistedRide.destName || 'Destination'} • Tap to view`) 
+                  : (isCapsuleDocked ? `PIN: ${persistedRide.safetyPin || '9653'}` : `PIN: ${persistedRide.safetyPin || '9653'} • ${persistedRide.tierName || 'E-Rickshaw'}`)}
               </span>
             </div>
-            <div className="vt-flr-action-badge">
-              <span>View Live</span>
-              <ChevronRight size={14} />
+            <div className="vt-flr-action-cluster">
+              <div className="vt-flr-action-badge">
+                <span>{isCapsuleDocked ? 'Live' : 'View Live'}</span>
+                <ChevronRight size={13} />
+              </div>
+              {!isAnyModalActive && (
+                <button
+                  type="button"
+                  className="vt-flr-min-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsLiveRideCapsuleMinimized((prev) => !prev);
+                  }}
+                  title={isCapsuleDocked ? "Expand activity capsule" : "Minimize activity capsule"}
+                  aria-label="Toggle capsule size"
+                >
+                  <Minus size={13} />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -600,6 +697,7 @@ export default function App() {
           <PartnerHubModal
             partnerId={activePartnerId}
             initialRole={activePartnerRole}
+            authorizedRole={sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin' ? 'admin' : (activePartnerRole || null)}
             drivers={drivers}
             onClose={() => setPartnerHubVisible(false)}
             onOpenLanding={(role) => {

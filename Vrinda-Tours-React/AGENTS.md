@@ -86,3 +86,30 @@ Limit vehicle and item cards to a maximum of 2 clean information hierarchy lines
 use supabase database properly professionally 
 because we have to handle it in real world
 
+[RULE: Floating Capsule & Modal/Overlay Collision Prevention]:
+1. **Zero Bottom Sheet Collision**: Persistent floating UI elements (such as live ride tracking capsules, help launchers, HUD strips, and FABs) must NEVER overlay or collide with active bottom sheets, modal cards, checkout drawers, or primary action buttons.
+2. **Adaptive Dynamic Island Top Docking**: Whenever any bottom sheet, preview modal, or drawer is active (`isAnyModalActive`), floating live capsules must smoothly morph and dock to the top Dynamic Island zone (`.vt-floating-live-ride-pill.docked-top` with `top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 10005;`) rather than unmounting or occluding bottom interaction controls.
+3. **Fluid Spring Transitions**: Transitions between bottom-floating and top-docked modes must use hardware-accelerated spring curves (`cubic-bezier(0.34, 1.35, 0.64, 1)`) with smooth opacity, padding, and transform interpolation to ensure 60fps/120fps performance across all mobile tiers without flickering or popping.
+4. **Adaptive Micro-Hierarchy & Radar Pulses**: Docked mini capsules must display single-row compact status with live radar pulses (`.vt-flr-radar-ring`), glowing status beacons, and interactive touch targets (minimum 40px touch zone) for seamless 1-tap full modal expansion.
+
+[RULE: Professional Luxury Toast Architecture]:
+1. **Zero System Emojis**: Always use crisp, branded SVG vector illustrations (`Crown`, `ShieldCheck`, `Car`, `BedDouble`, `UtensilsCrossed`, `Compass`, `Sparkles`) inside role-tinted neon glass containers rather than system emojis.
+2. **Horizontal Luxury Glass Pill Layout**: Design toasts as compact single/dual-line floating obsidian glass capsules with `backdrop-filter: blur(24px)`, subtle borders (`1px solid rgba(255,255,255,0.16)`), and integrated pill CTA buttons (`Open Workspace →`) instead of bulky stacked action blocks.
+3. **Auto-Dismiss & Progress Animation**: All dynamic toasts must include an auto-dismiss timer (5.5s) with a delicate animated gradient progress line at the bottom that pauses on hover.
+4. **Spring Physics & Collision Clearance**: Toasts must mount with smooth spring curves (`cubic-bezier(0.34, 1.35, 0.64, 1)`) and automatically suppress or dock to clear active modals and primary bottom action sheets.
+
+the more the text the less it looks good to use
+
+[RULE: Rich Dropdown & Luxury Popover Menu Architecture]:
+1. **Rich Select Dropdowns (Trigger & Card Options)**:
+   - Double-chevron indicators (`ChevronsUpDown`) with subtle focus-ring glow on open.
+   - Floating options container with rounded cards (`border-radius: 18px-22px`), backdrop blur, and smooth spring entry (`cubic-bezier(0.16, 1, 0.3, 1)`).
+   - Rich option items featuring title, concise descriptive subtitle (`0.75rem`, muted), and inline custom badges (e.g., `✨ AI Assistant`, `Active`, `Recommended`).
+2. **Luxury Popover Menus**:
+   - Dark Obsidian Glass styling (`rgba(24, 24, 27, 0.96)` or crisp light glass), 20px rounded corners, and delicate inner border (`1px solid rgba(255, 255, 255, 0.1)`).
+   - Crisp SVG icon containers (26px squircle) paired with left-aligned label and right-aligned secondary details/chevrons (e.g. `Devotee Tier` → `Free / Active`, `Refer & Earn` → `+500 Pts`).
+   - Clean micro-dividers and separated danger actions (e.g., `Logout` in soft rose red).
+3. **Accessibility & Responsive Defense**:
+   - Full keyboard navigation (`Enter`, `Space`, `Escape`) and outside-click auto-dismiss.
+   - Flexible viewports (`max-width: calc(100vw - 24px)`) with auto-clamp positioning.
+

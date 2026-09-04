@@ -1614,6 +1614,7 @@
   .tp-journey-header {
     margin-bottom: 2rem;
     padding: 0 1rem;
+    text-align: center;
   }
 
   .tp-journey-title {
@@ -1627,180 +1628,111 @@
     line-height: 1.55;
   }
 
-  /* Symmetrical Centered 3-Card Stage */
+  /* Single centered prominent card on mobile */
   .tp-journey-stage {
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 8px;
     width: 100%;
-    max-width: 100%;
-    padding: 0 8px;
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 0 1rem;
     box-sizing: border-box;
-    overflow: visible;
+    min-height: auto;
   }
 
-  .tp-journey-card {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    will-change: flex, width, transform;
-    transition: flex 0.42s cubic-bezier(0.2, 0.9, 0.3, 1),
-      width 0.42s cubic-bezier(0.2, 0.9, 0.3, 1),
-      transform 0.32s cubic-bezier(0.2, 0.9, 0.3, 1),
-      background 0.3s ease,
-      box-shadow 0.3s ease,
-      border-color 0.3s ease;
+  /* Hide awkward deformed inactive slivers on mobile */
+  .tp-journey-card.tp-j-inactive {
+    display: none !important;
   }
 
-  /* Center Active Card (Always Centered) */
+  /* Full-width prominent active card on mobile */
   .tp-journey-card.tp-j-active {
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 215px;
-    max-width: 265px;
-    height: 395px;
-    border-radius: 26px;
-    padding: 1.25rem 1.1rem 1.4rem;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 380px;
+    min-height: 380px;
+    height: auto;
+    border-radius: 28px;
+    padding: 1.6rem 1.4rem;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    z-index: 2;
     background: linear-gradient(155deg, #f0f7ff 0%, #e0f2fe 50%, #dbeafe 100%);
     border: 1.5px solid #bfdbfe;
-    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.16);
+    box-shadow: 0 18px 42px rgba(37, 99, 235, 0.14);
+    animation: tpMobileCardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes tpMobileCardFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 
   .tp-journey-card.tp-j-active .tp-j-active-view {
-    position: absolute;
-    inset: 0;
-    padding: 1.25rem 1.1rem 1.4rem;
+    position: relative;
+    inset: auto;
+    padding: 0;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .tp-j-photo-window {
-    width: 125px;
-    height: 125px;
-    border-radius: 0 24px 0 100px;
-    margin-top: -1.25rem;
-    margin-right: -1.1rem;
+    width: 140px;
+    height: 140px;
+    border-radius: 0 24px 0 110px;
+    margin-top: -1.6rem;
+    margin-right: -1.4rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.9);
     border-left: 2px solid rgba(255, 255, 255, 0.9);
-    box-shadow: -4px 6px 16px rgba(37, 99, 235, 0.12);
+    box-shadow: -4px 6px 18px rgba(37, 99, 235, 0.12);
     flex-shrink: 0;
   }
 
   .tp-j-body {
-    margin-top: 0.2rem;
+    margin-top: 0.8rem;
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 0.55rem;
     width: 100%;
     box-sizing: border-box;
   }
 
   .tp-j-active-title {
-    font-size: 1.22rem;
+    font-size: 1.35rem;
     font-weight: 900;
-    line-height: 1.22;
+    line-height: 1.2;
     color: #0f172a;
-    word-break: normal;
-    overflow-wrap: break-word;
   }
 
   .tp-j-active-desc {
-    font-size: 0.78rem;
-    line-height: 1.48;
-    word-break: normal;
-    overflow-wrap: break-word;
+    font-size: 0.84rem;
+    line-height: 1.5;
     color: #334155;
   }
 
   .tp-j-learn-more-btn {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: #1d4ed8;
     font-weight: 800;
-    margin-top: 0.2rem;
-  }
-
-  /* Symmetrical Left and Right Inactive Capsule Bars */
-  .tp-journey-card.tp-j-inactive {
-    display: flex;
-    flex: 0 0 52px;
-    width: 52px;
-    min-width: 46px;
-    max-width: 56px;
-    height: 340px;
-    border-radius: 24px;
-    background-color: #f8fafc;
-    border: 1.5px solid #e2e8f0;
-    padding: 1.1rem 0.2rem;
-    box-sizing: border-box;
-    overflow: hidden;
-    cursor: pointer;
-    z-index: 1;
-    opacity: 0.92;
-  }
-
-  .tp-journey-card.tp-j-inactive .tp-j-inactive-view {
-    padding: 0.8rem 0.15rem;
-    align-items: center;
-    justify-content: space-between;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .tp-journey-card.tp-j-inactive .tp-j-inactive-icon-wrap {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #ffffff;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-  }
-
-  .tp-journey-card.tp-j-inactive .tp-j-inactive-icon {
-    width: 15px;
-    height: 15px;
-  }
-
-  .tp-journey-card.tp-j-inactive .tp-j-inactive-title {
-    font-size: 0.58rem;
-    font-weight: 800;
-    text-align: center;
-    line-height: 1.15;
-    color: var(--tp-dark);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    width: 100%;
-    margin: 0;
-  }
-
-  .tp-journey-card.tp-j-inactive .tp-j-inactive-line {
-    display: block;
-    white-space: nowrap;
-    word-break: keep-all;
-    hyphens: none;
+    margin-top: 0.25rem;
   }
 
   .tp-journey-dots-row {
-    margin-top: 1.6rem;
+    margin-top: 1.8rem;
   }
 }
 
@@ -3924,6 +3856,36 @@
   color: #6d28d9;
 }
 
+.tp-profile-plan-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 7px;
+  border-radius: 9px;
+  background: rgba(241, 245, 249, 0.45);
+  transition: all 0.15s ease;
+}
+
+.tp-profile-plan-row:hover {
+  background: rgba(241, 245, 249, 0.85);
+}
+
+.tp-profile-plan-label {
+  font-size: 0.81rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.tp-profile-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: #64748b;
+  letter-spacing: 0.01em;
+}
+
 .tp-profile-dropdown-footer {
   padding-top: 2px;
 }
@@ -4087,37 +4049,56 @@
   letter-spacing: 0.02em;
 }
 
-/* Floating Interactive Toast for Registration / Profile Prompts */
+/* ==========================================================================
+   Floating Interactive Luxury Toast (Sonner/Linear Glassmorphic Standard)
+   ========================================================================== */
+
 .tp-floating-toast {
   position: fixed !important;
   bottom: max(24px, env(safe-area-inset-bottom)) !important;
   right: 24px !important;
   left: auto !important;
-  max-width: 390px;
-  width: calc(100vw - 32px);
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(11, 15, 25, 0.09);
-  border-radius: 20px;
-  box-shadow: 0 20px 48px rgba(11, 15, 25, 0.16), 0 4px 14px rgba(11, 15, 25, 0.06);
-  padding: 12px 14px;
+  width: auto;
+  min-width: 320px;
+  max-width: min(460px, calc(100vw - 32px));
+  background: rgba(13, 17, 28, 0.94);
+  color: #ffffff;
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 4px 12px -2px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  padding: 10px 14px 10px 12px;
   z-index: 99999999 !important;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  animation: tpToastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: tpToastSpringIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   box-sizing: border-box;
   pointer-events: auto !important;
   touch-action: manipulation !important;
   user-select: none;
   -webkit-user-select: none;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-@keyframes tpToastSlideUp {
+.tp-floating-toast:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 
+    0 28px 56px -12px rgba(0, 0, 0, 0.72),
+    0 6px 16px -2px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+@keyframes tpToastSpringIn {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.95);
+    transform: translateY(24px) scale(0.95);
   }
 
   to {
@@ -4131,13 +4112,15 @@
     left: 50% !important;
     right: auto !important;
     bottom: max(16px, env(safe-area-inset-bottom)) !important;
-    width: calc(100% - 28px) !important;
+    width: calc(100vw - 24px) !important;
     max-width: 420px !important;
+    min-width: 0 !important;
+    padding: 9px 12px 9px 10px !important;
     transform: translateX(-50%) !important;
-    animation: tpToastMobileSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    animation: tpToastMobileSpringIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
   }
 
-  @keyframes tpToastMobileSlideUp {
+  @keyframes tpToastMobileSpringIn {
     from {
       opacity: 0;
       transform: translateX(-50%) translateY(24px) scale(0.95);
@@ -4150,121 +4133,247 @@
   }
 }
 
+.tp-toast-main-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
 .tp-toast-icon-wrap {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: #f1f5f9;
-  color: #0f172a;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #34d399;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   pointer-events: none;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .tp-toast-icon-wrap.highlight {
-  background: #fef3c7;
-  color: #d97706;
-  border: 1px solid #fde68a;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Role-Themed Refined Glowing Beacons */
+.tp-floating-toast.role-admin .tp-toast-icon-wrap {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(245, 158, 11, 0.15);
+}
+
+.tp-floating-toast.role-driver .tp-toast-icon-wrap {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(16, 185, 129, 0.15);
+}
+
+.tp-floating-toast.role-hotel .tp-toast-icon-wrap {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.35);
+  color: #c084fc;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(168, 85, 247, 0.15);
+}
+
+.tp-floating-toast.role-restaurant .tp-toast-icon-wrap,
+.tp-floating-toast.role-restaurant_staff .tp-toast-icon-wrap {
+  background: rgba(249, 115, 22, 0.14);
+  border-color: rgba(249, 115, 22, 0.35);
+  color: #fb923c;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(249, 115, 22, 0.15);
+}
+
+.tp-floating-toast.role-agency .tp-toast-icon-wrap {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(56, 189, 248, 0.15);
+}
+
+.tp-floating-toast.role-pilgrim .tp-toast-icon-wrap {
+  background: rgba(20, 184, 166, 0.14);
+  border-color: rgba(20, 184, 166, 0.35);
+  color: #2dd4bf;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 14px rgba(20, 184, 166, 0.15);
 }
 
 .tp-toast-body {
   flex: 1;
   min-width: 0;
-  pointer-events: auto !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .tp-toast-title {
-  font-size: 0.94rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0 0 2px;
-  letter-spacing: -0.01em;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  white-space: nowrap;
 }
 
 .tp-toast-desc {
-  font-size: 0.78rem;
+  font-size: 0.73rem;
   font-weight: 500;
-  color: #64748b;
-  line-height: 1.3;
-  margin: 0 0 10px;
+  color: #94a3b8;
+  line-height: 1.35;
+  margin: 2px 0 0;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.tp-toast-actions {
+@media (max-width: 640px) {
+  .tp-toast-desc {
+    max-width: 175px;
+  }
+}
+
+.tp-toast-actions-stack {
   display: flex;
   align-items: center;
-  gap: 12px;
-  pointer-events: auto !important;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .tp-toast-cta {
-  position: relative;
-  z-index: 10;
-  padding: 8px 18px;
-  background: #0f172a;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  font-weight: 800;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.tp-toast-cta:hover,
-.tp-toast-cta:active {
-  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.25);
-}
-
-.tp-toast-dismiss {
-  position: relative;
-  z-index: 10;
-  padding: 6px 10px;
-  background: transparent;
-  color: #64748b;
-  border: none;
-  font-size: 0.78rem;
-  font-weight: 700;
+  gap: 5px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   cursor: pointer !important;
   pointer-events: auto !important;
   touch-action: manipulation !important;
-  transition: color 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.tp-toast-dismiss:hover,
-.tp-toast-dismiss:active {
-  color: #0f172a;
+.tp-toast-cta:hover {
+  background: #ffffff;
+  color: #09090b;
+  border-color: #ffffff;
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25);
+}
+
+.tp-toast-cta:active {
+  transform: scale(0.96);
+}
+
+.tp-toast-cta-arrow {
+  transition: transform 0.18s ease;
+}
+
+.tp-toast-cta:hover .tp-toast-cta-arrow {
+  transform: translateX(2px);
 }
 
 .tp-toast-close-btn {
-  position: relative;
-  z-index: 10;
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer !important;
-  pointer-events: auto !important;
-  touch-action: manipulation !important;
-  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  padding: 0;
+  transition: all 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.tp-toast-close-btn:hover,
+.tp-toast-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
 .tp-toast-close-btn:active {
-  color: #0b0f19;
+  transform: scale(0.92);
+}
+
+/* Delicate Hairline Progress Track */
+.tp-toast-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.tp-toast-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  border-radius: 999px;
+  animation: tpToastProgress 5.5s linear forwards;
+}
+
+.tp-floating-toast.role-admin .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.tp-floating-toast.role-driver .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.tp-floating-toast.role-hotel .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #8b5cf6, #c084fc);
+}
+
+.tp-floating-toast.role-restaurant .tp-toast-progress-bar,
+.tp-floating-toast.role-restaurant_staff .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #f97316, #fb923c);
+}
+
+.tp-floating-toast.role-agency .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+}
+
+.tp-floating-toast.role-pilgrim .tp-toast-progress-bar {
+  background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+}
+
+.tp-floating-toast:hover .tp-toast-progress-bar {
+  animation-play-state: paused;
+}
+
+@keyframes tpToastProgress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
 }
 
 /* Centered Luxury Profile Hero for One-Step Google Sign-In */
@@ -9056,9 +9165,9 @@
 }
 
 .tp-role-driver {
-  background: #ecfdf5 !important;
-  color: #047857 !important;
-  border-color: #a7f3d0 !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
 }
 
 .tp-role-restaurant {
@@ -9115,51 +9224,98 @@
 
 /* Desktop Dropdown Role Switcher Strip */
 .tp-role-quick-strip {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 10px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 16px;
+  padding: 10px 10px 9px;
   margin: 6px 0 8px;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  position: relative;
 }
 
 .tp-role-strip-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
+  padding: 0 2px;
 }
 
 .tp-role-strip-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.73rem;
-  color: #475569;
-  font-weight: 600;
+  gap: 7px;
+  min-width: 0;
 }
 
-.tp-role-strip-title strong {
-  color: #0f172a;
+.tp-role-shield-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.tp-role-title-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tp-role-title-muted {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+.tp-role-title-highlight {
   font-weight: 800;
+  font-size: 0.76rem;
+  letter-spacing: -0.01em;
 }
 
 .tp-btn-switch-role-link {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: transparent;
-  border: none;
-  font-size: 0.7rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.68rem;
   font-weight: 750;
   color: #4f46e5;
   cursor: pointer;
-  padding: 0;
-  transition: color 0.15s ease;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tp-btn-switch-role-link:hover {
+  background: #eef2ff;
   color: #3730a3;
-  text-decoration: underline;
+  border-color: #c7d2fe;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.12);
+}
+
+.tp-btn-switch-role-link .tp-btn-chevron-arrow {
+  transition: transform 0.18s ease;
+}
+
+.tp-btn-switch-role-link:hover .tp-btn-chevron-arrow {
+  transform: translateX(2px);
 }
 
 .tp-role-quick-pills {
@@ -9174,63 +9330,155 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 7px 4px 6px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  padding: 8px 4px 7px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
   background: #ffffff;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.tp-role-quick-pill .tp-role-pill-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 2px;
 }
 
 .tp-role-quick-pill .tp-role-pill-icon {
-  font-size: 1.05rem;
-  line-height: 1.1;
+  font-size: 1.15rem;
+  line-height: 1;
+  display: inline-block;
   transition: transform 0.2s ease;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.04));
 }
 
 .tp-role-quick-pill .tp-role-pill-label {
-  font-size: 0.68rem;
+  font-size: 0.69rem;
   font-weight: 700;
   color: #475569;
-  margin-top: 3px;
-  line-height: 1.1;
+  margin-top: 2px;
+  line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
 }
 
-.tp-role-quick-pill:hover {
-  border-color: #cbd5e1;
+.tp-role-quick-pill:hover:not(.active) {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+.tp-role-quick-pill:hover:not(.active) .tp-role-pill-icon-wrap {
+  transform: scale(1.08);
   background: #f1f5f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
 }
 
-.tp-role-quick-pill:hover .tp-role-pill-icon {
-  transform: scale(1.1);
+.tp-role-quick-pill:hover:not(.active) .tp-role-pill-label {
+  color: #0f172a;
+}
+
+.tp-role-quick-pill:active {
+  transform: scale(0.97);
 }
 
 .tp-role-quick-pill.active {
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
   border-color: #0f172a;
-  background: #0f172a;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(15, 23, 42, 0.1);
+}
+
+.tp-role-quick-pill.active .tp-role-pill-icon-wrap {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.tp-role-quick-pill.active svg {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .tp-role-quick-pill.active .tp-role-pill-label {
   color: #ffffff;
   font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .tp-role-pill-indicator {
   position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 5px;
-  height: 5px;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #38bdf8;
-  box-shadow: 0 0 5px #38bdf8;
+  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+  border: 1px solid #0f172a;
+  animation: tpPulseIndicator 2s infinite ease-in-out;
+}
+
+/* Role-specific active indicator beacon accents */
+.tp-role-pill-pilgrim.active .tp-role-pill-indicator {
+  background: #2dd4bf;
+  box-shadow: 0 0 8px #2dd4bf;
+}
+
+.tp-role-pill-driver.active .tp-role-pill-indicator {
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.tp-role-pill-restaurant.active .tp-role-pill-indicator {
+  background: #fb923c;
+  box-shadow: 0 0 8px #fb923c;
+}
+
+.tp-role-pill-hotel.active .tp-role-pill-indicator {
+  background: #60a5fa;
+  box-shadow: 0 0 8px #60a5fa;
+}
+
+.tp-role-pill-agency.active .tp-role-pill-indicator {
+  background: #c084fc;
+  box-shadow: 0 0 8px #c084fc;
+}
+
+.tp-role-pill-admin.active .tp-role-pill-indicator {
+  background: #fbbf24;
+  box-shadow: 0 0 8px #fbbf24;
+}
+
+@keyframes tpPulseIndicator {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.85;
+  }
 }
 
 /* Dynamic Highlight Dropdown Items */
@@ -9288,44 +9536,61 @@
 /* Mobile Drawer Role & Authority Strip */
 .tp-mobile-role-strip {
   margin: 8px 0 6px;
-  padding: 10px;
-  background: #f8fafc;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
+  padding: 10px 10px 9px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+  position: relative;
 }
 
 .tp-mobile-role-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 8px;
+  padding: 0 2px;
 }
 
 .tp-mobile-role-left {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.tp-mobile-role-left strong {
-  color: #0f172a;
-  font-weight: 800;
+  gap: 7px;
+  min-width: 0;
 }
 
 .tp-btn-mobile-all-roles {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  background: transparent;
-  border: none;
-  font-size: 0.7rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.68rem;
   font-weight: 750;
   color: #4f46e5;
   cursor: pointer;
-  padding: 0;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tp-btn-mobile-all-roles:hover,
+.tp-btn-mobile-all-roles:active {
+  background: #eef2ff;
+  color: #3730a3;
+  border-color: #c7d2fe;
+}
+
+.tp-btn-mobile-all-roles .tp-btn-chevron-arrow {
+  transition: transform 0.18s ease;
+}
+
+.tp-btn-mobile-all-roles:hover .tp-btn-chevron-arrow {
+  transform: translateX(2px);
 }
 
 .tp-mobile-role-pills {
@@ -9341,46 +9606,82 @@
   justify-content: center;
   position: relative;
   padding: 8px 4px 7px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  text-align: center;
+}
+
+.tp-mobile-role-pill .tp-role-pill-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 2px;
 }
 
 .tp-mobile-role-pill .tp-role-pill-icon {
-  font-size: 1.1rem;
-  line-height: 1.1;
+  font-size: 1.15rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.04));
 }
 
 .tp-mobile-role-pill .tp-role-pill-label {
-  font-size: 0.68rem;
+  font-size: 0.69rem;
   font-weight: 700;
   color: #475569;
-  margin-top: 3px;
-  line-height: 1.1;
+  margin-top: 2px;
+  line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
 }
 
-.tp-mobile-role-pill:hover,
-.tp-mobile-role-pill:active {
-  background: #f1f5f9;
+.tp-mobile-role-pill:hover:not(.active),
+.tp-mobile-role-pill:active:not(.active) {
+  background: #ffffff;
   border-color: #cbd5e1;
 }
 
 .tp-mobile-role-pill.active {
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
   border-color: #0f172a;
-  background: #0f172a;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+  box-shadow: 0 6px 18px -2px rgba(15, 23, 42, 0.28), 0 0 0 2px rgba(15, 23, 42, 0.1);
+}
+
+.tp-mobile-role-pill.active .tp-role-pill-icon-wrap {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.tp-mobile-role-pill.active svg {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .tp-mobile-role-pill.active .tp-role-pill-label {
   color: #ffffff;
   font-weight: 800;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* Dynamic Mobile CTAs */
@@ -9405,23 +9706,23 @@
 }
 
 /* =========================================================================
-   ROLE & AUTHORITY MODAL
+   ROLE & AUTHORITY MODAL (Minimalist & High-Impact)
    ========================================================================= */
 .tp-role-modal-card {
-  max-width: 680px;
+  max-width: 660px;
   width: 95%;
-  max-height: 88vh;
+  max-height: 85vh;
   display: flex;
   flex-direction: column;
   background: #ffffff;
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
   border: 1px solid #e2e8f0;
 }
 
 .tp-role-modal-header {
-  padding: 18px 22px 14px;
+  padding: 16px 20px 12px;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: flex-start;
@@ -9432,31 +9733,32 @@
 .tp-role-modal-eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 0.68rem;
+  gap: 4px;
+  font-size: 0.65rem;
   font-weight: 800;
   color: #6366f1;
-  letter-spacing: 0.06em;
-  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+  margin-bottom: 3px;
   text-transform: uppercase;
 }
 
 .tp-role-modal-header h3 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 3px;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
 }
 
 .tp-role-modal-header p {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: #64748b;
   margin: 0;
   line-height: 1.35;
 }
 
 .tp-role-modal-body {
-  padding: 16px 20px;
+  padding: 14px 18px;
   overflow-y: auto;
   flex: 1;
   -webkit-overflow-scrolling: touch;
@@ -9465,17 +9767,17 @@
 
 .tp-role-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
 }
 
 .tp-role-card {
-  border: 1.5px solid #e2e8f0;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
-  padding: 14px;
+  padding: 12px 14px;
   background: #ffffff;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -9483,12 +9785,12 @@
 
 .tp-role-card:hover {
   border-color: #cbd5e1;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
 }
 
 .tp-role-card.is-active {
   border-color: #0f172a;
-  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.1);
   background: #ffffff;
 }
 
@@ -9503,18 +9805,24 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 2.5px 8px;
+  font-size: 0.7rem;
+  font-weight: 750;
+  padding: 2px 7.5px;
   border-radius: 999px;
   border: 1px solid;
+}
+
+.tp-role-card-badge .tp-role-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tp-role-active-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.68rem;
+  gap: 3.5px;
+  font-size: 0.65rem;
   font-weight: 800;
   color: #059669;
   background: #ecfdf5;
@@ -9524,42 +9832,29 @@
 }
 
 .tp-role-card-name {
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 800;
   color: #0f172a;
-  margin: 0 0 4px;
+  margin: 0 0 2px;
+  letter-spacing: -0.01em;
 }
 
 .tp-role-card-desc {
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   color: #64748b;
-  line-height: 1.4;
+  line-height: 1.35;
   margin: 0 0 10px;
   flex: 1;
 }
 
-.tp-role-card-authority {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 10px;
-  padding: 5px 8px;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #f1f5f9;
-}
-
 .tp-btn-select-role {
   width: 100%;
-  padding: 6.5px 12px;
-  font-size: 0.76rem;
-  font-weight: 750;
+  padding: 6px 12px;
+  font-size: 0.74rem;
+  font-weight: 700;
   border-radius: 999px;
-  border: 1.5px solid #e2e8f0;
-  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
   color: #0f172a;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -9578,7 +9873,7 @@
 }
 
 .tp-role-modal-footer {
-  padding: 12px 22px;
+  padding: 10px 18px;
   border-top: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
@@ -9587,17 +9882,17 @@
 }
 
 .tp-role-footer-info {
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   color: #64748b;
   font-weight: 500;
 }
 
 .tp-btn-role-done {
-  padding: 6px 18px;
+  padding: 5.5px 16px;
   border-radius: 999px;
   background: #0f172a;
   color: #ffffff;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 750;
   border: none;
   cursor: pointer;

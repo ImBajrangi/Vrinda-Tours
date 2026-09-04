@@ -49,15 +49,8 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
   const debounce = useDebounce();
 
   // Multi-Category Partners with Supabase sync
-  const [allPartners, setAllPartners] = useState([
-    { id: 'd_1', name: 'Shri Daasi', category: 'driver', phone: '+919876543201', role_details: '🛺 E-Rickshaw • UP-85 VT 2026', verified: true, category_locked: true, rating: '4.9', status: 'Available' },
-    { id: 'd_2', name: 'Radhe', category: 'driver', phone: '+919876543202', role_details: '🛺 E-Rickshaw • UP-85', verified: true, category_locked: true, rating: '4.9', status: 'Offline' },
-    { id: 'r_1', name: 'Brijwasin Dining', category: 'restaurant', phone: '+919876543230', role_details: '🍽️ Sattvic Bhojanalaya', verified: true, category_locked: true, rating: '4.8', status: 'Open' },
-    { id: 'r_2', name: 'Govinda\'s Kitchen', category: 'restaurant', phone: '+919876543220', role_details: '🍽️ Pure Sattvic Thali', verified: true, category_locked: true, rating: '4.7', status: 'Open' },
-    { id: 'h_1', name: 'Radha Krishna Dham', category: 'hotel', phone: '+919876543210', role_details: '🏨 Temple Guesthouse', verified: true, category_locked: true, rating: '4.9', status: '4 Rooms' },
-    { id: 'h_2', name: 'Vrinda Heritage Stay', category: 'hotel', phone: '+919876543213', role_details: '🏨 Heritage Haveli', verified: true, category_locked: true, rating: '4.8', status: '2 Suites' },
-    { id: 'a_1', name: 'Shri Braj 84 Kos Yatra Tours', category: 'agency', phone: '+919876543240', role_details: '🚩 84 Kos Parikrama & Group Fleet', verified: true, category_locked: true, rating: '4.9', status: 'Open' }
-  ]);
+  const [allPartners, setAllPartners] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Realtime Supabase Fetch & Subscription with unique channel name
   useEffect(() => {
@@ -69,11 +62,13 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!error && data && data.length > 0 && isMounted) {
+        if (!error && data && isMounted) {
           setAllPartners(data);
         }
       } catch (err) {
-        // Silent — fallback data already loaded
+        console.warn('[OperationsAdminTab] Partners fetch warning:', err);
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -108,8 +103,8 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
     e.preventDefault();
     const newId = `partner_${Date.now()}`;
     const roleDetails = category === 'driver' 
-      ? `🛺 ${vehicleType} • ${vehicleNo || 'UP-85'}` 
-      : (category === 'restaurant' ? '🍽️ Sattvic Restaurant' : (category === 'agency' ? '🚩 84 Kos Yatra Tours' : '🏨 Hotel Partner'));
+      ? `${vehicleType} • ${vehicleNo || 'UP-85'}` 
+      : (category === 'restaurant' ? 'Sattvic Restaurant' : (category === 'agency' ? '84 Kos Yatra Tours' : 'Hotel Partner'));
 
     const newEntry = {
       id: newId,
@@ -280,11 +275,11 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
       <div className="ph-sub-filter-bar">
         {[
           { key: 'all', label: 'All Partners' },
-          { key: 'pending', label: `⏳ Pending (${pendingCount})` },
-          { key: 'driver', label: '🛺 Drivers' },
-          { key: 'hotel', label: '🏨 Stays' },
-          { key: 'restaurant', label: '🍽️ Dining' },
-          { key: 'agency', label: '🚩 Agencies' }
+          { key: 'pending', label: `Pending (${pendingCount})` },
+          { key: 'driver', label: 'Drivers' },
+          { key: 'hotel', label: 'Stays' },
+          { key: 'restaurant', label: 'Dining' },
+          { key: 'agency', label: 'Agencies' }
         ].map(chip => (
           <button
             key={chip.key}
@@ -427,9 +422,10 @@ export default function OperationsAdminTab({ drivers = [], isAdmin = false }) {
                   onChange={e => setCategory(e.target.value)}
                   className="ph-modal-select"
                 >
-                  <option value="driver">🛺 Driver Partner (E-Rickshaw/Taxi)</option>
-                  <option value="restaurant">🍽️ Restaurant & Dining Staff</option>
-                  <option value="hotel">🏨 Hotel, Ashram & Stay Staff</option>
+                  <option value="driver">Driver Partner (E-Rickshaw/Taxi)</option>
+                  <option value="restaurant">Restaurant &amp; Dining Staff</option>
+                  <option value="hotel">Hotel, Ashram &amp; Stay Staff</option>
+                  <option value="agency">Tour Agency &amp; Yatra Staff</option>
                 </select>
               </div>
 

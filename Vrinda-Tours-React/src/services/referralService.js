@@ -178,9 +178,9 @@ export const REFERRAL_CATEGORIES = [
     title: 'Pilgrim Navigation & Temple Darshan',
     desc: 'Share with family & friends for live temple navigation, darshan timings & 500 Brij Points.',
     path: '/?app=user',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?app=user${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🙏 Join Vrinda Vihar to explore divine temples, get 500 Brij Reward Points & 15% OFF on verified stays & e-rickshaw rides in Vrindavan:\n\n${origin}/?app=user${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   },
   {
@@ -191,9 +191,9 @@ export const REFERRAL_CATEGORIES = [
     title: 'E-Rickshaw, Auto & Cab Partner',
     desc: 'Invite local drivers to earn up to ₹1,90,000/mo with 0% commission & direct pilgrim bookings.',
     path: '/?join=driver&mode=register',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?join=driver&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🛺 Register as a Verified Driver Partner on Vrinda Vihar. 0% Commission Forever & earn up to ₹1,90,000/mo across Vrindavan & Mathura. Register directly here:\n\n${origin}/?join=driver&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   },
   {
@@ -204,9 +204,9 @@ export const REFERRAL_CATEGORIES = [
     title: 'Hotel, Ashram & Stay Desk',
     desc: 'Invite hotel & ashram owners to list rooms with 0% commission and instant payouts.',
     path: '/?join=hotel&mode=register',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?join=hotel&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🏨 List your Hotel, Ashram or Dharamshala on Vrinda Vihar Stay Desk with 0% listing fee & direct pilgrim bookings in Vrindavan. Join here:\n\n${origin}/?join=hotel&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   },
   {
@@ -217,9 +217,9 @@ export const REFERRAL_CATEGORIES = [
     title: 'Bhojnalaya & Sattvic Dining',
     desc: 'Invite restaurant & sweet shop owners to list pure sattvic food for pilgrims.',
     path: '/?join=dining&mode=register',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?join=dining&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🍽️ Partner your Bhojnalaya, Restaurant or Sweets shop on Vrinda Vihar for 100% pure sattvic food lovers across Braj Dham. Register here:\n\n${origin}/?join=dining&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   },
   {
@@ -228,11 +228,11 @@ export const REFERRAL_CATEGORIES = [
     icon: '🚩',
     badge: '84 Kos',
     title: 'Yatra & Parikrama Operator',
-    desc: 'Invite travel agencies & tour guides for 84 Kos Parikrama and VIP group packages.',
+    desc: 'Invite travel agencies & tour guides for 84 Kos Parikrama and group packages.',
     path: '/?join=agency&mode=register',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?join=agency&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🚩 Register your Yatra Agency or 84 Kos Parikrama Tour Operator on Vrinda Vihar for verified devotee groups. Register here:\n\n${origin}/?join=agency&mode=register${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   },
   {
@@ -243,9 +243,9 @@ export const REFERRAL_CATEGORIES = [
     title: 'Partner Operations Dashboard',
     desc: 'Direct link to the unified B2B partner management and operations portal.',
     path: '/?portal=partner',
-    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    getLink: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `${origin}/?portal=partner${code ? `&ref=${encodeURIComponent(code)}` : ''}`,
-    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) => 
+    whatsappMsg: (code, origin = (typeof window !== 'undefined' ? window.location.origin : '')) =>
       `Radhe Radhe! 🏢 Access the Vrinda Vihar Unified Partner Portal for bookings, operations and fleet tracking:\n\n${origin}/?portal=partner${code ? `&ref=${encodeURIComponent(code)}` : ''}`
   }
 ];

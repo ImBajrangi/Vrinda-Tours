@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Car, Shield, CheckCircle2, ChevronRight, ChevronDown, Phone, User, 
-  MapPin, Navigation, ArrowRight, X, Sparkles, 
+import {
+  Car, Shield, CheckCircle2, ChevronRight, ChevronDown, Phone, User,
+  MapPin, Navigation, ArrowRight, X, Sparkles,
   Clock, TrendingUp, Check, ShieldCheck, AlertCircle, LogIn, HeartHandshake,
   Zap, ArrowUpRight, ArrowLeft, CheckSquare, Award, BadgePercent, Sparkle,
   Mail, Lock, Eye, EyeOff, Compass, Building2, UtensilsCrossed, Share2, Copy
@@ -72,42 +72,42 @@ export const VehicleGraphic = ({ type, size = 22 }) => {
 };
 
 const VEHICLE_TYPES = [
-  { 
-    id: 'E-Rickshaw', 
-    label: 'E-Rickshaw', 
-    desc: 'Dham Parikrama & Mandir Routes', 
+  {
+    id: 'E-Rickshaw',
+    label: 'E-Rickshaw',
+    desc: 'Dham Parikrama & Mandir Routes',
     category: 'LOCAL DHAM',
     earningEst: '₹1,400–₹2,600 / day',
     tripRate: '15–22 Devotee Trips / Day'
   },
-  { 
-    id: 'Taxi', 
-    label: 'Cab / Taxi', 
-    desc: 'Sedan, Dzire, Etios & Hatchback', 
+  {
+    id: 'Taxi',
+    label: 'Cab / Taxi',
+    desc: 'Sedan, Dzire, Etios & Hatchback',
     category: 'CITY & INTERCITY',
     earningEst: '₹2,500–₹5,000 / day',
     tripRate: '4–7 Outstation & City Runs'
   },
-  { 
-    id: 'Auto', 
-    label: 'Auto Rickshaw', 
-    desc: 'Station Transfer & Town Runs', 
+  {
+    id: 'Auto',
+    label: 'Auto Rickshaw',
+    desc: 'Station Transfer & Town Runs',
     category: 'QUICK RUNS',
     earningEst: '₹1,800–₹3,200 / day',
     tripRate: '12–18 Town & Station Transfers'
   },
-  { 
-    id: 'SUV', 
-    label: 'SUV / Luxury', 
-    desc: 'Innova, Ertiga, Crysta & Scorpio', 
+  {
+    id: 'SUV',
+    label: 'SUV / Luxury',
+    desc: 'Innova, Ertiga, Crysta & Scorpio',
     category: 'FAMILY YATRA',
     earningEst: '₹4,000–₹7,500 / day',
     tripRate: '2–4 Full Dham Yatra Tours'
   },
-  { 
-    id: 'Tempo', 
-    label: 'Tempo Traveler', 
-    desc: '9–26 Seater 84 Kos Pilgrimage', 
+  {
+    id: 'Tempo',
+    label: 'Tempo Traveler',
+    desc: '9–26 Seater 84 Kos Pilgrimage',
     category: 'GROUP TOURS',
     earningEst: '₹6,000–₹12,000 / day',
     tripRate: 'Group Pilgrimage Charters'
@@ -154,19 +154,19 @@ const OPERATING_ZONES = [
   }
 ];
 
-export default function DriverLandingPage({ 
-  onClose, 
-  onOpenDriverCompanion, 
+export default function DriverLandingPage({
+  onClose,
+  onOpenDriverCompanion,
   onOpenHotelPage,
   onOpenRestaurantPage,
   onOpenAgencyPage,
-  drivers = [] 
+  drivers = []
 }) {
   const [activeView, setActiveView] = useState('landing'); // 'landing' | 'wizard'
   const [currentStep, setCurrentStep] = useState(1); // 1: Personal, 2: Vehicle, 3: Zone & Confirm
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [regSessionId] = useState(() => 'dreg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
-  
+
   // Registration Form State
   const [regForm, setRegForm] = useState({
     name: '',
@@ -212,16 +212,16 @@ export default function DriverLandingPage({
     const refCode = localStorage.getItem('vrinda_referrer_code') || '';
     const shareUrl = `${window.location.origin}/?join=driver&mode=register${refCode ? `&ref=${refCode}` : ''}`;
     const shareText = `Radhe Radhe! 🛺 Join Vrinda Vihar as a Driver Partner (E-Rickshaw, Auto, Cab) with 0% Commission Forever:\n\n${shareUrl}`;
-    
+
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Driver Partner Registration - Vrinda Vihar', text: shareText, url: shareUrl });
         setCopiedPageShare(true);
         setTimeout(() => setCopiedPageShare(false), 2000);
         return;
-      } catch (e) {}
+      } catch (e) { }
     }
-    
+
     navigator.clipboard?.writeText(shareUrl);
     setCopiedPageShare(true);
     setTimeout(() => setCopiedPageShare(false), 2000);
@@ -253,8 +253,8 @@ export default function DriverLandingPage({
           setCurrentStep(1);
           setShowLoginModal(false);
           return;
-        } 
-        
+        }
+
         if (mode === 'login' || mode === 'signin' || hash.includes('login') || hash.includes('signin')) {
           setShowLoginModal(true);
           return;
@@ -264,7 +264,7 @@ export default function DriverLandingPage({
         if (sectionId && sectionId !== 'driver' && sectionId !== 'drivers' && sectionId !== 'landing') {
           scrollToSection(sectionId);
         }
-      } catch (e) {}
+      } catch (e) { }
     };
 
     handleUrlState();
@@ -323,16 +323,16 @@ export default function DriverLandingPage({
         if (!rawPending) return;
 
         const { data: { session } } = await supabase.auth.getSession();
-        
+
         if (session?.user && isMounted) {
           sessionStorage.removeItem('vt_pending_driver_reg');
 
           const user = session.user;
           const googleName = user.user_metadata?.full_name || user.user_metadata?.name || 'Driver Partner';
           const googleEmail = user.email || '';
-          
+
           let pendingData = {};
-          try { pendingData = JSON.parse(rawPending); } catch (e) {}
+          try { pendingData = JSON.parse(rawPending); } catch (e) { }
 
           if (pendingData.intent === 'step1_google_login' || !pendingData.vehicleNo) {
             setRegForm(prev => ({
@@ -380,7 +380,7 @@ export default function DriverLandingPage({
     try {
       const phoneValidation = validatePhoneNumber(regForm.phone);
       const cleanPhone = phoneValidation.clean || regForm.phone;
-      
+
       const payload = {
         id: regSessionId,
         step: stepNumber,
@@ -402,7 +402,7 @@ export default function DriverLandingPage({
 
       try {
         localStorage.setItem('vt_driver_reg_' + regSessionId, JSON.stringify(payload));
-      } catch (e) {}
+      } catch (e) { }
 
       const { error } = await supabase.from('driver_registrations').upsert(payload);
       if (error) {
@@ -455,7 +455,7 @@ export default function DriverLandingPage({
   const handleStep1Next = async (e) => {
     e.preventDefault();
     setRegError('');
-    
+
     if (!regForm.name.trim() || regForm.name.trim().length < 2) {
       setRegError('Please enter your full legal name');
       return;
@@ -525,8 +525,8 @@ export default function DriverLandingPage({
     try {
       const phoneValidation = validatePhoneNumber(regForm.phone);
       const cleanPhone = phoneValidation.clean || regForm.phone;
-      const formattedVehicleNo = regForm.vehicleNo.trim() 
-        ? regForm.vehicleNo.toUpperCase().trim() 
+      const formattedVehicleNo = regForm.vehicleNo.trim()
+        ? regForm.vehicleNo.toUpperCase().trim()
         : `UP-85 ${Math.floor(1000 + Math.random() * 9000)}`;
 
       const newDriverId = 'd_' + Date.now();
@@ -584,7 +584,7 @@ export default function DriverLandingPage({
       sessionStorage.setItem('vt_partner_id', newDriverId);
       sessionStorage.setItem('vt_driver_id', newDriverId);
       sessionStorage.setItem('vt_partner_role', 'driver');
-      
+
       setRegSuccess(true);
       setTimeout(() => {
         if (onOpenDriverCompanion) {
@@ -656,7 +656,7 @@ export default function DriverLandingPage({
 
   return (
     <div className="dmd-root">
-      
+
       {/* 0. AUTO-CONTINUOUS TICKER / ANNOUNCEMENT BAR */}
       <div className="dmd-announcement-bar">
         <div className="dmd-announcement-track-wrap">
@@ -723,11 +723,11 @@ export default function DriverLandingPage({
       {/* TOP NAVIGATION BAR */}
       <header className="dmd-top-nav">
         <div className="dmd-nav-container">
-          
+
           {/* Left: Brand + Category Dropdown Switcher */}
           <div className="dmd-brand-block" ref={portalDropdownRef}>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-brand-pill-btn"
               onClick={() => setPortalDropdownOpen(prev => !prev)}
               aria-expanded={portalDropdownOpen}
@@ -758,8 +758,8 @@ export default function DriverLandingPage({
                     <Check size={14} className="dmd-popover-check" />
                   </button>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenHotelPage) onOpenHotelPage(); }}
                   >
@@ -772,8 +772,8 @@ export default function DriverLandingPage({
                     </div>
                   </button>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenRestaurantPage) onOpenRestaurantPage(); }}
                   >
@@ -786,8 +786,8 @@ export default function DriverLandingPage({
                     </div>
                   </button>
 
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-popover-item"
                     onClick={() => { setPortalDropdownOpen(false); if (onOpenAgencyPage) onOpenAgencyPage(); }}
                   >
@@ -806,43 +806,43 @@ export default function DriverLandingPage({
 
           {/* Center: Clean Editorial Navigation Links */}
           <nav className="dmd-nav-center">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`dmd-nav-link ${activeView === 'landing' ? 'active' : ''}`}
               onClick={() => { setActiveView('landing'); if (mainBodyRef.current) mainBodyRef.current.scrollTo({ top: 0, behavior: 'smooth' }); }}
             >
               Overview
             </button>
-            <a 
-              href="#vehicles" 
+            <a
+              href="#vehicles"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('vehicles'); }}
             >
               Fleet &amp; Vehicles
             </a>
-            <a 
-              href="#benefits" 
+            <a
+              href="#benefits"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('benefits'); }}
             >
               Benefits
             </a>
-            <a 
-              href="#territories" 
+            <a
+              href="#territories"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('territories'); }}
             >
               Territories
             </a>
-            <a 
-              href="#faq" 
+            <a
+              href="#faq"
               className="dmd-nav-link"
               onClick={(e) => { e.preventDefault(); scrollToSection('faq'); }}
             >
               FAQ
             </a>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className={`dmd-nav-link-pill ${activeView === 'wizard' ? 'active' : ''}`}
               onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
             >
@@ -853,9 +853,9 @@ export default function DriverLandingPage({
 
           {/* Right: Actions */}
           <div className="dmd-nav-right">
-            <button 
-              type="button" 
-              className="dmd-nav-btn-icon" 
+            <button
+              type="button"
+              className="dmd-nav-btn-icon"
               onClick={handleShareCurrentPage}
               title="Share Driver Registration link"
               aria-label="Share Registration link"
@@ -864,9 +864,9 @@ export default function DriverLandingPage({
               {copiedPageShare ? <Check size={15} /> : <Share2 size={15} />}
               <span className="dmd-btn-text-desktop">{copiedPageShare ? 'Copied!' : 'Share'}</span>
             </button>
-            <button 
-              type="button" 
-              className="dmd-nav-btn-icon" 
+            <button
+              type="button"
+              className="dmd-nav-btn-icon"
               onClick={onClose}
               title="Go to Devotee / User Landing Page"
               aria-label="Pilgrim User App"
@@ -874,15 +874,15 @@ export default function DriverLandingPage({
               <Compass size={15} />
               <span className="dmd-btn-text-desktop">User App</span>
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-signin"
               onClick={() => setShowLoginModal(true)}
             >
               Sign In
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-primary dmd-btn-register-cta"
               onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
             >
@@ -895,12 +895,12 @@ export default function DriverLandingPage({
 
       {/* MAIN BODY */}
       <main className="dmd-main-body" ref={mainBodyRef} onScroll={handleBodyScroll}>
-        
+
         {/* VIEW 1: FULL-WIDTH RESPONSIVE STEPPED WIZARD */}
         {activeView === 'wizard' ? (
           <section className="dmd-wizard-section">
             <div className="dmd-wizard-container">
-              
+
               {/* Stepper Progress Header */}
               <div className="dmd-stepper-header">
                 <div className="dmd-stepper-steps">
@@ -923,11 +923,11 @@ export default function DriverLandingPage({
 
               {/* Wizard Multi-Column Layout (Left Summary / Right Step Form) */}
               <div className="dmd-wizard-grid">
-                
+
                 {/* Left Dynamic WOW Summary Card */}
                 <div className="dmd-wizard-summary-col">
                   <div className="dmd-summary-card dmd-wow-card">
-                    
+
                     {/* Live Driver ID Hologram */}
                     <div className="dmd-id-card-live">
                       <div className="dmd-id-card-top">
@@ -977,7 +977,7 @@ export default function DriverLandingPage({
 
                 {/* Right Interactive Form Column */}
                 <div className="dmd-wizard-form-col">
-                  
+
                   {/* STEP 1: PERSONAL / AUTH PROFILE */}
                   {currentStep === 1 && (
                     <div className="dmd-step-card dmd-fade-in">
@@ -1020,10 +1020,10 @@ export default function DriverLandingPage({
                           <label className="dmd-label">Full Name</label>
                           <div className="dmd-input-wrap">
                             <User size={18} className="dmd-input-icon" />
-                            <input 
-                              type="text" 
-                              required 
-                              placeholder="e.g. Radheshyam Sharma" 
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Radheshyam Sharma"
                               className="dmd-input dmd-input-large"
                               value={regForm.name}
                               onChange={e => setRegForm({ ...regForm, name: e.target.value })}
@@ -1035,10 +1035,10 @@ export default function DriverLandingPage({
                           <label className="dmd-label">Email Address</label>
                           <div className="dmd-input-wrap">
                             <Mail size={18} className="dmd-input-icon" />
-                            <input 
-                              type="email" 
-                              required 
-                              placeholder="driver@gmail.com" 
+                            <input
+                              type="email"
+                              required
+                              placeholder="driver@gmail.com"
                               className="dmd-input dmd-input-large"
                               value={regForm.email}
                               onChange={e => setRegForm({ ...regForm, email: e.target.value })}
@@ -1051,16 +1051,16 @@ export default function DriverLandingPage({
                             <label className="dmd-label">Password</label>
                             <div className="dmd-input-wrap">
                               <Lock size={18} className="dmd-input-icon" />
-                              <input 
-                                type={showPassword ? 'text' : 'password'} 
-                                required 
-                                placeholder="Min. 6 characters" 
+                              <input
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                placeholder="Min. 6 characters"
                                 className="dmd-input dmd-input-large"
                                 value={regForm.password}
                                 onChange={e => setRegForm({ ...regForm, password: e.target.value })}
                               />
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="dmd-eye-toggle-btn"
                                 onClick={() => setShowPassword(!showPassword)}
                               >
@@ -1074,10 +1074,10 @@ export default function DriverLandingPage({
                           <label className="dmd-label">Mobile / WhatsApp</label>
                           <div className="dmd-input-wrap dmd-phone-input-wrap">
                             <span className="dmd-phone-prefix">+91</span>
-                            <input 
-                              type="tel" 
-                              required 
-                              placeholder="98765 43210" 
+                            <input
+                              type="tel"
+                              required
+                              placeholder="98765 43210"
                               className="dmd-input dmd-input-large dmd-input-phone"
                               value={regForm.phone}
                               maxLength={12}
@@ -1088,8 +1088,8 @@ export default function DriverLandingPage({
                         </div>
 
                         <div className="dmd-form-actions">
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large dmd-btn-full"
                             disabled={isSubmitting}
                           >
@@ -1111,13 +1111,13 @@ export default function DriverLandingPage({
                       </div>
 
                       <form onSubmit={handleStep2Next} className="dmd-step-form">
-                        
+
                         <div className="dmd-form-group">
                           <label className="dmd-label">Vehicle Type</label>
                           <div className="dmd-vehicle-card-selector">
                             {VEHICLE_TYPES.map(v => (
-                              <div 
-                                key={v.id} 
+                              <div
+                                key={v.id}
                                 className={`dmd-vehicle-option-card ${regForm.vehicleType === v.id ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, vehicleType: v.id })}
                               >
@@ -1142,9 +1142,9 @@ export default function DriverLandingPage({
                               <div className="dmd-hsrp-chakra" />
                               <span>IND</span>
                             </div>
-                            <input 
-                              type="text" 
-                              placeholder="UP 85 AB 1234" 
+                            <input
+                              type="text"
+                              placeholder="UP 85 AB 1234"
                               className="dmd-input dmd-input-hsrp"
                               value={regForm.vehicleNo}
                               onChange={e => setRegForm({ ...regForm, vehicleNo: e.target.value.toUpperCase() })}
@@ -1157,9 +1157,9 @@ export default function DriverLandingPage({
                           <label className="dmd-label">Braj Experience</label>
                           <div className="dmd-chip-group">
                             {EXPERIENCE_OPTIONS.map(exp => (
-                              <button 
-                                type="button" 
-                                key={exp} 
+                              <button
+                                type="button"
+                                key={exp}
                                 className={`dmd-select-chip ${regForm.experience === exp ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, experience: exp })}
                               >
@@ -1170,16 +1170,16 @@ export default function DriverLandingPage({
                         </div>
 
                         <div className="dmd-form-actions dmd-btn-row">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="dmd-btn-secondary dmd-btn-large"
                             onClick={() => setCurrentStep(1)}
                           >
                             <ArrowLeft size={18} />
                             <span>Back</span>
                           </button>
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large"
                           >
                             <span>Continue</span>
@@ -1208,12 +1208,12 @@ export default function DriverLandingPage({
                       )}
 
                       <form onSubmit={handleFinalSubmit} className="dmd-step-form">
-                        
+
                         <div className="dmd-form-group">
                           <label className="dmd-label">Select Territory</label>
                           <div className="dmd-zone-card-list">
                             {OPERATING_ZONES.map(z => (
-                              <div 
+                              <div
                                 key={z.id}
                                 className={`dmd-zone-item-card ${regForm.zone === z.name ? 'active' : ''}`}
                                 onClick={() => setRegForm({ ...regForm, zone: z.name })}
@@ -1248,16 +1248,16 @@ export default function DriverLandingPage({
                         </div>
 
                         <div className="dmd-form-actions dmd-btn-row">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="dmd-btn-secondary dmd-btn-large"
                             onClick={() => setCurrentStep(2)}
                           >
                             <ArrowLeft size={18} />
                             <span>Back</span>
                           </button>
-                          <button 
-                            type="submit" 
+                          <button
+                            type="submit"
                             className="dmd-btn-primary dmd-btn-large dmd-btn-submit"
                             disabled={isSubmitting}
                           >
@@ -1289,7 +1289,7 @@ export default function DriverLandingPage({
             <section className="dmd-hero-section">
               <div className="dmd-container">
                 <div className="dmd-hero-grid">
-                  
+
                   {/* Left Hero Content */}
                   <div className="dmd-hero-content">
                     <span className="dmd-eyebrow">
@@ -1321,16 +1321,16 @@ export default function DriverLandingPage({
                     </div>
 
                     <div className="dmd-hero-actions">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-primary dmd-btn-large"
                         onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                       >
                         <span>Pre-Register Free</span>
                         <ArrowRight size={18} />
                       </button>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-secondary dmd-btn-large"
                         onClick={() => setShowLoginModal(true)}
                       >
@@ -1355,7 +1355,7 @@ export default function DriverLandingPage({
 
                       {/* Fogged / Blurred Route Ticket with Tape */}
                       <div className="dmd-ticket-wrap-fog">
-                        
+
                         <div className="dmd-dispatch-ticket dmd-fogged-ticket">
                           {/* Origin */}
                           <div className="dmd-route-stop">
@@ -1364,7 +1364,7 @@ export default function DriverLandingPage({
                             </div>
                             <div className="dmd-stop-details">
                               <div className="dmd-stop-name">Shri Radha Rani Mandir</div>
-                              <div className="dmd-stop-sub">Gate 1 VIP Entry • Devotee Pickup</div>
+                              <div className="dmd-stop-sub">Gate 1 Entry • Devotee Pickup</div>
                             </div>
                           </div>
 
@@ -1409,8 +1409,8 @@ export default function DriverLandingPage({
 
                       </div>
 
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-primary dmd-btn-full dmd-btn-large dmd-btn-bouncing-cta dmd-btn-exciting-row"
                         onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                       >
@@ -1423,7 +1423,7 @@ export default function DriverLandingPage({
                           <ArrowRight size={18} />
                         </div>
                       </button>
-                      
+
                       <div className="dmd-zero-cost-note">
                         <CheckCircle2 size={14} />
                         <span>₹0 Fee • No Payment Needed</span>
@@ -1446,8 +1446,8 @@ export default function DriverLandingPage({
 
                 <div className="dmd-fleet-grid">
                   {VEHICLE_TYPES.map(v => (
-                    <div 
-                      key={v.id} 
+                    <div
+                      key={v.id}
                       className="dmd-fleet-card dmd-fleet-spring"
                       onClick={() => {
                         setRegForm(prev => ({ ...prev, vehicleType: v.id }));
@@ -1528,8 +1528,8 @@ export default function DriverLandingPage({
 
                 <div className="dmd-territories-grid">
                   {OPERATING_ZONES.map(z => (
-                    <div 
-                      key={z.id} 
+                    <div
+                      key={z.id}
                       className="dmd-territory-card"
                       onClick={() => {
                         setRegForm(prev => ({ ...prev, zone: z.name }));
@@ -1580,8 +1580,8 @@ export default function DriverLandingPage({
                       a: "Yes. Local E-Rickshaws, Autos, and commercial cabs operating respectfully in Braj Dham are eligible for registration."
                     }
                   ].map((faq, idx) => (
-                    <div 
-                      key={idx} 
+                    <div
+                      key={idx}
                       className={`dmd-faq-item ${openFaqIndex === idx ? 'open' : ''}`}
                       onClick={() => setOpenFaqIndex(openFaqIndex === idx ? -1 : idx)}
                     >
@@ -1611,16 +1611,16 @@ export default function DriverLandingPage({
                   <p className="dmd-footer-copy">© 2026 Vrinda Vihar &amp; Sacred Braj Dham Seva · 100% Commission-Free Seva.</p>
                 </div>
                 <div className="dmd-footer-right">
-                  <button 
-                    type="button" 
-                    className="dmd-btn-user-link" 
+                  <button
+                    type="button"
+                    className="dmd-btn-user-link"
                     onClick={onClose}
                   >
                     <Compass size={14} />
                     <span>Return to User App</span>
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-btn-primary"
                     onClick={() => { setActiveView('wizard'); setCurrentStep(1); }}
                   >
@@ -1651,8 +1651,8 @@ export default function DriverLandingPage({
               <div className="dmd-id-phone">+91 {regForm.phone}</div>
               <div className="dmd-id-role">{regForm.vehicleType} • {regForm.zone}</div>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-btn-primary dmd-btn-large dmd-btn-full"
               onClick={() => {
                 setRegSuccess(false);
@@ -1671,8 +1671,8 @@ export default function DriverLandingPage({
       {showLoginModal && (
         <div className="dmd-modal-backdrop">
           <div className="dmd-modal-dialog">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-modal-close-btn"
               onClick={() => setShowLoginModal(false)}
             >
@@ -1693,15 +1693,15 @@ export default function DriverLandingPage({
             )}
 
             <div className="dmd-login-mode-tabs">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`dmd-login-tab-btn ${loginMode === 'phone' ? 'active' : ''}`}
                 onClick={() => setLoginMode('phone')}
               >
                 Mobile / OTP
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className={`dmd-login-tab-btn ${loginMode === 'email' ? 'active' : ''}`}
                 onClick={() => setLoginMode('email')}
               >
@@ -1715,10 +1715,10 @@ export default function DriverLandingPage({
                   <label className="dmd-label">Registered 10-Digit Mobile Number</label>
                   <div className="dmd-input-wrap dmd-phone-input-wrap">
                     <span className="dmd-phone-prefix">+91</span>
-                    <input 
-                      type="tel" 
-                      required 
-                      placeholder="98765 43210" 
+                    <input
+                      type="tel"
+                      required
+                      placeholder="98765 43210"
                       className="dmd-input dmd-input-large dmd-input-phone"
                       value={loginPhone}
                       maxLength={12}
@@ -1732,10 +1732,10 @@ export default function DriverLandingPage({
                     <label className="dmd-label">Registered Email</label>
                     <div className="dmd-input-wrap">
                       <Mail size={18} className="dmd-input-icon" />
-                      <input 
-                        type="email" 
-                        required 
-                        placeholder="driver@example.com" 
+                      <input
+                        type="email"
+                        required
+                        placeholder="driver@example.com"
                         className="dmd-input dmd-input-large"
                         value={loginEmail}
                         onChange={e => setLoginEmail(e.target.value)}
@@ -1746,16 +1746,16 @@ export default function DriverLandingPage({
                     <label className="dmd-label">Password</label>
                     <div className="dmd-input-wrap">
                       <Lock size={18} className="dmd-input-icon" />
-                      <input 
-                        type={showPassword ? 'text' : 'password'} 
-                        required 
-                        placeholder="Enter password" 
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Enter password"
                         className="dmd-input dmd-input-large"
                         value={loginPassword}
                         onChange={e => setLoginPassword(e.target.value)}
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-eye-toggle-btn"
                         onClick={() => setShowPassword(!showPassword)}
                       >
@@ -1766,8 +1766,8 @@ export default function DriverLandingPage({
                 </>
               )}
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="dmd-btn-primary dmd-btn-large dmd-btn-full"
                 disabled={isLoggingIn}
               >
@@ -1777,8 +1777,8 @@ export default function DriverLandingPage({
 
             <div className="dmd-modal-footer-note">
               <span>New to Vrinda Drivers? </span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="dmd-link-btn"
                 onClick={() => {
                   setShowLoginModal(false);

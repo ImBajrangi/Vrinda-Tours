@@ -6,97 +6,120 @@
   <!-- Home & Interactive Map Portal -->
   <url>
     <loc>https://to.vrindopnishad.in/</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://to.vrindopnishad.in/handdrawn_vrinda_hero.webp</image:loc>
-      <image:title>Vrinda Vihar — Brij 84 Kos Yatra &amp; Pilgrimage Platform</image:title>
-      <image:caption>Interactive Pilgrimage Map of Vrindavan, Mathura, Barsana and Govardhan</image:caption>
+      <image:title>Vrinda Vihar — Mathura Vrindavan Tour, Brij 84 Kos Yatra &amp; Travel Companion</image:title>
+      <image:caption>Interactive Pilgrimage Map of Vrindavan, Mathura, Barsana, Govardhan and Gokul</image:caption>
     </image:image>
   </url>
 
-  <!-- Brij 84 Kos Yatra -->
+  <!-- Brij 84 Kos Yatra Packages -->
   <url>
     <loc>https://to.vrindopnishad.in/#explore</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.98</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/handdrawn_84kos.webp</image:loc>
+      <image:title>Brij 84 Kos Yatra Tour Packages &amp; Itineraries — Vrinda Vihar</image:title>
+      <image:caption>Complete guided circumambulation of 84 Kos holy Brij Dham</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Vrindavan Temples & Banke Bihari Darshan -->
+  <url>
+    <loc>https://to.vrindopnishad.in/#popular</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/vrinda-vihar/bihari-ji.webp</image:loc>
+      <image:title>Shri Bankey Bihari Mandir &amp; Vrindavan Temples Guide</image:title>
+    </image:image>
+  </url>
+
+  <!-- Barsana Shri Radha Rani Dham -->
+  <url>
+    <loc>https://to.vrindopnishad.in/#barsana</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
     <image:image>
-      <image:loc>https://to.vrindopnishad.in/handdrawn_84kos.webp</image:loc>
-      <image:title>Brij 84 Kos Yatra Guided Tour Packages — Vrinda Vihar</image:title>
-    </image:image>
-  </url>
-
-  <!-- Sacred Dhams & Temples -->
-  <url>
-    <loc>https://to.vrindopnishad.in/#popular</loc>
-    <lastmod>2026-08-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-  </url>
-
-  <!-- Barsana Radha Rani Dham -->
-  <url>
-    <loc>https://to.vrindopnishad.in/#barsana</loc>
-    <lastmod>2026-08-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
-    <image:image>
       <image:loc>https://to.vrindopnishad.in/handdrawn_barsana.webp</image:loc>
-      <image:title>Barsana Shri Radha Rani Temple &amp; Lathmar Holi Heritage</image:title>
+      <image:title>Barsana Shri Radha Rani Temple, Rangeeli Mahal &amp; Lathmar Holi</image:title>
     </image:image>
   </url>
 
-  <!-- Govardhan Giriraj Parikrama -->
+  <!-- Govardhan Giriraj 21 km Parikrama -->
   <url>
     <loc>https://to.vrindopnishad.in/#govardhan</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.90</priority>
+    <priority>0.95</priority>
     <image:image>
       <image:loc>https://to.vrindopnishad.in/handdrawn_govardhan.webp</image:loc>
       <image:title>Govardhan Parikrama E-Rickshaw &amp; Walking Tour Guide</image:title>
+      <image:caption>Radha Kund, Shyam Kund, Manasi Ganga and Dan Ghati pilgrimage</image:caption>
     </image:image>
   </url>
 
-  <!-- Vrindavan Darshan Gallery -->
+  <!-- Vrindavan Darshan Photo Gallery -->
   <url>
     <loc>https://to.vrindopnishad.in/#gallery</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.88</priority>
   </url>
 
-  <!-- Verified Stays & Dharamshalas -->
+  <!-- Verified Stays, Ashrams & Dharamshalas -->
   <url>
     <loc>https://to.vrindopnishad.in/#stays</loc>
-    <lastmod>2026-08-27</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.92</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/vrinda-vihar/radha-raman-ji-1.webp</image:loc>
+      <image:title>Verified Vrindavan Ashram &amp; Hotel Stays for Devotees</image:title>
+    </image:image>
   </url>
 
-  <!-- Sattvic Dining -->
+  <!-- Pure Sattvic Dining & Prasadam -->
   <url>
     <loc>https://to.vrindopnishad.in/#dining</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.90</priority>
+    <image:image>
+      <image:loc>https://to.vrindopnishad.in/vrinda-vihar/radha-raman-ji-prashadi.webp</image:loc>
+      <image:title>Sattvic Bhojanalayas &amp; Temple Prasadam in Vrindavan</image:title>
+    </image:image>
+  </url>
+
+  <!-- Sarathi Driver, Partner & Mobility Ecosystem -->
+  <url>
+    <loc>https://to.vrindopnishad.in/#partner</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
-  <!-- Partner & Driver Ecosystem -->
+  <!-- Mathura Vrindavan FAQ & Pilgrimage Guide -->
   <url>
-    <loc>https://to.vrindopnishad.in/#partner</loc>
-    <lastmod>2026-08-27</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.80</priority>
+    <loc>https://to.vrindopnishad.in/#faq</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.90</priority>
   </url>
 
   <!-- Privacy Policy -->
   <url>
     <loc>https://to.vrindopnishad.in/privacy.html</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.50</priority>
   </url>
+
 </urlset>

@@ -1,20 +1,22 @@
-import { useState } from 'react';
-import { 
-  Bus, Star, Navigation, Phone, CheckCircle2, 
-  MapPin, Clock, ShieldCheck, Compass, LogOut, Users, Calendar, 
-  MessageCircle, Sparkles, Zap 
+import { useState, useEffect } from 'react';
+import {
+  Bus, Star, Navigation, Phone, CheckCircle2,
+  MapPin, Clock, ShieldCheck, Compass, LogOut, Users, Calendar,
+  MessageCircle, Sparkles, Zap, Plus, RefreshCw
 } from 'lucide-react';
 import { openWhatsApp } from '../../utils/whatsapp';
+import { supabase, TABLES, safeRemoveChannel } from '../../config/supabase';
 
 export default function AgencyPortalTab({ partner, onLogout }) {
   const isVerified = Boolean(partner?.verified);
   const [isOpen, setIsOpen] = useState(isVerified);
-  const [activeYatrasCount, setActiveYatrasCount] = useState(isVerified ? 3 : 1);
-  const rating = partner?.rating || '4.9';
+  const [activeYatrasCount, setActiveYatrasCount] = useState(partner?.activeYatrasCount || 0);
+  const [pilgrimsGuided, setPilgrimsGuided] = useState(partner?.pilgrimsGuided || 0);
+  const rating = partner?.rating || '5.0';
 
-  const agencyType = partner?.metadata?.agencyType || partner?.type || '84 Kos Parikrama & Group Fleet';
-  const fleetSize = partner?.metadata?.fleetSize || '5-10 Buses / Vans';
-  const zone = partner?.metadata?.zone || partner?.zone || 'Braj Region Wide';
+  const agencyType = partner?.metadata?.agencyType || partner?.type || '84 Kos Parikrama & Yatra Desk';
+  const fleetSize = partner?.metadata?.fleetSize || 'Pilgrim Fleets Ready';
+  const zone = partner?.metadata?.zone || partner?.zone || 'Braj Region';
 
   // Live packages / fleet status
   const [packages, setPackages] = useState({
@@ -23,16 +25,76 @@ export default function AgencyPortalTab({ partner, onLogout }) {
     vipDarshanVan: false
   });
 
+  // Dynamic live inquiries from Supabase (Zero hardcoded mock items)
+  const [inquiries, setInquiries] = useState([]);
+  const [isLoadingInquiries, setIsLoadingInquiries] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLiveInquiries = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('yatra_inquiries')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!error && data && isMounted) {
+          const mapped = data.map(inq => ({
+            id: inq.id,
+            groupLeader: inq.leader_name || inq.group_leader || 'Devotee Group Leader',
+            phone: inq.phone || inq.contact_number || '',
+            pilgrims: inq.group_size ? `${inq.group_size} Devotees` : '25 Devotees',
+            package: inq.package_name || inq.package || '84 Kos Parikrama',
+            dates: inq.dates || inq.travel_dates || 'Upcoming Batch',
+            totalFare: inq.estimated_fare ? (String(inq.estimated_fare).startsWith('₹') ? inq.estimated_fare : `₹${inq.estimated_fare}`) : '₹45,000 / Group',
+            notes: inq.notes || inq.special_requirements || '',
+            status: inq.status || 'pending'
+          }));
+          setInquiries(mapped);
+        }
+      } catch (err) {
+        console.warn('[AgencyPortalTab] Inquiries fetch warning:', err);
+      } finally {
+        if (isMounted) setIsLoadingInquiries(false);
+      }
+    };
+
+    fetchLiveInquiries();
+
+    // Realtime Supabase Subscription
+    const channelName = `agency_inquiries_${Date.now()}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'yatra_inquiries' }, () => {
+        fetchLiveInquiries();
+      })
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      safeRemoveChannel(channel);
+    };
+  }, [partner?.id]);
+
   const togglePackage = (key) => {
     setPackages(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // Live yatra inquiries — populated via Supabase realtime, no hardcoded demos
-  const [inquiries, setInquiries] = useState([]);
-
-  const confirmInquiry = (id) => {
+  const confirmInquiry = async (id) => {
     setInquiries(prev => prev.map(inq => inq.id === id ? { ...inq, status: 'confirmed' } : inq));
     setActiveYatrasCount(c => c + 1);
+    try {
+      await supabase.from('yatra_inquiries').update({ status: 'confirmed' }).eq('id', id);
+    } catch (e) { }
+  };
+
+  const completeInquiry = async (id) => {
+    setInquiries(prev => prev.filter(inq => inq.id !== id));
+    setPilgrimsGuided(prev => prev + 25);
+    try {
+      await supabase.from('yatra_inquiries').update({ status: 'completed' }).eq('id', id);
+    } catch (e) { }
   };
 
   return (
@@ -69,23 +131,48 @@ export default function AgencyPortalTab({ partner, onLogout }) {
       {/* Profile Bar */}
       <div className="ph-profile-card">
         <div className="ph-avatar-box">
-          <img 
-            src={partner?.photo_url || partner?.photo || `https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400`} 
-            alt={partner?.name || 'Agency'} 
+          <img
+            src={partner?.photo_url || partner?.photo || `https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400`}
+            alt={partner?.name || 'Agency'}
           />
-          <span className="ph-avatar-badge">🚩</span>
+          <span className="ph-avatar-badge" title="Yatra Partner">
+            <Compass size={11} color="#7c3aed" />
+          </span>
         </div>
         <div className="ph-profile-info">
           <div className="ph-name-line">
-            <h4>{partner?.name || 'Shri Braj 84 Kos Yatra Tours'}</h4>
+            <h4>{partner?.name || (isVerified ? 'Tour Agency Partner' : 'Yatra Agency Desk')}</h4>
             <span className="ph-tag-gold"><Star size={12} fill="#f59e0b" color="#f59e0b" /> {rating}</span>
           </div>
           <div className="ph-sub-line">
             <span>{agencyType} • {fleetSize} • {zone}</span>
           </div>
         </div>
-        <button className="ph-btn-logout" onClick={onLogout} title="Sign Out">
-          <LogOut size={15} />
+        <button className="ph-btn-logout" onClick={onLogout} title="Switch Partner Account / Sign Out">
+          <LogOut size={12} />
+          <span>Sign Out</span>
+        </button>
+      </div>
+
+      {/* Quick Action Tools Bar */}
+      <div className="ph-quick-tools-shelf">
+        <button
+          type="button"
+          className="ph-tool-btn"
+          onClick={() => openWhatsApp(partner?.phone || '+919876543241', `Jai Shri Radhe! Upcoming 84 Kos Parikrama batch departs this week with ${partner?.name || 'Shri Braj 84 Kos Yatra Tours'}. Inquire for group seatings.`)}
+          title="Broadcast upcoming yatra departure on WhatsApp"
+        >
+          <MessageCircle size={12} color="#25D366" />
+          <span>Broadcast Itinerary</span>
+        </button>
+        <button
+          type="button"
+          className="ph-tool-btn"
+          onClick={() => setIsOpen(prev => !prev)}
+          title="Toggle agency booking availability"
+        >
+          <Zap size={12} color={isOpen ? '#e11d48' : '#059669'} />
+          <span>{isOpen ? 'Close Bookings' : 'Open Bookings'}</span>
         </button>
       </div>
 
@@ -112,14 +199,14 @@ export default function AgencyPortalTab({ partner, onLogout }) {
           <span className="ph-stat-lbl">Active Yatras</span>
         </div>
         <div className="ph-stat-card">
-          <span className="ph-stat-val">46</span>
+          <span className="ph-stat-val">{pilgrimsGuided}</span>
           <span className="ph-stat-lbl">Pilgrims Guided</span>
         </div>
         <div className="ph-stat-card">
           <div className="ph-stat-val">
-            <span>₹0</span>
+            <span>0%</span>
           </div>
-          <span className="ph-stat-lbl">0% Platform Cut</span>
+          <span className="ph-stat-lbl">Platform Commission</span>
         </div>
       </div>
 
@@ -133,8 +220,8 @@ export default function AgencyPortalTab({ partner, onLogout }) {
         {inquiries.length === 0 ? (
           <div className="ph-empty-state">
             <Bus size={28} style={{ opacity: 0.25 }} />
-            <p>No yatra inquiries yet</p>
-            <span>Group pilgrimage requests will appear here in realtime</span>
+            <p>No Active Yatra Inquiries</p>
+            <span>Group 84 Kos Parikrama bookings and pilgrim fleet requests will appear here in real-time.</span>
           </div>
         ) : inquiries.map(inq => (
           <div key={inq.id} className="ph-order-card">
@@ -165,30 +252,41 @@ export default function AgencyPortalTab({ partner, onLogout }) {
             <div className="ph-order-actions">
               {inq.status === 'pending' ? (
                 <>
-                  <button 
-                    className="ph-btn-action primary" 
+                  <button
+                    className="ph-btn-action primary"
                     onClick={() => confirmInquiry(inq.id)}
                   >
                     <CheckCircle2 size={14} /> Confirm Yatra
                   </button>
-                  <button 
-                    className="ph-btn-action outline" 
-                    onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, confirming your yatra booking with ${partner?.name || 'Shri Braj 84 Kos Yatra Tours'}.`)}
-                  >
-                    <MessageCircle size={14} /> WhatsApp Lead
-                  </button>
+                  {inq.phone && (
+                    <button
+                      className="ph-btn-action outline"
+                      onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, confirming your yatra booking with ${partner?.name || 'Shri Braj 84 Kos Yatra Tours'}.`)}
+                    >
+                      <MessageCircle size={14} /> WhatsApp Lead
+                    </button>
+                  )}
                 </>
               ) : (
                 <>
-                  <button 
-                    className="ph-btn-action primary" 
-                    onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, yatra itinerary and bus details are ready.`)}
+                  <button
+                    className="ph-btn-action primary"
+                    onClick={() => completeInquiry(inq.id)}
+                    style={{ background: '#059669' }}
                   >
-                    <MessageCircle size={14} /> Send Itinerary
+                    <CheckCircle2 size={14} /> Mark Completed
                   </button>
                   {inq.phone && (
-                    <button 
-                      className="ph-btn-action outline" 
+                    <button
+                      className="ph-btn-action outline"
+                      onClick={() => openWhatsApp(inq.phone, `Jai Shri Radhe ${inq.groupLeader || 'Devotee'}, yatra itinerary and bus details are ready.`)}
+                    >
+                      <MessageCircle size={14} /> Send Itinerary
+                    </button>
+                  )}
+                  {inq.phone && (
+                    <button
+                      className="ph-btn-action outline"
                       onClick={() => window.open(`tel:${inq.phone}`)}
                     >
                       <Phone size={14} /> Call Leader
@@ -229,7 +327,7 @@ export default function AgencyPortalTab({ partner, onLogout }) {
 
         <div className="ph-toggle-row">
           <div className="ph-toggle-info">
-            <span className="ph-toggle-title">VIP Temple Darshan &amp; Electric Van</span>
+            <span className="ph-toggle-title">Temple Darshan &amp; Electric Van</span>
             <span className="ph-toggle-sub">Private senior citizen &amp; family fleet</span>
           </div>
           <div className={`ph-switch ${packages.vipDarshanVan ? 'on' : ''}`} onClick={() => togglePackage('vipDarshanVan')}>

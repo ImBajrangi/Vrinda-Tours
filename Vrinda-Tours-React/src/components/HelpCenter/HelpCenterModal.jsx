@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  X, Send, MessageSquare, Headphones, Sparkles, CheckCheck, 
+import {
+  X, Send, MessageSquare, Headphones, Sparkles, CheckCheck,
   Clock, ShieldCheck, ChevronRight, User, AlertCircle, RefreshCw,
   Phone, Mail, ArrowRight, CornerDownRight, ThumbsUp, CheckCircle2,
   Copy, Check, CreditCard, Calendar, Users, MapPin, Tag
 } from 'lucide-react';
-import { 
-  getOrCreateThreadId, 
-  sendSupportMessage, 
+import {
+  getOrCreateThreadId,
+  sendSupportMessage,
   getThreadMessages,
   subscribeToThread
 } from '../../services/messagingService';
 import './HelpCenterModal.css';
 
 const QUICK_PROMPTS = [
-  { icon: '👑', label: 'VIP Darshan Pass', category: 'vip', text: 'How can I get priority VIP darshan pass for Bankey Bihari & Prem Mandir?' },
+  { icon: '👑', label: 'Darshan Pass', category: 'vip', text: 'How can I get priority darshan pass for Bankey Bihari & Prem Mandir?' },
   { icon: '🛺', label: 'Govardhan Parikrama', category: 'parikrama', text: 'I need an electric E-Rickshaw guide for 21 km Govardhan Parikrama.' },
   { icon: '🏨', label: 'Ashram & Stays', category: 'hotel', text: 'I want assistance booking a verified Ashram or AC Guest House in Vrindavan.' },
   { icon: '🗺️', label: 'Custom Itinerary', category: 'custom', text: 'Can you create a custom 2-day Brij Yatra itinerary with cab & driver?' },
@@ -143,7 +143,7 @@ export default function HelpCenterModal({
   const [showDetailsForm, setShowDetailsForm] = useState(false);
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'faqs'
   const [copiedTxn, setCopiedTxn] = useState('');
-  
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -265,10 +265,10 @@ export default function HelpCenterModal({
 
   return (
     <div className="hc-modal-overlay" onClick={onClose}>
-      <div 
-        className="hc-modal-container" 
+      <div
+        className="hc-modal-container"
         onClick={(e) => e.stopPropagation()}
-        role="dialog" 
+        role="dialog"
         aria-modal="true"
         aria-label="Vrinda Vihar Help Centre"
       >
@@ -335,7 +335,7 @@ export default function HelpCenterModal({
         {/* Unified Luxury Sub-Bar Segmented Switcher */}
         <div className="hc-nav-bar">
           <div className="hc-segmented-pill">
-            <button 
+            <button
               type="button"
               className={`hc-seg-btn ${activeTab === 'chat' ? 'active' : ''}`}
               onClick={() => setActiveTab('chat')}
@@ -343,7 +343,7 @@ export default function HelpCenterModal({
               <MessageSquare size={13} />
               <span>Direct Messaging</span>
             </button>
-            <button 
+            <button
               type="button"
               className={`hc-seg-btn ${activeTab === 'faqs' ? 'active' : ''}`}
               onClick={() => setActiveTab('faqs')}
@@ -579,8 +579,8 @@ export default function HelpCenterModal({
                                 <span className="hc-cell-lbl">Transaction Reference</span>
                                 <div className="hc-txn-row">
                                   <span className="hc-txn-id">{parsedReceipt.txnId}</span>
-                                  <button 
-                                    type="button" 
+                                  <button
+                                    type="button"
                                     className="hc-btn-copy-mini"
                                     onClick={() => handleCopyTxn(parsedReceipt.txnId)}
                                     title="Copy Reference ID"
@@ -596,7 +596,7 @@ export default function HelpCenterModal({
                               </div>
                             )}
                           </div>
-                          
+
                           <div className="hc-receipt-footer">
                             <span className="hc-receipt-footer-note">
                               🔒 100% Guaranteed Booking • Priority Concierge Notified
@@ -658,8 +658,8 @@ export default function HelpCenterModal({
 
                 /* Case C: Standard Rich Chat Bubble */
                 return (
-                  <div 
-                    key={`bubble_${msg.id || index}_${index}`} 
+                  <div
+                    key={`bubble_${msg.id || index}_${index}`}
                     className={`hc-message-row ${isMe ? 'is-me' : 'is-support'}`}
                   >
                     {!isMe && (
@@ -670,8 +670,8 @@ export default function HelpCenterModal({
 
                     <div className="hc-bubble-wrap">
                       <div className="hc-msg-sender-name">
-                        {isMe 
-                          ? 'You' 
+                        {isMe
+                          ? 'You'
                           : (isAdmin ? 'Vrinda Vihar Desk' : 'Vrinda Concierge')}
                       </div>
 
@@ -694,8 +694,8 @@ export default function HelpCenterModal({
             </div>
 
             {/* Chat Input Compose Box */}
-            <form 
-              className="hc-compose-form" 
+            <form
+              className="hc-compose-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendMessage();
@@ -735,7 +735,7 @@ export default function HelpCenterModal({
           <div className="hc-faqs-container">
             <div className="hc-faq-card">
               <div className="hc-faq-top-row">
-                <div className="hc-faq-tag hc-tag-gold">👑 VIP Darshan & Passes</div>
+                <div className="hc-faq-tag hc-tag-gold">Darshan & Passes</div>
                 <h4>Bankey Bihari Temple</h4>
               </div>
               <div className="hc-faq-facts-grid">
@@ -752,15 +752,15 @@ export default function HelpCenterModal({
                   <span>Gate 2 Priority & Wheelchair Desk</span>
                 </div>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="hc-faq-ask-btn"
                 onClick={() => {
                   setActiveTab('chat');
-                  handleSendMessage('Please arrange wheelchair or VIP pass for Bankey Bihari Darshan', 'vip');
+                  handleSendMessage('Please arrange wheelchair or pass for Bankey Bihari Darshan', 'vip');
                 }}
               >
-                <span>Get VIP Pass Assistance</span>
+                <span>Get Pass Assistance</span>
                 <ArrowRight size={13} />
               </button>
             </div>
@@ -784,8 +784,8 @@ export default function HelpCenterModal({
                   <span>Verified Brajwasi Local Drivers</span>
                 </div>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="hc-faq-ask-btn"
                 onClick={() => {
                   setActiveTab('chat');
@@ -805,7 +805,7 @@ export default function HelpCenterModal({
               <div className="hc-faq-facts-grid">
                 <div className="hc-fact-pill">
                   <Calendar size={12} />
-                  <span>Gaudiya Ashrams • VIP AC Rooms</span>
+                  <span>Gaudiya Ashrams • AC Rooms</span>
                 </div>
                 <div className="hc-fact-pill hc-fact-highlight">
                   <CreditCard size={12} />
@@ -816,8 +816,8 @@ export default function HelpCenterModal({
                   <span>Clean Sattvic Living Guaranteed</span>
                 </div>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="hc-faq-ask-btn"
                 onClick={() => {
                   setActiveTab('chat');
@@ -844,8 +844,8 @@ export default function HelpCenterModal({
                   <span>1 & 2 Day Full Itineraries</span>
                 </div>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="hc-faq-ask-btn"
                 onClick={() => {
                   setActiveTab('chat');
