@@ -508,6 +508,9 @@ export default function App() {
         onAdminOpen={() => setAdminVisible(true)}
         onSearchFocusChange={setIsSearchActive}
         isNavigating={Boolean(activeRoute)}
+        partnerId={activePartnerId}
+        partnerRole={activePartnerRole}
+        isAdmin={Boolean(sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin')}
       />
 
       {activeRoute && !partnerLandingVisible && (

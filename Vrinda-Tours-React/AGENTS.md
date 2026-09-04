@@ -113,3 +113,5 @@ the more the text the less it looks good to use
    - Full keyboard navigation (`Enter`, `Space`, `Escape`) and outside-click auto-dismiss.
    - Flexible viewports (`max-width: calc(100vw - 24px)`) with auto-clamp positioning.
 
+Never use fallback role strings to deduce authentication state; always require a non-preview, persisted session ID to prevent merchant UI leakage to public visitors
+

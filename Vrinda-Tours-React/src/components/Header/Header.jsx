@@ -21,7 +21,10 @@ export default function Header({
   onFilterChange,
   onAdminOpen,
   onSearchFocusChange,
-  isNavigating = false
+  isNavigating = false,
+  partnerId = null,
+  partnerRole = null,
+  isAdmin = false
 }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -29,6 +32,62 @@ export default function Header({
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
   const { favorites, isFavorite, favoritesCount } = useFavorites();
+
+  // Check if current user is an authenticated partner or admin (hide partner button for normal pilgrims)
+  const isPartnerUser = useMemo(() => {
+    try {
+      if (isAdmin) return true;
+      const pid = partnerId || sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id') || localStorage.getItem('vt_partner_id') || localStorage.getItem('vt_driver_id');
+      const isRealPartnerId = Boolean(
+        pid && 
+        pid !== 'admin_preview_driver' && 
+        pid !== 'admin_preview_hotel' && 
+        pid !== 'admin_preview_restaurant' && 
+        pid !== 'admin_preview_agency' && 
+        pid !== 'driver_preview' && 
+        pid !== 'hotel_preview' && 
+        pid !== 'restaurant_preview' && 
+        pid !== 'agency_preview' && 
+        pid !== 'undefined' && 
+        pid !== 'null'
+      );
+      if (isRealPartnerId) return true;
+      
+      const adminSession = sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin';
+      if (adminSession) return true;
+      return false;
+    } catch {
+      return false;
+    }
+  }, [isAdmin, partnerId]);
+
+  // Determine partner desk title and label
+  const partnerButtonConfig = useMemo(() => {
+    try {
+      const effectiveRole = (isAdmin || sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true')
+        ? 'admin' 
+        : (partnerRole || sessionStorage.getItem('vt_partner_role') || localStorage.getItem('vt_user_role') || 'driver');
+      
+      switch (effectiveRole) {
+        case 'admin':
+          return { label: 'Admin', title: 'Super Admin Operations Console' };
+        case 'driver':
+          return { label: 'Sarathi', title: 'Sarathi Driver Workspace' };
+        case 'hotel':
+        case 'hotel_staff':
+          return { label: 'Stay Desk', title: 'Ashram & Hotel Stay Workspace' };
+        case 'restaurant':
+        case 'restaurant_staff':
+          return { label: 'Dining', title: 'Dining & Kitchen Workspace' };
+        case 'agency':
+          return { label: 'Yatra Desk', title: 'Tour Agency Workspace' };
+        default:
+          return { label: 'Partner', title: 'Partner Workspace' };
+      }
+    } catch {
+      return { label: 'Partner', title: 'Partner Workspace' };
+    }
+  }, [isAdmin, partnerRole]);
 
   useEffect(() => {
     if (onSearchFocusChange) {
@@ -243,16 +302,18 @@ export default function Header({
               <span className="btn-text">Rides</span>
             </button>
 
-            <button 
-              className="icon-btn header-action-btn" 
-              id="partner-btn" 
-              onClick={onOpenDriverPortal}
-              title="Brij Staff & Partner Hub (Drivers, Dining, Stays, Admin)"
-              aria-label="Partner Hub"
-            >
-              <BriefcaseIcon style={{ width: 15, height: 15 }} />
-              <span className="btn-text">Partner</span>
-            </button>
+            {isPartnerUser && (
+              <button 
+                className="icon-btn header-action-btn partner-active-chip" 
+                id="partner-btn" 
+                onClick={onOpenDriverPortal}
+                title={partnerButtonConfig.title}
+                aria-label="Partner Workspace"
+              >
+                <BriefcaseIcon style={{ width: 15, height: 15 }} />
+                <span className="btn-text">{partnerButtonConfig.label}</span>
+              </button>
+            )}
           </>
         )}
       </div>
