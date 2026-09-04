@@ -1463,38 +1463,38 @@ export const footerNavigation = {
   brandTagline: 'Vrinda Vihar by Vrindopnishad — Authentic Brij pilgrimage packages, temple darshans, verified Brajwasi drivers, and sacred spiritual yatras across Mathura, Vrindavan, Barsana & Govardhan.',
   columns: [
     {
-      title: 'Brij Pilgrimage',
+      title: 'Pilgrimage',
       links: [
-        { label: '84 Kos Yatra Guide', href: '/brij-84-kos-yatra.html', tab: 'yatra' },
-        { label: 'Popular Brij Yatras', href: '#popular' },
-        { label: 'Govardhan 21 km Parikrama', href: '#mission', tab: 'guidelines' },
-        { label: 'Sacred Brij Packages', href: '#explore' }
+        { label: '84 Kos', href: '/brij-84-kos-yatra.html', tab: 'yatra' },
+        { label: 'Yatras', href: '#popular' },
+        { label: 'Parikrama', href: '#mission', tab: 'guidelines' },
+        { label: 'Packages', href: '#explore' }
       ]
     },
     {
-      title: 'Sacred Mission',
+      title: 'Mission',
       links: [
-        { label: 'About Vrinda Vihar', href: '/about.html', tab: 'about' },
-        { label: 'Pilgrim Guidelines & Etiquette', href: '/guidelines.html', tab: 'guidelines' },
-        { label: 'Barsana & Nandgaon Darshan', href: '#initiatives' },
-        { label: 'Eco-Mobility & Drivers', href: '#partner' }
+        { label: 'About Us', href: '/about.html', tab: 'about' },
+        { label: 'Guidelines', href: '/guidelines.html', tab: 'guidelines' },
+        { label: 'Darshan', href: '#initiatives' },
+        { label: 'Drivers', href: '#partner' }
       ]
     },
     {
-      title: 'Devotee Support',
+      title: 'Support',
       links: [
-        { label: '24/7 Help Centre & Live Chat', href: '/help.html', tab: 'help' },
-        { label: 'Emergency & Police Directory', href: '/help.html', tab: 'help' },
-        { label: 'Contact Operations Desk', href: '/contact.html', tab: 'contact' },
-        { label: 'Admin Console', href: '#admin' }
+        { label: 'Help Center', href: '/help.html', tab: 'help' },
+        { label: 'Emergency', href: '/help.html', tab: 'help' },
+        { label: 'Contact', href: '/contact.html', tab: 'contact' },
+        { label: 'Admin', href: '#admin' }
       ]
     },
     {
-      title: 'Trust & Legal',
+      title: 'Legal',
       links: [
-        { label: 'Privacy Policy (DPDP 2023)', href: '/privacy.html', tab: 'privacy' },
-        { label: 'Devotee Terms & Fare Policy', href: '/terms.html', tab: 'terms' },
-        { label: '0% Middleman Guarantee', href: '/about.html', tab: 'about' }
+        { label: 'Privacy', href: '/privacy.html', tab: 'privacy' },
+        { label: 'Terms', href: '/terms.html', tab: 'terms' },
+        { label: 'Zero Middleman', href: '/about.html', tab: 'about' }
       ]
     }
   ],

@@ -2917,6 +2917,8 @@
   font-size: 0.88rem;
   text-decoration: none;
   transition: color 0.2s ease;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .tp-footer-links a:hover {

@@ -2276,6 +2276,8 @@ body[data-theme="light"] .sanctuary-master-footer {
   color: var(--color-text-secondary);
   text-decoration: none;
   transition: color var(--transition-fast);
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .sanctuary-footer-links a:hover {
