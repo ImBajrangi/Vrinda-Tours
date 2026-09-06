@@ -117,3 +117,11 @@ Never use fallback role strings to deduce authentication state; always require a
 
 - For all toast, notification bar, and modal transitions, always enforce two-phase exit animations with hardware-accelerated transforms (`transform`, `opacity`, `filter`) using Apple HIG cubic-bezier spring easing before unmounting from state.
 
+For in-progress search or requesting screens, never display provisional driver personal identities (faces, names, distance pills) before an actual ride confirmation. Use anonymous, minimalist radar pings or sonar sweeps to maintain visual clarity and avoid UI overlap
+
+Rule: Global Feedback Consistency: “All global feedback mechanisms (toasts, alerts, confirmation badges) must originate from a centralized provider using standardized capsule design tokens rather than ad-hoc local elements.”
+
+Rule: Gesture-First Micro-Interactions: “Ensure transient UI components (toasts, bottom sheets, snackbars) support native touch gestures such as swipe-to-dismiss and tap-outside cancellation.”
+
+For Apple-style dynamic capsules and interactive pills, keep hover states strictly static (no scale/offset shifts) while preserving tactile :active spring-press shrink and release expansion (scale(0.96) with cubic-bezier physics).
+

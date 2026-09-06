@@ -29,13 +29,13 @@ export const heroSteps = [
     tagline: 'SACRED BRIJ YATRA & DARSHAN',
     title: 'Experience\nThe Magic Of\nBrij Vibers!',
     bgImage: '/vrinda-vihar/radha-rani-temple-barsana.webp',
-    aspectRatio: '16/9',
+    aspectRatio: '2.2/1',
     ctaText: 'Book A Trip Now'
   },
   {
     step: 2,
     tagline: 'DIVINE PILGRIMAGE CIRCUITS',
-    title: 'Sacred \nDhams & Temple Trails!',
+    title: 'Sacred Dhams\n& Divine\nTemple Trails!',
     bgImage: '/vrinda-vihar/krishn-kund-govardhan-2.webp',
     aspectRatio: '2.2/1',
     ctaText: 'Explore Packages'
@@ -1494,6 +1494,7 @@ export const footerNavigation = {
       links: [
         { label: 'Privacy', href: '/privacy.html', tab: 'privacy' },
         { label: 'Terms', href: '/terms.html', tab: 'terms' },
+        { label: 'Cookie Settings', href: '#cookies', isCookieTrigger: true },
         { label: 'Zero Middleman', href: '/about.html', tab: 'about' }
       ]
     }

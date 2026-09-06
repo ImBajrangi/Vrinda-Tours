@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { createPortal } from 'react-dom';
 import AnimatedIcon from '../UI/AnimatedIcon';
 import MorphingIcon from '../UI/MorphingIcon';
+import { triggerCelebration } from '../UI/Confetti';
 import {
   Compass, Calendar, Clock, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
@@ -51,11 +52,15 @@ import { getPersistedLocalRide, subscribeToRideRequest } from '../../services/ri
 import { validatePhoneNumber } from '../../utils/phoneValidator';
 import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
-import { savePaymentRecord } from '../../services/stripeService';
+import PackageDetailPage from '../PackageDetail/PackageDetailPage';
+import { getPackageDeepDetails } from '../../data/packageDeepData';
+import CookieConsentBar from '../UI/CookieConsentBar';
+import PackageReservationModal from '../PackageBooking/PackageReservationModal';
+import TransactionRecallBanner from '../UI/TransactionRecallBanner';
 import './PartnerLandingPage.css';
 
 // Interactive Trip Packages Selector Modal
-function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
+function TripPackagesModal({ isOpen, onClose, onSelectPackage, onOpenDetail }) {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -157,7 +162,14 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
             </div>
           ) : (
             filteredPackages.map((pkg) => (
-              <div key={pkg.id} className="tp-tpkg-card" onClick={() => onSelectPackage(pkg)}>
+              <div
+                key={pkg.id}
+                className="tp-tpkg-card"
+                onClick={() => {
+                  if (onOpenDetail) onOpenDetail(pkg);
+                  else onSelectPackage(pkg);
+                }}
+              >
                 {/* Card Image Banner */}
                 <div className="tp-tpkg-card-cover">
                   <img src={pkg.image} alt={pkg.title} className="tp-tpkg-img" loading="lazy" />
@@ -224,18 +236,34 @@ function TripPackagesModal({ isOpen, onClose, onSelectPackage }) {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      className="tp-tpkg-select-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSelectPackage(pkg);
-                      }}
-                      aria-label={`Book ${pkg.title}`}
-                    >
-                      <span>Book Now</span>
-                      <ArrowRight size={13} />
-                    </button>
+                    <div className="tp-tpkg-card-btn-suite">
+                      {onOpenDetail && (
+                        <button
+                          type="button"
+                          className="tp-tpkg-detail-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenDetail(pkg);
+                          }}
+                          aria-label={`View full details for ${pkg.title}`}
+                        >
+                          <Eye size={13} />
+                          <span>Details</span>
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="tp-tpkg-select-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectPackage(pkg);
+                        }}
+                        aria-label={`Book ${pkg.title}`}
+                      >
+                        <span>Book Now</span>
+                        <ArrowRight size={13} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -726,7 +754,7 @@ function OmniSearchModal({
 
                   {/* Title & Description */}
                   <div className="tp-search-item-info">
-                    <div className="tp-search-item-top">
+                    <div className="tp-search-item-header">
                       <span className="tp-search-item-title">{item.title}</span>
                       <span className={`tp-search-type-badge tp-badge-${item.resultType}`}>
                         {item.resultType === 'package' && 'Package'}
@@ -735,9 +763,24 @@ function OmniSearchModal({
                         {item.resultType === 'darshan' && 'Darshan'}
                       </span>
                     </div>
-                    <p className="tp-search-item-sub">
-                      {item.subtitle || item.tagline || item.location || item.description || ''}
-                    </p>
+
+                    <div className="tp-search-item-meta">
+                      {item.duration && (
+                        <span className="tp-search-meta-chip">
+                          <Clock size={11} />
+                          <span>{item.duration}</span>
+                        </span>
+                      )}
+                      {item.rating && (
+                        <span className="tp-search-meta-chip tp-search-rating-chip">
+                          <Star size={10} fill="#f59e0b" color="#f59e0b" />
+                          <span>{item.rating}</span>
+                        </span>
+                      )}
+                      <p className="tp-search-item-sub">
+                        {item.subtitle || item.tagline || item.location || item.description || ''}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Price or Action Arrow */}
@@ -748,7 +791,9 @@ function OmniSearchModal({
                         <small>{priceData.unit}</small>
                       </span>
                     )}
-                    <ArrowRight size={14} className="tp-search-arrow" />
+                    <div className="tp-search-arrow-wrap">
+                      <ArrowRight size={13} className="tp-search-arrow" />
+                    </div>
                   </div>
                 </div>
               );
@@ -1226,6 +1271,9 @@ export default function PartnerLandingPage({
 
   const handleSwitchRole = async (newRoleKey) => {
     if (!ROLE_CONFIGS[newRoleKey]) return;
+    setIsProfileMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    setIsRoleModalOpen(false);
     try {
       localStorage.setItem('vt_user_role', newRoleKey);
     } catch { }
@@ -1361,7 +1409,8 @@ export default function PartnerLandingPage({
     isReferralModalOpen ||
     stripeModalItem ||
     lightboxItem ||
-    isMobileMenuOpen
+    isMobileMenuOpen ||
+    isProfileMenuOpen
   );
   const isCapsuleDocked = isAnyModalActive || isLiveRideCapsuleMinimized;
 
@@ -1731,6 +1780,7 @@ export default function PartnerLandingPage({
       syncPilgrimToSupabase(newUser, refCodeEntered).catch(console.error);
 
       setAuthSuccessMsg(refCodeEntered ? 'Registration complete! +500 Brij Reward Points added.' : 'Account created & signed in successfully!');
+      triggerCelebration({ mode: 'cannon', count: 56 });
       setTimeout(() => {
         setIsAuthModalOpen(false);
         setAuthSuccessMsg('');
@@ -2153,13 +2203,77 @@ export default function PartnerLandingPage({
     }, 2500);
   };
 
+  // Dedicated Dynamic Package Detail Page State
+  const [activePackageDetail, setActivePackageDetail] = useState(null);
+
+  // Sync activePackageDetail with URL query param (?package=<id>) & popstate
+  useEffect(() => {
+    const handleUrlPackageSync = () => {
+      if (typeof window === 'undefined') return;
+      const params = new URLSearchParams(window.location.search);
+      const pkgParam = params.get('package');
+      if (pkgParam) {
+        const found =
+          (tripPackages || []).find((p) => p.id === pkgParam) ||
+          (popularPlaces || []).find((p) => p.id === pkgParam) ||
+          pkgParam;
+        const resolved = getPackageDeepDetails(found);
+        if (resolved) {
+          setActivePackageDetail(resolved);
+        }
+      } else {
+        setActivePackageDetail(null);
+      }
+    };
+
+    handleUrlPackageSync();
+    window.addEventListener('popstate', handleUrlPackageSync);
+    return () => window.removeEventListener('popstate', handleUrlPackageSync);
+  }, []);
+
+  const handleOpenPackageDetail = useCallback((itemOrId) => {
+    const detailed = getPackageDeepDetails(itemOrId);
+    if (!detailed) return;
+    setActivePackageDetail(detailed);
+    setSelectedItem(null);
+    setIsTripPackagesModalOpen(false);
+
+    if (typeof window !== 'undefined' && window.history) {
+      const newUrl = `${window.location.pathname}?package=${encodeURIComponent(detailed.id)}`;
+      window.history.pushState({ packageId: detailed.id }, '', newUrl);
+    }
+  }, []);
+
+  const handleClosePackageDetail = useCallback(() => {
+    setActivePackageDetail(null);
+    if (typeof window !== 'undefined' && window.history) {
+      window.history.pushState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  const handleInitiateStripeFromDetail = useCallback((detailObj) => {
+    setStripeModalItem(detailObj);
+  }, []);
+
+  const handleInitiateInquiryFromDetail = useCallback((detailObj) => {
+    if (onOpenHelpCenter) {
+      onOpenHelpCenter();
+    }
+  }, [onOpenHelpCenter]);
+
   return (
     <div className="tp-page-wrapper">
       {/* 1. TOP NAVIGATION BAR */}
       <header className="tp-navbar">
         <div className="tp-nav-container">
           {/* Logo */}
-          <div className="tp-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div
+            className="tp-brand"
+            onClick={() => {
+              if (activePackageDetail) handleClosePackageDetail();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
             <div className="tp-logo-mark-modern">
               <div className="tp-logo-outer-ring">
                 <div className="tp-logo-inner-dot" />
@@ -2170,12 +2284,12 @@ export default function PartnerLandingPage({
 
           {/* Navigation Links */}
           <nav className="tp-nav-menu">
-            <a href="#about" className="tp-nav-item">About</a>
-            <a href="#popular" className="tp-nav-item">Tours</a>
-            <a href="#explore" className="tp-nav-item">Packages</a>
-            <a href="#gallery" className="tp-nav-item">Divine Darshan</a>
-            <a href="#initiatives" className="tp-nav-item">Journal</a>
-            <a href="#contact" className="tp-nav-item">Contact</a>
+            <a href="#about" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>About</a>
+            <a href="#popular" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>Tours</a>
+            <a href="#explore" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>Packages</a>
+            <a href="#gallery" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>Divine Darshan</a>
+            <a href="#initiatives" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>Journal</a>
+            <a href="#contact" className="tp-nav-item" onClick={() => activePackageDetail && handleClosePackageDetail()}>Contact</a>
           </nav>
 
           {/* Action CTAs */}
@@ -2236,7 +2350,6 @@ export default function PartnerLandingPage({
                             e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'User')}&background=0f172a&color=ffffff&bold=true`;
                           }}
                         />
-                        <span className="tp-profile-status-dot" title="Active & Verified" />
                       </div>
                       <div className="tp-profile-dropdown-user-info">
                         <div className="tp-profile-name-row">
@@ -2310,7 +2423,6 @@ export default function PartnerLandingPage({
                                 {renderRoleIcon(rk, 13)}
                               </span>
                               <span className="tp-role-pill-label">{cfg.navLabel || cfg.shortLabel}</span>
-                              {isCurrent && <span className="tp-role-pill-indicator" />}
                             </button>
                           );
                         })}
@@ -2916,7 +3028,6 @@ export default function PartnerLandingPage({
                               {renderRoleIcon(rk, 13)}
                             </span>
                             <span className="tp-role-pill-label">{cfg.navLabel || cfg.shortLabel}</span>
-                            {isCurrent && <span className="tp-role-pill-indicator" />}
                           </button>
                         );
                       })}
@@ -3331,8 +3442,26 @@ export default function PartnerLandingPage({
         document.body
       )}
 
-      {/* 2. MASTER AVIATION HERO SECTION (Exact Reference Design) */}
-      <section className="tp-hero-section" id="hero">
+      {/* 2. DYNAMIC SACRED PACKAGE DETAIL PAGE VIEW OR LANDING PAGE CONTENT */}
+      {activePackageDetail ? (
+        <PackageDetailPage
+          pkg={activePackageDetail}
+          onBack={handleClosePackageDetail}
+          onBookStripe={handleInitiateStripeFromDetail}
+          onBookInquiry={handleInitiateInquiryFromDetail}
+          onOpenReservationModal={(pkgItem) => setSelectedItem(pkgItem)}
+          onOpenHelpCenter={onOpenHelpCenter}
+          initialCheckInDate={checkInDate}
+          initialCheckOutDate={checkOutDate}
+          initialGuests={roomsGuests}
+          currentUser={currentUser}
+          isFavorite={safeFavoriteIds.includes(activePackageDetail.id)}
+          onToggleFavorite={toggleFavorite}
+        />
+      ) : (
+        <>
+          {/* 2. MASTER AVIATION HERO SECTION (Exact Reference Design) */}
+          <section className="tp-hero-section" id="hero">
         <div className="tp-hero-plane-card">
           {/* Background Soaring Airplane Visual (Preloaded Layered Images for Instant Transitions) */}
           <div className="tp-plane-bg-layer">
@@ -4153,6 +4282,8 @@ export default function PartnerLandingPage({
           </div>
         </div>
       </section>
+        </>
+      )}
 
       {/* 8. MASTER SUSTAINABLE FOOTER (Matching Reference Design) */}
       <footer className="tp-footer tp-master-sustainable-footer" id="contact">
@@ -4208,6 +4339,28 @@ export default function PartnerLandingPage({
                               onOpenInfoModal(link.tab);
                             } else {
                               window.location.href = link.href;
+                            }
+                          }}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            font: 'inherit',
+                            color: 'inherit',
+                            cursor: 'pointer',
+                            textAlign: 'left'
+                          }}
+                        >
+                          {link.label}
+                        </button>
+                      ) : link.isCookieTrigger ? (
+                        <button
+                          type="button"
+                          className="tp-footer-link-btn"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (typeof window !== 'undefined' && window.openCookieConsent) {
+                              window.openCookieConsent();
                             }
                           }}
                           style={{
@@ -4318,6 +4471,7 @@ export default function PartnerLandingPage({
         isOpen={isTripPackagesModalOpen}
         onClose={() => setIsTripPackagesModalOpen(false)}
         onSelectPackage={handleSelectTripPackage}
+        onOpenDetail={handleOpenPackageDetail}
       />
 
       {/* Interactive Role & Category Authority Configuration Modal */}
@@ -4328,216 +4482,21 @@ export default function PartnerLandingPage({
         onSelectRole={handleSwitchRole}
       />
 
-      {selectedItem && typeof document !== 'undefined' && createPortal(
-        <div className="tp-modal-overlay" onClick={() => setSelectedItem(null)}>
-          <div className="tp-modal-card tp-booking-modal-card" onClick={(e) => e.stopPropagation()}>
+      {/* Luxury 3-Stage Sacred Package Reservation Modal (Cart -> Checkout -> Success) */}
+      <PackageReservationModal
+        isOpen={Boolean(selectedItem)}
+        onClose={() => setSelectedItem(null)}
+        packageItem={selectedItem}
+        onOpenDetail={handleOpenPackageDetail}
+        onOpenHelpCenter={onOpenHelpCenter}
+        currentUser={currentUser}
+      />
 
-            {/* Top Hero Banner with Media & Close Button */}
-            <div className="tp-modal-hero-cover">
-              <img src={selectedItem.image} alt={selectedItem.title} className="tp-modal-hero-img" loading="eager" decoding="async" />
-              <div className="tp-modal-hero-scrim" />
-
-              {/* Minimal Clean Close Icon */}
-              <button className="tp-modal-close-icon" onClick={() => setSelectedItem(null)} aria-label="Close modal">
-                <X size={20} />
-              </button>
-
-              {/* Destination Title & Location Floating on Hero */}
-              <div className="tp-modal-hero-content">
-                <div className="tp-modal-hero-loc-row">
-                  <MapPin size={13} className="tp-modal-hero-loc-icon" />
-                  <span>{selectedItem.location || selectedItem.region || 'Curated Expedition'}</span>
-                  <span className="tp-modal-rating-badge">
-                    <Star size={11} fill="#fbbf24" color="#fbbf24" />
-                    <span>{selectedItem.rating || '4.9'}</span>
-                  </span>
-                </div>
-                <h3 className="tp-modal-hero-title">{selectedItem.title}</h3>
-              </div>
-            </div>
-
-            {/* Modal Body Container */}
-            <div className="tp-modal-body-wrapper">
-
-              {/* Trip Highlights Info Bar: Clean Modern Inline Meta Row (Matching Reference Image) */}
-              <div className="tp-modal-trip-meta-bar">
-                <div className="tp-meta-chip-item">
-                  <Tag size={14} className="tp-meta-chip-icon" />
-                  <span className="tp-meta-chip-text">
-                    from <strong>{selectedItem.price}</strong> <small>{selectedItem.priceUnit || '/day'}</small>
-                  </span>
-                </div>
-
-                <div className="tp-meta-chip-item">
-                  <Calendar size={14} className="tp-meta-chip-icon" />
-                  <span className="tp-meta-chip-text">
-                    <strong>{formatTripDates(checkInDate, checkOutDate)}</strong>
-                  </span>
-                </div>
-
-                <div className="tp-meta-chip-item">
-                  <Users size={14} className="tp-meta-chip-icon" />
-                  <span className="tp-meta-chip-text">
-                    <strong>{roomsGuests ? roomsGuests.replace('1 Room, ', '') : '2 Guests'}</strong>
-                  </span>
-                </div>
-              </div>
-
-              {/* Ultra-Light 1-Tap Google Login */}
-              {!currentUser && (
-                <div className="tp-modal-quick-auth">
-                  <button
-                    type="button"
-                    className={`tp-btn-google-one-tap ${isGoogleSigningIn ? 'is-loading' : ''}`}
-                    onClick={handleDirectGoogleLogin}
-                    disabled={isGoogleSigningIn}
-                    aria-label="Continue with Google"
-                  >
-                    <div className="tp-google-btn-inner">
-                      {isGoogleSigningIn ? (
-                        <div className="tp-google-mini-spinner" />
-                      ) : (
-                        <svg width="18" height="18" viewBox="0 0 24 24" className="tp-google-icon-svg">
-                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-                        </svg>
-                      )}
-                      <span className="tp-google-btn-label">
-                        {isGoogleSigningIn ? 'Connecting to Google...' : 'Continue with Google'}
-                      </span>
-                    </div>
-                    <span className="tp-google-pill-tag">1-Tap Autofill</span>
-                  </button>
-
-                  <div className="tp-modal-or-divider">
-                    <span>or quick reserve with mobile</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Form Content */}
-              {bookingSuccess ? (
-                <div className="tp-booking-success-box">
-                  <div className="tp-success-icon-wrap">
-                    <CheckCircle2 size={42} className="tp-success-icon" />
-                  </div>
-                  <h4>Reservation Inquiry Dispatched!</h4>
-                  <p>Connecting to your Vrinda Vihar Help Centre live concierge...</p>
-                </div>
-              ) : (
-                <form onSubmit={handleBookingSubmit} className="tp-auth-ios-form">
-                  {currentUser && (
-                    <div className="tp-modal-traveler-strip">
-                      <div className="tp-traveler-strip-left">
-                        <div className="tp-traveler-strip-avatar">
-                          {currentUser.avatar ? (
-                            <img src={currentUser.avatar} alt={currentUser.name} />
-                          ) : (
-                            <User size={15} />
-                          )}
-                        </div>
-                        <div className="tp-traveler-strip-text">
-                          <span className="tp-traveler-strip-name">{currentUser.name}</span>
-                          <span className="tp-traveler-strip-email">{currentUser.email}</span>
-                        </div>
-                      </div>
-                      <span className="tp-traveler-strip-badge">
-                        <CheckCircle2 size={12} />
-                        <span>Verified</span>
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Optional Name (Only shown if not logged in) */}
-                  {!currentUser?.name && (
-                    <div className="tp-auth-pill-input-wrap tp-compact-input">
-                      <User size={16} className="tp-auth-pill-icon" />
-                      <input
-                        type="text"
-                        className="tp-auth-pill-input"
-                        placeholder="Your Name"
-                        value={bookingName}
-                        onChange={(e) => handleBookingNameChange(e.target.value)}
-                      />
-                    </div>
-                  )}
-
-                  {/* Primary Mobile input */}
-                  <div className="tp-auth-pill-input-wrap tp-compact-input">
-                    <Phone size={16} className="tp-auth-pill-icon" />
-                    <input
-                      type="tel"
-                      className="tp-auth-pill-input"
-                      placeholder="Enter 10-digit Mobile / WhatsApp *"
-                      value={bookingPhone}
-                      onChange={(e) => handleBookingPhoneChange(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  {bookingError && (
-                    <div className="tp-modal-inline-err">
-                      <AlertCircle size={13} />
-                      <span>{bookingError}</span>
-                    </div>
-                  )}
-
-                  <div className="tp-modal-payment-cta-stack">
-                    <button
-                      type="button"
-                      className="tp-btn-auth-primary-stripe"
-                      onClick={() => {
-                        setStripeModalItem(selectedItem);
-                      }}
-                    >
-                      <CreditCard size={17} />
-                      <span>Pay Online via Stripe</span>
-                    </button>
-
-                    <div className="tp-modal-cta-row">
-                      <button type="submit" className="tp-btn-auth-secondary-wa">
-                        <Headphones size={15} />
-                        <span>Reserve via Help Centre</span>
-                        <ArrowRight size={14} className="tp-modal-btn-arrow" />
-                      </button>
-                      <button
-                        type="button"
-                        className={`tp-btn-modal-heart-circle ${safeFavoriteIds.includes(selectedItem?.id) ? 'is-favorited' : ''}`}
-                        onClick={() => toggleFavorite(selectedItem?.id, selectedItem?.title)}
-                        title={safeFavoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
-                        aria-label={safeFavoriteIds.includes(selectedItem?.id) ? "Remove from Favourites" : "Save to Favourites"}
-                      >
-                        <Heart
-                          size={18}
-                          fill={safeFavoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'none'}
-                          color={safeFavoriteIds.includes(selectedItem?.id) ? '#ef4444' : 'currentColor'}
-                          className={safeFavoriteIds.includes(selectedItem?.id) ? 'tp-heart-pop' : ''}
-                        />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Subtle Professional Trust Perks */}
-                  <div className="tp-modal-trust-perks">
-                    <span className="tp-trust-tag">
-                      <ShieldCheck size={13} />
-                      <span>Free Cancellation</span>
-                    </span>
-                    <span className="tp-trust-dot">•</span>
-                    <span className="tp-trust-tag">
-                      <Sparkles size={13} />
-                      <span>24/7 Concierge</span>
-                    </span>
-                  </div>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      {/* Transaction Recall Notification Banner with Live Countdown Timer */}
+      <TransactionRecallBanner
+        onResumeReservation={(pkg) => setSelectedItem(pkg)}
+        isModalOpen={Boolean(selectedItem) || Boolean(activePackageDetail)}
+      />
 
       {/* Stripe Payment Gateway Modal */}
       {stripeModalItem && (
@@ -5626,6 +5585,9 @@ export default function PartnerLandingPage({
           }}
         />
       )}
+
+      {/* Modern Floating Cookie Consent Bar */}
+      <CookieConsentBar />
     </div>
   );
 }

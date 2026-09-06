@@ -22,6 +22,7 @@ import { locations as initialData } from './data/locations';
 import AnnouncementBanner from './components/UI/AnnouncementBanner';
 import ErrorBoundary from './components/UI/ErrorBoundary';
 import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
+import Confetti from './components/UI/Confetti';
 import { updatePageSEO } from './utils/seoHelper';
 
 // Lazy-loaded secondary modals and partner portals on-demand
@@ -782,6 +783,8 @@ export default function App() {
           <Navigation size={18} fill="currentColor" />
         </button>
       </div>
+
+      <Confetti />
 
       {toast && (
         <Toast {...toast} onDismiss={() => setToast(null)} />

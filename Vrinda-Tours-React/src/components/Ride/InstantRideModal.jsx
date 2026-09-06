@@ -296,18 +296,6 @@ export default function InstantRideModal({
       .sort((a, b) => a._distance - b._distance);
   }, [drivers, pickupLocation.lat, pickupLocation.lng]);
 
-  // Real-time available drivers around user's location
-  const radarDrivers = useMemo(() => {
-    return (availableDrivers || []).slice(0, 4).map((d, index) => {
-      const angle = (index * 115 + 40) % 360;
-      const radiusPercent = Math.min(84, Math.max(55, Math.round((d._distance || 0.8) * 35 + 50)));
-      return {
-        ...d,
-        angle,
-        radiusPercent
-      };
-    });
-  }, [availableDrivers]);
 
   // Nearest driver distance for live ETA
   const nearestDriverDist = availableDrivers[0]?._distance || 1.2;
@@ -962,12 +950,20 @@ export default function InstantRideModal({
         )}
 
         {/* ------------------------------------------------------------- */}
-        {/* STAGE 2: CLEAN MINIMALIST RADAR SEARCHING                     */}
+        {/* STAGE 2: SUBTLE, CLASSY & RELATABLE RADAR (UBER EXECUTIVE)   */}
         {/* ------------------------------------------------------------- */}
         {stage === 'SEARCHING_RADAR' && (
           <div className="ubr-radar-stage-clean">
-            {/* 1. Hero Pulse Visual with Concentric Ripple Waves & Real Driver Avatars */}
+            {/* Top Luxury Indeterminate Progress Line */}
+            <div className="ubr-radar-top-progress">
+              <div className="ubr-radar-progress-bar" />
+            </div>
+
+            {/* 1. Subtle, Hypnotic Radar Centerpiece */}
             <div className="ubr-radar-visual-clean">
+              {/* Rotating Soft Radar Beam */}
+              <div className="ubr-radar-scanner-sweep" />
+
               {/* Concentric Expanding Ripple Waves */}
               <div className="ubr-radar-wave wave-1" />
               <div className="ubr-radar-wave wave-2" />
@@ -980,36 +976,9 @@ export default function InstantRideModal({
                 <div className="ubr-radar-ring ring-3" />
               </div>
 
-              {/* Real Nearby Driver Profile Avatars / Illustrations */}
-              {radarDrivers.map((driver) => {
-                const rad = (driver.angle * Math.PI) / 180;
-                const r = (54 * (driver.radiusPercent || 70)) / 100;
-                const x = 70 + r * Math.cos(rad) - 13; // 26px avatar pod / 2 = 13px
-                const y = 70 + r * Math.sin(rad) - 13;
-                const avatarSrc = driver.avatar || driver.photo || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(driver.name || 'Driver')}&backgroundColor=e0f2fe`;
-
-                return (
-                  <div
-                    key={driver.id || driver.name}
-                    className="ubr-radar-driver-pod"
-                    style={{ left: `${x}px`, top: `${y}px` }}
-                    title={`${driver.name} (${driver._distanceText || 'Nearby'})`}
-                  >
-                    <img
-                      src={avatarSrc}
-                      alt={driver.name}
-                      className="ubr-radar-driver-img"
-                      onError={(e) => {
-                        e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(driver.name || 'Driver')}&backgroundColor=e0f2fe`;
-                      }}
-                    />
-                    <span className="ubr-radar-driver-pulse" />
-                  </div>
-                );
-              })}
-
-              {/* Central Floating Vehicle Pod */}
+              {/* Central Hero Vehicle Pod (Crisp & Completely Unobstructed) */}
               <div className="ubr-radar-hero-pod">
+                <div className="ubr-radar-hero-glow" />
                 {(() => {
                   const IconComp = selectedTier.iconComponent;
                   return <IconComp />;
@@ -1019,26 +988,67 @@ export default function InstantRideModal({
 
             {/* 2. Focused Status Headline & Real-Time Dynamic Subtitle */}
             <div className="ubr-radar-clean-content">
-              <h3 className="ubr-radar-clean-title">Looking for nearby rides</h3>
+              <h3 className="ubr-radar-clean-title">Finding your ride...</h3>
               <p className="ubr-radar-clean-subtitle">{searchStepText}</p>
               
               <div className="ubr-radar-clean-timer">
-                <Clock size={13} />
-                <span>Matching in {searchTimer}s</span>
+                <Clock size={12} className="ubr-radar-timer-icon" />
+                <span>Matching in ~{searchTimer}s</span>
               </div>
             </div>
 
-            {/* 3. Clean 1-Line Minimalist Trip Summary */}
-            <div className="ubr-radar-clean-summary">
-              <span className="ubr-rcs-fare">₹{currentFare} Locked</span>
-              <span className="ubr-rcs-dot">•</span>
-              <span className="ubr-rcs-dist">{formatDistance(tripDistanceKm)}</span>
-              <span className="ubr-rcs-dot">•</span>
-              <span className="ubr-rcs-surge">Zero Surge</span>
+            {/* 3. Classy, Reassuring Trip Summary Card */}
+            <div className="ubr-radar-trip-card">
+              <div className="ubr-radar-route-preview">
+                <div className="ubr-radar-route-stop">
+                  <span className="ubr-radar-route-dot pickup" />
+                  <span className="ubr-radar-route-text" title={pickupLocation.name}>
+                    {pickupLocation.name || 'Current Location'}
+                  </span>
+                </div>
+                <div className="ubr-radar-route-connector">
+                  <span className="ubr-radar-route-arrow">→</span>
+                </div>
+                <div className="ubr-radar-route-stop">
+                  <span className="ubr-radar-route-dot dest" />
+                  <span className="ubr-radar-route-text" title={destLocation.name}>
+                    {destLocation.name || 'Destination'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="ubr-radar-specs-row">
+                <div className="ubr-radar-spec-item">
+                  <span className="ubr-radar-spec-label">Tier</span>
+                  <span className="ubr-radar-spec-val">{selectedTier.name}</span>
+                </div>
+                <div className="ubr-radar-spec-sep" />
+                <div className="ubr-radar-spec-item">
+                  <span className="ubr-radar-spec-label">Upfront Fare</span>
+                  <span className="ubr-radar-spec-val fare">₹{currentFare}</span>
+                </div>
+                <div className="ubr-radar-spec-sep" />
+                <div className="ubr-radar-spec-item">
+                  <span className="ubr-radar-spec-label">Trip</span>
+                  <span className="ubr-radar-spec-val">{formatDistance(tripDistanceKm)}</span>
+                </div>
+                <div className="ubr-radar-spec-sep" />
+                <div className="ubr-radar-spec-item">
+                  <span className="ubr-radar-surge-tag">
+                    <CheckCircle2 size={11} /> Locked
+                  </span>
+                </div>
+              </div>
             </div>
 
-            {/* 4. Cancel Action */}
-            <button className="ubr-radar-clean-cancel-btn" onClick={handleCancel}>
+            {/* 4. Minimalist Trust Badge */}
+            <div className="ubr-radar-trust-badge">
+              <ShieldCheck size={13} className="ubr-radar-trust-icon" />
+              <span>4-Digit Safety PIN • Verified Braj Sarathi</span>
+            </div>
+
+            {/* 5. Clean Cancel Action */}
+            <button className="ubr-radar-clean-cancel-btn" onClick={handleCancel} type="button">
               Cancel Request
             </button>
           </div>

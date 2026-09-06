@@ -1043,69 +1043,140 @@
    -------------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
-   STAGE 2: CLEAN MINIMALIST RADAR SEARCHING (UBER EXECUTIVE)
+   STAGE 2: SUBTLE, CLASSY & RELATABLE RADAR (UBER EXECUTIVE)
    -------------------------------------------------------------------------- */
 
 .ubr-radar-stage-clean {
-  padding: 32px 24px 28px;
+  padding: 16px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   justify-content: center;
-  gap: 16px;
-  max-width: 440px;
+  gap: 13px;
+  max-width: 400px;
   margin: 0 auto;
   box-sizing: border-box;
   width: 100%;
+  animation: ubrRadarFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* 1. Hero Pulse Visual */
+@keyframes ubrRadarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Top Luxury Indeterminate Progress Line */
+.ubr-radar-top-progress {
+  width: 100%;
+  height: 2.5px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 2px;
+}
+
+.ubr-radar-progress-bar {
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #10b981 50%, transparent);
+  border-radius: 999px;
+  animation: ubrRadarProgressSlide 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes ubrRadarProgressSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+/* 1. Subtle, Hypnotic Radar Centerpiece */
 .ubr-radar-visual-clean {
   position: relative;
-  width: 156px;
-  height: 156px;
+  width: 172px;
+  height: 172px;
   border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 0%, #f8fafc 100%);
-  border: 1.5px solid #e2e8f0;
+  background: radial-gradient(circle at center, #ffffff 0%, #f8fafc 65%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
-  margin: 4px 0 8px;
+  box-shadow: 
+    0 12px 30px -6px rgba(15, 23, 42, 0.07),
+    inset 0 0 20px rgba(16, 185, 129, 0.03);
+  margin: 2px 0;
+  overflow: visible;
 }
 
+/* Rotating Soft Radar Scanner Beam */
+.ubr-radar-scanner-sweep {
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(16, 185, 129, 0.16) 0deg,
+    rgba(16, 185, 129, 0.05) 35deg,
+    transparent 70deg,
+    transparent 360deg
+  );
+  pointer-events: none;
+  animation: ubrRadarSweepRotate 3.6s linear infinite;
+  z-index: 2;
+}
+
+@keyframes ubrRadarSweepRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Range Rings */
 .ubr-radar-grid-rings {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   pointer-events: none;
+  z-index: 1;
 }
 
 .ubr-radar-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px dashed rgba(148, 163, 184, 0.35);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .ubr-radar-ring.ring-1 {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
+  border: 1px dashed rgba(148, 163, 184, 0.28);
 }
 
 .ubr-radar-ring.ring-2 {
-  width: 106px;
-  height: 106px;
+  width: 118px;
+  height: 118px;
+  border: 1px dashed rgba(148, 163, 184, 0.32);
 }
 
 .ubr-radar-ring.ring-3 {
-  width: 144px;
-  height: 144px;
-  border-style: solid;
-  border-color: rgba(148, 163, 184, 0.2);
+  width: 160px;
+  height: 160px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 /* Expanding Ripple Waves */
@@ -1113,13 +1184,15 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 76px;
-  height: 76px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   border: 1.5px solid rgba(16, 185, 129, 0.35);
-  transform: translate(-50%, -50%) scale(0.6);
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0.5);
   pointer-events: none;
-  animation: ubrRadarRipple 3s cubic-bezier(0.1, 0.2, 0.7, 1) infinite;
+  animation: ubrRadarRipple 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  z-index: 1;
 }
 
 .ubr-radar-wave.wave-1 {
@@ -1136,89 +1209,56 @@
 
 @keyframes ubrRadarRipple {
   0% {
-    transform: translate(-50%, -50%) scale(0.6);
+    transform: translate(-50%, -50%) scale(0.5);
     opacity: 0.85;
   }
-
-  75% {
-    transform: translate(-50%, -50%) scale(2.1);
-    opacity: 0.2;
+  60% {
+    opacity: 0.3;
     border-color: rgba(16, 185, 129, 0.25);
   }
-
   100% {
-    transform: translate(-50%, -50%) scale(2.5);
+    transform: translate(-50%, -50%) scale(2.3);
     opacity: 0;
   }
 }
 
-/* Dynamic Real Driver Profile Pods on Radar */
-.ubr-radar-driver-pod {
-  position: absolute;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #78bfeb;
-  box-shadow: 0 3px 10px rgba(16, 148, 185, 0.35);
-  z-index: 5;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ubr-radar-driver-pod:hover {
-  transform: scale(1.25);
-  z-index: 10;
-  box-shadow: 0 4px 14px rgba(16, 145, 185, 0.5);
-}
-
-.ubr-radar-driver-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-}
-
-.ubr-radar-driver-pulse {
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 1.5px solid #1097b9;
-  animation: ubrDriverPodPulse 2s ease-out infinite;
-  pointer-events: none;
-}
-
-@keyframes ubrDriverPodPulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-
-  100% {
-    transform: scale(1.6);
-    opacity: 0;
-  }
-}
-
+/* Central Hero Vehicle Pod (Crisp & Clean) */
 .ubr-radar-hero-pod {
   position: relative;
   width: 62px;
   height: 62px;
   border-radius: 50%;
   background: #ffffff;
-  border: 0.5px solid #123043;
+  border: 1.5px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 4;
-  /* box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12); */
-  padding: 10px;
+  z-index: 5;
+  box-shadow: 
+    0 8px 22px -4px rgba(15, 23, 42, 0.1),
+    0 0 0 4px rgba(16, 185, 129, 0.06);
+  padding: 8px;
   box-sizing: border-box;
+}
+
+.ubr-radar-hero-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0) 70%);
+  pointer-events: none;
+  animation: ubrHeroGlowPulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes ubrHeroGlowPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0.85;
+  }
 }
 
 /* 2. Focused Status Headline & Subtitle */
@@ -1226,24 +1266,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 4px;
+  margin-top: 1px;
 }
 
 .ubr-radar-clean-title {
-  font-size: 1.32rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
   margin: 0;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 
 .ubr-radar-clean-subtitle {
-  font-size: 0.86rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: #64748b;
   margin: 0;
   min-height: 20px;
-  max-width: 340px;
+  max-width: 320px;
   line-height: 1.4;
 }
 
@@ -1255,75 +1296,176 @@
   font-weight: 700;
   color: #334155;
   background: #f1f5f9;
-  padding: 5px 14px;
+  padding: 4px 12px;
   border-radius: 999px;
-  margin-top: 4px;
+  margin-top: 3px;
   border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-/* 3. Clean 1-Line Minimalist Trip Summary */
-.ubr-radar-clean-summary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 10px 20px;
-  background: #f8fafc;
+.ubr-radar-timer-icon {
+  color: #64748b;
+}
+
+/* 3. Classy, Reassuring Trip Summary Card */
+.ubr-radar-trip-card {
+  width: 100%;
+  max-width: 370px;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #334155;
-  margin-top: 6px;
-  width: 100%;
-  max-width: 360px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
   box-sizing: border-box;
 }
 
-.ubr-rcs-fare {
+.ubr-radar-route-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+}
+
+.ubr-radar-route-stop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 44%;
+  min-width: 0;
+}
+
+.ubr-radar-route-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ubr-radar-route-dot.pickup {
+  background: #10b981;
+  box-shadow: 0 0 4px rgba(16, 185, 129, 0.6);
+}
+
+.ubr-radar-route-dot.dest {
+  background: #64748b;
+}
+
+.ubr-radar-route-text {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ubr-radar-route-connector {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ubr-radar-specs-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.ubr-radar-spec-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.ubr-radar-spec-label {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ubr-radar-spec-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.ubr-radar-spec-val.fare {
   color: #0f172a;
   font-weight: 800;
 }
 
-.ubr-rcs-dot {
-  color: #cbd5e1;
+.ubr-radar-spec-sep {
+  width: 1px;
+  height: 20px;
+  background: #f1f5f9;
 }
 
-.ubr-rcs-dist {
-  color: #64748b;
-  font-weight: 600;
-}
-
-.ubr-rcs-surge {
-  color: #16a34a;
+.ubr-radar-surge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
   font-weight: 800;
+  color: #15803d;
   background: #dcfce7;
-  padding: 2px 7px;
+  padding: 3px 7px;
   border-radius: 6px;
-  font-size: 0.72rem;
-  letter-spacing: 0.01em;
 }
 
-/* 4. Minimalist Cancel Button */
+/* 4. Minimalist Trust Badge */
+.ubr-radar-trust-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: -3px;
+}
+
+.ubr-radar-trust-icon {
+  color: #10b981;
+}
+
+/* 5. Minimalist Cancel Button */
 .ubr-radar-clean-cancel-btn {
   width: 100%;
-  max-width: 360px;
-  margin-top: 10px;
-  padding: 13px 20px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  font-size: 0.88rem;
+  max-width: 370px;
+  margin-top: 1px;
+  padding: 12px 20px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #64748b;
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
 }
 
 .ubr-radar-clean-cancel-btn:hover {
-  background: #fee2e2;
+  background: #fef2f2;
   border-color: #fecaca;
   color: #dc2626;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
+}
+
+.ubr-radar-clean-cancel-btn:active {
+  transform: scale(0.985);
 }
 
 /* --------------------------------------------------------------------------

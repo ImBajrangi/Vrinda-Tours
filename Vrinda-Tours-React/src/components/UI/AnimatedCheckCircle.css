@@ -1,0 +1,89 @@
+.vt-anim-check-circle {
+  position: relative;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
+}
+
+.vt-anim-check-circle svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.vt-anim-check-circle.is-unchecked {
+  opacity: 0.6;
+}
+
+.vt-anim-check-circle.is-checked {
+  opacity: 1;
+}
+
+.vt-anim-check-circle.is-disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Animated Radio Button */
+.vt-animated-radio-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition: all 0.15s ease;
+}
+
+.vt-animated-radio-label.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vt-animated-radio-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vt-animated-radio-label:hover .vt-anim-check-circle.is-unchecked {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* Animated Checkbox */
+.vt-animated-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition: all 0.15s ease;
+}
+
+.vt-animated-checkbox-label.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.vt-animated-checkbox-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vt-animated-checkbox-label:hover .vt-anim-check-circle.is-unchecked {
+  opacity: 0.9;
+  transform: scale(1.05);
+}

@@ -1,0 +1,843 @@
+/* ==========================================================================
+   Vrinda Vihar — Modern Floating Cookie Consent Bar & Privacy Preference Center
+   Animation: Apple Spring Physics • Dynamic Island Toast • Morphing Accordions
+   Performance: Hardware-accelerated, 120fps fluid on budget & flagship devices
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. The Floating Pill Shell (Apple Dynamic Island / Notification Toast In-Out)
+   -------------------------------------------------------------------------- */
+.vt-cookie-bar-container {
+  position: fixed !important;
+  bottom: 28px !important;
+  left: 50% !important;
+  top: auto !important;
+  right: auto !important;
+  transform: translate(-50%, 0) !important;
+  z-index: 99990 !important;
+  width: max-content;
+  max-width: calc(100vw - 36px);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  user-select: none;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Apple Dynamic Toast Spring Entrance (Notification Toast / Dynamic Island physics) */
+.vt-cookie-bar-container.is-revealed {
+  pointer-events: auto;
+  opacity: 1;
+  animation: vtAppleToastEnter 0.58s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+/* Apple Dismiss Slide-Down Exit */
+.vt-cookie-bar-container.is-hiding {
+  pointer-events: none;
+  animation: vtAppleToastExit 0.34s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+@keyframes vtAppleToastEnter {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 65px) scale(0.8);
+    filter: blur(8px);
+  }
+
+  45% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+
+  68% {
+    transform: translate(-50%, -8px) scale(1.035);
+  }
+
+  84% {
+    transform: translate(-50%, 2.5px) scale(0.992);
+  }
+
+  94% {
+    transform: translate(-50%, -0.8px) scale(1.003);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+@keyframes vtAppleToastExit {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+    filter: blur(0px);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -3px) scale(1.012);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 50px) scale(0.86);
+    filter: blur(6px);
+  }
+}
+
+.vt-cookie-bar-pill {
+  background: #ffffff;
+  border-radius: 9999px;
+  padding: 8px 10px 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  box-shadow:
+    0 0 0 6px rgba(0, 0, 0, 0.038),
+    0 14px 40px -4px rgba(0, 0, 0, 0.14),
+    0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-sizing: border-box;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Left: Cookie Icon Badge & Description */
+.vt-cookie-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.vt-cookie-icon-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0f172a;
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vt-cookie-bar-pill:hover .vt-cookie-icon-badge {
+  transform: rotate(-10deg) scale(1.05);
+}
+
+.vt-cookie-icon {
+  color: #0f172a;
+}
+
+.vt-cookie-text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #0f172a;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Right: Action Buttons Suite */
+.vt-cookie-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.vt-cookie-btn-pref {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.vt-cookie-btn-pref:hover,
+.vt-cookie-btn-pref.is-active {
+  background: #f1f5f9;
+  color: #0f172a;
+  transform: scale(1.08);
+}
+
+.vt-cookie-btn-pref:active {
+  transform: scale(0.92);
+}
+
+.vt-cookie-btn-reject {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 8px 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+
+.vt-cookie-btn-reject:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.vt-cookie-btn-reject:active {
+  transform: scale(0.95);
+}
+
+.vt-cookie-btn-accept {
+  background: #0f172a;
+  border: 1px solid #0f172a;
+  border-radius: 9999px;
+  padding: 8px 22px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+}
+
+.vt-cookie-btn-accept:hover {
+  background: #1e293b;
+}
+
+.vt-cookie-btn-accept:active {
+  transform: scale(0.95);
+}
+
+/* --------------------------------------------------------------------------
+   2. Full Privacy Preference Center Modal (Apple-style Spring Morphing)
+   -------------------------------------------------------------------------- */
+.vt-cookie-modal-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: vtBackdropFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.vt-cookie-modal-backdrop.is-closing {
+  animation: vtBackdropFadeOut 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes vtBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes vtBackdropFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.vt-cookie-pref-center-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  width: 520px;
+  max-width: 100%;
+  max-height: 85vh;
+  max-height: calc(100dvh - 48px);
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 25px 60px -12px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: auto;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  animation: vtAppleModalEnter 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.vt-cookie-pref-center-card.is-closing {
+  animation: vtAppleModalExit 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes vtAppleModalEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(36px);
+    filter: blur(6px);
+  }
+
+  65% {
+    opacity: 1;
+    transform: scale(1.018) translateY(-4px);
+    filter: blur(0);
+  }
+
+  85% {
+    transform: scale(0.995) translateY(1.5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes vtAppleModalExit {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.92) translateY(24px);
+    filter: blur(4px);
+  }
+}
+
+/* Modal Header */
+.vt-pref-center-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.vt-pref-close-btn {
+  background: transparent;
+  border: none;
+  color: #0f172a;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.vt-pref-close-btn:hover {
+  background: #f1f5f9;
+  transform: scale(1.1);
+}
+
+.vt-pref-close-btn:active {
+  transform: scale(0.9);
+}
+
+.vt-pref-center-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+.vt-pref-header-spacer {
+  width: 28px;
+}
+
+/* Modal Body (Scrollable Container with Apple Touch Physics & Min-Height 0) */
+.vt-pref-center-body {
+  padding: 22px 24px 28px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* CRITICAL: Enables flex child shrinking on iOS WebKit */
+}
+
+/* Custom Sleek Apple Scrollbars */
+.vt-pref-center-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.vt-pref-center-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.vt-pref-center-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.16);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+.vt-pref-center-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.32);
+}
+
+.vt-pref-intro-text {
+  margin: 0 0 18px 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+/* Top Full-Width Allow Button */
+.vt-pref-btn-allow-all {
+  width: 100%;
+  height: 44px;
+  border-radius: 9999px;
+  background: #000000;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 22px;
+  transition: background 0.18s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+
+.vt-pref-btn-allow-all:hover {
+  background: #1f2937;
+}
+
+.vt-pref-btn-allow-all:active {
+  transform: scale(0.97);
+}
+
+/* --------------------------------------------------------------------------
+   3. Accordion Categories List (Fluid Morphing & Apple Spring Bouncy Headers)
+   -------------------------------------------------------------------------- */
+.vt-pref-accordion-list {
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.vt-pref-acc-item {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: background-color;
+}
+
+.vt-pref-acc-item:last-child {
+  border-bottom: none;
+}
+
+.vt-pref-acc-item.is-open {
+  background: #fbfcfd;
+}
+
+/* Apple Bouncy Accordion Header (Tactile Touch Feedback & Morphing Feel) */
+.vt-pref-acc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 18px;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  transition:
+    background-color 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.vt-pref-acc-header:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.vt-pref-acc-header:active {
+  transform: scale(0.982);
+}
+
+.vt-pref-acc-item.is-open .vt-pref-acc-header {
+  background-color: rgba(0, 0, 0, 0.015);
+}
+
+.vt-pref-acc-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Morphing Icon Wrapper with Apple Spring Pop */
+.vt-pref-acc-toggle-icon {
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.2s ease;
+}
+
+.vt-pref-acc-header:hover .vt-pref-acc-toggle-icon {
+  transform: scale(1.05);
+}
+
+.vt-pref-acc-header:active .vt-pref-acc-toggle-icon {
+  transform: scale(0.92);
+}
+
+.vt-pref-acc-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.vt-pref-acc-item.is-open .vt-pref-acc-title {
+  color: #000000;
+}
+
+/* Apple iOS Toggle Switches with Haptic Squash & Stretch Spring */
+.vt-pref-switch-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.vt-pref-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 25px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.vt-pref-switch.is-locked {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.vt-pref-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.vt-pref-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: background-color 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  border-radius: 9999px;
+}
+
+.vt-pref-slider:before {
+  position: absolute;
+  content: "";
+  height: 19px;
+  width: 19px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition:
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vt-pref-switch:active:not(.is-locked) .vt-pref-slider:before {
+  width: 23px;
+  /* iOS tactile squash-and-stretch on press */
+}
+
+.vt-pref-switch input:checked+.vt-pref-slider {
+  background-color: #000000;
+}
+
+.vt-pref-switch input:checked+.vt-pref-slider:before {
+  transform: translateX(19px);
+}
+
+/* Fluid Apple-Style CSS Grid Expansion Container */
+.vt-pref-acc-content-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: grid-template-rows;
+}
+
+.vt-pref-acc-item.is-open .vt-pref-acc-content-wrapper {
+  grid-template-rows: 1fr;
+}
+
+.vt-pref-acc-body {
+  overflow: hidden;
+  padding: 0 20px 0 54px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.35s cubic-bezier(0.34, 1.35, 0.64, 1),
+    padding 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, opacity;
+}
+
+.vt-pref-acc-item.is-open .vt-pref-acc-body {
+  opacity: 1;
+  transform: translateY(0);
+  padding-bottom: 18px;
+  transition-delay: 0.04s;
+}
+
+.vt-pref-acc-body p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #475569;
+  letter-spacing: -0.005em;
+}
+
+/* Modal Bottom Action Row (Reject & Confirm) */
+.vt-pref-center-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px)) 24px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.025);
+  z-index: 3;
+}
+
+.vt-pref-btn-reject,
+.vt-pref-btn-confirm {
+  flex: 1;
+  height: 42px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.vt-pref-btn-reject:hover,
+.vt-pref-btn-confirm:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.vt-pref-btn-reject:active,
+.vt-pref-btn-confirm:active {
+  transform: scale(0.96) translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* --------------------------------------------------------------------------
+   4. Responsive Breakpoints (Smooth on all segments of phones)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .vt-cookie-bar-container {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 50% !important;
+    transform: translate(-50%, 0) !important;
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+  }
+
+  .vt-cookie-bar-pill {
+    border-radius: 24px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+
+  .vt-cookie-bar-left {
+    align-items: flex-start;
+  }
+
+  .vt-cookie-text {
+    white-space: normal;
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .vt-cookie-bar-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .vt-cookie-btn-reject,
+  .vt-cookie-btn-accept {
+    flex: 1;
+    text-align: center;
+    padding: 9px 14px;
+    font-size: 0.85rem;
+  }
+
+  .vt-cookie-modal-backdrop {
+    padding: 16px 12px;
+  }
+
+  .vt-cookie-pref-center-card {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100dvh - 32px);
+    border-radius: 22px;
+  }
+
+  .vt-pref-center-header {
+    padding: 14px 18px;
+  }
+
+  .vt-pref-center-body {
+    padding: 16px 18px 20px 18px;
+  }
+
+  .vt-pref-intro-text {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .vt-pref-btn-allow-all {
+    height: 42px;
+    margin-bottom: 16px;
+    font-size: 0.88rem;
+  }
+
+  .vt-pref-accordion-list {
+    border-radius: 14px;
+  }
+
+  .vt-pref-acc-header {
+    padding: 13px 14px;
+  }
+
+  .vt-pref-acc-title {
+    font-size: 0.84rem;
+  }
+
+  .vt-pref-acc-toggle-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .vt-pref-switch {
+    width: 40px;
+    height: 23px;
+  }
+
+  .vt-pref-slider:before {
+    height: 17px;
+    width: 17px;
+  }
+
+  .vt-pref-switch:active:not(.is-locked) .vt-pref-slider:before {
+    width: 20px;
+  }
+
+  .vt-pref-switch input:checked+.vt-pref-slider:before {
+    transform: translateX(17px);
+  }
+
+  .vt-pref-acc-body {
+    padding: 0 14px 14px 44px;
+  }
+
+  .vt-pref-acc-body p {
+    font-size: 0.77rem;
+    line-height: 1.52;
+  }
+
+  .vt-pref-center-footer {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) 16px;
+    gap: 10px;
+  }
+
+  .vt-pref-btn-reject,
+  .vt-pref-btn-confirm {
+    height: 40px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .vt-cookie-pref-center-card {
+    max-height: calc(100dvh - 20px);
+    border-radius: 20px;
+  }
+
+  .vt-pref-center-header {
+    padding: 12px 14px;
+  }
+
+  .vt-pref-center-title {
+    font-size: 0.88rem;
+  }
+
+  .vt-pref-center-body {
+    padding: 12px 12px 16px 12px;
+  }
+
+  .vt-pref-acc-body {
+    padding: 0 12px 12px 38px;
+  }
+
+  .vt-pref-acc-title {
+    font-size: 0.82rem;
+  }
+}
