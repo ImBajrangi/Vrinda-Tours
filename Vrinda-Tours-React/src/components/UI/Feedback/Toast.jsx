@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, Heart, HeartOff, Check } from 'lucide-react';
-import AnimatedIcon from './AnimatedIcon';
-import './UI.css';
+import AnimatedIcon from '../Animations/AnimatedIcon';
+import '../Common/UI.css';
 
 export default function Toast({ 
   message, 

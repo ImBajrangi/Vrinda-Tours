@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import ErrorBoundary from './components/UI/ErrorBoundary';
+import ErrorBoundary from './components/UI/Feedback/ErrorBoundary';
 import './App.css';
 
 // Register Offline Map Tile Caching Service Worker

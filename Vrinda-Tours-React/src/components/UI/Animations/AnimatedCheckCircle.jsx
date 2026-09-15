@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import lottie from 'lottie-web';
-import checkCircleAnimation from '../../assets/animations/check-circle.json';
+import checkCircleAnimation from '../../../assets/animations/check-circle.json';
 import './AnimatedCheckCircle.css';
 
 /**

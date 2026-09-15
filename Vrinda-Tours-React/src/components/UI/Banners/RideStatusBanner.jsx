@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Phone, Car, CheckCircle2, Navigation } from 'lucide-react';
-import './UI.css';
+import '../Common/UI.css';
 
 export default function RideStatusBanner({ status, driver, onCancel }) {
   const [exiting, setExiting] = useState(false);

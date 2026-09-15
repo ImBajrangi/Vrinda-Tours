@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Cookie, SlidersHorizontal, X } from 'lucide-react';
-import MorphingIcon from './MorphingIcon';
+import MorphingIcon from '../Animations/MorphingIcon';
 import './CookieConsentBar.css';
 
 const COOKIE_STORAGE_KEY = 'vt_cookie_consent';

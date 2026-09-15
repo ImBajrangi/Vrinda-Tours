@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { 
-  XMarkIcon, PlusIcon, TrashIcon, CameraIcon, 
-  ArrowRightOnRectangleIcon, UserIcon, LockClosedIcon, 
+import {
+  XMarkIcon, PlusIcon, TrashIcon, CameraIcon,
+  ArrowRightOnRectangleIcon, UserIcon, LockClosedIcon,
   UserPlusIcon, PhoneIcon, TruckIcon, ExclamationTriangleIcon,
   MapPinIcon, CheckCircleIcon, MagnifyingGlassIcon, SparklesIcon,
   BuildingOffice2Icon, BuildingStorefrontIcon, GlobeAltIcon,
-  ClockIcon, ArrowPathIcon, EyeIcon, PencilSquareIcon, 
+  ClockIcon, ArrowPathIcon, EyeIcon, PencilSquareIcon,
   MegaphoneIcon, ChartBarIcon, TagIcon, StarIcon as StarOutline,
   ShieldCheckIcon, ArrowTopRightOnSquareIcon, CreditCardIcon,
   ChatBubbleLeftRightIcon, PaperAirplaneIcon, Bars3Icon,
@@ -16,20 +16,20 @@ import {
   DocumentTextIcon, XCircleIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
-import { 
-  doc, setDoc, deleteDoc, updateDoc, collection, addDoc, 
-  onSnapshot, query as firestoreQuery, orderBy, limit as firestoreLimit 
+import {
+  doc, setDoc, deleteDoc, updateDoc, collection, addDoc,
+  onSnapshot, query as firestoreQuery, orderBy, limit as firestoreLimit
 } from 'firebase/firestore';
 import { firestore } from '../../config/firebase';
 import { supabase, safeRemoveChannel } from '../../config/supabase';
 import { getPaymentsHistory, formatINR, STRIPE_PUBLISHABLE_KEY, subscribeToPayments } from '../../services/stripeService';
 import { getAllSupportThreads, sendAdminReply, updateThreadStatus, subscribeToAdminInbox, approveSupportRequest, rejectSupportRequest, inquireSupportRequest } from '../../services/messagingService';
-import { 
-  approveSettlement, 
-  rejectSettlement, 
-  subscribeToAllSettlements, 
+import {
+  approveSettlement,
+  rejectSettlement,
+  subscribeToAllSettlements,
   manuallyAdjustDriverDue,
-  ADMIN_PAYMENT_CONFIG 
+  ADMIN_PAYMENT_CONFIG
 } from '../../services/commissionService';
 import './AdminDashboardPage.css';
 
@@ -59,12 +59,12 @@ function formatRelativeTime(dateInput) {
   }
 }
 
-export default function AdminDashboardPage({ 
-  drivers = [], 
-  locations = [], 
-  userPosition, 
+export default function AdminDashboardPage({
+  drivers = [],
+  locations = [],
+  userPosition,
   onSelectLocation,
-  onClose 
+  onClose
 }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
@@ -167,7 +167,7 @@ export default function AdminDashboardPage({
     e.preventDefault();
     const { settlement, reason, customReason } = rejectingSettlementModal;
     if (!settlement?.id) return;
-    
+
     const finalReason = reason === 'custom' ? (customReason.trim() || 'Payment not verified') : reason;
     try {
       await rejectSettlement(settlement.id, finalReason, 'Rejected by Admin');
@@ -217,7 +217,7 @@ export default function AdminDashboardPage({
           setAdminUserEmail(email);
           localStorage.setItem('vt_admin_session', email);
         }
-      } catch {}
+      } catch { }
       setIsChecking(false);
     };
     checkAdmin();
@@ -404,7 +404,7 @@ export default function AdminDashboardPage({
 
     // D. Real-time Announcements Listener (with resilient fallback)
     const startFs = performance.now();
-    let unsubAnnouncements = () => {};
+    let unsubAnnouncements = () => { };
     try {
       if (firestore) {
         unsubAnnouncements = onSnapshot(collection(firestore, 'announcements'), (snapshot) => {
@@ -697,7 +697,7 @@ export default function AdminDashboardPage({
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-    } catch {}
+    } catch { }
     localStorage.removeItem('vt_admin_session');
     setIsLoggedIn(false);
     setAdminUserEmail('');
@@ -1063,12 +1063,12 @@ export default function AdminDashboardPage({
               <label>Administrator Email</label>
               <div className="dmd-admin-input-wrap">
                 <UserIcon style={{ width: 18, height: 18 }} />
-                <input 
-                  type="email" 
-                  value={loginEmail} 
-                  onChange={e => setLoginEmail(e.target.value)} 
-                  placeholder="sakhi@vrindatours.com" 
-                  required 
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={e => setLoginEmail(e.target.value)}
+                  placeholder="sakhi@vrindatours.com"
+                  required
                   autoFocus
                 />
               </div>
@@ -1078,12 +1078,12 @@ export default function AdminDashboardPage({
               <label>Password or Master Key</label>
               <div className="dmd-admin-input-wrap">
                 <LockClosedIcon style={{ width: 18, height: 18 }} />
-                <input 
-                  type="password" 
-                  value={loginPassword} 
-                  onChange={e => setLoginPassword(e.target.value)} 
-                  placeholder="••••••••" 
-                  required 
+                <input
+                  type="password"
+                  value={loginPassword}
+                  onChange={e => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
                 />
               </div>
             </div>
@@ -1102,8 +1102,8 @@ export default function AdminDashboardPage({
           </form>
 
           <div className="dmd-admin-auth-footer">
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-admin-btn-back"
               onClick={onClose}
             >
@@ -1119,7 +1119,7 @@ export default function AdminDashboardPage({
   // Master Full-Page Dashboard Layout (DESIGN.md Spec)
   return (
     <div className="dmd-admin-root">
-      
+
       {/* Toast Alert Banner */}
       {toastMsg && (
         <div className={`dmd-admin-toast ${toastMsg.type}`}>
@@ -1145,7 +1145,7 @@ export default function AdminDashboardPage({
       </div>
 
       <div className="dmd-admin-main-container">
-        
+
         {/* Mobile Backdrop */}
         {sidebarOpen && (
           <div className="dmd-admin-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
@@ -1153,7 +1153,7 @@ export default function AdminDashboardPage({
 
         {/* Left Dark Sidebar Navigation */}
         <aside className={`dmd-admin-sidebar ${sidebarOpen ? 'is-mobile-open' : ''}`}>
-          
+
           {/* Brand Header */}
           <div className="dmd-admin-sidebar-brand">
             <div className="dmd-admin-brand-icon">
@@ -1172,10 +1172,10 @@ export default function AdminDashboardPage({
 
           {/* Nav Categories */}
           <nav className="dmd-admin-nav-list">
-            
+
             <div className="dmd-admin-nav-category">MAIN PLATFORM</div>
-            
-            <button 
+
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
               onClick={() => { setActiveTab('overview'); setSidebarOpen(false); }}
@@ -1184,7 +1184,7 @@ export default function AdminDashboardPage({
               <span>Overview & KPIs</span>
             </button>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'locations' ? 'active' : ''}`}
               onClick={() => { setActiveTab('locations'); setSidebarOpen(false); }}
@@ -1196,7 +1196,7 @@ export default function AdminDashboardPage({
 
             <div className="dmd-admin-nav-category" style={{ marginTop: '16px' }}>OPERATIONS & FLEET</div>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'partners' ? 'active' : ''}`}
               onClick={() => { setActiveTab('partners'); setSidebarOpen(false); }}
@@ -1206,7 +1206,7 @@ export default function AdminDashboardPage({
               <span className="dmd-admin-pill-badge">{partners.length}</span>
             </button>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'bookings' ? 'active' : ''}`}
               onClick={() => { setActiveTab('bookings'); setSidebarOpen(false); }}
@@ -1216,7 +1216,7 @@ export default function AdminDashboardPage({
               <span className="dmd-admin-pill-badge">{rideRequests.length + roomBookings.length + tableReservations.length}</span>
             </button>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'registrations' ? 'active' : ''}`}
               onClick={() => { setActiveTab('registrations'); setSidebarOpen(false); }}
@@ -1226,7 +1226,7 @@ export default function AdminDashboardPage({
               {registrations.length > 0 && <span className="dmd-admin-pill-badge alert">{registrations.length}</span>}
             </button>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'payments' ? 'active' : ''}`}
               onClick={() => { setActiveTab('payments'); setSidebarOpen(false); }}
@@ -1238,7 +1238,7 @@ export default function AdminDashboardPage({
 
             <div className="dmd-admin-nav-category" style={{ marginTop: '16px' }}>COMMUNICATIONS</div>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'support' ? 'active' : ''}`}
               onClick={() => { setActiveTab('support'); setSidebarOpen(false); }}
@@ -1248,7 +1248,7 @@ export default function AdminDashboardPage({
               {supportThreads.length > 0 && <span className="dmd-admin-pill-badge lilac">Live ({supportThreads.length})</span>}
             </button>
 
-            <button 
+            <button
               type="button"
               className={`dmd-admin-nav-item ${activeTab === 'broadcast' ? 'active' : ''}`}
               onClick={() => { setActiveTab('broadcast'); setSidebarOpen(false); }}
@@ -1265,8 +1265,8 @@ export default function AdminDashboardPage({
               <span className="dmd-sync-dot" />
               <span>Live WebSockets Synced</span>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="dmd-admin-btn-live-store"
               onClick={onClose}
             >
@@ -1279,12 +1279,12 @@ export default function AdminDashboardPage({
 
         {/* Main Work Area */}
         <main className="dmd-admin-viewport">
-          
+
           {/* Top Header Console */}
           <header className="dmd-admin-top-bar">
             <div className="dmd-admin-bar-left">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="dmd-admin-mobile-toggle"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 aria-label="Toggle Menu"
@@ -1306,9 +1306,9 @@ export default function AdminDashboardPage({
                 <span>Stripe Test Mode</span>
               </div>
 
-              <button 
-                type="button" 
-                className="dmd-admin-btn-sync" 
+              <button
+                type="button"
+                className="dmd-admin-btn-sync"
                 onClick={fetchAllData}
                 title="Synchronize Live Databases"
               >
@@ -1326,8 +1326,8 @@ export default function AdminDashboardPage({
                 </div>
               </div>
 
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="dmd-admin-btn-logout"
                 onClick={handleLogout}
                 title="Sign Out of Admin Console"
@@ -1344,7 +1344,7 @@ export default function AdminDashboardPage({
             {/* TAB 1: OVERVIEW */}
             {activeTab === 'overview' && (
               <div className="dmd-admin-fade">
-                
+
                 {/* Hero Editorial Header */}
                 <div className="dmd-admin-hero-block">
                   <div>
@@ -1363,7 +1363,7 @@ export default function AdminDashboardPage({
 
                 {/* Editorial Color-Block KPI Cards (DESIGN.MD Spec) */}
                 <div className="dmd-kpi-block-grid">
-                  
+
                   {/* Card 1: Lime Block */}
                   <div className="dmd-kpi-card lime">
                     <div className="dmd-kpi-card-top">
@@ -1435,7 +1435,7 @@ export default function AdminDashboardPage({
 
                 {/* 2-Column Split: Dynamic Volume Graph & Real-time Live Event Feed */}
                 <div className="dmd-editorial-split-grid">
-                  
+
                   {/* Left: Dynamic Real-time Volume Graph */}
                   <div className="dmd-editorial-card">
                     <div className="dmd-card-header-bar">
@@ -1450,9 +1450,9 @@ export default function AdminDashboardPage({
                       {dynamicVolumeAnalytics.map((col) => (
                         <div key={col.month} className="dmd-chart-column">
                           <div className="dmd-bar-track">
-                            <div 
-                              className={`dmd-bar-fill ${col.isCurrent ? 'is-current' : ''}`} 
-                              style={{ height: `${col.val}%` }} 
+                            <div
+                              className={`dmd-bar-fill ${col.isCurrent ? 'is-current' : ''}`}
+                              style={{ height: `${col.val}%` }}
                               title={`${col.month}: ${col.label} (${col.count} bookings)`}
                             />
                           </div>
@@ -1576,8 +1576,8 @@ export default function AdminDashboardPage({
                     <h2 className="dmd-section-title">Sacred POIs & Mandir Directory ({filteredLocations.length})</h2>
                     <p className="dmd-section-sub">Manage temples, ghats, prasadam spots, and ashrams shown on the live map</p>
                   </div>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-action-btn primary"
                     onClick={() => setShowAddPoiModal(true)}
                   >
@@ -1589,9 +1589,9 @@ export default function AdminDashboardPage({
                 <div className="dmd-filters-bar">
                   <div className="dmd-search-field-wrap">
                     <MagnifyingGlassIcon style={{ width: 16, height: 16, color: '#000000' }} />
-                    <input 
-                      type="text" 
-                      placeholder="Search temple name, area, or description..." 
+                    <input
+                      type="text"
+                      placeholder="Search temple name, area, or description..."
                       value={searchQuery}
                       onChange={e => setSearchQuery(e.target.value)}
                       className="dmd-search-input"
@@ -1642,9 +1642,9 @@ export default function AdminDashboardPage({
                         filteredLocations.map((loc) => (
                           <tr key={loc.id || loc.name}>
                             <td>
-                              <img 
-                                src={loc.image || 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=150&q=80'} 
-                                alt={loc.name} 
+                              <img
+                                src={loc.image || 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=150&q=80'}
+                                alt={loc.name}
                                 className="dmd-poi-thumb"
                               />
                             </td>
@@ -1672,8 +1672,8 @@ export default function AdminDashboardPage({
                             </td>
                             <td>
                               <div className="dmd-actions-cluster">
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="dmd-tbl-action-btn edit"
                                   onClick={() => setEditingPoi({
                                     ...loc,
@@ -1703,8 +1703,8 @@ export default function AdminDashboardPage({
                                 >
                                   <PencilSquareIcon style={{ width: 14, height: 14 }} />
                                 </button>
-                                <button 
-                                  type="button" 
+                                <button
+                                  type="button"
                                   className="dmd-tbl-action-btn delete"
                                   onClick={() => setDeletingPoi(loc)}
                                   title="Delete location"
@@ -1730,8 +1730,8 @@ export default function AdminDashboardPage({
                     <h2 className="dmd-section-title">Partner Directory & Verification Center ({partners.length})</h2>
                     <p className="dmd-section-sub">Audit ashrams, hotels, fleet drivers, and local tour operators</p>
                   </div>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="dmd-action-btn primary"
                     onClick={() => setShowAddPartnerModal(true)}
                   >
@@ -1781,8 +1781,8 @@ export default function AdminDashboardPage({
                               </span>
                             </td>
                             <td>
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className={`dmd-btn-verify-action ${p.verified ? 'is-verified' : ''}`}
                                 onClick={() => handleVerifyPartner(p.id, p.verified)}
                               >
@@ -1907,8 +1907,8 @@ export default function AdminDashboardPage({
 
                 <div className="dmd-editorial-card" style={{ marginTop: '18px' }}>
                   <form onSubmit={handleAddBroadcastItem} className="dmd-broadcast-form">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="Enter announcement text (e.g. Mangala Aarti timings, weather advisory...)"
                       value={newBroadcastText}
                       onChange={e => setNewBroadcastText(e.target.value)}
@@ -1926,8 +1926,8 @@ export default function AdminDashboardPage({
                           <MegaphoneIcon style={{ width: 16, height: 16, color: '#f59e0b' }} />
                           <span>{item.text}</span>
                         </div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="dmd-tbl-action-btn delete"
                           onClick={() => handleRemoveBroadcastItem(item.id)}
                           title="Delete notice"
@@ -1946,8 +1946,8 @@ export default function AdminDashboardPage({
               <div className="dmd-admin-fade">
                 {/* Sub-tab Navigation */}
                 <div className="dmd-payments-subtab-bar">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`dmd-subtab-btn ${paymentsSubTab === 'driver_commissions' ? 'active' : ''}`}
                     onClick={() => setPaymentsSubTab('driver_commissions')}
                   >
@@ -1957,8 +1957,8 @@ export default function AdminDashboardPage({
                       <span className="dmd-subtab-badge pulse">{pendingSettlements.length} Pending</span>
                     )}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className={`dmd-subtab-btn ${paymentsSubTab === 'stripe_payments' ? 'active' : ''}`}
                     onClick={() => setPaymentsSubTab('stripe_payments')}
                   >
@@ -2041,9 +2041,9 @@ export default function AdminDashboardPage({
                                 <div className="dmd-puc-top">
                                   <div className="dmd-puc-driver">
                                     <div className="dmd-puc-avatar">
-                                      <img 
-                                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(s.driverName || 'Driver')}&backgroundColor=f1f5f9`} 
-                                        alt={s.driverName} 
+                                      <img
+                                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(s.driverName || 'Driver')}&backgroundColor=f1f5f9`}
+                                        alt={s.driverName}
                                       />
                                     </div>
                                     <div>
@@ -2074,9 +2074,9 @@ export default function AdminDashboardPage({
                                     <small>12-DIGIT UTR / TRANSACTION ID</small>
                                     <div className="dmd-code-copy-flex">
                                       <code className="dmd-utr-text">{s.utrNumber}</code>
-                                      <button 
-                                        type="button" 
-                                        className="dmd-btn-copy-utr" 
+                                      <button
+                                        type="button"
+                                        className="dmd-btn-copy-utr"
                                         onClick={() => copyToClipboard(s.utrNumber, `utr_${s.id}`)}
                                         title="Copy UTR to verify in Bank App"
                                       >
@@ -2094,8 +2094,8 @@ export default function AdminDashboardPage({
 
                                 {s.proofImage && (
                                   <div className="dmd-puc-proof-row">
-                                    <button 
-                                      type="button" 
+                                    <button
+                                      type="button"
                                       className="dmd-btn-view-proof"
                                       onClick={() => setProofPreviewModal(s.proofImage)}
                                     >
@@ -2112,8 +2112,8 @@ export default function AdminDashboardPage({
                                 )}
 
                                 <div className="dmd-puc-actions">
-                                  <button 
-                                    type="button" 
+                                  <button
+                                    type="button"
                                     className="dmd-btn-reject-utr"
                                     onClick={() => handleOpenRejectModal(s)}
                                     title="Reject payment (e.g. money not received in bank)"
@@ -2121,8 +2121,8 @@ export default function AdminDashboardPage({
                                     <XCircleIcon style={{ width: 16, height: 16 }} />
                                     <span>Reject (पैसे नहीं आए)</span>
                                   </button>
-                                  <button 
-                                    type="button" 
+                                  <button
+                                    type="button"
                                     className="dmd-btn-approve-utr"
                                     onClick={() => handleApproveSettlement(s)}
                                     disabled={isApproving}
@@ -2163,9 +2163,9 @@ export default function AdminDashboardPage({
 
                           <div className="dmd-search-pill-box">
                             <MagnifyingGlassIcon style={{ width: 14, height: 14, color: '#64748b' }} />
-                            <input 
-                              type="text" 
-                              placeholder="Search by UTR, driver, phone..." 
+                            <input
+                              type="text"
+                              placeholder="Search by UTR, driver, phone..."
                               value={settlementSearch}
                               onChange={(e) => setSettlementSearch(e.target.value)}
                             />
@@ -2233,8 +2233,8 @@ export default function AdminDashboardPage({
                                   </td>
                                   <td>
                                     {s.proofImage ? (
-                                      <button 
-                                        type="button" 
+                                      <button
+                                        type="button"
                                         className="dmd-tbl-view-img-btn"
                                         onClick={() => setProofPreviewModal(s.proofImage)}
                                       >
@@ -2323,8 +2323,8 @@ export default function AdminDashboardPage({
                                       <span style={{ color: '#16a34a', fontWeight: 700 }}>₹{d.totalCommissionPaid || 0}</span>
                                     </td>
                                     <td>
-                                      <button 
-                                        type="button" 
+                                      <button
+                                        type="button"
                                         className="dmd-action-btn-sm"
                                         onClick={() => setManualAdjustModal({ open: true, driver: d, newAmount: String(due), reason: '' })}
                                         title="Manually adjust commission balance"
@@ -2462,10 +2462,10 @@ export default function AdminDashboardPage({
                         'custom'
                       ].map((r) => (
                         <label key={r} className="dmd-radio-option">
-                          <input 
-                            type="radio" 
-                            name="rejectReason" 
-                            checked={rejectingSettlementModal.reason === r} 
+                          <input
+                            type="radio"
+                            name="rejectReason"
+                            checked={rejectingSettlementModal.reason === r}
                             onChange={() => setRejectingSettlementModal(prev => ({ ...prev, reason: r }))}
                           />
                           <span>{r === 'custom' ? 'Other custom reason (अन्य कारण)...' : r}</span>
@@ -2485,15 +2485,15 @@ export default function AdminDashboardPage({
                     )}
 
                     <div className="dmd-modal-actions">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-cancel"
                         onClick={() => setRejectingSettlementModal({ open: false, settlement: null, reason: '', customReason: '' })}
                       >
                         Cancel
                       </button>
-                      <button 
-                        type="submit" 
+                      <button
+                        type="submit"
                         className="dmd-btn-confirm-reject"
                       >
                         Confirm Rejection (अस्वीकार करें)
@@ -2538,8 +2538,8 @@ export default function AdminDashboardPage({
                   <form onSubmit={handleManualAdjustSubmit} className="dmd-modal-body">
                     <div>
                       <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>New Outstanding Due Amount (₹)</label>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         min="0"
                         value={manualAdjustModal.newAmount}
                         onChange={(e) => setManualAdjustModal(prev => ({ ...prev, newAmount: e.target.value }))}
@@ -2550,8 +2550,8 @@ export default function AdminDashboardPage({
 
                     <div>
                       <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '4px' }}>Reason for adjustment</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={manualAdjustModal.reason}
                         onChange={(e) => setManualAdjustModal(prev => ({ ...prev, reason: e.target.value }))}
                         placeholder="e.g. Manual cash settled at office"
@@ -2560,15 +2560,15 @@ export default function AdminDashboardPage({
                     </div>
 
                     <div className="dmd-modal-actions">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="dmd-btn-cancel"
                         onClick={() => setManualAdjustModal({ open: false, driver: null, newAmount: '', reason: '' })}
                       >
                         Cancel
                       </button>
-                      <button 
-                        type="submit" 
+                      <button
+                        type="submit"
                         className="dmd-btn-save"
                       >
                         Update Balance
@@ -2593,14 +2593,14 @@ export default function AdminDashboardPage({
                 </div>
 
                 <div className="dmd-inbox-grid">
-                  
+
                   {/* Left: Thread List */}
                   <div className={`dmd-inbox-threads-pane ${selectedThreadId ? 'is-hidden-mobile' : ''}`}>
                     <div className="dmd-inbox-search">
-                      <input 
-                        type="text" 
-                        placeholder="Search devotee or inquiry text..." 
-                        value={supportSearch} 
+                      <input
+                        type="text"
+                        placeholder="Search devotee or inquiry text..."
+                        value={supportSearch}
                         onChange={e => setSupportSearch(e.target.value)}
                         className="dmd-inbox-search-input"
                       />
@@ -2777,10 +2777,10 @@ export default function AdminDashboardPage({
                                         return (
                                           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                             {parts.map((p, pIdx) => (
-                                              <div 
-                                                key={pIdx} 
-                                                style={{ 
-                                                  fontSize: pIdx === 0 ? '0.88rem' : '0.8rem', 
+                                              <div
+                                                key={pIdx}
+                                                style={{
+                                                  fontSize: pIdx === 0 ? '0.88rem' : '0.8rem',
                                                   fontWeight: pIdx === 0 ? 800 : 500,
                                                   color: pIdx === 0 ? '#15803d' : 'inherit'
                                                 }}
@@ -2842,7 +2842,7 @@ export default function AdminDashboardPage({
               </button>
             </div>
             <form onSubmit={handleCreatePoi} className="dmd-dialog-form">
-              
+
               {/* Section 1: Primary Identity */}
               <div className="dmd-form-section">
                 <div className="dmd-form-section-head">
@@ -2851,21 +2851,21 @@ export default function AdminDashboardPage({
                 <div className="dmd-form-row-2">
                   <div className="dmd-form-group">
                     <label>Location / Mandir Name *</label>
-                    <input 
-                      type="text" 
-                      value={poiName} 
-                      onChange={e => setPoiName(e.target.value)} 
-                      placeholder="e.g. Shri Bankey Bihari Mandir" 
-                      required 
+                    <input
+                      type="text"
+                      value={poiName}
+                      onChange={e => setPoiName(e.target.value)}
+                      placeholder="e.g. Shri Bankey Bihari Mandir"
+                      required
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label><span>Hindi Devanagari Name</span> <small>(Optional)</small></label>
-                    <input 
-                      type="text" 
-                      value={poiHindiName} 
-                      onChange={e => setPoiHindiName(e.target.value)} 
-                      placeholder="e.g. श्री बांके बिहारी मंदिर" 
+                    <input
+                      type="text"
+                      value={poiHindiName}
+                      onChange={e => setPoiHindiName(e.target.value)}
+                      placeholder="e.g. श्री बांके बिहारी मंदिर"
                     />
                   </div>
                 </div>
@@ -2884,22 +2884,22 @@ export default function AdminDashboardPage({
                   </div>
                   <div className="dmd-form-group">
                     <label><span>Rating</span> <small>(1.0 - 5.0)</small></label>
-                    <input 
-                      type="number" 
-                      step="0.1" 
-                      min="1" 
-                      max="5" 
-                      value={poiRating} 
-                      onChange={e => setPoiRating(e.target.value)} 
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="5"
+                      value={poiRating}
+                      onChange={e => setPoiRating(e.target.value)}
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Reward Points</label>
-                    <input 
-                      type="number" 
-                      value={poiPoints} 
-                      onChange={e => setPoiPoints(e.target.value)} 
-                      placeholder="20" 
+                    <input
+                      type="number"
+                      value={poiPoints}
+                      onChange={e => setPoiPoints(e.target.value)}
+                      placeholder="20"
                     />
                   </div>
                 </div>
@@ -2913,34 +2913,34 @@ export default function AdminDashboardPage({
                 <div className="dmd-form-row-2 dmd-form-row-coords">
                   <div className="dmd-form-group">
                     <label>Latitude *</label>
-                    <input 
-                      type="number" 
-                      step="any" 
-                      value={poiLat} 
-                      onChange={e => setPoiLat(e.target.value)} 
-                      placeholder="27.5818" 
-                      required 
+                    <input
+                      type="number"
+                      step="any"
+                      value={poiLat}
+                      onChange={e => setPoiLat(e.target.value)}
+                      placeholder="27.5818"
+                      required
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Longitude *</label>
-                    <input 
-                      type="number" 
-                      step="any" 
-                      value={poiLng} 
-                      onChange={e => setPoiLng(e.target.value)} 
-                      placeholder="77.6975" 
-                      required 
+                    <input
+                      type="number"
+                      step="any"
+                      value={poiLng}
+                      onChange={e => setPoiLng(e.target.value)}
+                      placeholder="77.6975"
+                      required
                     />
                   </div>
                 </div>
                 <div className="dmd-form-group">
                   <label>Photo / Banner Image URL</label>
-                  <input 
-                    type="text" 
-                    value={poiImage} 
-                    onChange={e => setPoiImage(e.target.value)} 
-                    placeholder="/vrinda-vihar/... or https://..." 
+                  <input
+                    type="text"
+                    value={poiImage}
+                    onChange={e => setPoiImage(e.target.value)}
+                    placeholder="/vrinda-vihar/... or https://..."
                   />
                   {poiImage && (
                     <div className="dmd-img-preview-box">
@@ -2958,30 +2958,30 @@ export default function AdminDashboardPage({
                 </div>
                 <div className="dmd-form-group">
                   <label>Spiritual Lore & Description</label>
-                  <textarea 
-                    rows="3" 
-                    value={poiDescription} 
-                    onChange={e => setPoiDescription(e.target.value)} 
-                    placeholder="Enter transcendental history, pastimes (leelas), or visiting guidelines..." 
+                  <textarea
+                    rows="3"
+                    value={poiDescription}
+                    onChange={e => setPoiDescription(e.target.value)}
+                    placeholder="Enter transcendental history, pastimes (leelas), or visiting guidelines..."
                   />
                 </div>
                 <div className="dmd-form-row-2">
                   <div className="dmd-form-group">
                     <label>Daily Darshan Timings</label>
-                    <input 
-                      type="text" 
-                      value={poiTimings} 
-                      onChange={e => setPoiTimings(e.target.value)} 
-                      placeholder="e.g. 7:30 AM - 12:00 PM, 5:30 PM - 9:30 PM" 
+                    <input
+                      type="text"
+                      value={poiTimings}
+                      onChange={e => setPoiTimings(e.target.value)}
+                      placeholder="e.g. 7:30 AM - 12:00 PM, 5:30 PM - 9:30 PM"
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Aarti Schedule <small>(Optional)</small></label>
-                    <input 
-                      type="text" 
-                      value={poiAartiTimings} 
-                      onChange={e => setPoiAartiTimings(e.target.value)} 
-                      placeholder="e.g. Mangala 7:45 AM, Sandhya 7:30 PM" 
+                    <input
+                      type="text"
+                      value={poiAartiTimings}
+                      onChange={e => setPoiAartiTimings(e.target.value)}
+                      placeholder="e.g. Mangala 7:45 AM, Sandhya 7:30 PM"
                     />
                   </div>
                 </div>
@@ -2996,40 +2996,40 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Contact / Booking Phone</label>
-                      <input 
-                        type="text" 
-                        value={poiPhone} 
-                        onChange={e => setPoiPhone(e.target.value)} 
-                        placeholder="+91 98765 43210" 
+                      <input
+                        type="text"
+                        value={poiPhone}
+                        onChange={e => setPoiPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Price Range</label>
-                      <input 
-                        type="text" 
-                        value={poiPriceRange} 
-                        onChange={e => setPoiPriceRange(e.target.value)} 
-                        placeholder="e.g. ₹800 - ₹2,500 / night" 
+                      <input
+                        type="text"
+                        value={poiPriceRange}
+                        onChange={e => setPoiPriceRange(e.target.value)}
+                        placeholder="e.g. ₹800 - ₹2,500 / night"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Room Types <small>(comma separated)</small></label>
-                      <input 
-                        type="text" 
-                        value={poiRoomTypes} 
-                        onChange={e => setPoiRoomTypes(e.target.value)} 
-                        placeholder="Standard, Deluxe, AC Suite, Ashram Cottage" 
+                      <input
+                        type="text"
+                        value={poiRoomTypes}
+                        onChange={e => setPoiRoomTypes(e.target.value)}
+                        placeholder="Standard, Deluxe, AC Suite, Ashram Cottage"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Amenities</label>
-                      <input 
-                        type="text" 
-                        value={poiAmenities} 
-                        onChange={e => setPoiAmenities(e.target.value)} 
-                        placeholder="AC, Pure Veg Dining, Temple View, Gaushala" 
+                      <input
+                        type="text"
+                        value={poiAmenities}
+                        onChange={e => setPoiAmenities(e.target.value)}
+                        placeholder="AC, Pure Veg Dining, Temple View, Gaushala"
                       />
                     </div>
                   </div>
@@ -3044,40 +3044,40 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Reservation Phone</label>
-                      <input 
-                        type="text" 
-                        value={poiPhone} 
-                        onChange={e => setPoiPhone(e.target.value)} 
-                        placeholder="+91 98765 43210" 
+                      <input
+                        type="text"
+                        value={poiPhone}
+                        onChange={e => setPoiPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Cuisine Type</label>
-                      <input 
-                        type="text" 
-                        value={poiCuisine} 
-                        onChange={e => setPoiCuisine(e.target.value)} 
-                        placeholder="Pure Sattvic Vedic Thali, Street Food" 
+                      <input
+                        type="text"
+                        value={poiCuisine}
+                        onChange={e => setPoiCuisine(e.target.value)}
+                        placeholder="Pure Sattvic Vedic Thali, Street Food"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Price Range</label>
-                      <input 
-                        type="text" 
-                        value={poiPriceRange} 
-                        onChange={e => setPoiPriceRange(e.target.value)} 
-                        placeholder="e.g. ₹100 - ₹300 per person" 
+                      <input
+                        type="text"
+                        value={poiPriceRange}
+                        onChange={e => setPoiPriceRange(e.target.value)}
+                        placeholder="e.g. ₹100 - ₹300 per person"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Specialties / Mahaprasad</label>
-                      <input 
-                        type="text" 
-                        value={poiSpecialties} 
-                        onChange={e => setPoiSpecialties(e.target.value)} 
-                        placeholder="Mathura Peda, Rabdi, Hing Kachori, Makhan Mishri" 
+                      <input
+                        type="text"
+                        value={poiSpecialties}
+                        onChange={e => setPoiSpecialties(e.target.value)}
+                        placeholder="Mathura Peda, Rabdi, Hing Kachori, Makhan Mishri"
                       />
                     </div>
                   </div>
@@ -3092,49 +3092,49 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Dham Sub-type</label>
-                      <input 
-                        type="text" 
-                        value={poiType} 
-                        onChange={e => setPoiType(e.target.value)} 
-                        placeholder="e.g. Holy Dham & Temple City, Sacred Hill Zone" 
+                      <input
+                        type="text"
+                        value={poiType}
+                        onChange={e => setPoiType(e.target.value)}
+                        placeholder="e.g. Holy Dham & Temple City, Sacred Hill Zone"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Parikrama Circuit <small>(km)</small></label>
-                      <input 
-                        type="number" 
-                        value={poiParikramaKm} 
-                        onChange={e => setPoiParikramaKm(e.target.value)} 
-                        placeholder="21" 
+                      <input
+                        type="number"
+                        value={poiParikramaKm}
+                        onChange={e => setPoiParikramaKm(e.target.value)}
+                        placeholder="21"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-group">
                     <label>Key Mandirs Inside <small>(comma separated)</small></label>
-                    <input 
-                      type="text" 
-                      value={poiHighlights} 
-                      onChange={e => setPoiHighlights(e.target.value)} 
-                      placeholder="Radha Kund, Mansi Ganga, Daan Ghati, Mukharbind" 
+                    <input
+                      type="text"
+                      value={poiHighlights}
+                      onChange={e => setPoiHighlights(e.target.value)}
+                      placeholder="Radha Kund, Mansi Ganga, Daan Ghati, Mukharbind"
                     />
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Best Darshan Time / Tips</label>
-                      <input 
-                        type="text" 
-                        value={poiBestTime} 
-                        onChange={e => setPoiBestTime(e.target.value)} 
-                        placeholder="Morning or Night Parikrama under moonlit sky" 
+                      <input
+                        type="text"
+                        value={poiBestTime}
+                        onChange={e => setPoiBestTime(e.target.value)}
+                        placeholder="Morning or Night Parikrama under moonlit sky"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Map Color Accent</label>
-                      <input 
-                        type="text" 
-                        value={poiColor} 
-                        onChange={e => setPoiColor(e.target.value)} 
-                        placeholder="#10b981" 
+                      <input
+                        type="text"
+                        value={poiColor}
+                        onChange={e => setPoiColor(e.target.value)}
+                        placeholder="#10b981"
                       />
                     </div>
                   </div>
@@ -3142,17 +3142,17 @@ export default function AdminDashboardPage({
               )}
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
-                <button 
-                  type="button" 
-                  className="dmd-action-btn" 
+                <button
+                  type="button"
+                  className="dmd-action-btn"
                   style={{ flex: 1, height: '44px' }}
                   onClick={() => setShowAddPoiModal(false)}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="dmd-action-btn primary" 
+                <button
+                  type="submit"
+                  className="dmd-action-btn primary"
                   style={{ flex: 2, height: '44px' }}
                 >
                   Publish Location Live
@@ -3186,20 +3186,20 @@ export default function AdminDashboardPage({
                 <div className="dmd-form-row-2">
                   <div className="dmd-form-group">
                     <label>Location / Mandir Name *</label>
-                    <input 
-                      type="text" 
-                      value={editingPoi.name || ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, name: e.target.value })} 
-                      required 
+                    <input
+                      type="text"
+                      value={editingPoi.name || ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, name: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label><span>Hindi Devanagari Name</span> <small>(Optional)</small></label>
-                    <input 
-                      type="text" 
-                      value={editingPoi.hindiName || ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, hindiName: e.target.value })} 
-                      placeholder="e.g. श्री बांके बिहारी मंदिर" 
+                    <input
+                      type="text"
+                      value={editingPoi.hindiName || ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, hindiName: e.target.value })}
+                      placeholder="e.g. श्री बांके बिहारी मंदिर"
                     />
                   </div>
                 </div>
@@ -3207,8 +3207,8 @@ export default function AdminDashboardPage({
                 <div className="dmd-form-row-3">
                   <div className="dmd-form-group dmd-col-span-cat">
                     <label>Category *</label>
-                    <select 
-                      value={editingPoi.category || 'Temple'} 
+                    <select
+                      value={editingPoi.category || 'Temple'}
                       onChange={e => setEditingPoi({ ...editingPoi, category: e.target.value })}
                     >
                       <option value="Temple">🛕 Temple (Mandir)</option>
@@ -3221,21 +3221,21 @@ export default function AdminDashboardPage({
                   </div>
                   <div className="dmd-form-group">
                     <label><span>Rating</span> <small>(1.0 - 5.0)</small></label>
-                    <input 
-                      type="number" 
-                      step="0.1" 
-                      min="1" 
-                      max="5" 
-                      value={editingPoi.rating ?? '4.8'} 
-                      onChange={e => setEditingPoi({ ...editingPoi, rating: e.target.value })} 
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="5"
+                      value={editingPoi.rating ?? '4.8'}
+                      onChange={e => setEditingPoi({ ...editingPoi, rating: e.target.value })}
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Reward Points</label>
-                    <input 
-                      type="number" 
-                      value={editingPoi.points ?? '20'} 
-                      onChange={e => setEditingPoi({ ...editingPoi, points: e.target.value })} 
+                    <input
+                      type="number"
+                      value={editingPoi.points ?? '20'}
+                      onChange={e => setEditingPoi({ ...editingPoi, points: e.target.value })}
                     />
                   </div>
                 </div>
@@ -3249,32 +3249,32 @@ export default function AdminDashboardPage({
                 <div className="dmd-form-row-2 dmd-form-row-coords">
                   <div className="dmd-form-group">
                     <label>Latitude *</label>
-                    <input 
-                      type="number" 
-                      step="any" 
-                      value={editingPoi.lat ?? ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, lat: e.target.value })} 
-                      required 
+                    <input
+                      type="number"
+                      step="any"
+                      value={editingPoi.lat ?? ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, lat: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Longitude *</label>
-                    <input 
-                      type="number" 
-                      step="any" 
-                      value={editingPoi.lng ?? ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, lng: e.target.value })} 
-                      required 
+                    <input
+                      type="number"
+                      step="any"
+                      value={editingPoi.lng ?? ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, lng: e.target.value })}
+                      required
                     />
                   </div>
                 </div>
                 <div className="dmd-form-group">
                   <label>Photo / Banner Image URL</label>
-                  <input 
-                    type="text" 
-                    value={editingPoi.image || ''} 
-                    onChange={e => setEditingPoi({ ...editingPoi, image: e.target.value })} 
-                    placeholder="/vrinda-vihar/... or https://..." 
+                  <input
+                    type="text"
+                    value={editingPoi.image || ''}
+                    onChange={e => setEditingPoi({ ...editingPoi, image: e.target.value })}
+                    placeholder="/vrinda-vihar/... or https://..."
                   />
                   {editingPoi.image && (
                     <div className="dmd-img-preview-box">
@@ -3292,30 +3292,30 @@ export default function AdminDashboardPage({
                 </div>
                 <div className="dmd-form-group">
                   <label>Spiritual Lore & Description</label>
-                  <textarea 
-                    rows="3" 
-                    value={editingPoi.description || ''} 
-                    onChange={e => setEditingPoi({ ...editingPoi, description: e.target.value })} 
-                    placeholder="Enter history, significance, or visiting instructions..." 
+                  <textarea
+                    rows="3"
+                    value={editingPoi.description || ''}
+                    onChange={e => setEditingPoi({ ...editingPoi, description: e.target.value })}
+                    placeholder="Enter history, significance, or visiting instructions..."
                   />
                 </div>
                 <div className="dmd-form-row-2">
                   <div className="dmd-form-group">
                     <label>Daily Darshan Timings</label>
-                    <input 
-                      type="text" 
-                      value={editingPoi.timings || ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, timings: e.target.value })} 
-                      placeholder="e.g. 7:30 AM - 12:00 PM, 5:30 PM - 9:30 PM" 
+                    <input
+                      type="text"
+                      value={editingPoi.timings || ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, timings: e.target.value })}
+                      placeholder="e.g. 7:30 AM - 12:00 PM, 5:30 PM - 9:30 PM"
                     />
                   </div>
                   <div className="dmd-form-group">
                     <label>Aarti Schedule <small>(Optional)</small></label>
-                    <input 
-                      type="text" 
-                      value={editingPoi.aartiTimings || ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, aartiTimings: e.target.value })} 
-                      placeholder="e.g. Mangala 7:45 AM, Sandhya 7:30 PM" 
+                    <input
+                      type="text"
+                      value={editingPoi.aartiTimings || ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, aartiTimings: e.target.value })}
+                      placeholder="e.g. Mangala 7:45 AM, Sandhya 7:30 PM"
                     />
                   </div>
                 </div>
@@ -3330,40 +3330,40 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Contact / Booking Phone</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.phone || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, phone: e.target.value })} 
-                        placeholder="+91 98765 43210" 
+                      <input
+                        type="text"
+                        value={editingPoi.phone || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, phone: e.target.value })}
+                        placeholder="+91 98765 43210"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Price Range</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.priceRange || ''} 
-                        onChange={e => setPoiPriceRange(e.target.value)} 
-                        placeholder="e.g. ₹800 - ₹2,500 / night" 
+                      <input
+                        type="text"
+                        value={editingPoi.priceRange || ''}
+                        onChange={e => setPoiPriceRange(e.target.value)}
+                        placeholder="e.g. ₹800 - ₹2,500 / night"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Room Types <small>(comma separated)</small></label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.roomTypes || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, roomTypes: e.target.value })} 
-                        placeholder="Standard, Deluxe, AC Suite, Ashram Cottage" 
+                      <input
+                        type="text"
+                        value={editingPoi.roomTypes || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, roomTypes: e.target.value })}
+                        placeholder="Standard, Deluxe, AC Suite, Ashram Cottage"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Amenities</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.amenities || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, amenities: e.target.value })} 
-                        placeholder="AC, Pure Veg Dining, Temple View, Gaushala" 
+                      <input
+                        type="text"
+                        value={editingPoi.amenities || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, amenities: e.target.value })}
+                        placeholder="AC, Pure Veg Dining, Temple View, Gaushala"
                       />
                     </div>
                   </div>
@@ -3378,40 +3378,40 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Reservation Phone</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.phone || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, phone: e.target.value })} 
-                        placeholder="+91 98765 43210" 
+                      <input
+                        type="text"
+                        value={editingPoi.phone || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, phone: e.target.value })}
+                        placeholder="+91 98765 43210"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Cuisine Type</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.cuisine || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, cuisine: e.target.value })} 
-                        placeholder="Pure Sattvic Vedic Thali, Street Food" 
+                      <input
+                        type="text"
+                        value={editingPoi.cuisine || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, cuisine: e.target.value })}
+                        placeholder="Pure Sattvic Vedic Thali, Street Food"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Price Range</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.priceRange || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, priceRange: e.target.value })} 
-                        placeholder="e.g. ₹100 - ₹300 per person" 
+                      <input
+                        type="text"
+                        value={editingPoi.priceRange || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, priceRange: e.target.value })}
+                        placeholder="e.g. ₹100 - ₹300 per person"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Specialties / Mahaprasad</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.specialties || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, specialties: e.target.value })} 
-                        placeholder="Mathura Peda, Rabdi, Hing Kachori, Makhan Mishri" 
+                      <input
+                        type="text"
+                        value={editingPoi.specialties || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, specialties: e.target.value })}
+                        placeholder="Mathura Peda, Rabdi, Hing Kachori, Makhan Mishri"
                       />
                     </div>
                   </div>
@@ -3426,49 +3426,49 @@ export default function AdminDashboardPage({
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Dham Sub-type</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.type || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, type: e.target.value })} 
-                        placeholder="e.g. Holy Dham & Temple City, Sacred Hill Zone" 
+                      <input
+                        type="text"
+                        value={editingPoi.type || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, type: e.target.value })}
+                        placeholder="e.g. Holy Dham & Temple City, Sacred Hill Zone"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Parikrama Circuit <small>(km)</small></label>
-                      <input 
-                        type="number" 
-                        value={editingPoi.parikramaKm ?? ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, parikramaKm: e.target.value })} 
-                        placeholder="21" 
+                      <input
+                        type="number"
+                        value={editingPoi.parikramaKm ?? ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, parikramaKm: e.target.value })}
+                        placeholder="21"
                       />
                     </div>
                   </div>
                   <div className="dmd-form-group">
                     <label>Key Mandirs Inside <small>(comma separated)</small></label>
-                    <input 
-                      type="text" 
-                      value={editingPoi.highlights || ''} 
-                      onChange={e => setEditingPoi({ ...editingPoi, highlights: e.target.value })} 
-                      placeholder="Radha Kund, Mansi Ganga, Daan Ghati, Mukharbind" 
+                    <input
+                      type="text"
+                      value={editingPoi.highlights || ''}
+                      onChange={e => setEditingPoi({ ...editingPoi, highlights: e.target.value })}
+                      placeholder="Radha Kund, Mansi Ganga, Daan Ghati, Mukharbind"
                     />
                   </div>
                   <div className="dmd-form-row-2">
                     <div className="dmd-form-group">
                       <label>Best Darshan Time / Tips</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.bestTime || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, bestTime: e.target.value })} 
-                        placeholder="Morning or Night Parikrama under moonlit sky" 
+                      <input
+                        type="text"
+                        value={editingPoi.bestTime || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, bestTime: e.target.value })}
+                        placeholder="Morning or Night Parikrama under moonlit sky"
                       />
                     </div>
                     <div className="dmd-form-group">
                       <label>Map Color Accent</label>
-                      <input 
-                        type="text" 
-                        value={editingPoi.color || ''} 
-                        onChange={e => setEditingPoi({ ...editingPoi, color: e.target.value })} 
-                        placeholder="#10b981" 
+                      <input
+                        type="text"
+                        value={editingPoi.color || ''}
+                        onChange={e => setEditingPoi({ ...editingPoi, color: e.target.value })}
+                        placeholder="#10b981"
                       />
                     </div>
                   </div>
@@ -3476,17 +3476,17 @@ export default function AdminDashboardPage({
               )}
 
               <div style={{ display: 'flex', gap: '12px', marginTop: '12px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
-                <button 
-                  type="button" 
-                  className="dmd-action-btn" 
+                <button
+                  type="button"
+                  className="dmd-action-btn"
                   style={{ flex: 1, height: '44px' }}
                   onClick={() => setEditingPoi(null)}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="dmd-action-btn primary" 
+                <button
+                  type="submit"
+                  className="dmd-action-btn primary"
                   style={{ flex: 2, height: '44px' }}
                 >
                   Update & Save Changes
@@ -3514,9 +3514,9 @@ export default function AdminDashboardPage({
               <button className="dmd-action-btn" style={{ flex: 1, height: '42px' }} onClick={() => setDeletingPoi(null)}>
                 Cancel
               </button>
-              <button 
-                className="dmd-action-btn" 
-                style={{ flex: 1, height: '42px', background: '#ef4444', color: '#ffffff', borderColor: '#ef4444' }} 
+              <button
+                className="dmd-action-btn"
+                style={{ flex: 1, height: '42px', background: '#ef4444', color: '#ffffff', borderColor: '#ef4444' }}
                 onClick={handleDeletePoi}
               >
                 Delete

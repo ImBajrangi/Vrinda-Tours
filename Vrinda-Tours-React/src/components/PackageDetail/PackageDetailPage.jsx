@@ -10,7 +10,7 @@ import {
 import { getPackageDeepDetails } from '../../data/packageDeepData';
 import { updatePageSEO } from '../../utils/seoHelper';
 import { getCachedData, setCachedData } from '../../data/landingData';
-import AnimatedCheckCircle from '../UI/AnimatedCheckCircle';
+import AnimatedCheckCircle from '../UI/Animations/AnimatedCheckCircle';
 import './PackageDetailPage.css';
 
 const DETAIL_ADDONS = [

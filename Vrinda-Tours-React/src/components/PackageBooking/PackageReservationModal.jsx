@@ -7,8 +7,8 @@ import {
   Building, User, Phone, AlertCircle, Compass, Heart, MoreVertical, Plus, Minus,
   Sunrise, Moon
 } from 'lucide-react';
-import { triggerCelebration } from '../UI/Confetti';
-import AnimatedCheckCircle from '../UI/AnimatedCheckCircle';
+import { triggerCelebration } from '../UI/Animations/Confetti';
+import AnimatedCheckCircle from '../UI/Animations/AnimatedCheckCircle';
 import './PackageReservationModal.css';
 
 /**

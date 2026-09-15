@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import AnimatedIcon from '../UI/AnimatedIcon';
-import MorphingIcon from '../UI/MorphingIcon';
-import { triggerCelebration } from '../UI/Confetti';
+import AnimatedIcon from '../UI/Animations/AnimatedIcon';
+import MorphingIcon from '../UI/Animations/MorphingIcon';
+import { triggerCelebration } from '../UI/Animations/Confetti';
 import {
   Compass, Calendar, Clock, Users, MapPin, Search, Star,
   ArrowRight, ArrowLeft, ArrowUpRight, CheckCircle2, Play, SlidersHorizontal,
@@ -54,9 +54,9 @@ import InstantRideModal from '../Ride/InstantRideModal';
 import StripePaymentModal from '../Payment/StripePaymentModal';
 import PackageDetailPage from '../PackageDetail/PackageDetailPage';
 import { getPackageDeepDetails } from '../../data/packageDeepData';
-import CookieConsentBar from '../UI/CookieConsentBar';
+import CookieConsentBar from '../UI/Banners/CookieConsentBar';
 import PackageReservationModal from '../PackageBooking/PackageReservationModal';
-import TransactionRecallBanner from '../UI/TransactionRecallBanner';
+import TransactionRecallBanner from '../UI/Banners/TransactionRecallBanner';
 import './PartnerLandingPage.css';
 
 // Interactive Trip Packages Selector Modal

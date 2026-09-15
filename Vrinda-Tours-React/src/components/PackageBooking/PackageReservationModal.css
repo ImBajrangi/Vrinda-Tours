@@ -1366,7 +1366,7 @@
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0) 72%);
+  /* background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0) 72%); */
   animation: vtHaloPulse 2s ease-in-out infinite;
 }
 
@@ -1416,7 +1416,7 @@
   font-size: 11px;
   line-height: 1;
   pointer-events: none;
-  animation: vtSparkleFloat 2.2s ease-in-out infinite alternate;
+  /* animation: vtSparkleFloat 2.2s ease-in-out infinite alternate; */
 }
 
 @keyframes vtSparkleFloat {

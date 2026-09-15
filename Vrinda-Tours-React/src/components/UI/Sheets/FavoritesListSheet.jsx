@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Heart, Navigation, Star, ArrowRight, Compass, Sparkles, BedDouble, UtensilsCrossed, Landmark, Home, Info, Trash2, X } from 'lucide-react';
-import { calculateDistance, formatDistance, calculateETA } from '../../utils/distance';
-import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
+import { calculateDistance, formatDistance, calculateETA } from '../../../utils/distance';
+import { useBottomSheetDrag } from '../../../hooks/useBottomSheetDrag';
 import './FavoritesListSheet.css';
 
 export default function FavoritesListSheet({

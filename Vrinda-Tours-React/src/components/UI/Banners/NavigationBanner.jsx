@@ -9,8 +9,8 @@ import {
   Star,
   Heart
 } from 'lucide-react';
-import { locations } from '../../data/locations';
-import { useFavorites } from '../../hooks/useFavorites';
+import { locations } from '../../../data/locations';
+import { useFavorites } from '../../../hooks/useFavorites';
 import './NavigationBanner.css';
 
 // Haversine exact distance formula
