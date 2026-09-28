@@ -31,6 +31,11 @@ import {
   manuallyAdjustDriverDue,
   ADMIN_PAYMENT_CONFIG
 } from '../../services/commissionService';
+import { 
+  fetchBookingRequests, 
+  subscribeToBookingRequests, 
+  updateBookingStatus 
+} from '../../services/realtimeDatabaseService';
 import './AdminDashboardPage.css';
 
 // Admin email whitelist and master passcode
@@ -83,6 +88,11 @@ export default function AdminDashboardPage({
   const [rideRequests, setRideRequests] = useState([]);
   const [roomBookings, setRoomBookings] = useState([]);
   const [tableReservations, setTableReservations] = useState([]);
+  const [realtimeBookingRequests, setRealtimeBookingRequests] = useState([]);
+  const [selectedBookingForOps, setSelectedBookingForOps] = useState(null);
+  const [bookingFilterStatus, setBookingFilterStatus] = useState('ALL');
+  const [opsInternalNote, setOpsInternalNote] = useState('');
+  const [opsAssignedOperator, setOpsAssignedOperator] = useState('');
   const [registrations, setRegistrations] = useState([]);
   const [payments, setPayments] = useState([]);
   const [supportThreads, setSupportThreads] = useState([]);
@@ -270,6 +280,10 @@ export default function AdminDashboardPage({
         .limit(50);
       if (tablesData) setTableReservations(tablesData);
 
+      // 4b. Realtime Central Booking Requests (Hotels, Dining, Tours, Darshan, Cabs)
+      const rBookings = await fetchBookingRequests();
+      if (rBookings) setRealtimeBookingRequests(rBookings);
+
       // 5. Stepped Registrations
       const [driverRegs, hotelRegs, restRegs, agencyRegs] = await Promise.all([
         supabase.from('driver_registrations').select('*').order('created_at', { ascending: false }).limit(20),
@@ -342,6 +356,7 @@ export default function AdminDashboardPage({
       .on('postgres_changes', { event: '*', schema: 'public', table: 'ride_requests' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'room_bookings' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'table_reservations' }, () => fetchAllData())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'booking_requests' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'driver_registrations' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'hotel_registrations' }, () => fetchAllData())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'restaurant_registrations' }, () => fetchAllData())
@@ -353,6 +368,13 @@ export default function AdminDashboardPage({
           setTelemetry(prev => ({ ...prev, channelActive: true }));
         }
       });
+
+    // A2. Dedicated Realtime Booking Pipeline Stream
+    const unsubBookings = subscribeToBookingRequests(() => {
+      fetchBookingRequests().then(data => {
+        if (data) setRealtimeBookingRequests(data);
+      });
+    });
 
     // B. Real-Time Bi-Directional Devotee Chat Inbox Subscription (<20ms instant sync)
     const unsubInbox = subscribeToAdminInbox((eventPayload) => {
@@ -446,6 +468,7 @@ export default function AdminDashboardPage({
       safeRemoveChannel(supaChannel);
       unsubInbox();
       unsubPayments();
+      if (typeof unsubBookings === 'function') unsubBookings();
       if (typeof unsubAnnouncements === 'function') unsubAnnouncements();
     };
   }, [isLoggedIn]);
@@ -989,6 +1012,48 @@ export default function AdminDashboardPage({
       }
     } catch (err) {
       showToast('Failed to update partner verification', 'error');
+    }
+  };
+
+  // Realtime Booking Request Operations Handlers
+  const handleUpdateBookingReqStatus = async (bookingId, newStatus, customNotes = '', customOp = '') => {
+    try {
+      const ok = await updateBookingStatus(bookingId, {
+        status: newStatus,
+        internalNotes: customNotes || opsInternalNote,
+        assignedOperator: customOp || opsAssignedOperator
+      });
+      if (ok) {
+        showToast(`Booking ${bookingId} status updated to ${newStatus}`);
+        const fresh = await fetchBookingRequests();
+        setRealtimeBookingRequests(fresh);
+        if (selectedBookingForOps && selectedBookingForOps.id === bookingId) {
+          setSelectedBookingForOps(prev => ({
+            ...prev,
+            status: newStatus,
+            statusLabel: newStatus,
+            internalNotes: customNotes || opsInternalNote || prev.internalNotes,
+            assignedOperator: customOp || opsAssignedOperator || prev.assignedOperator
+          }));
+        }
+      }
+    } catch (err) {
+      showToast('Error updating booking status', 'error');
+    }
+  };
+
+  const handleSaveBookingOpsDetails = async (bookingId) => {
+    try {
+      await updateBookingStatus(bookingId, {
+        status: selectedBookingForOps?.status || 'UNDER_REVIEW',
+        internalNotes: opsInternalNote,
+        assignedOperator: opsAssignedOperator
+      });
+      showToast(`Saved operator & internal notes for #${bookingId}`);
+      const fresh = await fetchBookingRequests();
+      setRealtimeBookingRequests(fresh);
+    } catch (err) {
+      showToast('Failed to save booking notes', 'error');
     }
   };
 
@@ -1798,57 +1863,360 @@ export default function AdminDashboardPage({
               </div>
             )}
 
-            {/* TAB 4: LIVE BOOKINGS */}
+            {/* TAB 4: LIVE BOOKINGS OPERATIONS DASHBOARD */}
             {activeTab === 'bookings' && (
               <div className="dmd-admin-fade">
-                <h2 className="dmd-section-title">Live Dispatch & Bookings Queue ({[...rideRequests, ...roomBookings, ...tableReservations].length})</h2>
-                <p className="dmd-section-sub">Incoming ride requests, room reservations, and table orders across Brij</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+                  <div>
+                    <h2 className="dmd-section-title">Central Booking Requests & Operations Desk ({realtimeBookingRequests.length})</h2>
+                    <p className="dmd-section-sub">Zero-friction DISCOVER → SELECT → REQUEST pipeline across Stays, Dining, Tours, Darshan & Cabs</p>
+                  </div>
+                  <button 
+                    type="button" 
+                    className="dmd-action-btn secondary"
+                    onClick={() => {
+                      fetchBookingRequests().then(data => {
+                        if (data) setRealtimeBookingRequests(data);
+                        showToast('Refreshed booking requests from Supabase');
+                      });
+                    }}
+                  >
+                    <ArrowPathIcon style={{ width: 14, height: 14 }} /> Refresh Stream
+                  </button>
+                </div>
 
-                <div className="dmd-table-wrapper" style={{ marginTop: '18px' }}>
+                {/* Operations Status Metric Pills */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                  <button
+                    type="button"
+                    className={`dmd-payments-subtab ${bookingFilterStatus === 'ALL' ? 'active' : ''}`}
+                    onClick={() => setBookingFilterStatus('ALL')}
+                  >
+                    All Requests ({realtimeBookingRequests.length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`dmd-payments-subtab ${bookingFilterStatus === 'REQUESTED' ? 'active' : ''}`}
+                    onClick={() => setBookingFilterStatus('REQUESTED')}
+                  >
+                    🟡 New Requested ({realtimeBookingRequests.filter(b => b.status === 'REQUESTED').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`dmd-payments-subtab ${bookingFilterStatus === 'CONTACTING_CUSTOMER' ? 'active' : ''}`}
+                    onClick={() => setBookingFilterStatus('CONTACTING_CUSTOMER')}
+                  >
+                    🔵 Contacting Devotee ({realtimeBookingRequests.filter(b => b.status === 'CONTACTING_CUSTOMER').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`dmd-payments-subtab ${bookingFilterStatus === 'CONFIRMED' ? 'active' : ''}`}
+                    onClick={() => setBookingFilterStatus('CONFIRMED')}
+                  >
+                    🟢 Confirmed ({realtimeBookingRequests.filter(b => b.status === 'CONFIRMED').length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`dmd-payments-subtab ${bookingFilterStatus === 'COMPLETED' ? 'active' : ''}`}
+                    onClick={() => setBookingFilterStatus('COMPLETED')}
+                  >
+                    ⚪ Completed ({realtimeBookingRequests.filter(b => b.status === 'COMPLETED').length})
+                  </button>
+                </div>
+
+                <div className="dmd-table-wrapper">
                   <table className="dmd-data-table">
                     <thead>
                       <tr>
-                        <th>Service Type</th>
-                        <th>Devotee Name</th>
-                        <th>Destination / Room</th>
-                        <th>Contact Info</th>
+                        <th>Request ID</th>
+                        <th>Service / Venue</th>
+                        <th>Devotee Details</th>
+                        <th>Date & Guests</th>
+                        <th>Devotee Notes</th>
                         <th>Status</th>
-                        <th>Date</th>
+                        <th>Operator & Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {[...rideRequests, ...roomBookings, ...tableReservations].length === 0 ? (
+                      {(bookingFilterStatus === 'ALL' ? realtimeBookingRequests : realtimeBookingRequests.filter(b => b.status === bookingFilterStatus)).length === 0 ? (
                         <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b' }}>
+                          <td colSpan="7" style={{ textAlign: 'center', padding: '3.5rem', color: '#64748b' }}>
                             <ClockIcon style={{ width: 34, height: 34, margin: '0 auto 8px', color: '#94a3b8' }} />
-                            <p style={{ margin: 0, fontWeight: 700 }}>No live bookings currently in queue.</p>
+                            <p style={{ margin: 0, fontWeight: 700 }}>No booking requests found for status &ldquo;{bookingFilterStatus}&rdquo;.</p>
                           </td>
                         </tr>
                       ) : (
-                        [...rideRequests, ...roomBookings, ...tableReservations].map((b, idx) => (
-                          <tr key={b.id || idx}>
-                            <td>
-                              <span className="dmd-tag-category">
-                                {b.hotel_name ? 'Hotel Stay' : b.outlet_name ? 'Dining' : 'E-Rickshaw Ride'}
-                              </span>
-                            </td>
-                            <td><strong>{b.user_name || b.guest_name || 'Pilgrim'}</strong></td>
-                            <td><span>{b.hotel_name || b.destination || b.package_title || 'Direct Booking'}</span></td>
-                            <td><span>{b.user_phone || b.phone || 'Direct'}</span></td>
-                            <td>
-                              <span className="dmd-verify-pill verified">{b.status || 'Confirmed'}</span>
-                            </td>
-                            <td>
-                              <span className="dmd-cell-sub">
-                                {b.created_at ? new Date(b.created_at).toLocaleDateString('en-IN') : 'Recent'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))
+                        (bookingFilterStatus === 'ALL' ? realtimeBookingRequests : realtimeBookingRequests.filter(b => b.status === bookingFilterStatus)).map((b) => {
+                          const statusClass = b.status === 'CONFIRMED' || b.status === 'COMPLETED' ? 'verified' : b.status === 'CANCELLED' ? 'rejected' : 'pending';
+                          const waPhone = (b.customerWhatsapp || b.customerPhone || '').replace(/[^0-9]/g, '');
+                          const waText = encodeURIComponent(`🙏 Radhe Radhe ${b.customerName || 'Devotee'}! Reaching out from Vrinda Tours regarding your booking request #${b.id} for ${b.venueName || b.serviceType}.`);
+
+                          return (
+                            <tr key={b.id}>
+                              <td>
+                                <strong style={{ color: '#09090b', fontFamily: 'monospace', fontSize: '0.85rem' }}>#{b.id}</strong>
+                                <br />
+                                <span className="dmd-cell-sub">{formatRelativeTime(b.createdAt)}</span>
+                              </td>
+                              <td>
+                                <span className="dmd-tag-category" style={{ marginBottom: '4px', display: 'inline-block' }}>
+                                  {b.serviceType || 'SERVICE'}
+                                </span>
+                                <br />
+                                <strong style={{ fontSize: '0.88rem' }}>{b.venueName}</strong>
+                                {b.locationName && (
+                                  <span className="dmd-cell-sub" style={{ display: 'block' }}>📍 {b.locationName}</span>
+                                )}
+                              </td>
+                              <td>
+                                <strong>{b.customerName || 'Pilgrim Devotee'}</strong>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                                  <a 
+                                    href={`tel:${b.customerPhone}`} 
+                                    style={{ color: '#2563eb', fontSize: '0.78rem', textDecoration: 'none', fontWeight: 600 }}
+                                  >
+                                    📞 {b.customerPhone}
+                                  </a>
+                                  {waPhone && (
+                                    <a
+                                      href={`https://wa.me/${waPhone}?text=${waText}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ color: '#059669', fontSize: '0.78rem', textDecoration: 'none', fontWeight: 700 }}
+                                      title="Open WhatsApp chat with devotee"
+                                    >
+                                      💬 WA
+                                    </a>
+                                  )}
+                                </div>
+                              </td>
+                              <td>
+                                <span style={{ fontWeight: 600, fontSize: '0.82rem' }}>📅 {b.checkInDate || 'Flexible'}</span>
+                                {b.timeSlot && <span className="dmd-cell-sub" style={{ display: 'block' }}>⏰ {b.timeSlot}</span>}
+                                <span className="dmd-cell-sub" style={{ display: 'block', marginTop: '2px' }}>
+                                  👥 {b.guestsCount} Guests {b.roomType ? `• ${b.roomType}` : ''}
+                                </span>
+                              </td>
+                              <td style={{ maxWidth: '180px' }}>
+                                <span style={{ fontSize: '0.78rem', color: b.notes ? '#334155' : '#94a3b8', fontStyle: b.notes ? 'normal' : 'italic' }}>
+                                  {b.notes || 'No special requests'}
+                                </span>
+                                {b.internalNotes && (
+                                  <div style={{ marginTop: '4px', padding: '2px 6px', background: '#fef3c7', borderRadius: '4px', fontSize: '0.72rem', color: '#92400e' }}>
+                                    📝 <strong>Desk:</strong> {b.internalNotes}
+                                  </div>
+                                )}
+                              </td>
+                              <td>
+                                <span className={`dmd-verify-pill ${statusClass}`}>
+                                  {b.status}
+                                </span>
+                                {b.assignedOperator && (
+                                  <span className="dmd-cell-sub" style={{ display: 'block', marginTop: '4px' }}>
+                                    👤 Op: {b.assignedOperator}
+                                  </span>
+                                )}
+                              </td>
+                              <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                  <div style={{ display: 'flex', gap: '4px' }}>
+                                    <button
+                                      type="button"
+                                      className="dmd-action-btn primary"
+                                      style={{ padding: '3px 8px', fontSize: '0.75rem' }}
+                                      onClick={() => {
+                                        setSelectedBookingForOps(b);
+                                        setOpsInternalNote(b.internalNotes || '');
+                                        setOpsAssignedOperator(b.assignedOperator || '');
+                                      }}
+                                    >
+                                      👁️ Open
+                                    </button>
+
+                                    {waPhone && (
+                                      <a
+                                        href={`https://wa.me/${waPhone}?text=${waText}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="dmd-action-btn secondary"
+                                        style={{ padding: '3px 8px', fontSize: '0.75rem', textDecoration: 'none', background: '#dcfce7', color: '#15803d', borderColor: '#bbf7d0' }}
+                                      >
+                                        💬 Contact
+                                      </a>
+                                    )}
+                                  </div>
+
+                                  <div style={{ display: 'flex', gap: '4px', marginTop: '2px' }}>
+                                    {b.status !== 'CONFIRMED' && (
+                                      <button
+                                        type="button"
+                                        style={{ background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0', borderRadius: '4px', padding: '2px 6px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                                        onClick={() => handleUpdateBookingReqStatus(b.id, 'CONFIRMED')}
+                                      >
+                                        Confirm
+                                      </button>
+                                    )}
+                                    {b.status !== 'CONTACTING_CUSTOMER' && b.status !== 'CONFIRMED' && (
+                                      <button
+                                        type="button"
+                                        style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '4px', padding: '2px 6px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                                        onClick={() => handleUpdateBookingReqStatus(b.id, 'CONTACTING_CUSTOMER')}
+                                      >
+                                        Contacting
+                                      </button>
+                                    )}
+                                    {b.status !== 'CANCELLED' && (
+                                      <button
+                                        type="button"
+                                        style={{ background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '4px', padding: '2px 6px', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600 }}
+                                        onClick={() => handleUpdateBookingReqStatus(b.id, 'CANCELLED')}
+                                      >
+                                        Cancel
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
                   </table>
                 </div>
+
+                {/* Selected Booking Operations Drawer Modal */}
+                {selectedBookingForOps && (
+                  <div 
+                    style={{
+                      position: 'fixed',
+                      inset: 0,
+                      background: 'rgba(0,0,0,0.6)',
+                      zIndex: 11000,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '16px'
+                    }}
+                    onClick={() => setSelectedBookingForOps(null)}
+                  >
+                    <div 
+                      style={{
+                        background: '#ffffff',
+                        borderRadius: '16px',
+                        maxWidth: '560px',
+                        width: '100%',
+                        padding: '24px',
+                        boxShadow: '0 20px 40px rgba(0,0,0,0.25)',
+                        maxHeight: '90vh',
+                        overflowY: 'auto'
+                      }}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px', marginBottom: '16px' }}>
+                        <div>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#2563eb', letterSpacing: '0.05em' }}>
+                            BOOKING REQUEST OPERATION
+                          </span>
+                          <h3 style={{ margin: '2px 0 0', fontSize: '1.25rem', fontWeight: 800, color: '#09090b' }}>
+                            #{selectedBookingForOps.id} • {selectedBookingForOps.venueName}
+                          </h3>
+                        </div>
+                        <button 
+                          onClick={() => setSelectedBookingForOps(null)}
+                          style={{ background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#64748b' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {/* Devotee Breakdown */}
+                      <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '14px', marginBottom: '16px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '0.84rem' }}>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Customer Devotee:</span>
+                            <div style={{ fontWeight: 700 }}>{selectedBookingForOps.customerName}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Phone Number:</span>
+                            <div style={{ fontWeight: 700 }}>{selectedBookingForOps.customerPhone}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Service Category:</span>
+                            <div style={{ fontWeight: 700 }}>{selectedBookingForOps.serviceType}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Dates:</span>
+                            <div style={{ fontWeight: 700 }}>{selectedBookingForOps.checkInDate} {selectedBookingForOps.checkOutDate ? `to ${selectedBookingForOps.checkOutDate}` : ''}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Guests & Unit:</span>
+                            <div style={{ fontWeight: 700 }}>{selectedBookingForOps.guestsCount} Guests • {selectedBookingForOps.roomType || 'Standard'}</div>
+                          </div>
+                          <div>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Current Status:</span>
+                            <div style={{ fontWeight: 700, color: '#047857' }}>{selectedBookingForOps.status}</div>
+                          </div>
+                        </div>
+
+                        {selectedBookingForOps.notes && (
+                          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed #cbd5e1', fontSize: '0.82rem' }}>
+                            <span style={{ color: '#64748b', fontSize: '0.75rem' }}>Special Devotee Request:</span>
+                            <p style={{ margin: '2px 0 0', fontWeight: 600, color: '#1e293b' }}>{selectedBookingForOps.notes}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Operations Controls */}
+                      <div style={{ marginBottom: '16px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                          Assigned Operations Officer / Sarathi:
+                        </label>
+                        <input
+                          type="text"
+                          value={opsAssignedOperator}
+                          onChange={e => setOpsAssignedOperator(e.target.value)}
+                          placeholder="e.g. Radheshyam Desk Lead, Sanjay Sharma"
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                        />
+                      </div>
+
+                      <div style={{ marginBottom: '18px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                          Internal Admin Notes (Private):
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={opsInternalNote}
+                          onChange={e => setOpsInternalNote(e.target.value)}
+                          placeholder="Add internal verification notes, ashram contact logs, or payment details..."
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '16px' }}>
+                        <button
+                          type="button"
+                          className="dmd-action-btn secondary"
+                          onClick={() => handleSaveBookingOpsDetails(selectedBookingForOps.id)}
+                        >
+                          💾 Save Notes & Operator
+                        </button>
+                        <button
+                          type="button"
+                          className="dmd-action-btn primary"
+                          style={{ background: '#059669', borderColor: '#047857' }}
+                          onClick={() => {
+                            handleUpdateBookingReqStatus(selectedBookingForOps.id, 'CONFIRMED');
+                            setSelectedBookingForOps(null);
+                          }}
+                        >
+                          ✅ Confirm Booking
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -1,0 +1,282 @@
+/* ==========================================================================
+   Install App Modal — Global Obsidian & Emerald Glass Theme
+   ========================================================================== */
+
+.vt-app-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: vtFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vt-app-modal-card {
+  width: 100%;
+  max-width: 440px;
+  background: linear-gradient(180deg, #111522 0%, #0a0d16 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  box-shadow: 
+    0 24px 60px -12px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  color: #f8fafc;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: vtPopUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vtFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes vtPopUp {
+  from { opacity: 0; transform: scale(0.94) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.vt-am-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vt-am-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+}
+
+.vt-am-badge-icon {
+  color: #10b981;
+}
+
+.vt-am-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.vt-am-close-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.vt-am-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.vt-am-logo-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.vt-am-logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.vt-am-logo-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 19px;
+  border: 1.5px solid #10b981;
+  opacity: 0.6;
+  animation: vtPulse 2.5s infinite;
+}
+
+@keyframes vtPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.05); opacity: 0.2; }
+}
+
+.vt-am-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.vt-am-subtitle {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.45;
+  max-width: 360px;
+}
+
+.vt-am-tab-pills {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.vt-am-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  border-radius: 9px;
+  transition: all 0.2s ease;
+}
+
+.vt-am-tab.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.vt-am-benefits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vt-am-benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.vt-am-icon-box {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-am-icon-box.emerald {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.vt-am-icon-box.amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+
+.vt-am-icon-box.blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.vt-am-benefit-item strong {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-bottom: 2px;
+}
+
+.vt-am-benefit-item span {
+  display: block;
+  font-size: 11.5px;
+  color: #94a3b8;
+  line-height: 1.35;
+}
+
+.vt-am-ios-guide {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: #fbbf24;
+}
+
+.vt-am-ios-guide-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.vt-am-action-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.vt-am-install-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 600;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+  transition: all 0.2s ease;
+}
+
+.vt-am-install-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.45);
+}
+
+.vt-am-dismiss-btn {
+  height: 36px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.vt-am-dismiss-btn:hover {
+  color: #94a3b8;
+}

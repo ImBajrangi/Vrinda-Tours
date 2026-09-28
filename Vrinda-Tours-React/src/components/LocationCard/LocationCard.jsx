@@ -9,6 +9,7 @@ import { openWhatsApp, generateHotelMessage, generateRestaurantMessage } from '.
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
 import { useFavorites } from '../../hooks/useFavorites';
 import { shareWebPPicture } from '../../utils/imageOptimizer';
+import { getNearbyAttractionsForLocation } from '../../services/geocodingService';
 import './LocationCard.css';
 
 export default function LocationCard({ 
@@ -26,6 +27,7 @@ export default function LocationCard({
   const { isDragging, sheetStyle, handleProps, triggerClose } = useBottomSheetDrag(onClose);
   const [imgError, setImgError] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
+  const [nearbyAttractions, setNearbyAttractions] = useState([]);
 
   // Smoothly keep previous location alive during CSS exit transition
   useEffect(() => {
@@ -33,7 +35,12 @@ export default function LocationCard({
       setDisplayLocation(location);
       setMode('preview');
       setImgError(false);
+      if (location.lat && location.lng) {
+        getNearbyAttractionsForLocation(location.lat, location.lng, location.name, 3)
+          .then(res => setNearbyAttractions(res || []));
+      }
     } else {
+      setNearbyAttractions([]);
       const timer = setTimeout(() => {
         setDisplayLocation(null);
       }, 300);
@@ -304,6 +311,31 @@ export default function LocationCard({
                   <span className="metric-value">{activeLoc.rating || '4.8'}</span>
                 </div>
               </div>
+
+              {/* Nearby Sacred Sites & Landmarks */}
+              {nearbyAttractions.length > 0 && (
+                <div style={{ padding: '6px 10px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', margin: '2px 0' }}>
+                  <span style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, color: '#64748b', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    Nearby
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                    {nearbyAttractions.map(item => (
+                      <div 
+                        key={item.name} 
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', padding: '2px 0', cursor: 'pointer' }}
+                        onClick={() => {
+                          if (onDirections) {
+                            onDirections({ name: item.name, lat: activeLoc.lat, lng: activeLoc.lng });
+                          }
+                        }}
+                      >
+                        <span style={{ fontWeight: 600, color: '#1e293b' }}>{item.name}</span>
+                        <span style={{ color: '#2563eb', fontWeight: 700, fontSize: '0.74rem' }}>— {item.distanceText}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Morph Action Row */}
               <div className="card-actions-grid">

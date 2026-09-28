@@ -10,6 +10,7 @@ import LocationCard from './components/LocationCard/LocationCard';
 import { useFirebaseDrivers } from './hooks/useFirebaseDrivers';
 import { useFirebaseLocations } from './hooks/useFirebaseLocations';
 import { useFavorites } from './hooks/useFavorites';
+import { useNearbyFleet } from './hooks/useNearbyFleet';
 import { fetchNavigationRoute, openExternalGoogleMaps } from './utils/navigationService';
 import RideStatusBanner from './components/UI/Banners/RideStatusBanner';
 import NavigationBanner from './components/UI/Banners/NavigationBanner';
@@ -40,6 +41,8 @@ const AgencyLandingPage = lazy(() => import('./components/Agency/AgencyLandingPa
 const PartnerHubModal = lazy(() => import('./components/PartnerHub/PartnerHubModal'));
 const HelpCenterModal = lazy(() => import('./components/HelpCenter/HelpCenterModal'));
 const InfoModal = lazy(() => import('./components/InfoPages/InfoModal'));
+const UserProfileModal = lazy(() => import('./components/Profile/UserProfileModal'));
+const InstallAppModal = lazy(() => import('./components/InstallApp/InstallAppModal'));
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
@@ -57,6 +60,10 @@ export default function App() {
   const [infoModalTab, setInfoModalTab] = useState(null);
   const [driverPortalVisible, setDriverPortalVisible] = useState(false);
   const [partnerHubVisible, setPartnerHubVisible] = useState(false);
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState('overview');
+  const [installAppVisible, setInstallAppVisible] = useState(false);
+  const [installAppTrigger, setInstallAppTrigger] = useState('manual');
   const [activePartnerId, setActivePartnerId] = useState(() => sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id'));
   const [activePartnerRole, setActivePartnerRole] = useState(() => sessionStorage.getItem('vt_partner_role') || 'driver');
   const [driverLandingVisible, setDriverLandingVisible] = useState(false);
@@ -69,6 +76,18 @@ export default function App() {
   const [persistedRide, setPersistedRide] = useState(() => getPersistedLocalRide());
   const [isLiveRideCapsuleMinimized, setIsLiveRideCapsuleMinimized] = useState(false);
 
+  // Dynamic Geolocation & Live Driver Fleet
+  const { position, loading, requestLocation } = useGeolocation();
+  const { drivers: fbDrivers, firebaseReady } = useFirebaseDrivers();
+  const { nearbyDrivers } = useNearbyFleet(position, fbDrivers);
+  const { locations, loading: locationsLoading } = useFirebaseLocations();
+  const { favorites, removeFavorite } = useFavorites();
+
+  const favoriteLocations = useMemo(() => {
+    if (!Array.isArray(locations) || !Array.isArray(favorites)) return [];
+    return locations.filter((loc) => loc?.name && favorites.includes(loc.name));
+  }, [locations, favorites]);
+
   // Active modal/overlay detection to prevent floating capsules from overlapping bottom sheets/cards
   const isAnyModalActive = Boolean(
     activeLocation ||
@@ -80,6 +99,8 @@ export default function App() {
     helpCenterVisible ||
     infoModalTab ||
     driverPortalVisible ||
+    profileModalVisible ||
+    installAppVisible ||
     (activeRoute && isNavExpanded) ||
     (activeFilter === 'favourites' && !partnerLandingVisible)
   );
@@ -87,7 +108,7 @@ export default function App() {
 
   // Listen to background ride events & storage changes
   useEffect(() => {
-    const handleStorageUpdate = (e) => {
+    const handleStorageUpdate = () => {
       const current = getPersistedLocalRide();
       setPersistedRide(current);
     };
@@ -133,14 +154,14 @@ export default function App() {
     if (activeLocation) {
       updatePageSEO({
         title: `${activeLocation.name} — Vrindavan Darshan, Map & Travel Guide`,
-        description: activeLocation.description || `Explore ${activeLocation.name} in sacred Brij Dham with Vrinda Vihar interactive map, verified drivers, and travel tips.`,
+        description: activeLocation.description || `Explore ${activeLocation.name} in sacred Brij Dham with Vrinda Travels interactive map, verified drivers, and travel tips.`,
         image: activeLocation.image,
         url: `/#${encodeURIComponent(activeLocation.name)}`
       });
     } else if (hotelBooking) {
       updatePageSEO({
         title: `Book ${hotelBooking.name} — Verified Vrindavan Ashram & Stay`,
-        description: `Reserve your devotee room at ${hotelBooking.name} in Vrindavan with 0% middleman fees and pure sattvic amenities on Vrinda Vihar.`,
+        description: `Reserve your devotee room at ${hotelBooking.name} in Vrindavan with 0% middleman fees on Vrinda Travels.`,
         image: hotelBooking.image,
         url: '/#stays'
       });
@@ -153,20 +174,9 @@ export default function App() {
       });
     } else if (rideRequest) {
       updatePageSEO({
-        title: `Book E-Rickshaw to ${rideRequest.destination?.name || 'Temple'} | Vrinda Vihar`,
+        title: `Book E-Rickshaw to ${rideRequest.destination?.name || 'Temple'} | Vrinda Travels`,
         description: `Instant verified Sarathi electric rickshaw dispatch in Vrindavan for pilgrim travel to ${rideRequest.destination?.name || 'sacred temples'}.`,
         url: '/#rides'
-      });
-    } else if (activeFilter && activeFilter !== 'all') {
-      const filterName = activeFilter === 'Temple' ? 'Temples & Mandirs' : 
-                         activeFilter === 'Holy Site' ? 'Sacred Kunds & Holy Sites' : 
-                         activeFilter === 'Hotel' ? 'Verified Ashrams & Stays' : 
-                         activeFilter === 'Restaurant' || activeFilter === 'Dining' ? 'Sattvic Dining & Bhojanalayas' : 
-                         activeFilter === 'favourites' ? 'My Saved Favourite Sacred Sites' : activeFilter;
-      updatePageSEO({
-        title: `${filterName} in Mathura & Vrindavan — Brij Pilgrimage Map`,
-        description: `Explore all ${filterName.toLowerCase()} across Vrindavan, Mathura, Barsana and Govardhan on Vrinda Vihar interactive guide.`,
-        url: `/#${activeFilter}`
       });
     } else {
       updatePageSEO();
@@ -208,16 +218,6 @@ export default function App() {
     setPartnerHubVisible(true);
   }, [activePartnerRole]);
 
-  const { position, loading, requestLocation } = useGeolocation();
-  const { drivers, firebaseReady } = useFirebaseDrivers();
-  const { locations, loading: locationsLoading } = useFirebaseLocations();
-  const { favorites, removeFavorite } = useFavorites();
-
-  const favoriteLocations = useMemo(() => {
-    if (!Array.isArray(locations) || !Array.isArray(favorites)) return [];
-    return locations.filter((loc) => loc?.name && favorites.includes(loc.name));
-  }, [locations, favorites]);
-
   const handleCloseAdmin = useCallback(() => {
     setAdminVisible(false);
     setPartnerLandingVisible(true);
@@ -226,7 +226,7 @@ export default function App() {
     }
   }, []);
 
-  // Deep Link Routing for direct sharing of registration & portal sections
+  // Deep Link Routing
   useEffect(() => {
     const handleDeepLinkRouting = () => {
       try {
@@ -236,21 +236,11 @@ export default function App() {
         const portalParam = (searchParams.get('portal') || '').toLowerCase();
         const appParam = (searchParams.get('app') || '').toLowerCase();
 
-        // Capture and persist referral code across all category landing links
-        const refParam = (searchParams.get('ref') || searchParams.get('referral') || searchParams.get('referrer') || searchParams.get('invite') || searchParams.get('code') || '').trim();
-        if (refParam) {
-          try {
-            localStorage.setItem('vrinda_referrer_code', refParam.toUpperCase());
-          } catch {}
-        }
-
-        // Direct Admin Console access: ?admin=true or ?portal=admin or #admin
         if (hash === '#admin' || searchParams.get('admin') === 'true' || searchParams.get('admin') === '1' || portalParam === 'admin' || joinParam === 'admin') {
           setAdminVisible(true);
           return;
         }
 
-        // Direct User App Map link: ?app=user or #map or #user
         if (appParam === 'user' || hash === '#map' || hash === '#user' || hash === '#app') {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
@@ -261,7 +251,6 @@ export default function App() {
           return;
         }
 
-        // Direct Partner Hub Dashboard: ?portal=partner or ?partner=hub or #hub or #partner-hub
         if (portalParam === 'partner' || portalParam === 'hub' || joinParam === 'hub' || hash.includes('hub')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
@@ -272,8 +261,7 @@ export default function App() {
           return;
         }
 
-        // Direct Driver Registration / Landing: ?partner=driver or ?join=driver or #driver
-        if (joinParam === 'driver' || joinParam === 'drivers' || joinParam === 'cab' || joinParam === 'auto' || joinParam === 'rickshaw' || hash.includes('driver')) {
+        if (joinParam === 'driver' || joinParam === 'drivers' || hash.includes('driver')) {
           setPartnerLandingVisible(false);
           setHotelLandingVisible(false);
           setRestaurantLandingVisible(false);
@@ -282,8 +270,7 @@ export default function App() {
           return;
         }
 
-        // Direct Hotel & Stay Desk: ?partner=hotel or ?join=hotel or #hotel
-        if (joinParam === 'hotel' || joinParam === 'stay' || joinParam === 'ashram' || joinParam === 'room' || hash.includes('hotel') || hash.includes('stay')) {
+        if (joinParam === 'hotel' || joinParam === 'stay' || hash.includes('hotel') || hash.includes('stay')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
           setRestaurantLandingVisible(false);
@@ -292,8 +279,7 @@ export default function App() {
           return;
         }
 
-        // Direct Restaurant / Dining Desk: ?partner=restaurant or ?join=restaurant or #restaurant
-        if (joinParam === 'restaurant' || joinParam === 'dining' || joinParam === 'food' || joinParam === 'prasadam' || hash.includes('restaurant')) {
+        if (joinParam === 'restaurant' || joinParam === 'dining' || hash.includes('restaurant')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
           setHotelLandingVisible(false);
@@ -302,8 +288,7 @@ export default function App() {
           return;
         }
 
-        // Direct Agency Desk: ?partner=agency or ?join=agency or #agency
-        if (joinParam === 'agency' || joinParam === 'travel' || joinParam === 'partner' || hash.includes('agency')) {
+        if (joinParam === 'agency' || joinParam === 'travel' || hash.includes('agency')) {
           setPartnerLandingVisible(false);
           setDriverLandingVisible(false);
           setHotelLandingVisible(false);
@@ -311,7 +296,6 @@ export default function App() {
           return;
         }
 
-        // Direct Help Center: ?page=help or #help
         if (joinParam === 'help' || hash.includes('help')) {
           setHelpCenterVisible(true);
           return;
@@ -330,49 +314,14 @@ export default function App() {
     };
   }, []);
 
-  // Real-time synchronization for active ride with Driver Companion App
-  useEffect(() => {
-    if (!activeRide?.driver?.id || activeRide.driver.id === 'drv_demo_vrinda') return;
-
-    const unsub = onSnapshot(doc(firestore, 'drivers', activeRide.driver.id), (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.currentRide) {
-          setActiveRide(prev => prev ? { 
-            ...prev, 
-            status: data.currentRide.status || prev.status, 
-            rideData: data.currentRide 
-          } : null);
-        }
-      }
-    }, (err) => {
-      console.warn('Realtime ride tracking snapshot error:', err);
-    });
-
-    return () => unsub();
-  }, [activeRide?.driver?.id]);
-
-  // Sync back to Partner Hub on hash update
-  useEffect(() => {
-    const handlePartnerHubHash = () => {
-      if (window.location.hash === '#partner-hub' || window.location.hash === '#hub') {
-        const storedId = sessionStorage.getItem('vt_partner_id') || sessionStorage.getItem('vt_driver_id');
-        const storedRole = sessionStorage.getItem('vt_partner_role') || 'driver';
-        handleOpenPartnerDashboard(storedId, storedRole);
-      }
-    };
-    window.addEventListener('hashchange', handlePartnerHubHash);
-    return () => window.removeEventListener('hashchange', handlePartnerHubHash);
-  }, [handleOpenPartnerDashboard]);
-
   const handleFilterChange = useCallback((key) => {
     if (key === '__drivers__') {
-      setDriversVisible(true);
+      setRideRequest({ destination: activeLocation || { name: 'Shri Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103 } });
       return;
     }
     setActiveFilter(key);
     setActiveLocation(null);
-  }, []);
+  }, [activeLocation]);
 
   const handleSelectLocation = useCallback((loc) => {
     setIsSearchActive(false);
@@ -409,7 +358,7 @@ export default function App() {
         timestamp: Date.now()
       };
 
-      if (driver?.id && driver.id !== 'drv_demo_vrinda') {
+      if (driver?.id && driver.id !== 'drv_demo_vrinda' && !driver.id.startsWith('sarathi_fleet_')) {
         await updateDoc(doc(firestore, 'drivers', driver.id), { currentRide: rideData });
       }
       setActiveRide({ driver, status: 'requested', rideData });
@@ -422,7 +371,7 @@ export default function App() {
   }, [position, activeLocation, rideRequest]);
 
   const handleCancelRide = useCallback(async () => {
-    if (activeRide?.driver?.id && activeRide.driver.id !== 'drv_demo_vrinda') {
+    if (activeRide?.driver?.id && !activeRide.driver.id.startsWith('sarathi_fleet_')) {
       try {
         await updateDoc(doc(firestore, 'drivers', activeRide.driver.id), { currentRide: deleteField() });
       } catch (err) {
@@ -436,7 +385,7 @@ export default function App() {
 
   const handleDirections = useCallback(async (loc) => {
     setActiveLocation(null);
-    const origin = position || { lat: 27.646, lng: 77.377 }; // user position or Braj center
+    const origin = position || { lat: 27.5818, lng: 77.7010 }; // user position or Vrindavan center
     
     setToast({ message: 'Calculating route...', type: 'info' });
     const routeData = await fetchNavigationRoute(origin, loc);
@@ -450,7 +399,6 @@ export default function App() {
       });
       setToast({ message: 'Route ready', type: 'success' });
     } else {
-      // Platform in-app route not available -> redirect directly to Google Maps
       setToast({ message: 'Opening Google Maps...', type: 'info' });
       openExternalGoogleMaps(origin, loc);
     }
@@ -459,54 +407,56 @@ export default function App() {
   const handleLocate = useCallback(() => {
     requestLocation();
     if (position && window.__vtMap) {
-      window.__vtMap.flyTo(position.lat, position.lng, 14);
+      window.__vtMap.flyTo(position.lat, position.lng, 15);
     }
   }, [position, requestLocation]);
 
   // Seed Data to Backend if empty
+  // Network Connectivity Monitoring & Graceful Offline States
   useEffect(() => {
-    const seed = async () => {
-      try {
-        const snap = await getDocs(collection(firestore, 'locations'));
-        if (snap.empty) {
-          console.log('Backend empty. Seeding initial data...');
-          const batch = writeBatch(firestore);
-          initialData.forEach((loc) => {
-            const ref = doc(collection(firestore, 'locations'));
-            batch.set(ref, loc);
-          });
-          await batch.commit();
-          setToast({ message: 'Backend successfully initialized', type: 'success' });
-        }
-      } catch (err) {
-        console.error('Seeding Error:', err);
-      }
+    const handleOnline = () => setToast({ message: '✨ Back online. Reconnected to live fleet & bookings.', type: 'success' });
+    const handleOffline = () => setToast({ message: '⚠️ Network connection lost. Showing cached data.', type: 'error' });
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
-    if (firebaseReady) seed();
-  }, [firebaseReady]);
+  }, []);
 
   return (
     <main id="main-content" className="app-main-viewport">
       <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
-        Vrinda Vihar — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws
+        Vrinda Travels — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws
       </h1>
       <AnnouncementBanner />
 
       <MapView
         locations={locations}
-        drivers={drivers}
+        drivers={nearbyDrivers}
         activeFilter={activeFilter}
         userPosition={position}
         activeLocation={activeLocation}
         activeRoute={activeRoute}
         mapStyle={mapStyle}
         onSelectLocation={handleSelectLocation}
+        onBookRide={handleBookRide}
       />
 
       <Header
         onSelectLocation={handleSelectLocation}
         onOpenDriverPortal={() => handleOpenPartnerDashboard(activePartnerId, activePartnerRole)}
-        onOpenDrivers={() => setDriversVisible(true)}
+        onOpenDrivers={() => setRideRequest({ destination: activeLocation || { name: 'Shri Bankey Bihari Mandir', lat: 27.580456, lng: 77.701103 } })}
+        onOpenFullProfile={(tab) => {
+          setProfileModalTab(tab || 'overview');
+          setProfileModalVisible(true);
+        }}
+        onOpenInstallApp={() => {
+          setInstallAppTrigger('manual');
+          setInstallAppVisible(true);
+        }}
         activeFilter={activeFilter}
         onFilterChange={handleFilterChange}
         onAdminOpen={() => setAdminVisible(true)}
@@ -515,6 +465,7 @@ export default function App() {
         partnerId={activePartnerId}
         partnerRole={activePartnerRole}
         isAdmin={Boolean(sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin')}
+        userPosition={position}
       />
 
       {activeRoute && !partnerLandingVisible && (
@@ -535,9 +486,11 @@ export default function App() {
       <LocationCard
         location={!isSearchActive && !activeRide && !rideRequest ? activeLocation : null}
         userPosition={position}
-        drivers={drivers}
+        drivers={nearbyDrivers}
         onRequestRide={handleRequestRide}
         onBookRide={handleBookRide}
+        onBookHotel={handleBookHotel}
+        onBookRestaurant={handleBookRestaurant}
         onClose={() => setActiveLocation(null)}
         onDirections={handleDirections}
         onToast={setToast}
@@ -559,14 +512,28 @@ export default function App() {
         )}
 
         {hotelBooking && (
-          <HotelBooking location={hotelBooking} onClose={() => setHotelBooking(null)} />
+          <HotelBooking 
+            location={hotelBooking} 
+            onClose={() => setHotelBooking(null)}
+            onSuggestAppInstall={(reason) => {
+              setInstallAppTrigger(reason);
+              setInstallAppVisible(true);
+            }}
+          />
         )}
 
         {restaurantBooking && (
-          <RestaurantBooking location={restaurantBooking} onClose={() => setRestaurantBooking(null)} />
+          <RestaurantBooking 
+            location={restaurantBooking} 
+            onClose={() => setRestaurantBooking(null)}
+            onSuggestAppInstall={(reason) => {
+              setInstallAppTrigger(reason);
+              setInstallAppVisible(true);
+            }}
+          />
         )}
 
-        {/* Persistent Live Ride Floating Activity Pill (Apple Dynamic Island Capsule) */}
+        {/* Live Ride Dynamic Island Pill */}
         {persistedRide && (persistedRide.status === 'searching' || persistedRide.status === 'requested' || persistedRide.status === 'accepted' || persistedRide.status === 'driver_arrived' || persistedRide.status === 'in_progress') && !rideRequest && !activeRide && !partnerLandingVisible && (
           <div 
             className={`vt-floating-live-ride-pill ${isCapsuleDocked ? 'docked-top' : ''} ${persistedRide.status === 'searching' || persistedRide.status === 'requested' ? 'status-amber' : 'status-emerald'}`}
@@ -612,7 +579,7 @@ export default function App() {
           <InstantRideModal
             destination={rideRequest?.destination || activeLocation}
             userPosition={position}
-            drivers={drivers}
+            drivers={nearbyDrivers}
             activeRide={activeRide}
             onRequestRide={handleRequestRide}
             onCancelRide={handleCancelRide}
@@ -627,7 +594,7 @@ export default function App() {
 
         {driversVisible && (
           <DriversPanel
-            drivers={drivers}
+            drivers={nearbyDrivers}
             onClose={() => setDriversVisible(false)}
             onOpenAdmin={() => setAdminVisible(true)}
             onOpenDriverPortal={() => {
@@ -643,7 +610,7 @@ export default function App() {
 
         {adminVisible && (
           <AdminDashboardPage
-            drivers={drivers}
+            drivers={nearbyDrivers}
             locations={locations}
             userPosition={position}
             onSelectLocation={handleSelectLocation}
@@ -653,7 +620,7 @@ export default function App() {
 
         {driverLandingVisible && (
           <DriverLandingPage
-            drivers={drivers}
+            drivers={nearbyDrivers}
             onClose={() => setDriverLandingVisible(false)}
             onOpenHotelPage={() => { setDriverLandingVisible(false); setHotelLandingVisible(true); }}
             onOpenRestaurantPage={() => { setDriverLandingVisible(false); setRestaurantLandingVisible(true); }}
@@ -697,7 +664,7 @@ export default function App() {
             partnerId={activePartnerId}
             initialRole={activePartnerRole}
             authorizedRole={sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin' ? 'admin' : (activePartnerRole || null)}
-            drivers={drivers}
+            drivers={nearbyDrivers}
             onClose={() => setPartnerHubVisible(false)}
             onOpenLanding={(role) => {
               setPartnerHubVisible(false);
@@ -711,7 +678,7 @@ export default function App() {
 
         {driverPortalVisible && (
           <DriverPortalModal
-            drivers={drivers}
+            drivers={nearbyDrivers}
             onClose={() => setDriverPortalVisible(false)}
             onOpenLanding={(role) => {
               setDriverPortalVisible(false);
@@ -753,10 +720,36 @@ export default function App() {
             onClose={() => setInfoModalTab(null)}
           />
         )}
+
+        {profileModalVisible && (
+          <UserProfileModal
+            isOpen={profileModalVisible}
+            initialRole={activePartnerRole}
+            onClose={() => setProfileModalVisible(false)}
+            onSelectLocation={handleSelectLocation}
+            onOpenDriverWorkspace={() => { setProfileModalVisible(false); setDriverLandingVisible(true); }}
+            onOpenHotelWorkspace={() => { setProfileModalVisible(false); setHotelLandingVisible(true); }}
+            onOpenRestaurantWorkspace={() => { setProfileModalVisible(false); setRestaurantLandingVisible(true); }}
+            onOpenAdminWorkspace={() => { setProfileModalVisible(false); setAdminVisible(true); }}
+            onOpenInstallApp={() => {
+              setProfileModalVisible(false);
+              setInstallAppTrigger('manual');
+              setInstallAppVisible(true);
+            }}
+          />
+        )}
+
+        {installAppVisible && (
+          <InstallAppModal
+            isOpen={installAppVisible}
+            onClose={() => setInstallAppVisible(false)}
+            triggerReason={installAppTrigger}
+          />
+        )}
       </Suspense>
 
-      {/* Map Controls Cluster (Cornered when space is available + Smart Glide) */}
-      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest || (activeRoute && isNavExpanded) || (activeFilter === 'favourites' && !partnerLandingVisible && !driverLandingVisible && !hotelLandingVisible && !restaurantLandingVisible && !agencyLandingVisible) ? 'card-visible' : (activeRoute && !isNavExpanded) ? 'capsule-visible' : ''} ${hotelBooking || restaurantBooking || partnerHubVisible || driverPortalVisible || driverLandingVisible || hotelLandingVisible || restaurantLandingVisible || agencyLandingVisible || driversVisible || adminVisible ? 'hidden' : ''}`}>
+      {/* Map Controls Cluster */}
+      <div className={`map-controls-cluster ${activeLocation || activeRide || rideRequest || (activeRoute && isNavExpanded) || (activeFilter === 'favourites' && !partnerLandingVisible && !driverLandingVisible && !hotelLandingVisible && !restaurantLandingVisible && !agencyLandingVisible) ? 'card-visible' : (activeRoute && !isNavExpanded) ? 'capsule-visible' : ''} ${hotelBooking || restaurantBooking || partnerHubVisible || driverPortalVisible || driverLandingVisible || hotelLandingVisible || restaurantLandingVisible || agencyLandingVisible || driversVisible || adminVisible || profileModalVisible || installAppVisible ? 'hidden' : ''}`}>
         <MapStyleSwitcher
           activeStyle={mapStyle}
           onStyleChange={(newStyle) => {

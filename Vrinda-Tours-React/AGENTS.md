@@ -125,3 +125,15 @@ Rule: Gesture-First Micro-Interactions: “Ensure transient UI components (toast
 
 For Apple-style dynamic capsules and interactive pills, keep hover states strictly static (no scale/offset shifts) while preserving tactile :active spring-press shrink and release expansion (scale(0.96) with cubic-bezier physics).
 
+Rule: atomic-concurrency-first
+
+All mobility bookings and inventory reservations must use database-level atomic locking (SELECT ... FOR UPDATE via RPC functions) rather than sequential client-side read-then-write calls.
+
+Rule: zero-client-seeding
+
+Never include client-side automatic table seeding or dummy data fallback generators on application startup. In case of network or database failure, render a graceful retry UI banner.
+
+Rule: telemetry-stream-segregation
+
+High-frequency GPS and IoT sensor streams must be separated from transactional business state tables to prevent high Postgres replication load.
+

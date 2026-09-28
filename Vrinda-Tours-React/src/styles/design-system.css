@@ -1,0 +1,247 @@
+/* ==========================================================================
+   VRINDA TOURS — GLOBAL UNIFIED DESIGN SYSTEM
+   Premium Indian Travel + Modern Mobility Platform + Clean SaaS Architecture
+   ========================================================================== */
+
+:root {
+  /* --- Brand Core Color Tokens --- */
+  --vt-bg-primary: #090d16;
+  --vt-bg-elevated: #0f172a;
+  --vt-bg-card: rgba(15, 23, 42, 0.85);
+  --vt-bg-surface: rgba(255, 255, 255, 0.04);
+  --vt-bg-surface-hover: rgba(255, 255, 255, 0.08);
+  --vt-bg-surface-active: rgba(255, 255, 255, 0.12);
+
+  /* --- Accents: Divine Emerald, Sacred Saffron Gold, Royal Indigo --- */
+  --vt-emerald: #10b981;
+  --vt-emerald-dark: #059669;
+  --vt-emerald-light: #34d399;
+  --vt-emerald-subtle: rgba(16, 185, 129, 0.14);
+
+  --vt-saffron: #f59e0b;
+  --vt-saffron-dark: #d97706;
+  --vt-saffron-light: #fbbf24;
+  --vt-saffron-subtle: rgba(245, 158, 11, 0.14);
+
+  --vt-indigo: #6366f1;
+  --vt-rose: #f43f5e;
+  --vt-blue: #0284c7;
+
+  /* --- Text Hierarchy --- */
+  --vt-text-primary: #ffffff;
+  --vt-text-secondary: #cbd5e1;
+  --vt-text-muted: #94a3b8;
+  --vt-text-dim: #64748b;
+
+  /* --- Borders & Hairlines --- */
+  --vt-border-subtle: rgba(255, 255, 255, 0.08);
+  --vt-border-medium: rgba(255, 255, 255, 0.15);
+  --vt-border-highlight: rgba(255, 255, 255, 0.25);
+
+  /* --- Spacing Scale --- */
+  --vt-space-1: 4px;
+  --vt-space-2: 8px;
+  --vt-space-3: 12px;
+  --vt-space-4: 16px;
+  --vt-space-5: 20px;
+  --vt-space-6: 24px;
+  --vt-space-8: 32px;
+  --vt-space-10: 40px;
+
+  /* --- Radii Scale --- */
+  --vt-radius-sm: 8px;
+  --vt-radius-md: 12px;
+  --vt-radius-lg: 18px;
+  --vt-radius-xl: 24px;
+  --vt-radius-pill: 9999px;
+
+  /* --- Shadows Scale --- */
+  --vt-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --vt-shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
+  --vt-shadow-lg: 0 16px 48px -8px rgba(0, 0, 0, 0.65);
+  --vt-shadow-modal: 0 24px 64px -12px rgba(0, 0, 0, 0.85);
+
+  /* --- Transitions --- */
+  --vt-transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --vt-transition-smooth: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --vt-transition-spring: 0.35s cubic-bezier(0.16, 1.2, 0.3, 1);
+}
+
+/* ==========================================================================
+   Reusable UI Component Utilities
+   ========================================================================== */
+
+/* Buttons */
+.vt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vt-space-2);
+  height: 44px;
+  padding: 0 var(--vt-space-4);
+  border-radius: var(--vt-radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  transition: all var(--vt-transition-smooth);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.vt-btn-primary {
+  background: linear-gradient(135deg, var(--vt-emerald) 0%, var(--vt-emerald-dark) 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px var(--vt-emerald-subtle);
+}
+
+.vt-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(16, 185, 129, 0.4);
+}
+
+.vt-btn-saffron {
+  background: linear-gradient(135deg, var(--vt-saffron) 0%, var(--vt-saffron-dark) 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px var(--vt-saffron-subtle);
+}
+
+.vt-btn-secondary {
+  background: var(--vt-bg-surface);
+  border: 1px solid var(--vt-border-medium);
+  color: var(--vt-text-primary);
+}
+
+.vt-btn-secondary:hover:not(:disabled) {
+  background: var(--vt-bg-surface-hover);
+  border-color: var(--vt-border-highlight);
+}
+
+.vt-btn-ghost {
+  background: transparent;
+  color: var(--vt-text-muted);
+}
+
+.vt-btn-ghost:hover:not(:disabled) {
+  color: var(--vt-text-primary);
+  background: var(--vt-bg-surface);
+}
+
+.vt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Controls & Inputs */
+.vt-input {
+  width: 100%;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--vt-border-medium);
+  border-radius: var(--vt-radius-md);
+  color: var(--vt-text-primary);
+  font-size: 14px;
+  padding: 0 var(--vt-space-3);
+  outline: none;
+  transition: all var(--vt-transition-fast);
+}
+
+.vt-input:focus {
+  border-color: var(--vt-emerald);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px var(--vt-emerald-subtle);
+}
+
+.vt-input::placeholder {
+  color: var(--vt-text-dim);
+}
+
+/* Glass Surfaces & Cards */
+.vt-glass-card {
+  background: var(--vt-bg-card);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--vt-border-subtle);
+  border-radius: var(--vt-radius-lg);
+  box-shadow: var(--vt-shadow-md);
+}
+
+/* Badges */
+.vt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 8px;
+  border-radius: var(--vt-radius-pill);
+}
+
+.vt-badge-emerald {
+  background: var(--vt-emerald-subtle);
+  color: var(--vt-emerald-light);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.vt-badge-saffron {
+  background: var(--vt-saffron-subtle);
+  color: var(--vt-saffron-light);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.vt-badge-rose {
+  background: rgba(244, 63, 94, 0.15);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.vt-badge-blue {
+  background: rgba(2, 132, 199, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+/* Status Indicators */
+.vt-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.vt-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.vt-status-online { background: var(--vt-emerald); box-shadow: 0 0 8px var(--vt-emerald); }
+.vt-status-busy { background: var(--vt-saffron); box-shadow: 0 0 8px var(--vt-saffron); }
+.vt-status-offline { background: var(--vt-text-dim); }
+
+/* Skeleton Loading Animation */
+.vt-skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.04) 75%);
+  background-size: 200% 100%;
+  animation: vtSkeletonWave 1.6s infinite;
+  border-radius: var(--vt-radius-sm);
+}
+
+@keyframes vtSkeletonWave {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Safe-area insets for Capacitor / Notch devices */
+.vt-safe-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+
+.vt-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+}

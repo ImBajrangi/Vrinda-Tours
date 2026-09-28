@@ -1,0 +1,196 @@
+/* ==========================================================================
+   Profile Dropdown — Global Obsidian Glass Design
+   ========================================================================== */
+
+.vt-pdd-container {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: rgba(14, 18, 28, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 
+    0 16px 40px -8px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 10px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: vtDropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+
+@keyframes vtDropdownSlide {
+  from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.vt-pdd-user-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vt-pdd-user-banner:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.vt-pdd-avatar {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-pdd-online-dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 9px;
+  height: 9px;
+  background: #10b981;
+  border: 1.5px solid #0e121c;
+  border-radius: 50%;
+}
+
+.vt-pdd-user-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.vt-pdd-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vt-pdd-name-row strong {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.vt-pdd-role-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  text-transform: uppercase;
+}
+
+.vt-pdd-phone {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.vt-pdd-arrow {
+  color: #64748b;
+}
+
+.vt-pdd-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 2px 0;
+}
+
+.vt-pdd-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vt-pdd-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.vt-pdd-item:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.vt-pdd-item-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vt-pdd-item-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+.vt-pdd-item-icon.red { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+.vt-pdd-item-icon.emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.vt-pdd-item-icon.gold { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+.vt-pdd-item-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+.vt-pdd-item-title {
+  flex: 1;
+}
+
+.vt-pdd-count-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.vt-pdd-new-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #10b981;
+  color: #ffffff;
+}
+
+.vt-pdd-footer {
+  padding: 4px 6px;
+}
+
+.vt-pdd-help-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #34d399;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.vt-pdd-help-link:hover {
+  background: rgba(16, 185, 129, 0.1);
+}

@@ -3543,23 +3543,92 @@ export default function PartnerLandingPage({
                 </button>
               </div>
 
-              {/* Hero Interactive Universal Discovery Search Bar */}
-              <div className="tp-hero-search-bar" onClick={() => setIsOmniSearchOpen(true)}>
-                <div className="tp-hsb-left">
-                  <Search size={16} className="tp-hsb-icon" />
-                  <span className="tp-hsb-text">Search sacred dhams, yatra plans, passes, GPS map...</span>
+              {/* Primary Interaction: Where are you going? */}
+              <div style={{ marginTop: '1.2rem', width: '100%', maxWidth: '530px' }}>
+                <span style={{ display: 'block', fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.04em', color: '#64748b', textTransform: 'uppercase', marginBottom: '6px' }}>
+                  Where are you going?
+                </span>
+
+                <div className="tp-hero-search-bar" onClick={() => setIsOmniSearchOpen(true)}>
+                  <div className="tp-hsb-left">
+                    <Search size={16} className="tp-hsb-icon" />
+                    <span className="tp-hsb-text">Search a place (e.g. Raman Reti, Banke Bihari, Prem Mandir...)</span>
+                  </div>
+                  <div className="tp-hsb-right">
+                    <button
+                      type="button"
+                      className="tp-hsb-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOmniSearchOpen(true);
+                      }}
+                    >
+                      <span>Explore</span>
+                      <ArrowRight size={13} />
+                    </button>
+                  </div>
                 </div>
-                <div className="tp-hsb-right">
+
+                {/* 6 Direct Fast-Action Category Shortcuts */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
                   <button
                     type="button"
-                    className="tp-hsb-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsOmniSearchOpen(true);
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={() => setIsInstantRideModalOpen(true)}
+                  >
+                    <span>🛺</span> Ride
+                  </button>
+
+                  <button
+                    type="button"
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={() => {
+                      if (onOpenHotelPage) onOpenHotelPage();
+                      else {
+                        const el = document.getElementById('stays');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }
                     }}
                   >
-                    <span>Search</span>
-                    <ArrowRight size={13} />
+                    <span>🏨</span> Stay
+                  </button>
+
+                  <button
+                    type="button"
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={() => {
+                      if (onOpenRestaurantPage) onOpenRestaurantPage();
+                      else {
+                        const el = document.getElementById('dining');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  >
+                    <span>🍲</span> Food
+                  </button>
+
+                  <button
+                    type="button"
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={() => setIsOmniSearchOpen(true)}
+                  >
+                    <span>🛕</span> Darshan
+                  </button>
+
+                  <button
+                    type="button"
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={() => setIsTripPackagesOpen(true)}
+                  >
+                    <span>🚩</span> Tours
+                  </button>
+
+                  <button
+                    type="button"
+                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    onClick={onClose}
+                  >
+                    <span>🧭</span> Explore
                   </button>
                 </div>
               </div>
