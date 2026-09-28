@@ -50,8 +50,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +63,7 @@
   right: -1px;
   width: 9px;
   height: 9px;
-  background: #10b981;
+  background: #ffffff;
   border: 1.5px solid #0e121c;
   border-radius: 50%;
 }
@@ -92,8 +92,8 @@
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   text-transform: uppercase;
 }
 
@@ -108,8 +108,60 @@
 
 .vt-pdd-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.06);
-  margin: 2px 0;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 3px 0;
+}
+
+/* Theme Controller */
+.vt-pdd-theme-section {
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vt-pdd-section-lbl {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  color: #71717a;
+  text-transform: uppercase;
+}
+
+.vt-pdd-theme-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vt-pdd-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 5px 0;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  background: transparent;
+  color: #a1a1aa;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.vt-pdd-theme-btn:hover {
+  color: #ffffff;
+}
+
+.vt-pdd-theme-btn.active {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .vt-pdd-items-list {

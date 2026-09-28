@@ -29,7 +29,9 @@ export default function Header({
   partnerId = null,
   partnerRole = null,
   isAdmin = false,
-  userPosition = null
+  userPosition = null,
+  themePreference = 'system',
+  onThemeChange = null
 }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -322,6 +324,8 @@ export default function Header({
                   activeRole={activeUserRole}
                   savedCount={favoritesCount}
                   bookingsCount={bookingsCount}
+                  themePreference={themePreference}
+                  onThemeChange={onThemeChange}
                   onOpenFullProfile={(tab) => onOpenFullProfile?.(tab)}
                   onOpenInstallApp={() => onOpenInstallApp?.()}
                   onOpenDriverPortal={() => onOpenDriverPortal?.()}

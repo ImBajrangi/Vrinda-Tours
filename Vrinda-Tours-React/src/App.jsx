@@ -20,11 +20,12 @@ import './components/UI/Common/UI.css';
 import { doc, updateDoc, collection, getDocs, writeBatch, onSnapshot, deleteField } from 'firebase/firestore';
 import { firestore } from './config/firebase';
 import { locations as initialData } from './data/locations';
-import AnnouncementBanner from './components/UI/Banners/AnnouncementBanner';
 import ErrorBoundary from './components/UI/Feedback/ErrorBoundary';
 import PartnerLandingPage from './components/PartnerLanding/PartnerLandingPage';
 import Confetti from './components/UI/Animations/Confetti';
 import { updatePageSEO } from './utils/seoHelper';
+import { useTheme } from './hooks/useTheme';
+import './styles/theme.css';
 
 // Lazy-loaded secondary modals and partner portals on-demand
 const HotelBooking = lazy(() => import('./components/BookingSheets/HotelBooking'));
@@ -75,6 +76,9 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [persistedRide, setPersistedRide] = useState(() => getPersistedLocalRide());
   const [isLiveRideCapsuleMinimized, setIsLiveRideCapsuleMinimized] = useState(false);
+
+  // Uber Adaptive System Theme
+  const { resolvedTheme, isDark, themePreference, setTheme, toggleTheme } = useTheme();
 
   // Dynamic Geolocation & Live Driver Fleet
   const { position, loading, requestLocation } = useGeolocation();
@@ -440,6 +444,7 @@ export default function App() {
         activeLocation={activeLocation}
         activeRoute={activeRoute}
         mapStyle={mapStyle}
+        isDark={isDark}
         onSelectLocation={handleSelectLocation}
         onBookRide={handleBookRide}
       />
@@ -465,6 +470,9 @@ export default function App() {
         partnerRole={activePartnerRole}
         isAdmin={Boolean(sessionStorage.getItem('vt_is_admin') === 'true' || localStorage.getItem('vt_admin_session') === 'true' || localStorage.getItem('vt_user_role') === 'admin')}
         userPosition={position}
+        themePreference={themePreference}
+        onThemeChange={setTheme}
+        isDark={isDark}
       />
 
       {activeRoute && !partnerLandingVisible && (

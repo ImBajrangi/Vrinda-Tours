@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react';
 import { 
   User, Heart, BedDouble, Utensils, Car, 
-  Smartphone, ShieldCheck, ChevronRight, Sparkles, ExternalLink, Award 
+  Smartphone, ShieldCheck, ChevronRight, Sparkles, ExternalLink,
+  Sun, Moon, Laptop
 } from 'lucide-react';
 import './ProfileDropdown.css';
 
@@ -11,6 +12,8 @@ export default function ProfileDropdown({
   activeRole = 'user',
   savedCount = 0,
   bookingsCount = 0,
+  themePreference = 'system',
+  onThemeChange,
   onOpenFullProfile,
   onOpenInstallApp,
   onOpenDriverPortal,
@@ -59,6 +62,44 @@ export default function ProfileDropdown({
 
       <div className="vt-pdd-divider" />
 
+      {/* Theme Mode Segmented Controller */}
+      {onThemeChange && (
+        <div className="vt-pdd-theme-section">
+          <span className="vt-pdd-section-lbl">Theme</span>
+          <div className="vt-pdd-theme-toggle">
+            <button
+              type="button"
+              className={`vt-pdd-theme-btn ${themePreference === 'system' ? 'active' : ''}`}
+              onClick={() => onThemeChange('system')}
+              title="System Adaptive Theme"
+            >
+              <Laptop size={13} />
+              <span>System</span>
+            </button>
+            <button
+              type="button"
+              className={`vt-pdd-theme-btn ${themePreference === 'dark' ? 'active' : ''}`}
+              onClick={() => onThemeChange('dark')}
+              title="Dark Theme"
+            >
+              <Moon size={13} />
+              <span>Dark</span>
+            </button>
+            <button
+              type="button"
+              className={`vt-pdd-theme-btn ${themePreference === 'light' ? 'active' : ''}`}
+              onClick={() => onThemeChange('light')}
+              title="Light Theme"
+            >
+              <Sun size={13} />
+              <span>Light</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="vt-pdd-divider" />
+
       {/* Primary Items List */}
       <div className="vt-pdd-items-list">
         <button 
@@ -87,11 +128,11 @@ export default function ProfileDropdown({
           className="vt-pdd-item" 
           onClick={() => { onClose(); onOpenInstallApp(); }}
         >
-          <div className="vt-pdd-item-icon emerald">
+          <div className="vt-pdd-item-icon dark">
             <Smartphone size={15} />
           </div>
           <span className="vt-pdd-item-title">Install Mobile App</span>
-          <span className="vt-pdd-new-badge">PWA</span>
+          <span className="vt-pdd-new-badge">App</span>
         </button>
 
         <button 

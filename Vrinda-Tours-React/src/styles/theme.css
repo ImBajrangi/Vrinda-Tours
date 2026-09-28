@@ -1,0 +1,798 @@
+/* ==========================================================================
+   UBER DESIGN SYSTEM — SYSTEM ADAPTIVE DARK THEME TOKENS & OVERRIDES
+   Pure Pitch Black (#000000), Elevated Obsidian (#121212), Smooth Glassmorphism
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. ROOT CSS VARIABLES FOR LIGHT & DARK THEMES
+   -------------------------------------------------------------------------- */
+:root {
+  --uber-black: #000000;
+  --uber-bg: #ffffff;
+  --uber-surface: #f4f4f5;
+  --uber-surface-hover: #e4e4e7;
+  --uber-surface-elevated: #ffffff;
+  --uber-border: rgba(0, 0, 0, 0.08);
+  --uber-border-strong: rgba(0, 0, 0, 0.16);
+  --uber-text: #09090b;
+  --uber-text-secondary: #71717a;
+  --uber-text-muted: #a1a1aa;
+  --uber-cta-bg: #09090b;
+  --uber-cta-text: #ffffff;
+  --uber-cta-hover: #18181b;
+  --uber-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  --uber-modal-shadow: 0 -12px 40px rgba(0, 0, 0, 0.18);
+  --uber-drag-handle: #cbd5e1;
+}
+
+[data-theme="dark"],
+.dark-theme {
+  --uber-black: #000000;
+  --uber-bg: #000000;
+  --uber-surface: #18181b;
+  --uber-surface-hover: #27272a;
+  --uber-surface-elevated: #121212;
+  --uber-border: rgba(255, 255, 255, 0.1);
+  --uber-border-strong: rgba(255, 255, 255, 0.2);
+  --uber-text: #f4f4f5;
+  --uber-text-secondary: #a1a1aa;
+  --uber-text-muted: #71717a;
+  --uber-cta-bg: #ffffff;
+  --uber-cta-text: #000000;
+  --uber-cta-hover: #f4f4f5;
+  --uber-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  --uber-modal-shadow: 0 -12px 40px rgba(0, 0, 0, 0.7);
+  --uber-drag-handle: #52525b;
+}
+
+/* --------------------------------------------------------------------------
+   2. GLOBAL BODY & APP LEVEL DARK OVERRIDES
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] body,
+body.dark-theme {
+  background-color: #000000 !important;
+  color: #f4f4f5 !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. HEADER & SEARCH BAR (Uber Island Architecture)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .header-card {
+  background: rgba(18, 18, 18, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .search-bar {
+  background: #1c1c1e !important;
+  border-color: transparent !important;
+}
+
+[data-theme="dark"] .search-bar.focused {
+  background: #242426 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] .search-bar input {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .search-bar input::placeholder {
+  color: #71717a !important;
+}
+
+[data-theme="dark"] .search-icon {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .icon-btn {
+  background: #1c1c1e !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .icon-btn:hover {
+  background: #27272a !important;
+}
+
+[data-theme="dark"] .header-brand-logo {
+  background: #1c1c1e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .header-brand-logo:hover {
+  background: #27272a !important;
+}
+
+/* Search Results Dropdown */
+[data-theme="dark"] .search-results-panel {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  background: #121212 !important;
+}
+
+[data-theme="dark"] .search-results-header {
+  color: #71717a !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-theme="dark"] .search-result-item {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .search-result-item:hover,
+[data-theme="dark"] .search-result-item.selected,
+[data-theme="dark"] .search-result-item:focus-visible {
+  background: #1c1c1e !important;
+}
+
+[data-theme="dark"] .sr-name-row h4 {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .sr-town-text {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .sr-category-pill {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+}
+
+[data-theme="dark"] .sr-dist-badge {
+  background: #27272a !important;
+  color: #e4e4e7 !important;
+}
+
+[data-theme="dark"] .sr-arrow {
+  color: #71717a !important;
+}
+
+[data-theme="dark"] .search-result-item:hover .sr-arrow {
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. CATEGORY TRAY PILLS (Classic Uber Inversion)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .header-category-tray {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .pill {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .pill:hover {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .pill.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .pill.active .pill-icon {
+  color: #000000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. UBER RIDER FINDING SHEET (RiderFindingView)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .ubr-sheet {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .ubr-drag-pill {
+  background: #3f3f46 !important;
+}
+
+[data-theme="dark"] .ubr-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-subtitle {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-live-dot {
+  background: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-icon-close-btn {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-icon-close-btn:hover {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+/* Route timeline card */
+[data-theme="dark"] .ubr-route-card {
+  background: #1c1c1e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-stop-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-stop-name.destination {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-stop-divider {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-stop-dot.pickup {
+  background: #ffffff !important;
+  box-shadow: 0 0 0 2px #3f3f46 !important;
+}
+
+[data-theme="dark"] .ubr-stop-dot.drop {
+  background: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-route-meta-badge {
+  background: #27272a !important;
+  color: #f4f4f5 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Tier Cards */
+[data-theme="dark"] .ubr-tier-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-tier-card:hover {
+  background: #202024 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-theme="dark"] .ubr-tier-card.is-selected {
+  background: #222226 !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="dark"] .ubr-tier-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-tier-sub {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-tier-price {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-seat-badge {
+  background: #27272a !important;
+  color: #d4d4d8 !important;
+}
+
+/* Uber CTA Button (Solid White in Dark Mode with Pitch Black Text) */
+[data-theme="dark"] .ubr-confirm-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .ubr-confirm-btn:hover {
+  background: #f4f4f5 !important;
+}
+
+[data-theme="dark"] .ubr-confirm-btn:active {
+  background: #e4e4e7 !important;
+}
+
+[data-theme="dark"] .ubr-btn-fare {
+  color: #000000 !important;
+}
+
+/* Active Driver rows */
+[data-theme="dark"] .ubr-driver-row {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-driver-avatar {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-driver-name-row strong {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-driver-details {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-quick-book-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Active Trip card */
+[data-theme="dark"] .ubr-live-tag {
+  background: #27272a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .ubr-pulse-indicator {
+  background: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-active-sub {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-pin-badge {
+  background: #1c1c1e !important;
+}
+
+[data-theme="dark"] .ubr-pin-badge strong {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-assigned-driver-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-assigned-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-assigned-veh {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-call-btn {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-trip-details-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .ubr-trip-row span {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .ubr-trip-row strong {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .ubr-fare-amount {
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   6. LOCATION CARD & DETAILS BOTTOM SHEET
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .location-card {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .card-handle {
+  background: #3f3f46 !important;
+}
+
+[data-theme="dark"] .card-header-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-name-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-town-tag {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .card-description-text {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .metric-pill {
+  background: #1c1c1e !important;
+  color: #e4e4e7 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .metric-value {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .btn-action-icon {
+  background: #1c1c1e !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .btn-action-icon:hover {
+  background: #27272a !important;
+}
+
+[data-theme="dark"] .btn-action-primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+[data-theme="dark"] .bm-driver-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .bm-driver-card.selected {
+  background: #222226 !important;
+  border-color: #ffffff !important;
+}
+
+[data-theme="dark"] .bm-driver-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .bm-verified-badge {
+  background: #27272a !important;
+  color: #e4e4e7 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .bm-driver-eta {
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   7. BOOKING SHEETS (Hotel, Dining, Yatra)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .booking-sheet {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .booking-sheet-handle {
+  background: #3f3f46 !important;
+}
+
+[data-theme="dark"] .venue-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .venue-meta {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .form-section-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .preset-btn {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .preset-btn.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+}
+
+[data-theme="dark"] .rt-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .rt-card.active {
+  background: #222226 !important;
+  border-color: #ffffff !important;
+}
+
+[data-theme="dark"] .rt-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .rt-price {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .input-with-icon {
+  background: #1c1c1e !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .input-with-icon input,
+[data-theme="dark"] .input-with-icon textarea {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .input-with-icon input::placeholder,
+[data-theme="dark"] .input-with-icon textarea::placeholder {
+  color: #71717a !important;
+}
+
+[data-theme="dark"] .btn-submit-booking-request {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.15) !important;
+}
+
+[data-theme="dark"] .bs-success-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .bs-sc-val {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .bs-success-icon-wrap {
+  background: #1c1c1e !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .bs-success-ring {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* --------------------------------------------------------------------------
+   8. SAVED FAVOURITES SHEET
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .fav-sheet-container {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .fav-sheet-handle {
+  background: #3f3f46 !important;
+}
+
+[data-theme="dark"] .fav-sheet-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .fav-sheet-count {
+  background: #27272a !important;
+  color: #e4e4e7 !important;
+}
+
+[data-theme="dark"] .fav-sheet-explore-btn {
+  background: #1c1c1e !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .fav-sheet-close-btn {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .fav-item-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .fav-item-card:hover {
+  background: #202024 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-theme="dark"] .fav-item-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .fav-empty-desc {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .fav-empty-cta-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. MAP STYLE SWITCHER & FLOATING MAP CONTROLS
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .map-style-toggle-btn {
+  background: rgba(18, 18, 18, 0.94) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .map-style-toggle-btn:hover {
+  background: #27272a !important;
+}
+
+[data-theme="dark"] .map-type-sheet {
+  background: rgba(18, 18, 18, 0.98) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .map-type-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .map-type-subtitle {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .map-type-close {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .map-type-card.selected .map-type-thumbnail {
+  border-color: #ffffff !important;
+}
+
+[data-theme="dark"] .map-type-check {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+[data-theme="dark"] .map-type-name {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .map-type-card.selected .map-type-name {
+  color: #ffffff !important;
+}
+
+/* Leaflet Zoom & Navigation Controls */
+[data-theme="dark"] .leaflet-bar,
+[data-theme="dark"] .leaflet-bar a {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .leaflet-bar a:hover {
+  background: #1c1c1e !important;
+}
+
+[data-theme="dark"] .map-control-btn,
+[data-theme="dark"] .map-compass-btn {
+  background: rgba(18, 18, 18, 0.94) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Map hover tooltips */
+[data-theme="dark"] .map-poi-hover-tag {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-theme="dark"] .dest-map-tooltip {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* --------------------------------------------------------------------------
+   10. DYNAMIC ISLAND LIVE RIDE CAPSULE
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .vt-floating-live-ride-pill {
+  background: rgba(24, 24, 27, 0.95) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7) !important;
+}
+
+[data-theme="dark"] .vt-flr-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .vt-flr-sub {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .vt-flr-pin-badge {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   11. SECONDARY MODALS (App Install, Profile, Help)
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] .vt-app-modal-card,
+[data-theme="dark"] .vt-profile-modal-content,
+[data-theme="dark"] .help-modal-card,
+[data-theme="dark"] .info-modal-sheet {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-theme="dark"] .vt-am-title,
+[data-theme="dark"] .vt-am-benefit-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .vt-am-subtitle,
+[data-theme="dark"] .vt-am-benefit-desc {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .vt-am-tab {
+  background: #1c1c1e !important;
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .vt-am-tab.active {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+[data-theme="dark"] .vt-am-benefit-card {
+  background: #18181b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* --------------------------------------------------------------------------
+   12. THEME SWITCHER CONTROLS (Floating or Profile Tab)
+   -------------------------------------------------------------------------- */
+.vt-theme-switcher-group {
+  display: inline-flex;
+  align-items: center;
+  background: var(--uber-surface);
+  border: 1px solid var(--uber-border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.vt-theme-option-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  background: transparent;
+  color: var(--uber-text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vt-theme-option-btn:hover {
+  color: var(--uber-text);
+}
+
+.vt-theme-option-btn.active {
+  background: var(--uber-text);
+  color: var(--uber-bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

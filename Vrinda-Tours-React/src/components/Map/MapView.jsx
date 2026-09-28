@@ -63,6 +63,7 @@ export default function MapView({
   activeLocation, 
   activeRoute, 
   mapStyle = 'carto',
+  isDark = false,
   onSelectLocation 
 }) {
   const mapRef = useRef(null);
@@ -226,11 +227,12 @@ export default function MapView({
         }
       );
     } else {
-      // Primary Default: CARTO Voyager — free tier, no Google API usage
+      // Primary Default: CARTO Voyager (Light) or CARTO Dark Matter (Dark)
       const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || '';
       const cartoSuffix = cartoKey ? `?key=${cartoKey}` : '';
+      const cartoVariant = isDark ? 'dark_all' : 'voyager';
       tileLayer = L.tileLayer(
-        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoSuffix}`,
+        `https://{s}.basemaps.cartocdn.com/rastertiles/${cartoVariant}/{z}/{x}/{y}{r}.png${cartoSuffix}`,
         {
           maxZoom: 20,
           minZoom: 2,
@@ -247,7 +249,7 @@ export default function MapView({
     tileLayer.addTo(map);
     tileLayer.bringToBack();
     activeTileLayerRef.current = tileLayer;
-  }, [mapStyle]);
+  }, [mapStyle, isDark]);
 
   // Update location markers when filteredLocations OR activeRoute changes
   useEffect(() => {
