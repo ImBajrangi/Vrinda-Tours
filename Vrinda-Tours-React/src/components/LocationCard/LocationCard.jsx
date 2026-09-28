@@ -91,17 +91,6 @@ export default function LocationCard({
     return availableDrivers.find(d => d.id === selectedDriverId) || availableDrivers[0];
   }, [availableDrivers, selectedDriverId]);
 
-  const getVehicleEmoji = (type) => {
-    switch ((type || '').toLowerCase()) {
-      case 'e-rickshaw': return '🛺';
-      case 'auto': return '🛺';
-      case 'taxi': return '🚗';
-      case 'bike': return '🛵';
-      case 'bus': return '🚌';
-      default: return '🛺';
-    }
-  };
-
   // --- HOTEL BOOKING STATE ---
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
   const tomorrowStr = useMemo(() => {
@@ -130,7 +119,7 @@ export default function LocationCard({
       url: `https://to.vrindopnishad.in/?loc=${encodeURIComponent(activeLoc.name)}`,
       filename: `${(activeLoc.name || 'darshan').toLowerCase().replace(/[^a-z0-9]/g, '-')}.webp`,
       onSuccess: () => {
-        if (onToast) onToast({ message: '✨ Darshan shared in compressed WebP format', type: 'success' });
+        if (onToast) onToast({ message: 'Darshan link copied and shared', type: 'success' });
       }
     });
   };
@@ -185,7 +174,7 @@ export default function LocationCard({
     switch (cat) {
       case 'Temple': return { Icon: Landmark, color: '#b45309', bg: '#fef3c7' };
       case 'Holy Site': return { Icon: Sparkles, color: '#0284c7', bg: '#e0f2fe' };
-      case 'Hotel': return { Icon: BedDouble, color: '#15803d', bg: '#dcfce7' };
+      case 'Hotel': return { Icon: BedDouble, color: '#2563eb', bg: '#eff6ff' };
       case 'Restaurant':
       case 'Dining': return { Icon: UtensilsCrossed, color: '#c2410c', bg: '#ffedd5' };
       case 'Town': return { Icon: Home, color: '#4f46e5', bg: '#e0e7ff' };
@@ -431,7 +420,6 @@ export default function LocationCard({
                 <div className="bm-fleet-list">
                   {availableDrivers.map(d => {
                     const isSelected = d.id === selectedDriverId;
-                    const emoji = getVehicleEmoji(d.vehicleType);
 
                     return (
                       <div 
@@ -445,7 +433,7 @@ export default function LocationCard({
                             alt={d.name} 
                             className="bm-driver-avatar"
                           />
-                          <span className="bm-driver-vehicle-badge">{emoji}</span>
+                          <span className="bm-driver-vehicle-badge"><Car size={11} /></span>
                         </div>
 
                         <div className="bm-driver-info">

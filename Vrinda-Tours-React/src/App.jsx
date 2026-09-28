@@ -135,12 +135,12 @@ export default function App() {
       
       if (updated.status === 'accepted' && updated.driver) {
         setToast({
-          message: `🎉 Sarathi Assigned! ${updated.driver.name} is on the way (${updated.driver.vehicleNo || 'E-Rickshaw'})`,
+          message: `Driver Assigned: ${updated.driver.name} is on the way (${updated.driver.vehicleNo || 'E-Rickshaw'})`,
           type: 'success'
         });
       } else if (updated.status === 'driver_arrived') {
         setToast({
-          message: '🛺 Sarathi has arrived at your pickup point!',
+          message: 'Driver has arrived at your pickup point',
           type: 'success'
         });
       }
@@ -414,8 +414,8 @@ export default function App() {
   // Seed Data to Backend if empty
   // Network Connectivity Monitoring & Graceful Offline States
   useEffect(() => {
-    const handleOnline = () => setToast({ message: '✨ Back online. Reconnected to live fleet & bookings.', type: 'success' });
-    const handleOffline = () => setToast({ message: '⚠️ Network connection lost. Showing cached data.', type: 'error' });
+    const handleOnline = () => setToast({ message: 'Connected to live fleet and booking operations.', type: 'success' });
+    const handleOffline = () => setToast({ message: 'Network connection lost. Showing cached data.', type: 'error' });
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -431,7 +431,6 @@ export default function App() {
       <h1 className="sr-only" style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
         Vrinda Travels — Sacred Brij 84 Kos Yatra, Vrindavan Darshan, Stays & E-Rickshaws
       </h1>
-      <AnnouncementBanner />
 
       <MapView
         locations={locations}

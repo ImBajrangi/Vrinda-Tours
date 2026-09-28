@@ -229,12 +229,12 @@
 }
 
 .map-type-card.selected .map-type-thumbnail {
-  border-color: #81a0e5;
+  border-color: #09090b;
   border-width: 2.5px;
   box-shadow: none;
 }
 
-/* Selected Blue Check Badge */
+/* Selected Obsidian Check Badge */
 .map-type-check {
   position: absolute;
   top: 6px;
@@ -242,12 +242,12 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2563eb;
+  background: #09090b;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   animation: checkPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -276,7 +276,7 @@
 }
 
 .map-type-card.selected .map-type-name {
-  color: #2563eb;
+  color: #09090b;
   font-weight: 800;
 }
 

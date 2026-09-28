@@ -520,7 +520,9 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
       const loc = d.location;
 
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
-        const vehicleEmoji = d.vehicleType === 'Taxi' ? '🚗' : (d.vehicleType === 'Bike' ? '🛵' : '🛺');
+        const vehicleSvg = (d.vehicleType === 'Taxi' || d.vehicleType === 'Cab')
+          ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.2 1 12 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`
+          : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16L8 5h8l3 11H5z"/><circle cx="7.5" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/></svg>`;
 
         const existing = currentMap[d.id];
 
@@ -532,14 +534,14 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
             className: 'driver-marker-wrapper',
             html: `<div class="driver-map-marker">
                      <div class="car-icon ${status}">
-                       <span style="font-size:16px;">${vehicleEmoji}</span>
+                       ${vehicleSvg}
                      </div>
                      <div class="status-pulse ${status}"></div>
                      <div class="driver-name-tag">${d.name}</div>
                    </div>`,
-            iconSize: [42, 42],
-            iconAnchor: [21, 21],
-            popupAnchor: [0, -22]
+            iconSize: [40, 40],
+            iconAnchor: [20, 20],
+            popupAnchor: [0, -20]
           });
 
           const popupContent = `

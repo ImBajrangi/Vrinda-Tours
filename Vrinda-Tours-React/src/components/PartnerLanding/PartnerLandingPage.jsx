@@ -12,7 +12,7 @@ import {
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
   Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
   Check, Copy, UtensilsCrossed, Headphones, MessageSquare, AlertCircle, Minus,
-  Crown, BedDouble, HelpCircle, Settings, ChefHat
+  Crown, BedDouble, HelpCircle, Settings, ChefHat, Landmark, Map
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -3570,18 +3570,19 @@ export default function PartnerLandingPage({
                 </div>
 
                 {/* 6 Direct Fast-Action Category Shortcuts */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginTop: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => setIsInstantRideModalOpen(true)}
                   >
-                    <span>🛺</span> Ride
+                    <Car size={15} color="#059669" />
+                    <span>Ride</span>
                   </button>
 
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => {
                       if (onOpenHotelPage) onOpenHotelPage();
                       else {
@@ -3590,12 +3591,13 @@ export default function PartnerLandingPage({
                       }
                     }}
                   >
-                    <span>🏨</span> Stay
+                    <BedDouble size={15} color="#2563eb" />
+                    <span>Stay</span>
                   </button>
 
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => {
                       if (onOpenRestaurantPage) onOpenRestaurantPage();
                       else {
@@ -3604,31 +3606,35 @@ export default function PartnerLandingPage({
                       }
                     }}
                   >
-                    <span>🍲</span> Food
+                    <UtensilsCrossed size={15} color="#d97706" />
+                    <span>Food</span>
                   </button>
 
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => setIsOmniSearchOpen(true)}
                   >
-                    <span>🛕</span> Darshan
+                    <Landmark size={15} color="#7c3aed" />
+                    <span>Darshan</span>
                   </button>
 
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => setIsTripPackagesOpen(true)}
                   >
-                    <span>🚩</span> Tours
+                    <Map size={15} color="#ea580c" />
+                    <span>Tours</span>
                   </button>
 
                   <button
                     type="button"
-                    style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '6px 12px', fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+                    style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={onClose}
                   >
-                    <span>🧭</span> Explore
+                    <Compass size={15} color="#0891b2" />
+                    <span>Explore</span>
                   </button>
                 </div>
               </div>

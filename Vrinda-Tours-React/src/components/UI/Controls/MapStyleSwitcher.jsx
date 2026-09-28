@@ -77,7 +77,7 @@ function TerrainPreview() {
       <path d="M 0,20 Q 30,30 50,10 T 100,5" fill="none" stroke="#c4b59d" strokeWidth="0.8" strokeDasharray="2,2" />
       <path d="M 0,40 Q 45,55 70,30 T 120,25" fill="none" stroke="#bda88c" strokeWidth="0.9" />
       <path d="M 10,75 Q 60,65 85,45 T 120,50" fill="none" stroke="#bda88c" strokeWidth="0.9" />
-      <path d="M -5,55 Q 35,40 65,58 T 125,32" fill="none" stroke="#15803d" strokeWidth="1.8" strokeDasharray="3,2" />
+      <path d="M -5,55 Q 35,40 65,58 T 125,32" fill="none" stroke="#8c7b64" strokeWidth="1.8" strokeDasharray="3,2" />
     </svg>
   );
 }

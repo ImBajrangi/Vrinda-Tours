@@ -73,7 +73,7 @@ export default function InstallAppModal({ isOpen, onClose, triggerReason = 'manu
           <h2 className="vt-am-title">Install Vrinda Travels App</h2>
           <p className="vt-am-subtitle">
             {triggerReason === 'booking_success'
-              ? '🎉 Booking request saved! Install the official app for instant trip tracking & offline maps.'
+              ? 'Booking request submitted! Install the official app for instant trip tracking & offline maps.'
               : 'Lightning-fast mobile app for sacred Brij Darshan, verified E-Rickshaws & verified stay bookings.'}
           </p>
         </div>

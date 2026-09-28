@@ -464,13 +464,27 @@
 .sr-meta-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .sr-category-pill {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: #71717a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3b82f6;
+  background: #eff6ff;
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.sr-dot-sep {
+  font-size: 0.65rem;
+  color: #cbd5e1;
+}
+
+.sr-town-text {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: #64748b;
 }
 
 .sr-points {
@@ -731,7 +745,7 @@
   right: 2px;
   width: 8px;
   height: 8px;
-  background: #10b981;
+  background: #0f172a;
   border: 1.5px solid #ffffff;
   border-radius: 50%;
 }
@@ -741,8 +755,8 @@
   align-items: center;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #059669;
-  background: #d1fae5;
+  color: #0f172a;
+  background: #f1f5f9;
   padding: 1px 5px;
   border-radius: 4px;
 }

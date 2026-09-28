@@ -442,7 +442,7 @@ export async function acceptRideByDriver(rideId, driver) {
 
   // Notify and play chime
   playRideNotificationChime();
-  sendBrowserNotification('🎉 Driver Assigned!', {
+  sendBrowserNotification('Driver Assigned', {
     body: `${updatedDriver.name} (${updatedDriver.vehicleNo}) is on the way for your Braj Yatra.`
   });
 
@@ -504,7 +504,7 @@ export async function markDriverArrived(rideId, driverId) {
   } catch (err) {}
 
   playRideNotificationChime();
-  sendBrowserNotification('🛺 Driver Arrived at Pickup!', {
+  sendBrowserNotification('Driver Arrived at Pickup', {
     body: 'Your Sarathi has reached your pickup location. Please meet your driver.'
   });
 

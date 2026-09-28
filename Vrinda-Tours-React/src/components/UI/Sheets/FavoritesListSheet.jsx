@@ -21,7 +21,7 @@ export default function FavoritesListSheet({
       case 'Holy Site':
         return { Icon: Sparkles, color: '#0284c7', bg: '#e0f2fe' };
       case 'Hotel':
-        return { Icon: BedDouble, color: '#15803d', bg: '#dcfce7' };
+        return { Icon: BedDouble, color: '#2563eb', bg: '#eff6ff' };
       case 'Dining':
       case 'Restaurant':
         return { Icon: UtensilsCrossed, color: '#c2410c', bg: '#ffedd5' };
@@ -89,7 +89,7 @@ export default function FavoritesListSheet({
           </div>
           <h4 className="fav-empty-title">No Favourites Yet</h4>
           <p className="fav-empty-desc">
-            Tap the <span className="heart-inline-badge">❤️</span> on any sacred temple, holy site, hotel, or dining place to build your personal pilgrimage list.
+            Tap the <Heart size={13} fill="#e11d48" color="#e11d48" style={{ display: 'inline', verticalAlign: '-1px', margin: '0 2px' }} /> icon on any sacred temple, holy site, hotel, or dining place to build your personal pilgrimage list.
           </p>
           <button 
             type="button" 

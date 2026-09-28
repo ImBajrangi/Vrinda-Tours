@@ -67,19 +67,19 @@ export default function Header({
       if (favorites.length > 0) {
         const favLocs = locations.filter((l) => favorites.includes(l.name)).map(l => ({
           ...l,
-          subtitle: `${l.category} • Brij Dham`,
+          town: l.town || (l.name.includes('Barsana') ? 'Barsana' : l.name.includes('Govardhan') ? 'Govardhan' : 'Vrindavan'),
           source: 'fav'
         }));
         const otherLocs = locations.filter((l) => !favorites.includes(l.name)).map(l => ({
           ...l,
-          subtitle: `${l.category} • Brij Dham`,
+          town: l.town || (l.name.includes('Barsana') ? 'Barsana' : l.name.includes('Govardhan') ? 'Govardhan' : 'Vrindavan'),
           source: 'curated'
         }));
         setSearchResults([...favLocs, ...otherLocs].slice(0, 8));
       } else {
         setSearchResults(locations.slice(0, 8).map(l => ({
           ...l,
-          subtitle: `${l.category} • Brij Dham`,
+          town: l.town || (l.name.includes('Barsana') ? 'Barsana' : l.name.includes('Govardhan') ? 'Govardhan' : 'Vrindavan'),
           source: 'curated'
         })));
       }
@@ -424,10 +424,9 @@ export default function Header({
                           </div>
                         </div>
                         <div className="sr-meta-row">
-                          <span className="sr-category-pill">{loc.category || 'Area'}</span>
-                          {loc.subtitle && (
-                            <span className="sr-subtitle-text">{loc.subtitle}</span>
-                          )}
+                          <span className="sr-category-pill">{loc.category || 'Place'}</span>
+                          <span className="sr-dot-sep">•</span>
+                          <span className="sr-town-text">{loc.town || (loc.subtitle && !loc.subtitle.includes(loc.category) ? loc.subtitle : 'Brij Dham')}</span>
                         </div>
                       </div>
 
