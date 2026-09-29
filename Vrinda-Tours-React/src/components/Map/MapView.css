@@ -24,70 +24,59 @@
     justify-content: center;
     position: relative;
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.22));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16));
 }
 
-/* Category Glow Tokens */
-.cat-temple { --cat-glow: rgba(245, 158, 11, 0.65); --cat-ground: rgba(245, 158, 11, 0.45); }
-.cat-holy-site { --cat-glow: rgba(16, 185, 129, 0.65); --cat-ground: rgba(16, 185, 129, 0.45); }
-.cat-dining { --cat-glow: rgba(249, 115, 22, 0.65); --cat-ground: rgba(249, 115, 22, 0.45); }
-.cat-hotel { --cat-glow: rgba(99, 102, 241, 0.65); --cat-ground: rgba(99, 102, 241, 0.45); }
-.cat-info { --cat-glow: rgba(14, 165, 233, 0.65); --cat-ground: rgba(14, 165, 233, 0.45); }
-.cat-town { --cat-glow: rgba(148, 163, 184, 0.5); --cat-ground: rgba(148, 163, 184, 0.35); }
-
 .vt-map-pin:hover {
-    transform: scale(1.15);
+    transform: scale(1.12);
     z-index: 1000 !important;
-    filter: drop-shadow(0 3px 8px var(--cat-glow, rgba(0, 0, 0, 0.35))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
 }
 
 .vt-map-pin.is-active {
-    transform: scale(1.22);
+    transform: scale(1.16);
     z-index: 1001 !important;
-    filter: drop-shadow(0 0 14px var(--cat-glow, rgba(245, 158, 11, 0.7))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
 }
 
 /* Ground shadow / light handling */
 .pin-ground-light {
     opacity: 0.12;
-    transition: opacity 0.3s ease;
 }
 
 .pin-ground-shadow {
-    opacity: 0.85;
-    transition: opacity 0.3s ease;
+    opacity: 0.75;
 }
 
-/* --- Dark Map Theme Adaptations (Luminous Ambient Aura on Night Roads) --- */
+/* --- Dark Map Theme Adaptations (Clean, crisp, ZERO oversized blurred clouds) --- */
 .dark-map-theme .vt-map-pin,
 .dark-theme .vt-map-pin,
 [data-theme="dark"] .vt-map-pin {
-    filter: drop-shadow(0 0 10px var(--cat-glow, rgba(249, 115, 22, 0.65))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.32));
 }
 
 .dark-map-theme .vt-map-pin:hover,
 .dark-theme .vt-map-pin:hover,
 [data-theme="dark"] .vt-map-pin:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 16px var(--cat-glow, rgba(249, 115, 22, 0.8))) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.95));
+    transform: scale(1.12);
+    filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.42));
 }
 
 .dark-map-theme .vt-map-pin.is-active,
 .dark-theme .vt-map-pin.is-active,
 [data-theme="dark"] .vt-map-pin.is-active {
-    transform: scale(1.22);
-    filter: drop-shadow(0 0 20px var(--cat-glow, rgba(249, 115, 22, 0.9))) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.95));
+    transform: scale(1.16);
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.45));
 }
 
 .dark-map-theme .pin-ground-light,
 .dark-theme .pin-ground-light,
 [data-theme="dark"] .pin-ground-light {
-    opacity: 0.65;
-    filter: blur(1.5px);
+    opacity: 0.25;
 }
 
 .dark-map-theme .pin-ground-shadow,
@@ -123,8 +112,8 @@
     width: 20px;
     height: 10px;
     border-radius: 50%;
-    border: 1.5px solid var(--ripple-color, rgba(245, 158, 11, 0.75));
-    background: radial-gradient(ellipse at center, var(--ripple-bg, rgba(245, 158, 11, 0.2)) 0%, transparent 70%);
+    border: 1.2px solid var(--ripple-color, rgba(245, 158, 11, 0.75));
+    background: transparent;
     transform: translate(-50%, -50%) scale(0.2);
     opacity: 0;
     pointer-events: none;
@@ -1179,22 +1168,22 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
 
 .uber-walking-connector {
     animation: walkingDotsFlow 1.2s linear infinite;
-    filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
+    filter: none;
 }
 
 /* Standalone Destination Marker Permanent Label */
 .dest-permanent-label {
     background: rgba(15, 23, 42, 0.94) !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
     border-radius: 999px !important;
     padding: 3px 10px !important;
     font-size: 0.76rem !important;
     font-weight: 800 !important;
     letter-spacing: -0.01em !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     user-select: none !important;
     pointer-events: none !important;
 }
@@ -1221,9 +1210,9 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
     font-size: 0.75rem !important;
     font-weight: 700 !important;
     letter-spacing: -0.01em !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.1) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
     user-select: none !important;
     pointer-events: none !important;
     white-space: nowrap !important;
@@ -1375,7 +1364,7 @@ body.dark-theme .image-marker {
 [data-theme="dark"] .vt-map-pin,
 .dark-theme .vt-map-pin,
 body.dark-theme .vt-map-pin {
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
 }
 
 [data-theme="dark"] .image-marker.destination,
@@ -1399,7 +1388,7 @@ body.dark-theme .map-poi-tooltip-custom.leaflet-tooltip {
     background: rgba(33, 33, 33, 0.96) !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
 [data-theme="dark"] .map-poi-tooltip-custom.leaflet-tooltip::before,
@@ -1414,7 +1403,7 @@ body.dark-theme .dest-permanent-label {
     background: rgba(33, 33, 33, 0.96) !important;
     color: #ffffff !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
 }
 
 [data-theme="dark"] .dest-permanent-label::before,
