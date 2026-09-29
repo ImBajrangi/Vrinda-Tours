@@ -148,3 +148,5 @@ When overriding third-party component styles (such as Leaflet or external librar
 
 Always ensure Leaflet map popups maintain a minimum 10px floating air gap above active divIcon markers, and use map-theme-adaptive tokens (Porcelain for light maps, Obsidian for dark/satellite maps) with radial-gradient ground contact shadows.
 
+For dark theme elevation, avoid high-opacity shadows (rgba(0, 0, 0, > 0.35)) and large dark halos; instead, establish depth using subtle translucent borders (1px solid rgba(255, 255, 255, 0.08–0.12)) paired with low-opacity, multi-stop ambient shadows (rgba(0, 0, 0, 0.16–0.28))
+

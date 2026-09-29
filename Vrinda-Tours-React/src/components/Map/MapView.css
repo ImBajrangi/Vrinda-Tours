@@ -18,16 +18,18 @@
 
 .vt-map-pin {
     width: 38px;
-    height: 46px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: 19px 41.4px;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    transform: translateZ(0);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.16));
 }
 
@@ -41,15 +43,6 @@
     transform: scale(1.16);
     z-index: 1001 !important;
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
-}
-
-/* Ground shadow / light handling */
-.pin-ground-light {
-    opacity: 0.12;
-}
-
-.pin-ground-shadow {
-    opacity: 0.75;
 }
 
 /* --- Dark Map Theme Adaptations (Clean, crisp, ZERO oversized blurred clouds) --- */
@@ -73,18 +66,6 @@
     filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.45));
 }
 
-.dark-map-theme .pin-ground-light,
-.dark-theme .pin-ground-light,
-[data-theme="dark"] .pin-ground-light {
-    opacity: 0.25;
-}
-
-.dark-map-theme .pin-ground-shadow,
-.dark-theme .pin-ground-shadow,
-[data-theme="dark"] .pin-ground-shadow {
-    opacity: 0.4;
-}
-
 .vt-map-pin svg {
     display: block;
     width: 100%;
@@ -95,7 +76,7 @@
 /* --- One-Shot Liquid Water Ripple (Plays only ONCE upon selection, 0 continuous loop) --- */
 .vt-water-ripple-container {
     position: absolute;
-    bottom: -1px;
+    bottom: 0px;
     left: 50%;
     width: 24px;
     height: 12px;
@@ -495,7 +476,7 @@ body.dark-theme .marker-cluster:hover div span,
 
 /* --- High Contrast Adaptations for Satellite Imagery --- */
 .map-style-satellite .image-marker {
-    filter: drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 3.5px #ffffff) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85)) !important;
+    filter: drop-shadow(0 0 1.5px #ffffff) drop-shadow(0 0 3.5px #ffffff) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35)) !important;
     opacity: 1 !important;
 }
 
@@ -1256,10 +1237,13 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
 /* ==========================================================================
    Dark Theme Map Polish (High-Visibility Luminous Markers, Clusters & Tooltips)
    ========================================================================== */
-[data-theme="dark"] .leaflet-tile-pane,
-.dark-theme .leaflet-tile-pane,
-body.dark-theme .leaflet-tile-pane {
-    filter: brightness(1.06) contrast(1.12) saturate(1.15);
+/* Hardware-accelerated map layers for buttery 60fps / 120Hz panning & zero tile flicker */
+.leaflet-tile-pane,
+.leaflet-marker-pane,
+.leaflet-map-pane {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
 }
 
 /* Cluster Badges in Dark Mode */
@@ -1276,7 +1260,7 @@ body.dark-theme .marker-cluster div {
     background: #171717 !important;
     color: #ffffff !important;
     border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
     font-weight: 800 !important;
 }
 
@@ -1286,7 +1270,7 @@ body.dark-theme .marker-cluster:hover div {
     transform: scale(1.14);
     background: #262626 !important;
     border-color: #ffffff !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 12px rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28), 0 0 10px rgba(255, 255, 255, 0.25) !important;
 }
 
 /* Driver Cluster Badges in Dark Mode */
@@ -1296,7 +1280,7 @@ body.dark-theme .driver-cluster-pod {
     background: #18181b !important;
     color: #ffffff !important;
     border: 1.5px solid rgba(255, 255, 255, 0.32) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 
 [data-theme="dark"] .driver-cluster-badge:hover .driver-cluster-pod,
@@ -1304,7 +1288,7 @@ body.dark-theme .driver-cluster-pod {
 body.dark-theme .driver-cluster-badge:hover .driver-cluster-pod {
     background: #27272a !important;
     border-color: rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.9), 0 0 14px rgba(16, 185, 129, 0.45) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28), 0 0 12px rgba(16, 185, 129, 0.35) !important;
 }
 
 /* Modern Driver Marker Pods in Dark Mode */
@@ -1313,7 +1297,7 @@ body.dark-theme .driver-cluster-badge:hover .driver-cluster-pod {
 body.dark-theme .driver-pod {
     background: #18181b !important;
     border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
 }
 
 [data-theme="dark"] .modern-driver-marker:hover .driver-pod,
@@ -1321,7 +1305,7 @@ body.dark-theme .driver-pod {
 body.dark-theme .modern-driver-marker:hover .driver-pod {
     background: #27272a !important;
     border-color: rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.95), 0 0 10px rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.26), 0 0 10px rgba(255, 255, 255, 0.2) !important;
 }
 
 [data-theme="dark"] .driver-live-dot,
@@ -1335,14 +1319,14 @@ body.dark-theme .driver-live-dot {
 body.dark-theme .driver-hover-pill {
     background: rgba(24, 24, 27, 0.96) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* User Location Vector Beacon in Dark Mode */
 [data-theme="dark"] .user-beacon-core,
 .dark-theme .user-beacon-core,
 body.dark-theme .user-beacon-core {
-    box-shadow: 0 0 16px rgba(59, 130, 246, 0.9), 0 0 4px #ffffff, 0 4px 12px rgba(0, 0, 0, 0.8) !important;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.6), 0 0 4px #ffffff, 0 2px 8px rgba(0, 0, 0, 0.25) !important;
     border-color: #ffffff !important;
 }
 
@@ -1422,7 +1406,7 @@ body.dark-theme .leaflet-driver-popup .leaflet-popup-content-wrapper,
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
     color: #ececec !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 24px 54px -10px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 14px 36px -8px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 .leaflet-driver-popup .leaflet-popup-tip-container {
@@ -1441,7 +1425,7 @@ body.dark-theme .leaflet-driver-popup .leaflet-popup-tip,
 .dark-map-theme .leaflet-driver-popup .leaflet-popup-tip {
     background: #141418 !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Dark Map Theme: Authentic Uber Black Obsidian Token for Drivers */
@@ -1449,7 +1433,7 @@ body.dark-theme .leaflet-driver-popup .leaflet-popup-tip,
     background: #09090b !important;
     color: #ffffff !important;
     border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22), 0 0 10px rgba(16, 185, 129, 0.2) !important;
 }
 
 .dark-map-theme .driver-veh-icon {
@@ -1474,7 +1458,7 @@ body.dark-theme .leaflet-driver-popup .leaflet-popup-tip,
     background: #09090b !important;
     color: #ffffff !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(16, 185, 129, 0.35) !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25), 0 0 12px rgba(16, 185, 129, 0.35) !important;
 }
 
 .map-style-satellite .driver-veh-icon {

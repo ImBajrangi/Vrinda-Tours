@@ -42,7 +42,7 @@
   --shadow-level-1: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-level-2: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-level-3: 0 12px 28px rgba(0, 0, 0, 0.12);
-  --shadow-modal-dark: 0 20px 40px rgba(0, 0, 0, 0.6);
+  --shadow-modal-dark: 0 16px 40px -6px rgba(0, 0, 0, 0.28);
 
   /* Spacing */
   --space-xxs: 4px;
@@ -147,10 +147,10 @@ textarea {
   border-radius: 9999px !important;
   border: 0.5px solid rgba(255, 255, 255, 0.16) !important;
   box-shadow:
-    0 16px 44px -8px rgba(0, 0, 0, 0.65),
-    0 4px 12px rgba(0, 0, 0, 0.35),
+    0 12px 32px -8px rgba(0, 0, 0, 0.28),
+    0 3px 8px rgba(0, 0, 0, 0.14),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.5) !important;
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.2) !important;
   cursor: pointer !important;
   backdrop-filter: blur(32px) saturate(200%) !important;
   -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
@@ -174,10 +174,10 @@ textarea {
   background: rgba(22, 25, 34, 0.96) !important;
   border-color: rgba(255, 255, 255, 0.38) !important;
   box-shadow:
-    0 20px 50px -8px rgba(0, 0, 0, 0.72),
-    0 0 24px rgba(255, 255, 255, 0.06),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.4) !important;
+    0 16px 40px -8px rgba(0, 0, 0, 0.32),
+    0 0 20px rgba(255, 255, 255, 0.06),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.2) !important;
 }
 
 .vt-floating-live-ride-pill:active {
@@ -185,22 +185,22 @@ textarea {
   background: rgba(28, 32, 44, 0.98) !important;
   border-color: rgba(255, 255, 255, 0.48) !important;
   box-shadow:
-    0 10px 30px -4px rgba(0, 0, 0, 0.6),
+    0 8px 24px -4px rgba(0, 0, 0, 0.24),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Ambient Halos */
 .vt-floating-live-ride-pill.status-amber {
   box-shadow:
-    0 16px 44px -8px rgba(0, 0, 0, 0.65),
-    0 0 24px rgba(245, 158, 11, 0.16),
+    0 12px 32px -8px rgba(0, 0, 0, 0.28),
+    0 0 20px rgba(245, 158, 11, 0.16),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.28) !important;
 }
 
 .vt-floating-live-ride-pill.status-emerald {
   box-shadow:
-    0 16px 44px -8px rgba(0, 0, 0, 0.65),
-    0 0 24px rgba(16, 185, 129, 0.16),
+    0 12px 32px -8px rgba(0, 0, 0, 0.28),
+    0 0 20px rgba(16, 185, 129, 0.16),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.28) !important;
 }
 

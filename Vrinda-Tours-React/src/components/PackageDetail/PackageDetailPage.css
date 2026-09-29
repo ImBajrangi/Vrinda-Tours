@@ -2208,7 +2208,7 @@
   [data-theme="dark"] .pkg-mobile-sticky-bar {
     background: #212121 !important;
     border-top-color: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.7) !important;
+    box-shadow: 0 -8px 24px -4px rgba(0, 0, 0, 0.28), 0 -2px 6px rgba(0, 0, 0, 0.14) !important;
   }
 
   .pkg-mobile-sticky-bar-inner {

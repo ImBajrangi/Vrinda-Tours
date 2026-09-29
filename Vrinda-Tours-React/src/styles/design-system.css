@@ -56,10 +56,10 @@
   --vt-radius-pill: 9999px;
 
   /* --- Shadows Scale --- */
-  --vt-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
-  --vt-shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
-  --vt-shadow-lg: 0 16px 48px -8px rgba(0, 0, 0, 0.65);
-  --vt-shadow-modal: 0 24px 64px -12px rgba(0, 0, 0, 0.85);
+  --vt-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --vt-shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.1), 0 2px 6px -1px rgba(0, 0, 0, 0.05);
+  --vt-shadow-lg: 0 10px 28px -4px rgba(0, 0, 0, 0.12), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
+  --vt-shadow-modal: 0 16px 40px -6px rgba(0, 0, 0, 0.18), 0 6px 16px -4px rgba(0, 0, 0, 0.08);
 
   /* --- Transitions --- */
   --vt-transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);

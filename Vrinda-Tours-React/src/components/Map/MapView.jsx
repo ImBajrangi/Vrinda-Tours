@@ -75,7 +75,7 @@ function createIcon(category, isActive = false) {
     className: 'marker-wrapper',
     html: `
       <div class="vt-map-pin ${isActive ? 'is-active' : ''} cat-${pin.key}">
-        <svg width="38" height="46" viewBox="0 0 38 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="38" height="42" viewBox="0 0 38 42" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="pin-grad-${pin.key}" x1="19" y1="3" x2="19" y2="40" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stop-color="${pin.gradTop}"/>
@@ -87,10 +87,6 @@ function createIcon(category, isActive = false) {
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
             </linearGradient>
           </defs>
-
-          <!-- Vector Ground Contact Shadow & Night Light Pool -->
-          <ellipse class="pin-ground-light" cx="19" cy="42.5" rx="7.5" ry="2" fill="${pin.gradMid}"/>
-          <ellipse class="pin-ground-shadow" cx="19" cy="42.5" rx="5.5" ry="1.6" fill="rgba(0,0,0,0.2)"/>
 
           <!-- Apple Maps & Uber Luxury Floating POI Badge Body -->
           <path d="M 19 3 C 27.28 3, 34 9.72, 34 18 C 34 23.6, 30.6 28.3, 25.8 30.6 L 19 40.5 L 12.2 30.6 C 7.4 28.3, 4 23.6, 4 18 C 4 9.72, 10.72 3, 19 3 Z" 
@@ -122,8 +118,44 @@ function createIcon(category, isActive = false) {
         ` : ''}
       </div>
     `,
-    iconSize: [38, 46],
-    iconAnchor: [19, 41],
+    iconSize: [38, 42],
+    iconAnchor: [19, 41.4],
+    popupAnchor: [0, -42],
+  });
+}
+
+// Butter-smooth camera glide to focus a target coordinate with zero flickering or tile jitter
+function smoothCenterOn(map, lat, lng, { targetZoom = null, offsetY = 0, duration = 0.45 } = {}) {
+  if (!map || lat == null || lng == null) return;
+  map.stop(); // Cleanly abort any in-flight conflicting transitions
+
+  const currentZoom = map.getZoom();
+  const destZoom = targetZoom ? Math.max(currentZoom, targetZoom) : currentZoom;
+  const targetLatLng = L.latLng(lat, lng);
+
+  // If zoomed far out (< 14), gracefully zoom into neighborhood first
+  if (destZoom > currentZoom + 1) {
+    map.setView(targetLatLng, destZoom, { animate: true, duration: 0.5 });
+    return;
+  }
+
+  // Calculate pixel delta in current viewport
+  const pt = map.latLngToContainerPoint(targetLatLng);
+  const size = map.getSize();
+  const desiredX = size.x / 2;
+  const desiredY = Math.max(60, (size.y / 2) + offsetY);
+  const deltaX = pt.x - desiredX;
+  const deltaY = pt.y - desiredY;
+
+  // If already centered within 6 pixels, stay completely stable (prevents micro-shaking!)
+  if (Math.hypot(deltaX, deltaY) < 6) {
+    return;
+  }
+
+  map.panBy([deltaX, deltaY], {
+    animate: true,
+    duration,
+    easeLinearity: 0.25,
   });
 }
 
@@ -256,7 +288,12 @@ export default function MapView({
     map.addLayer(cluster);
     map.addLayer(driverCluster);
 
-    map.on('click', () => {
+    map.on('click', (e) => {
+      // Don't deselect location if a marker, popup, cluster, or UI control was clicked
+      const target = e?.originalEvent?.target;
+      if (target && target.closest?.('.leaflet-marker-icon, .leaflet-popup, .marker-cluster, .modern-driver-marker, .vt-map-pin, .leaflet-control')) {
+        return;
+      }
       onSelectLocationRef.current?.(null);
     });
 
@@ -404,9 +441,10 @@ export default function MapView({
       const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false) });
       marker._locData = loc;
       marker.on('click', (e) => {
-        if (e) {
-          L.DomEvent.stopPropagation(e);
+        if (e?.originalEvent) {
+          L.DomEvent.stopPropagation(e.originalEvent);
         }
+        L.DomEvent.stop(e);
         onSelectLocationRef.current?.(loc);
       });
       
@@ -431,31 +469,39 @@ export default function MapView({
 
   // Highlight active location marker & centralize cleanly in visible viewport
   useEffect(() => {
-    if (activeMarkerRef.current) {
+    // Only reset previous marker if the new active location is different
+    if (activeMarkerRef.current && activeMarkerRef.current._locData?.name !== activeLocation?.name) {
       const prev = activeMarkerRef.current;
       prev.setIcon(createIcon(prev._locData.category, false));
+      activeMarkerRef.current = null;
     }
 
-    if (activeLocation) {
-      const marker = markersRef.current.find((m) => m._locData.name === activeLocation.name);
-      if (marker) {
+    if (activeLocation && activeLocation.lat && activeLocation.lng) {
+      const map = mapInstanceRef.current;
+      const cluster = clusterRef.current;
+
+      const marker = markersRef.current.find((m) => m._locData?.name === activeLocation.name);
+      if (marker && marker !== activeMarkerRef.current) {
         marker.setIcon(createIcon(activeLocation.category, true));
         activeMarkerRef.current = marker;
-        
-        const map = mapInstanceRef.current;
-        if (map) {
-          const targetZoom = Math.max(map.getZoom(), 15);
-          // Gracefully smooth-pan map to selected location
-          map.flyTo([activeLocation.lat, activeLocation.lng], targetZoom, {
-            duration: 0.65,
-            easeLinearity: 0.25,
-            paddingTopLeft: [0, 160],
-            paddingBottomRight: [0, 240]
+      }
+
+      if (map) {
+        // If marker is inside a cluster, use markercluster's native zoomToShowLayer to smoothly uncluster it first
+        if (marker && cluster && cluster.hasLayer(marker) && cluster.getVisibleParent(marker) !== marker) {
+          cluster.zoomToShowLayer(marker, () => {
+            smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15, offsetY: -70 });
           });
+        } else {
+          // Marker is already visible or a standalone/destination marker: Glide directly as smooth as butter!
+          smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15, offsetY: -70 });
         }
       }
     } else {
-      activeMarkerRef.current = null;
+      if (activeMarkerRef.current) {
+        activeMarkerRef.current.setIcon(createIcon(activeMarkerRef.current._locData.category, false));
+        activeMarkerRef.current = null;
+      }
     }
   }, [activeLocation]);
 
@@ -570,9 +616,10 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
           }
         }, 3200);
         destMarker.on('click', (e) => {
-          if (e) {
-            L.DomEvent.stopPropagation(e);
+          if (e?.originalEvent) {
+            L.DomEvent.stopPropagation(e.originalEvent);
           }
+          L.DomEvent.stop(e);
           onSelectLocationRef.current?.(destLoc);
         });
         destMarker.addTo(group);
@@ -752,20 +799,11 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
           });
 
           marker.on('click', (e) => {
-            if (e) {
-              L.DomEvent.stopPropagation(e);
+            if (e?.originalEvent) {
+              L.DomEvent.stopPropagation(e.originalEvent);
             }
-            const map = mapInstanceRef.current;
-            if (map) {
-              const targetZoom = Math.max(map.getZoom(), 15);
-              // Auto-centralize map smoothly onto active driver marker with clear top & bottom viewport offsets
-              map.flyTo([loc.lat, loc.lng], targetZoom, {
-                duration: 0.7,
-                easeLinearity: 0.25,
-                paddingTopLeft: [0, 200],
-                paddingBottomRight: [0, 140]
-              });
-            }
+            L.DomEvent.stop(e);
+            smoothCenterOn(mapInstanceRef.current, loc.lat, loc.lng, { targetZoom: 15, offsetY: 70 });
           });
 
           driverCluster.addLayer(marker);

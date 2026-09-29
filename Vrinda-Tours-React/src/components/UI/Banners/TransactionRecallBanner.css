@@ -103,7 +103,7 @@
   background: rgba(14, 18, 28, 0.96);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 16px 40px -8px rgba(0, 0, 0, 0.75),
+    0 12px 32px -6px rgba(0, 0, 0, 0.28),
     0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
