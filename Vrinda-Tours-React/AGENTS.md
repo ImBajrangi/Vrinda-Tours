@@ -140,3 +140,5 @@ High-frequency GPS and IoT sensor streams must be separated from transactional b
 - **Minimalist Software Standard**: Keep all utility bars, consent prompts, and menu popovers strictly uncluttered (no redundant indicator dots, multi-tier nested accordions, or excessive badges unless explicitly requested).
 - **Reduced Animation Overhead**: Favor immediate, crisp CSS transitions (150ms-200ms cubic-bezier) over complex multi-bounce keyframe springs to optimize low-power mobile devices.
 
+Always pair theme overrides with unified selector blocks: `[data-theme="light"], .light-theme, body.light-theme` and `[data-theme="dark"], .dark-theme, body.dark-theme` to guarantee consistent theme resolution across all overlay menus.
+

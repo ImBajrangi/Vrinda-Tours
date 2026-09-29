@@ -178,27 +178,55 @@ body.dark-theme {
   color: #a1a1aa !important;
 }
 
-[data-theme="dark"] .header-mode-dropdown-menu {
-  background: #212121 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 24px 56px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+[data-theme="dark"] .header-mode-dropdown-menu,
+.dark-theme .header-mode-dropdown-menu,
+body.dark-theme .header-mode-dropdown-menu {
+  background: rgba(24, 24, 28, 0.96) !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 24px 56px -8px rgba(0, 0, 0, 0.85), 
+    0 4px 16px rgba(0, 0, 0, 0.4), 
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 [data-theme="dark"] .header-mode-item:hover,
-[data-theme="dark"] .header-mode-item.selected {
-  background: #2f2f2f !important;
+.dark-theme .header-mode-item:hover,
+body.dark-theme .header-mode-item:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-theme="dark"] .header-mode-item-title {
-  color: #ececec !important;
+[data-theme="dark"] .header-mode-item.selected,
+.dark-theme .header-mode-item.selected,
+body.dark-theme .header-mode-item.selected {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-theme="dark"] .header-mode-item-desc {
-  color: #8e8e8e !important;
+[data-theme="dark"] .header-mode-item.selected:hover,
+.dark-theme .header-mode-item.selected:hover,
+body.dark-theme .header-mode-item.selected:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
-[data-theme="dark"] .header-mode-check {
-  color: #ececec !important;
+[data-theme="dark"] .header-mode-item-title,
+.dark-theme .header-mode-item-title,
+body.dark-theme .header-mode-item-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .header-mode-item-desc,
+.dark-theme .header-mode-item-desc,
+body.dark-theme .header-mode-item-desc {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .header-mode-check,
+.dark-theme .header-mode-check,
+body.dark-theme .header-mode-check {
+  color: #ffffff !important;
 }
 
 [data-theme="dark"] .header-profile-btn {
