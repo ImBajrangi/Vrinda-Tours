@@ -73,11 +73,26 @@
   --radius-lg: 16px;
 }
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  tap-highlight-color: transparent !important;
+}
+
+html, body {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  -webkit-touch-callout: none;
+}
+
+a, button, input, select, textarea, [role="button"], [onclick], label, summary {
+  -webkit-tap-highlight-color: transparent !important;
+  outline: none;
+  -webkit-touch-callout: none;
 }
 
 ::selection {
