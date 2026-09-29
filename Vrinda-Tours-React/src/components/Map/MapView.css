@@ -10,6 +10,144 @@
     background: var(--bg-app);
 }
 
+/* --- Luxury Apple / Google Maps Vector POI Pins --- */
+.marker-wrapper {
+    background: transparent !important;
+    border: none !important;
+}
+
+.vt-map-pin {
+    width: 36px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.22s ease;
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.22));
+}
+
+.vt-map-pin:hover {
+    transform: scale(1.18);
+    z-index: 1000 !important;
+}
+
+.vt-map-pin.is-active {
+    transform: scale(1.24);
+    z-index: 1001 !important;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+/* Category-specific radiant ambient hover glows */
+.vt-map-pin.cat-temple:hover {
+    filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.5));
+}
+.vt-map-pin.cat-holy-site:hover {
+    filter: drop-shadow(0 3px 8px rgba(16, 185, 129, 0.5));
+}
+.vt-map-pin.cat-dining:hover {
+    filter: drop-shadow(0 3px 8px rgba(249, 115, 22, 0.5));
+}
+.vt-map-pin.cat-hotel:hover {
+    filter: drop-shadow(0 3px 8px rgba(99, 102, 241, 0.5));
+}
+.vt-map-pin.cat-info:hover {
+    filter: drop-shadow(0 3px 8px rgba(14, 165, 233, 0.5));
+}
+.vt-map-pin.cat-town:hover {
+    filter: drop-shadow(0 3px 8px rgba(71, 85, 105, 0.5));
+}
+
+.vt-map-pin svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* --- One-Shot Liquid Water Ripple (Plays only ONCE upon selection, 0 continuous loop) --- */
+.vt-water-ripple-container {
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    width: 24px;
+    height: 12px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: -1;
+    overflow: visible;
+}
+
+.vt-water-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ripple-color, rgba(245, 158, 11, 0.75));
+    background: radial-gradient(ellipse at center, var(--ripple-bg, rgba(245, 158, 11, 0.2)) 0%, transparent 70%);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.vt-water-ripple.wave-1 {
+    animation: vtSingleLiquidRipple 1.25s cubic-bezier(0.12, 0.8, 0.2, 1) 1 forwards;
+}
+
+.vt-water-ripple.wave-2 {
+    animation: vtSingleLiquidRipple 1.25s cubic-bezier(0.12, 0.8, 0.2, 1) 0.18s 1 forwards;
+}
+
+@keyframes vtSingleLiquidRipple {
+    0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 0.85;
+        border-width: 2px;
+    }
+    45% {
+        opacity: 0.45;
+        border-width: 1.5px;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3.5);
+        opacity: 0;
+        border-width: 0.5px;
+    }
+}
+
+/* Category-specific liquid ripple hues */
+.cat-temple .vt-water-ripple {
+    --ripple-color: rgba(245, 158, 11, 0.75);
+    --ripple-bg: rgba(245, 158, 11, 0.2);
+}
+.cat-holy-site .vt-water-ripple {
+    --ripple-color: rgba(16, 185, 129, 0.75);
+    --ripple-bg: rgba(16, 185, 129, 0.2);
+}
+.cat-dining .vt-water-ripple {
+    --ripple-color: rgba(249, 115, 22, 0.75);
+    --ripple-bg: rgba(249, 115, 22, 0.2);
+}
+.cat-hotel .vt-water-ripple {
+    --ripple-color: rgba(99, 102, 241, 0.75);
+    --ripple-bg: rgba(99, 102, 241, 0.2);
+}
+.cat-info .vt-water-ripple {
+    --ripple-color: rgba(14, 165, 233, 0.75);
+    --ripple-bg: rgba(14, 165, 233, 0.2);
+}
+.cat-town .vt-water-ripple {
+    --ripple-color: rgba(71, 85, 105, 0.75);
+    --ripple-bg: rgba(71, 85, 105, 0.2);
+}
+
 .image-marker {
     width: 40px;
     height: 40px;
@@ -17,53 +155,10 @@
     align-items: center;
     justify-content: center;
     transition: opacity 0.2s ease, filter 0.2s ease;
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.22));
     cursor: pointer;
     opacity: 0.95;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-}
-
-.image-marker img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    position: absolute;
-    top: 0;
-    left: 0;
-    transition: opacity 0.25s ease;
-    backface-visibility: hidden;
-    transform: none !important;
-    /* Guarantees pure transparent background removal on all raster icons/GIFs */
-    filter: url(#remove-bg);
-}
-
-.image-marker img.animated {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* Selective image toggle for animated markers */
-.image-marker.has-animation:hover img.animated {
-    opacity: 1;
-}
-
-.image-marker.has-animation:hover img.static {
-    opacity: 0;
-}
-
-.image-marker:hover:not(.active) {
-    opacity: 1;
-    z-index: 1000 !important;
-    transform: none !important;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
-}
-
-.image-marker.active {
-    opacity: 1;
-    z-index: 1001 !important;
-    transform: none !important;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
 }
 
 /* --- High-Precision Transparent User Location Beacon --- */
@@ -187,16 +282,19 @@
 
 
 /* --- Luxury Apple / Uber Minimalist Marker Clusters --- */
-/* --- Luxury Apple / Uber Minimalist Marker Clusters --- */
+/* --- Luxury Minimalist Marker Clusters (Tight 2px Shadow, Zero Safari Smudge) --- */
 .marker-cluster,
 .marker-cluster-small,
 .marker-cluster-medium,
 .marker-cluster-large {
     background-clip: padding-box;
     border-radius: 50% !important;
-    background-color: rgba(0, 0, 0, 0.06) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    background-color: rgba(15, 23, 42, 0.08) !important;
+    border: 1px solid rgba(15, 23, 42, 0.12) !important;
     box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .marker-cluster div,
@@ -211,16 +309,19 @@
     border-radius: 50% !important;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     font-size: 12px !important;
-    font-weight: 750 !important;
+    font-weight: 800 !important;
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #09090b !important;
+    background-color: #0f172a !important;
     color: #ffffff !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.22) !important;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease;
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .marker-cluster div span,
@@ -228,7 +329,8 @@
 .marker-cluster-medium div span,
 .marker-cluster-large div span {
     color: #ffffff !important;
-    font-weight: 750 !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
     transition: color 0.16s ease;
 }
 
@@ -237,9 +339,9 @@
 .marker-cluster-medium:hover div,
 .marker-cluster-large:hover div {
     transform: scale(1.12);
-    background-color: #18181b !important;
-    border-color: rgba(255, 255, 255, 0.45) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35) !important;
+    background-color: #1e293b !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.28) !important;
 }
 
 /* Dark Mode Obsidian Clusters */
@@ -299,10 +401,10 @@ body.dark-theme .marker-cluster-large div,
 .dark-map-theme .marker-cluster-small div,
 .dark-map-theme .marker-cluster-medium div,
 .dark-map-theme .marker-cluster-large div {
-    background: #1e1e20 !important;
+    background: #18181b !important;
     color: #ffffff !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.32) !important;
 }
 
 [data-theme="dark"] .marker-cluster:hover div,
@@ -322,10 +424,10 @@ body.dark-theme .marker-cluster-large:hover div,
 .dark-map-theme .marker-cluster-medium:hover div,
 .dark-map-theme .marker-cluster-large:hover div {
     transform: scale(1.08);
-    background: #2a2a2e !important;
+    background: #27272a !important;
     color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.45) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.38) !important;
 }
 
 [data-theme="dark"] .marker-cluster div span,
@@ -349,20 +451,95 @@ body.dark-theme .marker-cluster:hover div span,
     mix-blend-mode: normal !important;
 }
 
-.map-style-satellite .marker-cluster {
-    background-color: rgba(255, 255, 255, 0.28) !important;
+/* Outer cluster halo - frosted glass ring that stands out over satellite terrain */
+.map-style-satellite .marker-cluster,
+.map-style-satellite .marker-cluster-small,
+.map-style-satellite .marker-cluster-medium,
+.map-style-satellite .marker-cluster-large,
+.map-style-satellite.dark-map-theme .marker-cluster,
+.map-style-satellite.dark-theme .marker-cluster,
+[data-theme="dark"] .map-style-satellite .marker-cluster,
+body.dark-theme .map-style-satellite .marker-cluster,
+#map.map-style-satellite .marker-cluster {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35) !important;
 }
 
-.map-style-satellite .marker-cluster div {
+.map-style-satellite .marker-cluster:hover,
+.map-style-satellite .marker-cluster-small:hover,
+.map-style-satellite .marker-cluster-medium:hover,
+.map-style-satellite .marker-cluster-large:hover,
+.map-style-satellite.dark-map-theme .marker-cluster:hover,
+.map-style-satellite.dark-theme .marker-cluster:hover,
+[data-theme="dark"] .map-style-satellite .marker-cluster:hover,
+body.dark-theme .map-style-satellite .marker-cluster:hover,
+#map.map-style-satellite .marker-cluster:hover {
+    background-color: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Inner cluster disc - crisp high-contrast white badge */
+.map-style-satellite .marker-cluster div,
+.map-style-satellite .marker-cluster-small div,
+.map-style-satellite .marker-cluster-medium div,
+.map-style-satellite .marker-cluster-large div,
+.map-style-satellite.dark-map-theme .marker-cluster div,
+.map-style-satellite.dark-theme .marker-cluster div,
+[data-theme="dark"] .map-style-satellite .marker-cluster div,
+body.dark-theme .map-style-satellite .marker-cluster div,
+#map.map-style-satellite .marker-cluster div {
+    background: #ffffff !important;
     background-color: #ffffff !important;
-    color: #0f172a !important;
-    border: 1.5px solid #0f172a !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
-    font-weight: 900 !important;
+    color: #09090b !important;
+    border: 1.5px solid #09090b !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+    font-weight: 850 !important;
 }
 
-.map-style-satellite .marker-cluster:hover div {
-    background-color: #f1f5f9 !important;
+.map-style-satellite .marker-cluster:hover div,
+.map-style-satellite .marker-cluster-small:hover div,
+.map-style-satellite .marker-cluster-medium:hover div,
+.map-style-satellite .marker-cluster-large:hover div,
+.map-style-satellite.dark-map-theme .marker-cluster:hover div,
+.map-style-satellite.dark-theme .marker-cluster:hover div,
+[data-theme="dark"] .map-style-satellite .marker-cluster:hover div,
+body.dark-theme .map-style-satellite .marker-cluster:hover div,
+#map.map-style-satellite .marker-cluster:hover div {
+    background: #f4f4f5 !important;
+    background-color: #f4f4f5 !important;
+    border-color: #000000 !important;
+    transform: scale(1.12);
+}
+
+/* Cluster counter text - GUARANTEED ultra-deep black in all themes so it never renders invisible white-on-white */
+.map-style-satellite .marker-cluster div span,
+.map-style-satellite .marker-cluster-small div span,
+.map-style-satellite .marker-cluster-medium div span,
+.map-style-satellite .marker-cluster-large div span,
+.map-style-satellite .marker-cluster:hover div span,
+.map-style-satellite .marker-cluster-small:hover div span,
+.map-style-satellite .marker-cluster-medium:hover div span,
+.map-style-satellite .marker-cluster-large:hover div span,
+.map-style-satellite.dark-map-theme .marker-cluster div span,
+.map-style-satellite.dark-map-theme .marker-cluster:hover div span,
+.map-style-satellite.dark-theme .marker-cluster div span,
+.map-style-satellite.dark-theme .marker-cluster:hover div span,
+[data-theme="dark"] .map-style-satellite .marker-cluster div span,
+[data-theme="dark"] .map-style-satellite .marker-cluster:hover div span,
+.dark-theme .map-style-satellite .marker-cluster div span,
+.dark-theme .map-style-satellite .marker-cluster:hover div span,
+body.dark-theme .map-style-satellite .marker-cluster div span,
+body.dark-theme .map-style-satellite .marker-cluster:hover div span,
+.dark-map-theme .map-style-satellite .marker-cluster div span,
+.dark-map-theme .map-style-satellite .marker-cluster:hover div span,
+#map.map-style-satellite .marker-cluster div span,
+#map.map-style-satellite .marker-cluster:hover div span {
+    color: #09090b !important;
+    font-weight: 850 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .leaflet-control-zoom {
@@ -1092,49 +1269,23 @@ body.dark-theme .user-beacon-pulse {
 }
 
 /* Marker Visibility in Dark Mode: Converts black silhouette pins to luminous, crisp platinum pins with full SVG background transparency */
+/* Dark Theme Safe Marker Styling (No Destructive Invert) */
 [data-theme="dark"] .image-marker,
 .dark-theme .image-marker,
 body.dark-theme .image-marker {
     opacity: 1 !important;
 }
 
-[data-theme="dark"] .image-marker img.static,
-.dark-theme .image-marker img.static,
-body.dark-theme .image-marker img.static {
-    filter: url(#remove-bg) invert(1) brightness(1.1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6)) !important;
-    mix-blend-mode: normal !important;
+[data-theme="dark"] .vt-map-pin,
+.dark-theme .vt-map-pin,
+body.dark-theme .vt-map-pin {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
 }
 
-[data-theme="dark"] .image-marker img.animated,
-.dark-theme .image-marker img.animated,
-body.dark-theme .image-marker img.animated {
-    filter: url(#remove-bg) invert(1) brightness(1.1) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6)) !important;
-    mix-blend-mode: normal !important;
-}
-
-[data-theme="dark"] .image-marker:hover img.static,
-[data-theme="dark"] .image-marker:hover img.animated,
-.dark-theme .image-marker:hover img.static,
-.dark-theme .image-marker:hover img.animated,
-body.dark-theme .image-marker:hover img.static,
-body.dark-theme .image-marker:hover img.animated {
-    filter: url(#remove-bg) invert(1) brightness(1.2) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.8)) !important;
-}
-
-[data-theme="dark"] .image-marker.active img.static,
-[data-theme="dark"] .image-marker.active img.animated,
-.dark-theme .image-marker.active img.static,
-.dark-theme .image-marker.active img.animated,
-body.dark-theme .image-marker.active img.static,
-body.dark-theme .image-marker.active img.animated {
-    filter: url(#remove-bg) invert(1) brightness(1.25) drop-shadow(0 4px 14px rgba(0, 0, 0, 0.9)) !important;
-}
-
-/* Destination Active Flag */
-[data-theme="dark"] .image-marker.destination img,
-.dark-theme .image-marker.destination img,
-body.dark-theme .image-marker.destination img {
-    filter: url(#remove-bg) drop-shadow(0 2px 8px rgba(239, 68, 68, 0.6)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7)) !important;
+[data-theme="dark"] .image-marker.destination,
+.dark-theme .image-marker.destination,
+body.dark-theme .image-marker.destination {
+    filter: drop-shadow(0 2px 6px rgba(239, 68, 68, 0.4)) !important;
 }
 
 /* User Location GIF Marker in Dark Mode */

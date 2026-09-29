@@ -12,9 +12,9 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   width: 100%;
+  min-width: 0;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   padding: 0.2rem 0.35rem 0.2rem 0.25rem;
   touch-action: pan-x;
   cursor: grab;
@@ -50,7 +50,6 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   user-select: none;
   touch-action: manipulation;
-  scroll-snap-align: start;
   white-space: nowrap;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

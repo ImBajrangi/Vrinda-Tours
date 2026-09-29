@@ -142,3 +142,7 @@ High-frequency GPS and IoT sensor streams must be separated from transactional b
 
 Always pair theme overrides with unified selector blocks: `[data-theme="light"], .light-theme, body.light-theme` and `[data-theme="dark"], .dark-theme, body.dark-theme` to guarantee consistent theme resolution across all overlay menus.
 
+Never chain `drop-shadow()` with SVG matrix filters (`url(#filter)`) on nested `<img>` elements in hardware-accelerated containers; apply clean `-webkit-filter: drop-shadow(...)` strictly to the parent container to prevent WebKit alpha bleeding.
+
+When overriding third-party component styles (such as Leaflet or external libraries) across theme modes, always target both container and nested leaf text nodes (e.g., div and span) with explicit text color and background pairing rules to prevent cascade collisions
+

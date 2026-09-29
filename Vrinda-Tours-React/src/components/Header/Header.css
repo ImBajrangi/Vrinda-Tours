@@ -573,6 +573,8 @@ body.dark-theme .header-mode-check {
 /* Row 2: Category Filter Tray */
 .header-category-tray {
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
   padding-top: 0.28rem;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }

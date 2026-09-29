@@ -7,39 +7,162 @@ import './MapView.css';
 
 const MARKER_BASE = '/marker/';
 
-function getCategoryIcon(category) {
+function getCategoryPinData(category) {
   switch (category) {
     case 'Temple':
-      return `${MARKER_BASE}marker-ios-17-outlined/icons8-marker-100.gif`;
+      return {
+        key: 'temple',
+        gradTop: '#fde047',
+        gradMid: '#f59e0b',
+        gradBot: '#b45309',
+        iconColor: '#b45309',
+        // Sacred Golden Kalash & Dhwaja (Flag) Finial crowning the temple pin
+        crownSvg: `
+          <path d="M18 0.3 L19.4 2.8 H16.6 Z" fill="#fde047" stroke="#b45309" stroke-width="0.5"/>
+          <line x1="18" y1="0.3" x2="21" y2="1.2" stroke="#dc2626" stroke-width="1" stroke-linecap="round"/>
+          <circle cx="18" cy="2.8" r="1" fill="#f59e0b"/>
+        `,
+        // Sacred Hindu Temple Mandir with Kalash & Shikhara
+        glyph: `<path d="M12 2L13.5 5.5H10.5L12 2Z" fill="currentColor"/><path d="M12 5.5L15 9.5H9L12 5.5Z" fill="currentColor"/><rect x="7" y="9.5" width="10" height="2" rx="0.5" fill="currentColor"/><rect x="8" y="11.5" width="8" height="7.5" fill="currentColor"/><path d="M10.5 19V15C10.5 14.2 11.2 13.5 12 13.5C12.8 13.5 13.5 14.2 13.5 15V19" fill="#ffffff"/><line x1="5" y1="19" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+      };
     case 'Holy Site':
-      return `${MARKER_BASE}place-marker-ios-17-filled/icons8-place-marker-100.gif`;
+      return {
+        key: 'holy-site',
+        gradTop: '#6ee7b7',
+        gradMid: '#10b981',
+        gradBot: '#047857',
+        iconColor: '#047857',
+        // Sacred Lotus Petal Crown
+        crownSvg: `
+          <path d="M18 0.5 C18 0.5 16.5 2 16.5 3 C16.5 3.8 17.2 4.2 18 4.2 C18.8 4.2 19.5 3.8 19.5 3 C19.5 2 18 0.5 18 0.5 Z" fill="#6ee7b7" stroke="#047857" stroke-width="0.5"/>
+          <circle cx="18" cy="3.2" r="0.8" fill="#fde047"/>
+        `,
+        // Sacred Lotus Blossom
+        glyph: `<path d="M12 3C12 3 9.5 7.5 9.5 11C9.5 12.4 10.6 13.5 12 13.5C13.4 13.5 14.5 12.4 14.5 11C14.5 7.5 12 3 12 3Z" fill="currentColor"/><path d="M7.5 7C7.5 7 5.5 10.5 6 13C6.4 14.8 8 16 9.8 15.8C10.6 15.7 11.4 15.2 12 14.5C11 13 10.5 11 10.5 9C10.5 8.2 10.7 7.5 11 6.8C9.6 6.3 8.3 6.5 7.5 7Z" fill="currentColor"/><path d="M16.5 7C16.5 7 18.5 10.5 18 13C17.6 14.8 16 16 14.2 15.8C13.4 15.7 12.6 15.2 12 14.5C13 13 13.5 11 13.5 9C13.5 8.2 13.3 7.5 13 6.8C14.4 6.3 15.7 6.5 16.5 7Z" fill="currentColor"/><path d="M4 18C7 16.5 10 17.5 12 18.5C14 17.5 17 16.5 20 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+      };
     case 'Dining':
     case 'Restaurant':
-      return `${MARKER_BASE}pin-3.png`;
+      return {
+        key: 'dining',
+        gradTop: '#fdba74',
+        gradMid: '#f97316',
+        gradBot: '#c2410c',
+        iconColor: '#c2410c',
+        crownSvg: `
+          <circle cx="18" cy="2" r="1.2" fill="#fdba74" stroke="#c2410c" stroke-width="0.5"/>
+        `,
+        // Culinary Fork & Spoon
+        glyph: `<path d="M18 2v6a3 3 0 0 1-3 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 2v5a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 9v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+      };
     case 'Hotel':
+      return {
+        key: 'hotel',
+        gradTop: '#a5b4fc',
+        gradMid: '#6366f1',
+        gradBot: '#3730a3',
+        iconColor: '#4338ca',
+        crownSvg: `
+          <circle cx="18" cy="2" r="1.2" fill="#a5b4fc" stroke="#3730a3" stroke-width="0.5"/>
+        `,
+        // Bed / Ashram Stay
+        glyph: `<path d="M2 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 9h18a2 2 0 0 1 2 2v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 17h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 9v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+      };
     case 'Information':
-      return `${MARKER_BASE}pin-2.png`;
+      return {
+        key: 'info',
+        gradTop: '#7dd3fc',
+        gradMid: '#0ea5e9',
+        gradBot: '#0369a1',
+        iconColor: '#0369a1',
+        crownSvg: `
+          <circle cx="18" cy="2" r="1.2" fill="#7dd3fc" stroke="#0369a1" stroke-width="0.5"/>
+        `,
+        // Information Guide
+        glyph: `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.2" fill="currentColor"/>`,
+      };
     case 'Town':
-      return `${MARKER_BASE}marker-ink/icons8-marker-96.png`;
     default:
-      return `${MARKER_BASE}marker-ink/icons8-marker-96.png`;
+      return {
+        key: 'town',
+        gradTop: '#94a3b8',
+        gradMid: '#475569',
+        gradBot: '#1e293b',
+        iconColor: '#1e293b',
+        crownSvg: `
+          <circle cx="18" cy="2" r="1.2" fill="#94a3b8" stroke="#1e293b" stroke-width="0.5"/>
+        `,
+        // Heritage Town Landmark
+        glyph: `<path d="M12 21s-6-5.33-6-10a6 6 0 0 1 12 0c0 4.67-6 10-6 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.5" fill="currentColor"/>`,
+      };
   }
 }
 
 function createIcon(category, isActive = false) {
-  const hasAnim = category === 'Temple' || category === 'Holy Site';
-  const iconUrl = getCategoryIcon(category);
-  const baseStaticUrl = `${MARKER_BASE}marker-ink/icons8-marker-96.png`;
-  const staticUrl = hasAnim ? baseStaticUrl : iconUrl;
+  const pin = getCategoryPinData(category);
 
   return L.divIcon({
     className: 'marker-wrapper',
-    html: `<div class="image-marker ${isActive ? 'active destination' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
-             <img src="${staticUrl}" class="static" alt="${category}">
-             ${hasAnim ? `<img src="${iconUrl}" class="animated" alt="${category}">` : ''}
-           </div>`,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
+    html: `
+      <div class="vt-map-pin ${isActive ? 'is-active' : ''} cat-${pin.key}">
+        <svg width="36" height="46" viewBox="0 0 36 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="pin-grad-${pin.key}" x1="18" y1="2" x2="18" y2="42" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="${pin.gradTop}"/>
+              <stop offset="48%" stop-color="${pin.gradMid}"/>
+              <stop offset="100%" stop-color="${pin.gradBot}"/>
+            </linearGradient>
+            <linearGradient id="pin-gloss-${pin.key}" x1="18" y1="4" x2="18" y2="15" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Vector Ground Contact Shadow -->
+          <ellipse cx="18" cy="43.8" rx="6.5" ry="1.8" fill="rgba(0,0,0,0.18)"/>
+
+          <!-- Finial Crown / Spire -->
+          ${pin.crownSvg || ''}
+
+          <!-- Sculpted Royal Jharokha Arch Crest Body -->
+          <path d="M18 1.5 C19.5 2.8 22.5 4.5 26.5 5 C31 5.5 33.5 10 33.5 16.5 C33.5 22.5 29.5 27 25 31.2 C21.2 34.6 19 38.5 18 42.5 C17 38.5 14.8 34.6 11 31.2 C6.5 27 2.5 22.5 2.5 16.5 C2.5 10 5 5.5 9.5 5 C13.5 4.5 16.5 2.8 18 1.5 Z" 
+                fill="url(#pin-grad-${pin.key})" 
+                stroke="#ffffff" 
+                stroke-width="1.8" 
+                stroke-linejoin="round"/>
+
+          <!-- Upper Architectural Arch Inlay Highlight -->
+          <path d="M18 3.5 C20 4.8 22.5 6 25 6.5 C28 7.2 31 10.2 31 15.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-linecap="round"/>
+          <path d="M18 3.5 C16 4.8 13.5 6 11 6.5 C8 7.2 5 10.2 5 15.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-linecap="round"/>
+
+          <!-- Specular Curved Gloss Sheen -->
+          <path d="M8 14C9.5 8 13.5 4.8 18 4.8C22.5 4.8 26.5 8 28 14C24 9.5 20.5 7 15.5 7.5C11.5 8 9 11 8 14Z" 
+                fill="url(#pin-gloss-${pin.key})"/>
+
+          <!-- Concentric Outer Accent Ring -->
+          <circle cx="18" cy="18" r="12.2" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.8"/>
+
+          <!-- Inset Pure White Medallion (Preserved exactly as user loved!) -->
+          <circle cx="18" cy="18" r="9.5" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="0.8"/>
+          <circle cx="18" cy="18" r="8.8" fill="#ffffff" stroke="rgba(0,0,0,0.04)" stroke-width="0.5"/>
+
+          <!-- Centered Category Icon Glyph -->
+          <g transform="translate(11.5, 11.5) scale(0.54)" color="${pin.iconColor}">
+            ${pin.glyph}
+          </g>
+
+          <!-- Precision Anchor Tip Dot -->
+          <circle cx="18" cy="42.5" r="1" fill="#ffffff"/>
+        </svg>
+        ${isActive ? `
+          <div class="vt-water-ripple-container">
+            <div class="vt-water-ripple wave-1"></div>
+            <div class="vt-water-ripple wave-2"></div>
+          </div>
+        ` : ''}
+      </div>
+    `,
+    iconSize: [36, 46],
+    iconAnchor: [18, 43],
   });
 }
 

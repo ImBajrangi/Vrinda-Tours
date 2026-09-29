@@ -29,13 +29,18 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
   const scrollLeftRef = useRef(0);
   const hasMovedRef = useRef(false);
 
-  // Mouse wheel horizontal scroll conversion
+  // Mouse wheel horizontal scroll conversion — allows native trackpad swipe while converting mouse wheel roll
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
     const handleWheel = (e) => {
-      if (e.deltaY !== 0 && !e.shiftKey) {
+      // If user is already scrolling horizontally via trackpad or Shift key, preserve native smooth momentum
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey) {
+        return;
+      }
+      // Only convert pure vertical mouse wheel rolls on standard mice
+      if (Math.abs(e.deltaY) > 2) {
         e.preventDefault();
         track.scrollLeft += e.deltaY;
       }
@@ -53,19 +58,28 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
     scrollLeftRef.current = trackRef.current.scrollLeft;
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDraggingRef.current || !trackRef.current) return;
-    const x = e.pageX - trackRef.current.offsetLeft;
-    const walk = (x - startXRef.current) * 1.4;
-    if (Math.abs(walk) > 4) {
-      hasMovedRef.current = true;
-    }
-    trackRef.current.scrollLeft = scrollLeftRef.current - walk;
-  };
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (!isDraggingRef.current || !trackRef.current) return;
+      const x = e.pageX - trackRef.current.offsetLeft;
+      const walk = (x - startXRef.current) * 1.3;
+      if (Math.abs(walk) > 4) {
+        hasMovedRef.current = true;
+      }
+      trackRef.current.scrollLeft = scrollLeftRef.current - walk;
+    };
 
-  const handleMouseUp = () => {
-    isDraggingRef.current = false;
-  };
+    const handleGlobalMouseUp = () => {
+      isDraggingRef.current = false;
+    };
+
+    window.addEventListener('mousemove', handleGlobalMouseMove);
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove);
+      window.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, []);
 
   const handlePillClick = (key) => {
     if (hasMovedRef.current) {
@@ -94,9 +108,6 @@ export default function CategoryPills({ activeFilter, onFilterChange, onAdminOpe
       className="category-track"
       ref={trackRef}
       onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
     >
       {pills.map((cat) => {
         const IconComponent = ICON_MAP[cat.icon] || MapPin;
