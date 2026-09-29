@@ -1089,7 +1089,6 @@
   background: #ffffff;
   border-color: #cbd5e1;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  transform: translateY(-1px);
 }
 
 .dmd-infra-top {
@@ -1724,7 +1723,6 @@
 
 .dmd-btn-approve:hover {
   background: #16a34a;
-  transform: translateY(-1px);
 }
 
 .dmd-btn-inquire {
@@ -1735,7 +1733,6 @@
 
 .dmd-btn-inquire:hover {
   background: #fde68a;
-  transform: translateY(-1px);
 }
 
 .dmd-btn-reject {
@@ -1746,7 +1743,6 @@
 
 .dmd-btn-reject:hover {
   background: #fecaca;
-  transform: translateY(-1px);
 }
 
 .dmd-exec-quick-chips {

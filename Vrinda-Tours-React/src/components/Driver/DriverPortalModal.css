@@ -1528,7 +1528,6 @@
 }
 
 .dp-btn-pay-comm:hover {
-  transform: translateY(-1px);
   filter: brightness(1.08);
 }
 
@@ -2173,7 +2172,6 @@
 
 .dp-btn-submit-utr:hover {
   background: #15803d;
-  transform: translateY(-1px);
 }
 
 .dp-btn-submit-utr:disabled {

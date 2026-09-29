@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Rich Select Dropdown & Luxury Card Menu (Reference Design Standard)
+   Rich Select Dropdown — ChatGPT / Codex Reference Design Standard
+   Pure Matte Obsidian (#212121 / #2f2f2f / #ececec / #8e8e8e)
    ========================================================================== */
 
 .rich-select-wrapper {
@@ -14,18 +15,18 @@
 
 .rich-select-label {
   font-size: 0.85rem;
-  font-weight: 700;
-  color: #475569;
+  font-weight: 600;
+  color: #71717a;
   letter-spacing: -0.01em;
   user-select: none;
 }
 
 .rich-select-wrapper.dark .rich-select-label {
-  color: #94a3b8;
+  color: #8e8e8e;
 }
 
 /* --------------------------------------------------------------------------
-   Trigger Input Box (Reference Image 1: Rounded Rectangle with Chevrons)
+   Trigger Input Box
    -------------------------------------------------------------------------- */
 .rich-select-trigger {
   width: 100%;
@@ -34,63 +35,70 @@
   justify-content: space-between;
   padding: 10px 14px;
   background: #ffffff;
-  border: 1.5px solid rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 12px;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #0f172a;
+  color: #09090b;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   box-sizing: border-box;
   text-align: left;
 }
 
 .rich-select-trigger:hover {
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgba(0, 0, 0, 0.25);
+  background: #fafafa;
 }
 
 .rich-select-trigger.active,
 .rich-select-trigger:focus-visible {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3.5px rgba(99, 102, 241, 0.15), 0 2px 8px rgba(99, 102, 241, 0.08);
+  border-color: #09090b;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
 }
 
 .rich-select-trigger-text.placeholder {
-  color: #94a3b8;
+  color: #8e8e8e;
   font-weight: 500;
 }
 
 .rich-select-chevron {
-  color: #64748b;
+  color: #8e8e8e;
   flex-shrink: 0;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .rich-select-trigger.active .rich-select-chevron {
-  color: #6366f1;
+  transform: rotate(180deg);
+  color: #09090b;
 }
 
 /* Dark Theme Trigger */
 .rich-select-wrapper.dark .rich-select-trigger {
-  background: #18181b;
-  border-color: rgba(255, 255, 255, 0.12);
-  color: #f8fafc;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  background: #212121;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #ececec;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .rich-select-wrapper.dark .rich-select-trigger:hover {
-  border-color: rgba(129, 140, 248, 0.4);
+  background: #2f2f2f;
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .rich-select-wrapper.dark .rich-select-trigger.active {
-  border-color: #818cf8;
-  box-shadow: 0 0 0 3.5px rgba(129, 140, 248, 0.25);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+.rich-select-wrapper.dark .rich-select-trigger.active .rich-select-chevron {
+  color: #ececec;
 }
 
 /* --------------------------------------------------------------------------
-   Floating Dropdown Card Menu (Reference Image 1: Soft Floating Rounded Card)
+   Floating Dropdown Menu (ChatGPT / Codex Popover: #212121, 18px Radius)
    -------------------------------------------------------------------------- */
 .rich-select-menu {
   position: absolute;
@@ -99,62 +107,63 @@
   right: 0;
   background: #ffffff;
   border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 16px 40px -4px rgba(15, 23, 42, 0.12), 0 4px 14px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.05);
   padding: 8px;
   z-index: 99999;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   max-height: 320px;
   overflow-y: auto;
-  animation: richDropdownSpringIn 0.24s cubic-bezier(0.34, 1.35, 0.64, 1) forwards;
+  animation: richDropdownFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: top center;
   box-sizing: border-box;
 }
 
-@keyframes richDropdownSpringIn {
-  0% {
+@keyframes richDropdownFadeIn {
+  from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.97);
+    transform: translateY(-6px) scale(0.97);
   }
-  100% {
+  to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
-/* Dark Theme Menu (Reference Image 2: Luxury Dark Obsidian) */
+/* Dark Theme Menu (OpenAI Codex Matte Style) */
 .rich-select-wrapper.dark .rich-select-menu {
-  background: #1e1e20;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.6);
+  background: #212121;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 56px -8px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 /* --------------------------------------------------------------------------
-   Option Items with Header, Description & Badges (Reference Image 1)
+   Option Items with Header, Description & Checkmark (Reference Image 1)
    -------------------------------------------------------------------------- */
 .rich-select-item {
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   user-select: none;
   box-sizing: border-box;
+  background: transparent;
 }
 
 .rich-select-item:hover {
-  background: #f1f5f9;
+  background: #f4f4f5;
 }
 
 .rich-select-item.selected {
-  background: #f8fafc;
+  background: #f4f4f5;
 }
 
 .rich-select-wrapper.dark .rich-select-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: #2f2f2f;
 }
 
 .rich-select-wrapper.dark .rich-select-item.selected {
@@ -175,39 +184,39 @@
 }
 
 .rich-select-item-title {
-  font-size: 0.88rem;
-  font-weight: 750;
-  color: #0f172a;
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #09090b;
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .rich-select-wrapper.dark .rich-select-item-title {
-  color: #f8fafc;
+  color: #ececec;
 }
 
 .rich-select-check-icon {
-  color: #6366f1;
+  color: #09090b;
   flex-shrink: 0;
 }
 
 .rich-select-wrapper.dark .rich-select-check-icon {
-  color: #818cf8;
+  color: #ececec;
 }
 
 .rich-select-item-desc {
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #71717a;
   line-height: 1.35;
   margin: 3px 0 0;
 }
 
 .rich-select-wrapper.dark .rich-select-item-desc {
-  color: #94a3b8;
+  color: #8e8e8e;
 }
 
-/* Optional AI Assistant / Status Badge (Reference Image 1: Pill below description) */
+/* Optional AI Assistant / Status Badge */
 .rich-select-badge-wrap {
   margin-top: 6px;
   display: flex;
@@ -218,9 +227,9 @@
   display: inline-flex;
   align-items: center;
   gap: 4.5px;
-  padding: 3px 9px;
-  border-radius: 8px;
-  font-size: 0.74rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
@@ -232,21 +241,9 @@
 }
 
 .rich-select-item-badge.emerald {
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
-}
-
-.rich-select-item-badge.amber {
-  background: #fffbeb;
-  color: #d97706;
-  border: 1px solid #fde68a;
-}
-
-.rich-select-wrapper.dark .rich-select-item-badge.indigo {
-  background: rgba(99, 102, 241, 0.18);
-  color: #a5b4fc;
-  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(16, 163, 126, 0.12);
+  color: #10a37e;
+  border: 1px solid rgba(16, 163, 126, 0.25);
 }
 
 .rich-select-error-msg {

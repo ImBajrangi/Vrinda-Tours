@@ -18,7 +18,7 @@ export default function InstallAppModal({ isOpen, onClose, triggerReason = 'manu
     setIsIos(isIosDevice);
 
     // Check if already in standalone mode
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    if (window.matchMedia?.('(display-mode: standalone)')?.matches || Boolean(window.navigator?.standalone)) {
       setIsInstalled(true);
     }
 
@@ -55,10 +55,6 @@ export default function InstallAppModal({ isOpen, onClose, triggerReason = 'manu
       <div className="vt-app-modal-card" onClick={(e) => e.stopPropagation()}>
         {/* Top Header */}
         <div className="vt-am-header">
-          <div className="vt-am-badge">
-            <Sparkles size={13} className="vt-am-badge-icon" />
-            <span>Official Mobile Experience</span>
-          </div>
           <button className="vt-am-close-btn" onClick={onClose} aria-label="Close modal">
             <X size={18} />
           </button>
@@ -68,13 +64,12 @@ export default function InstallAppModal({ isOpen, onClose, triggerReason = 'manu
         <div className="vt-am-hero">
           <div className="vt-am-logo-wrap">
             <img src="/official-logo.svg" alt="Vrinda Travels Logo" className="vt-am-logo-img" />
-            <div className="vt-am-logo-ring" />
           </div>
           <h2 className="vt-am-title">Install Vrinda Travels App</h2>
           <p className="vt-am-subtitle">
             {triggerReason === 'booking_success'
               ? 'Booking request submitted! Install the official app for instant trip tracking & offline maps.'
-              : 'Lightning-fast mobile app for sacred Brij Darshan, verified E-Rickshaws & verified stay bookings.'}
+              : 'Lightning-fast mobile app for sacred Brij Darshan, verified E-Rickshaws & stay bookings.'}
           </p>
         </div>
 
@@ -176,8 +171,8 @@ export default function InstallAppModal({ isOpen, onClose, triggerReason = 'manu
         {/* Action Button CTA */}
         <div className="vt-am-action-bar">
           <button className="vt-am-install-btn" onClick={handleInstallClick}>
-            <Download size={18} />
-            <span>{isInstalled ? 'App Ready in Standalone Mode' : 'Install App Now (Free)'}</span>
+            <Download size={16} />
+            <span>{isInstalled ? 'App Ready in Standalone Mode' : 'Install App'}</span>
           </button>
           <button className="vt-am-dismiss-btn" onClick={onClose}>
             Maybe Later

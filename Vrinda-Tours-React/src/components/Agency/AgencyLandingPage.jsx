@@ -4,7 +4,7 @@ import {
   MapPin, Navigation, ArrowRight, X, Sparkles,
   Clock, TrendingUp, Check, ShieldCheck, AlertCircle, LogIn, HeartHandshake,
   Zap, ArrowUpRight, ArrowLeft, CheckSquare, Award, BadgePercent, Sparkle,
-  Mail, Lock, Eye, EyeOff, Bus, Users, Flag, Map, Car, Building2, UtensilsCrossed,
+  Mail, Lock, Eye, EyeOff, Bus, Users, Flag, Map as MapIcon, Car, Building2, UtensilsCrossed,
   Share2, Copy
 } from 'lucide-react';
 import { collection, addDoc } from 'firebase/firestore';
@@ -16,7 +16,7 @@ import './AgencyLandingPage.css';
 export const AgencyGraphic = ({ type = '', size = 22 }) => {
   if (type.includes('Guide')) return <Flag size={size} />;
   if (type.includes('Tempo') || type.includes('Bus') || type.includes('Fleet')) return <Bus size={size} />;
-  if (type.includes('Planner') || type.includes('Custom')) return <Map size={size} />;
+  if (type.includes('Planner') || type.includes('Custom')) return <MapIcon size={size} />;
   return <Compass size={size} />;
 };
 

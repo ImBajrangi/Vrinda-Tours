@@ -885,7 +885,6 @@
 
 .rd-dock-confirm-btn:hover {
   background: #27272a;
-  transform: translateY(-1px);
 }
 
 .rd-dock-confirm-btn:active {
@@ -997,7 +996,6 @@
 }
 
 .btn-submit-booking-request:hover:not(:disabled) {
-  transform: translateY(-1px);
   background: #18181b;
   box-shadow: 0 6px 24px rgba(9, 9, 11, 0.35);
 }
@@ -1144,7 +1142,6 @@
 }
 
 .bs-btn-whatsapp-direct:hover {
-  transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
 }
 

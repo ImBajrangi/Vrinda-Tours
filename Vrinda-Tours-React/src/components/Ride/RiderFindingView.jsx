@@ -1,8 +1,10 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, Navigation, Clock, ShieldCheck, Phone, Star, ArrowRight, 
   User, MapPin, MessageSquare, Check, Radio, Users, ChevronRight,
-  Shield, CheckCircle, Search
+  Shield, CheckCircle, Search, Landmark, Train, Sparkles, BedDouble,
+  Waves, Navigation2, Compass
 } from 'lucide-react';
 import { calculateDistance, formatDistance } from '../../utils/distance';
 import { useBottomSheetDrag } from '../../hooks/useBottomSheetDrag';
@@ -13,6 +15,118 @@ import {
 } from '../../services/realtimeDatabaseService';
 import { searchAllPlacesAndAreas } from '../../services/geocodingService';
 import './RiderFindingView.css';
+
+const PICKER_CATEGORIES = [
+  { key: 'all', label: 'All Places' },
+  { key: 'temple', label: 'Temples' },
+  { key: 'station', label: 'Stations' },
+  { key: 'holy_site', label: 'Holy Sites' },
+  { key: 'hotel', label: 'Stays' },
+  { key: 'ghat', label: 'Ghats' },
+];
+
+const CURATED_DESTINATIONS = [
+  {
+    id: 'curated_bankey_bihari',
+    name: 'Shri Bankey Bihari Mandir',
+    town: 'Vrindavan Alleys',
+    category: 'TEMPLE',
+    subtitle: 'Supreme darshan of Thakur Ji in old Vrindavan',
+    lat: 27.580456,
+    lng: 77.701103
+  },
+  {
+    id: 'curated_prem_mandir',
+    name: 'Prem Mandir & Musical Fountain',
+    town: 'Chhatikara Road, Vrindavan',
+    category: 'TEMPLE',
+    subtitle: 'White marble temple complex & evening fountain show',
+    lat: 27.5724,
+    lng: 77.6744
+  },
+  {
+    id: 'curated_mathura_junction',
+    name: 'Mathura Junction Railway Station',
+    town: 'Mathura (PF 1 Main Exit)',
+    category: 'STATION',
+    subtitle: 'Direct railway station taxi & rickshaw bay',
+    lat: 27.4924,
+    lng: 77.6737
+  },
+  {
+    id: 'curated_radha_raman',
+    name: 'Shri Radha Raman Temple',
+    town: 'Vrindavan',
+    category: 'TEMPLE',
+    subtitle: '500+ yr ancient self-manifested Shaligram deity',
+    lat: 27.584321,
+    lng: 77.704512
+  },
+  {
+    id: 'curated_radha_kund',
+    name: 'Radha Kund & Shyam Kund',
+    town: 'Govardhan Parikrama',
+    category: 'HOLY_SITE',
+    subtitle: 'The holiest kunds in Brij 84 Kos',
+    lat: 27.5255,
+    lng: 77.495
+  },
+  {
+    id: 'curated_janmabhoomi',
+    name: 'Shri Krishna Janmasthan Temple',
+    town: 'Mathura Central',
+    category: 'TEMPLE',
+    subtitle: 'Sacred birthplace of Lord Shri Krishna',
+    lat: 27.505,
+    lng: 77.67
+  },
+  {
+    id: 'curated_barsana',
+    name: 'Shri Radha Rani Temple',
+    town: 'Barsana Hilltop',
+    category: 'TEMPLE',
+    subtitle: 'Bhanugarh hilltop palace of Shri Radha Rani',
+    lat: 27.650261,
+    lng: 77.373287
+  },
+  {
+    id: 'curated_raman_reti',
+    name: 'Raman Reti & Brahmand Ghat',
+    town: 'Gokul Dham',
+    category: 'HOLY_SITE',
+    subtitle: 'Sacred micro-sand grove where Krishna crawled',
+    lat: 27.442,
+    lng: 77.718
+  },
+  {
+    id: 'curated_iskcon',
+    name: 'ISKCON Krishna Balaram Mandir',
+    town: 'Raman Reti, Vrindavan',
+    category: 'TEMPLE',
+    subtitle: 'Center of Bhakti yoga & kirtan',
+    lat: 27.5731,
+    lng: 77.6853
+  },
+  {
+    id: 'curated_vishram_ghat',
+    name: 'Vishram Ghat (Yamuna Maha Aarti)',
+    town: 'Mathura',
+    category: 'GHAT',
+    subtitle: 'Sacred Yamuna riverbank evening aarti',
+    lat: 27.502,
+    lng: 77.685
+  }
+];
+
+function getPlaceCategoryIcon(category = '') {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('temple')) return Landmark;
+  if (cat.includes('station') || cat.includes('railway') || cat.includes('bus')) return Train;
+  if (cat.includes('holy') || cat.includes('kund') || cat.includes('parikrama')) return Sparkles;
+  if (cat.includes('hotel') || cat.includes('stay') || cat.includes('ashram')) return BedDouble;
+  if (cat.includes('ghat')) return Waves;
+  return MapPin;
+}
 
 /* Minimalist Uber-Style Vector Vehicle Icons */
 function RickshawIcon({ className = "veh-icon" }) {
@@ -113,6 +227,7 @@ export default function RiderFindingView({
   const [stage, setStage] = useState('FINDING_DRIVERS'); // 'FINDING_DRIVERS' | 'TRIP_ACTIVE' | 'COMPLETED'
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [pickerTarget, setPickerTarget] = useState('destination');
+  const [selectedPickerCategory, setSelectedPickerCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [safetyPin] = useState(() => Math.floor(1000 + Math.random() * 9000).toString());
@@ -183,6 +298,24 @@ export default function RiderFindingView({
     fetchPlaces();
   }, [searchQuery, isPickerOpen, userPosition]);
 
+  // Compute Active Filtered Places for Picker
+  const displayPlaces = useMemo(() => {
+    let list = (searchResults && searchResults.length > 0) ? searchResults : CURATED_DESTINATIONS;
+    if (selectedPickerCategory !== 'all') {
+      const catKey = selectedPickerCategory.toLowerCase();
+      list = list.filter(p => {
+        const cat = (p.category || '').toLowerCase();
+        if (catKey === 'temple') return cat.includes('temple');
+        if (catKey === 'station') return cat.includes('station') || cat.includes('railway') || cat.includes('bus');
+        if (catKey === 'holy_site') return cat.includes('holy') || cat.includes('kund') || cat.includes('parikrama') || cat.includes('site');
+        if (catKey === 'hotel') return cat.includes('hotel') || cat.includes('stay') || cat.includes('ashram');
+        if (catKey === 'ghat') return cat.includes('ghat');
+        return true;
+      });
+    }
+    return list;
+  }, [searchResults, selectedPickerCategory]);
+
   // Handle Atomic Driver Dispatch
   const handleSelectDriverDirect = async (driver) => {
     if (isClaimingRide) return;
@@ -243,12 +376,41 @@ export default function RiderFindingView({
     }
   };
 
-  return (
-    <>
+  // Lock background body scroll when active & support Escape key
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        triggerClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [triggerClose]);
+
+  // Apply drag translation only on mobile viewports (< 768px)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const appliedSheetStyle = isMobile ? sheetStyle : (sheetStyle?.opacity !== undefined ? { opacity: sheetStyle.opacity } : {});
+
+  const modalElement = (
+    <div className="ubr-modal-root">
       <div className="ubr-overlay visible" onClick={triggerClose} aria-hidden="true" />
 
-      <div className={`ubr-sheet visible ${isDragging ? 'is-dragging' : ''}`} style={sheetStyle}>
-        {/* Top Drag Handle & Gesture Zone */}
+      <div 
+        className={`ubr-sheet visible ${isDragging ? 'is-dragging' : ''}`} 
+        style={appliedSheetStyle}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Choose a Ride"
+      >
+        {/* Top Drag Handle & Gesture Zone (Mobile only) */}
         <div className="ubr-drag-zone" {...handleProps} title="Swipe down to dismiss">
           <div className="ubr-drag-pill" />
         </div>
@@ -479,11 +641,15 @@ export default function RiderFindingView({
         {isPickerOpen && (
           <div className="ubr-picker-overlay">
             <div className="ubr-picker-header">
-              <h4>Choose {pickerTarget === 'pickup' ? 'Pickup Location' : 'Destination'}</h4>
+              <div className="ubr-picker-title-box">
+                <h4>Choose {pickerTarget === 'pickup' ? 'Pickup Location' : 'Destination'}</h4>
+                <span className="ubr-picker-sub">Select verified pilgrimage point or enter address</span>
+              </div>
               <button 
                 type="button" 
                 className="ubr-icon-close-btn" 
-                onClick={() => setIsPickerOpen(false)}
+                onClick={() => { setIsPickerOpen(false); setSearchQuery(''); }}
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -503,39 +669,138 @@ export default function RiderFindingView({
                   type="button" 
                   className="ubr-clear-btn" 
                   onClick={() => setSearchQuery('')}
+                  aria-label="Clear search"
                 >
                   <X size={14} />
                 </button>
               )}
             </div>
 
+            {/* Quick Category Filter Pills */}
+            <div className="ubr-picker-cats-tray">
+              {PICKER_CATEGORIES.map(cat => (
+                <button
+                  key={cat.key}
+                  type="button"
+                  className={`ubr-picker-cat-pill ${selectedPickerCategory === cat.key ? 'active' : ''}`}
+                  onClick={() => setSelectedPickerCategory(cat.key)}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
             <div className="ubr-picker-results">
-              {searchResults.map(p => (
+              {/* GPS Current Location 1-Tap Option */}
+              {(!searchQuery || 'current location'.includes(searchQuery.toLowerCase())) && (
                 <div 
-                  key={p.id || p.name} 
-                  className="ubr-picker-item"
+                  className="ubr-picker-item ubr-picker-gps-item"
                   onClick={() => {
-                    if (pickerTarget === 'pickup') setPickupLocation(p);
-                    else setDestLocation(p);
+                    const gpsLoc = {
+                      name: 'Current Location',
+                      town: 'Live GPS',
+                      category: 'GPS',
+                      lat: userPosition?.lat || 27.5818,
+                      lng: userPosition?.lng || 77.7010,
+                      isGps: true
+                    };
+                    if (pickerTarget === 'pickup') setPickupLocation(gpsLoc);
+                    else setDestLocation(gpsLoc);
                     setIsPickerOpen(false);
+                    setSearchQuery('');
+                  }}
+                >
+                  <div className="ubr-picker-item-icon gps-icon">
+                    <Navigation2 size={16} />
+                  </div>
+                  <div className="ubr-picker-item-text">
+                    <div className="ubr-picker-title-row">
+                      <strong>Use Current GPS Location</strong>
+                      <span className="ubr-gps-live-badge">Live GPS</span>
+                    </div>
+                    <span>Accurate to within ~15 meters</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Section Subheading when browsing */}
+              {!searchQuery && (
+                <div className="ubr-picker-section-label">
+                  <span>Popular Sacred Pilgrimage Destinations</span>
+                </div>
+              )}
+
+              {/* Display list of places */}
+              {displayPlaces.map(p => {
+                const PlaceIcon = getPlaceCategoryIcon(p.category);
+                const dynamicDistance = (userPosition?.lat && p.lat) 
+                  ? formatDistance(calculateDistance(userPosition.lat, userPosition.lng, p.lat, p.lng))
+                  : p.distanceText;
+
+                return (
+                  <div 
+                    key={p.id || p.name} 
+                    className="ubr-picker-item"
+                    onClick={() => {
+                      if (pickerTarget === 'pickup') setPickupLocation(p);
+                      else setDestLocation(p);
+                      setIsPickerOpen(false);
+                      setSearchQuery('');
+                    }}
+                  >
+                    <div className="ubr-picker-item-icon">
+                      <PlaceIcon size={16} />
+                    </div>
+                    <div className="ubr-picker-item-text">
+                      <div className="ubr-picker-title-row">
+                        <strong>{p.name}</strong>
+                      </div>
+                      <span>{p.town || 'Vrindavan'} • {p.subtitle || p.category}</span>
+                    </div>
+                    {dynamicDistance && (
+                      <span className="ubr-picker-dist">{dynamicDistance}</span>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Custom Search Query fallback if no direct match */}
+              {searchQuery.trim() && displayPlaces.length === 0 && (
+                <div 
+                  className="ubr-picker-item ubr-custom-location-item"
+                  onClick={() => {
+                    const customPlace = {
+                      name: searchQuery.trim(),
+                      town: 'Braj Mandal',
+                      category: 'Custom Location',
+                      lat: userPosition?.lat || 27.5818,
+                      lng: userPosition?.lng || 77.7010
+                    };
+                    if (pickerTarget === 'pickup') setPickupLocation(customPlace);
+                    else setDestLocation(customPlace);
+                    setIsPickerOpen(false);
+                    setSearchQuery('');
                   }}
                 >
                   <div className="ubr-picker-item-icon">
                     <MapPin size={16} />
                   </div>
                   <div className="ubr-picker-item-text">
-                    <strong>{p.name}</strong>
-                    <span>{p.town || 'Vrindavan'} • {p.category}</span>
+                    <strong>Set "{searchQuery.trim()}"</strong>
+                    <span>Use as {pickerTarget === 'pickup' ? 'pickup point' : 'destination'}</span>
                   </div>
-                  {p.distanceText && (
-                    <span className="ubr-picker-dist">{p.distanceText}</span>
-                  )}
+                  <ChevronRight size={16} className="ubr-picker-chevron" />
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalElement, document.body);
+  }
+  return modalElement;
 }

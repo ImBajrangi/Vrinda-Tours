@@ -1,71 +1,74 @@
 /* ==========================================================================
-   Profile Dropdown — Global Obsidian Glass Design
+   Profile Dropdown — Clean Minimalist ChatGPT / Apple Standard
+   Pure Matte Obsidian (#212121 / #2f2f2f / #171717 / #ececec)
    ========================================================================== */
 
 .vt-pdd-container {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  width: 280px;
-  background: rgba(14, 18, 28, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  width: 250px;
+  background: #212121;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 18px;
   box-shadow: 
-    0 16px 40px -8px rgba(0, 0, 0, 0.75),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  padding: 10px;
+    0 24px 56px -8px rgba(0, 0, 0, 0.8),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  padding: 6px;
   z-index: 10000;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  animation: vtDropdownSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 2px;
+  animation: vtDropdownSlideIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-@keyframes vtDropdownSlide {
-  from { opacity: 0; transform: scale(0.95) translateY(-6px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes vtDropdownSlideIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.96) translateY(-6px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
 }
 
+/* 1. User Profile Header Row */
 .vt-pdd-user-banner {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 8px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease;
+  user-select: none;
 }
 
 .vt-pdd-user-banner:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: #2f2f2f;
 }
 
-.vt-pdd-avatar {
+.vt-pdd-avatar-wrap {
   position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.vt-pdd-avatar-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2f2f2f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.vt-pdd-online-dot {
-  position: absolute;
-  bottom: -1px;
-  right: -1px;
-  width: 9px;
-  height: 9px;
-  background: #ffffff;
-  border: 1.5px solid #0e121c;
-  border-radius: 50%;
+  font-size: 15px;
 }
 
 .vt-pdd-user-meta {
@@ -73,6 +76,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .vt-pdd-name-row {
@@ -81,58 +85,106 @@
   gap: 6px;
 }
 
-.vt-pdd-name-row strong {
+.vt-pdd-name {
   font-size: 13.5px;
-  font-weight: 600;
-  color: #ffffff;
+  font-weight: 650;
+  color: #ececec;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
-.vt-pdd-role-tag {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  text-transform: uppercase;
-}
-
-.vt-pdd-phone {
+.vt-pdd-sub {
   font-size: 11px;
-  color: #94a3b8;
+  color: #8e8e8e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .vt-pdd-arrow {
-  color: #64748b;
+  color: #71717a;
+  flex-shrink: 0;
 }
 
+/* Divider */
 .vt-pdd-divider {
   height: 1px;
   background: rgba(255, 255, 255, 0.08);
-  margin: 3px 0;
+  margin: 3px 2px;
 }
 
-/* Theme Controller */
-.vt-pdd-theme-section {
-  padding: 6px 8px;
+/* 2. Primary Items List */
+.vt-pdd-items-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 1px;
 }
 
-.vt-pdd-section-lbl {
-  font-size: 10px;
-  font-weight: 750;
-  letter-spacing: 0.04em;
-  color: #71717a;
-  text-transform: uppercase;
+.vt-pdd-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: #ececec;
+  font-size: 12.5px;
+  font-weight: 500;
+  transition: background 0.12s ease, color 0.12s ease;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.vt-pdd-item:hover {
+  background: #2f2f2f;
+  color: #ffffff;
+}
+
+.vt-pdd-item-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b4b4b4;
+  flex-shrink: 0;
+  transition: color 0.12s ease;
+}
+
+.vt-pdd-item:hover .vt-pdd-item-icon {
+  color: #ffffff;
+}
+
+.vt-pdd-item-title {
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.vt-pdd-count-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 9999px;
+  background: #2f2f2f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ececec;
+}
+
+/* 3. Theme Controller */
+.vt-pdd-theme-section {
+  padding: 2px 4px;
 }
 
 .vt-pdd-theme-toggle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.35);
+  gap: 3px;
+  background: #171717;
   padding: 3px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -142,13 +194,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   padding: 5px 0;
-  border-radius: 7px;
+  border-radius: 8px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   background: transparent;
-  color: #a1a1aa;
+  color: #8e8e8e;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -159,90 +211,175 @@
 }
 
 .vt-pdd-theme-btn.active {
-  background: #ffffff;
-  color: #000000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.vt-pdd-items-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.vt-pdd-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  color: #e2e8f0;
-  font-size: 12.5px;
-  font-weight: 500;
-  transition: all 0.15s ease;
-  width: 100%;
-  text-align: left;
-}
-
-.vt-pdd-item:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: #2f2f2f;
   color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
-.vt-pdd-item-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.vt-pdd-item-icon.blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
-.vt-pdd-item-icon.red { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
-.vt-pdd-item-icon.emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
-.vt-pdd-item-icon.gold { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
-.vt-pdd-item-icon.purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
-
-.vt-pdd-item-title {
-  flex: 1;
-}
-
-.vt-pdd-count-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-}
-
-.vt-pdd-new-badge {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 5px;
-  border-radius: 4px;
-  background: #10b981;
-  color: #ffffff;
-}
-
+/* 4. Footer Support */
 .vt-pdd-footer {
-  padding: 4px 6px;
+  padding: 2px 4px;
 }
 
 .vt-pdd-help-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
-  color: #34d399;
+  font-size: 11.5px;
+  color: #ececec;
   text-decoration: none;
-  font-weight: 500;
-  padding: 4px;
-  border-radius: 6px;
-  transition: background 0.15s ease;
+  font-weight: 550;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 0.12s ease;
 }
 
 .vt-pdd-help-link:hover {
-  background: rgba(16, 185, 129, 0.1);
+  background: #2f2f2f;
+}
+
+.vt-pdd-help-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Explicit Dark Theme Support */
+[data-theme="dark"] .vt-pdd-container,
+.dark-theme .vt-pdd-container,
+body.dark-theme .vt-pdd-container {
+  background: #212121 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 56px -8px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .vt-pdd-name,
+[data-theme="dark"] .vt-pdd-item,
+[data-theme="dark"] .vt-pdd-help-link,
+.dark-theme .vt-pdd-name,
+.dark-theme .vt-pdd-item,
+.dark-theme .vt-pdd-help-link,
+body.dark-theme .vt-pdd-name,
+body.dark-theme .vt-pdd-item,
+body.dark-theme .vt-pdd-help-link {
+  color: #ececec !important;
+}
+
+[data-theme="dark"] .vt-pdd-sub,
+[data-theme="dark"] .vt-pdd-item-icon,
+[data-theme="dark"] .vt-pdd-arrow,
+.dark-theme .vt-pdd-sub,
+.dark-theme .vt-pdd-item-icon,
+.dark-theme .vt-pdd-arrow,
+body.dark-theme .vt-pdd-sub,
+body.dark-theme .vt-pdd-item-icon,
+body.dark-theme .vt-pdd-arrow {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .vt-pdd-user-banner:hover,
+[data-theme="dark"] .vt-pdd-item:hover,
+[data-theme="dark"] .vt-pdd-help-link:hover,
+.dark-theme .vt-pdd-user-banner:hover,
+.dark-theme .vt-pdd-item:hover,
+.dark-theme .vt-pdd-help-link:hover,
+body.dark-theme .vt-pdd-user-banner:hover,
+body.dark-theme .vt-pdd-item:hover,
+body.dark-theme .vt-pdd-help-link:hover {
+  background: #2f2f2f !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .vt-pdd-theme-toggle,
+.dark-theme .vt-pdd-theme-toggle,
+body.dark-theme .vt-pdd-theme-toggle {
+  background: #171717 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .vt-pdd-theme-btn,
+.dark-theme .vt-pdd-theme-btn,
+body.dark-theme .vt-pdd-theme-btn {
+  color: #a1a1aa !important;
+}
+
+[data-theme="dark"] .vt-pdd-theme-btn.active,
+.dark-theme .vt-pdd-theme-btn.active,
+body.dark-theme .vt-pdd-theme-btn.active {
+  background: #2f2f2f !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Light Theme Explicit Overrides */
+[data-theme="light"] .vt-pdd-container,
+.light-theme .vt-pdd-container,
+body.light-theme .vt-pdd-container {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .vt-pdd-user-banner:hover,
+[data-theme="light"] .vt-pdd-item:hover,
+[data-theme="light"] .vt-pdd-help-link:hover,
+.light-theme .vt-pdd-user-banner:hover,
+.light-theme .vt-pdd-item:hover,
+.light-theme .vt-pdd-help-link:hover,
+body.light-theme .vt-pdd-user-banner:hover,
+body.light-theme .vt-pdd-item:hover,
+body.light-theme .vt-pdd-help-link:hover {
+  background: #f4f4f5 !important;
+  color: #09090b !important;
+}
+
+[data-theme="light"] .vt-pdd-name,
+[data-theme="light"] .vt-pdd-item,
+[data-theme="light"] .vt-pdd-help-link,
+.light-theme .vt-pdd-name,
+.light-theme .vt-pdd-item,
+.light-theme .vt-pdd-help-link,
+body.light-theme .vt-pdd-name,
+body.light-theme .vt-pdd-item,
+body.light-theme .vt-pdd-help-link {
+  color: #09090b !important;
+}
+
+[data-theme="light"] .vt-pdd-sub,
+[data-theme="light"] .vt-pdd-item-icon,
+[data-theme="light"] .vt-pdd-arrow,
+.light-theme .vt-pdd-sub,
+.light-theme .vt-pdd-item-icon,
+.light-theme .vt-pdd-arrow,
+body.light-theme .vt-pdd-sub,
+body.light-theme .vt-pdd-item-icon,
+body.light-theme .vt-pdd-arrow {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .vt-pdd-divider,
+.light-theme .vt-pdd-divider,
+body.light-theme .vt-pdd-divider {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .vt-pdd-theme-toggle,
+.light-theme .vt-pdd-theme-toggle,
+body.light-theme .vt-pdd-theme-toggle {
+  background: #f4f4f5 !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .vt-pdd-theme-btn,
+.light-theme .vt-pdd-theme-btn,
+body.light-theme .vt-pdd-theme-btn {
+  color: #71717a !important;
+}
+
+[data-theme="light"] .vt-pdd-theme-btn.active,
+.light-theme .vt-pdd-theme-btn.active,
+body.light-theme .vt-pdd-theme-btn.active {
+  background: #ffffff !important;
+  color: #09090b !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
 }

@@ -328,21 +328,25 @@ export default function PackageReservationModal({
             ========================================================================= */}
         {step === 1 && (
           <div className="vt-pkm-view-container vt-pkm-cart-view">
-            {/* Top Navigation Bar: Back Arrow | My Cart List | 3-Dots Menu */}
+            {/* Top Navigation Bar: Close | Title | Info */}
             <div className="vt-pkm-top-bar">
               <button type="button" className="vt-pkm-nav-icon-btn" onClick={onClose} aria-label="Close cart">
-                <ArrowLeft size={18} />
+                <X size={18} />
               </button>
-              <h3 className="vt-pkm-nav-title">My Cart List</h3>
-              <button
-                type="button"
-                className="vt-pkm-nav-icon-btn"
-                onClick={() => onOpenDetail && onOpenDetail(packageItem)}
-                title="View Package Details"
-                aria-label="View Package Details"
-              >
-                <MoreVertical size={18} />
-              </button>
+              <h3 className="vt-pkm-nav-title">Select Passes &amp; Add-ons</h3>
+              {onOpenDetail ? (
+                <button
+                  type="button"
+                  className="vt-pkm-nav-icon-btn"
+                  onClick={() => onOpenDetail(packageItem)}
+                  title="View Package Details"
+                  aria-label="View Package Details"
+                >
+                  <Compass size={17} />
+                </button>
+              ) : (
+                <div style={{ width: 36, height: 36 }} />
+              )}
             </div>
 
             {/* Scrollable Cart Content */}
@@ -634,19 +638,20 @@ export default function PackageReservationModal({
             ========================================================================= */}
         {step === 2 && (
           <div className="vt-pkm-view-container vt-pkm-checkout-view">
-            {/* Top Navigation Bar: Back Arrow | Checkout | 3-Dots Menu */}
+            {/* Top Navigation Bar: Back Arrow | Checkout | Close */}
             <div className="vt-pkm-top-bar">
               <button
                 type="button"
                 className="vt-pkm-nav-icon-btn"
                 onClick={() => setStep(1)}
-                aria-label="Back to Cart"
+                aria-label="Back to Selection"
+                title="Back to Selection"
               >
                 <ArrowLeft size={18} />
               </button>
-              <h3 className="vt-pkm-nav-title">Checkout</h3>
-              <button type="button" className="vt-pkm-nav-icon-btn" onClick={onClose} aria-label="Close modal">
-                <MoreVertical size={18} />
+              <h3 className="vt-pkm-nav-title">Checkout &amp; Devotee Details</h3>
+              <button type="button" className="vt-pkm-nav-icon-btn" onClick={onClose} aria-label="Close modal" title="Close">
+                <X size={18} />
               </button>
             </div>
 

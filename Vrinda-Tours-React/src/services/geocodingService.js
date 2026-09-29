@@ -10,6 +10,7 @@
 import { fetchPlaces } from './realtimeDatabaseService';
 import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { calculateDistance, formatDistance } from '../utils/distance';
+import { locations } from '../data/locations';
 
 const MEMORY_CACHE = new Map();
 const CACHE_MAX_SIZE = 250;
@@ -37,7 +38,10 @@ export function classifyPlaceType(category) {
 export async function searchAllPlacesAndAreas(query, userCoords = null) {
   if (!query || !query.trim()) {
     const defaultPlaces = await fetchPlaces();
-    return (defaultPlaces || []).slice(0, 8).map(p => enrichPlaceResult(p, userCoords));
+    if (defaultPlaces && defaultPlaces.length > 0) {
+      return defaultPlaces.slice(0, 20).map(p => enrichPlaceResult(p, userCoords));
+    }
+    return (locations || []).map(p => enrichPlaceResult(p, userCoords));
   }
 
   const q = query.trim().toLowerCase();

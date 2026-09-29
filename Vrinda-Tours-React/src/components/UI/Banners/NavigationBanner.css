@@ -645,7 +645,7 @@ body.sheet-dragging .nav-hud-container {
 .nav-hud-btn-primary:hover {
   background: var(--nav-blue-hover);
   box-shadow: 0 8px 24px rgba(26, 115, 232, 0.45);
-  transform: translateY(-1.5px) scale(1.015);
+  transform: scale(1.02);
 }
 
 .nav-hud-btn-primary:active {
@@ -675,4 +675,136 @@ body.sheet-dragging .nav-hud-container {
     bottom: 1.5rem;
     left: calc(380px + 2.5rem);
   }
+}
+
+/* ==========================================================================
+   Dark Obsidian Theme Standard for Navigation Island HUD & Capsule
+   ========================================================================== */
+[data-theme="dark"] .nav-hud-surface,
+.dark-theme .nav-hud-surface {
+  background: #212121 !important;
+  color: #ececec !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .nav-hud-surface.is-collapsed-capsule,
+.dark-theme .nav-hud-surface.is-collapsed-capsule {
+  background: #212121 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.75), 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .nav-capsule-title,
+[data-theme="dark"] .nav-hud-title,
+.dark-theme .nav-capsule-title,
+.dark-theme .nav-hud-title {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .nav-capsule-meta,
+[data-theme="dark"] .nav-hud-subtitle,
+.dark-theme .nav-capsule-meta,
+.dark-theme .nav-hud-subtitle {
+  color: #8e8e8e !important;
+}
+
+[data-theme="dark"] .nav-capsule-bullet,
+.dark-theme .nav-capsule-bullet {
+  color: #3f3f46 !important;
+}
+
+[data-theme="dark"] .nav-hud-pull-pill,
+.dark-theme .nav-hud-pull-pill {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+[data-theme="dark"] .nav-hud-close,
+.dark-theme .nav-hud-close {
+  background: #2f2f2f !important;
+  color: #b4b4b4 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .nav-hud-close:hover,
+.dark-theme .nav-hud-close:hover {
+  background: #3f3f3f !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .nav-hud-metrics-bar,
+.dark-theme .nav-hud-metrics-bar {
+  background: #171717 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .nav-hud-arrival-badge,
+.dark-theme .nav-hud-arrival-badge {
+  color: #ececec !important;
+}
+
+[data-theme="dark"] .nav-hud-traffic-tag,
+.dark-theme .nav-hud-traffic-tag {
+  color: #8e8e8e !important;
+}
+
+[data-theme="dark"] .nav-hud-recs-toggle,
+.dark-theme .nav-hud-recs-toggle {
+  color: #ececec !important;
+}
+
+[data-theme="dark"] .nav-hud-recs-toggle:hover,
+.dark-theme .nav-hud-recs-toggle:hover {
+  background: #2f2f2f !important;
+}
+
+[data-theme="dark"] .nav-recs-list,
+.dark-theme .nav-recs-list {
+  background: #171717 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .nav-rec-row:hover,
+.dark-theme .nav-rec-row:hover {
+  background: #2f2f2f !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="dark"] .nav-rec-name,
+.dark-theme .nav-rec-name {
+  color: #ececec !important;
+}
+
+[data-theme="dark"] .nav-rec-sub-row,
+.dark-theme .nav-rec-sub-row {
+  color: #8e8e8e !important;
+}
+
+[data-theme="dark"] .nav-rec-category,
+.dark-theme .nav-rec-category {
+  color: #b4b4b4 !important;
+}
+
+[data-theme="dark"] .nav-rec-dist-badge,
+.dark-theme .nav-rec-dist-badge {
+  color: #8e8e8e !important;
+}
+
+[data-theme="dark"] .nav-hud-btn-primary,
+.dark-theme .nav-hud-btn-primary {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .nav-hud-btn-primary:hover,
+.dark-theme .nav-hud-btn-primary:hover {
+  background: #e5e5e5 !important;
+}
+
+[data-theme="dark"] .nav-capsule-action-btn,
+.dark-theme .nav-capsule-action-btn {
+  background: #ffffff !important;
+  color: #000000 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
 }

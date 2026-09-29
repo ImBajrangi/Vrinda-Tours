@@ -26,27 +26,15 @@ function getCategoryIcon(category) {
   }
 }
 
-function createIcon(category, isActive = false, isPlaying = false) {
+function createIcon(category, isActive = false) {
   const hasAnim = category === 'Temple' || category === 'Holy Site';
-
-  if (isActive) {
-    return L.divIcon({
-      className: 'marker-wrapper',
-      html: `<div class="image-marker active destination ${isPlaying ? 'playing' : ''}">
-               <img src="${MARKER_BASE}flag-3.png" class="static" alt="Destination">
-             </div>`,
-      iconSize: [44, 44],
-      iconAnchor: [22, 44],
-    });
-  }
-
   const iconUrl = getCategoryIcon(category);
   const baseStaticUrl = `${MARKER_BASE}marker-ink/icons8-marker-96.png`;
   const staticUrl = hasAnim ? baseStaticUrl : iconUrl;
 
   return L.divIcon({
     className: 'marker-wrapper',
-    html: `<div class="image-marker ${isPlaying ? 'playing' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
+    html: `<div class="image-marker ${isActive ? 'active destination' : ''} ${hasAnim ? 'has-animation' : 'is-static'}">
              <img src="${staticUrl}" class="static" alt="${category}">
              ${hasAnim ? `<img src="${iconUrl}" class="animated" alt="${category}">` : ''}
            </div>`,
@@ -69,6 +57,7 @@ export default function MapView({
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const clusterRef = useRef(null);
+  const driverClusterRef = useRef(null);
   const activeTileLayerRef = useRef(null);
   const markersRef = useRef([]);
   const driverMarkersRef = useRef({}); // { driverId: { marker, status, lat, lng } }
@@ -133,10 +122,55 @@ export default function MapView({
       removeOutsideVisibleBounds: true,
       animate: true,
       maxClusterRadius: 55,
-      animateAddingMarkers: true
+      animateAddingMarkers: true,
+      iconCreateFunction: function (c) {
+        const count = c.getChildCount();
+        let cSize = 'marker-cluster-small';
+        if (count > 50) cSize = 'marker-cluster-large';
+        else if (count > 15) cSize = 'marker-cluster-medium';
+        return L.divIcon({
+          html: `<div><span>${count}</span></div>`,
+          className: `marker-cluster ${cSize}`,
+          iconSize: L.point(40, 40),
+        });
+      },
+    });
+
+    // Dedicated Luxury Driver Marker Cluster Group for seamless merge on zoom out
+    const driverCluster = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      spiderfyOnMaxZoom: false,
+      spiderLegPolylineOptions: { weight: 0, opacity: 0 },
+      removeOutsideVisibleBounds: true,
+      animate: true,
+      maxClusterRadius: 46,
+      animateAddingMarkers: true,
+      iconCreateFunction: function (c) {
+        const count = c.getChildCount();
+        return L.divIcon({
+          html: `
+            <div class="driver-cluster-badge">
+              <div class="driver-cluster-pod">
+                <span class="driver-cluster-icon">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 16L8 5h8l3 11H5z"/><circle cx="7.5" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/>
+                  </svg>
+                </span>
+                <span class="driver-cluster-count">${count}</span>
+              </div>
+              <span class="driver-cluster-radar"></span>
+            </div>
+          `,
+          className: 'driver-cluster-wrapper',
+          iconSize: L.point(46, 32),
+          iconAnchor: [23, 16]
+        });
+      },
     });
 
     map.addLayer(cluster);
+    map.addLayer(driverCluster);
 
     map.on('click', () => {
       onSelectLocationRef.current?.(null);
@@ -144,6 +178,15 @@ export default function MapView({
 
     mapInstanceRef.current = map;
     clusterRef.current = cluster;
+    driverClusterRef.current = driverCluster;
+
+    window.__vtCloseDriverPopup = () => {
+      try {
+        mapInstanceRef.current?.closePopup();
+      } catch (err) {
+        console.warn('Error closing driver popup:', err);
+      }
+    };
 
     // Warm up Braj Mandal region tiles in offline cache during idle time
     const cartoKey = import.meta.env.VITE_CARTO_BASEMAP_KEY || 'cb1_25xx_1_ef24909b63d9228a6de7508f';
@@ -154,6 +197,13 @@ export default function MapView({
     }
 
     return () => {
+      delete window.__vtCloseDriverPopup;
+      if (driverClusterRef.current) {
+        driverClusterRef.current.clearLayers();
+      }
+      if (clusterRef.current) {
+        clusterRef.current.clearLayers();
+      }
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -267,7 +317,7 @@ export default function MapView({
         return;
       }
 
-      const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false, true) });
+      const marker = L.marker([loc.lat, loc.lng], { icon: createIcon(loc.category, false) });
       marker._locData = loc;
       marker.on('click', (e) => {
         if (e) {
@@ -292,14 +342,10 @@ export default function MapView({
 
       cluster.addLayer(marker);
       markersRef.current.push(marker);
-
-      setTimeout(() => {
-        marker.setIcon(createIcon(loc.category, false, false));
-      }, 2500);
     });
   }, [filteredLocations, activeRoute]);
 
-  // Highlight active location marker
+  // Highlight active location marker & centralize cleanly in visible viewport
   useEffect(() => {
     if (activeMarkerRef.current) {
       const prev = activeMarkerRef.current;
@@ -309,15 +355,20 @@ export default function MapView({
     if (activeLocation) {
       const marker = markersRef.current.find((m) => m._locData.name === activeLocation.name);
       if (marker) {
-        marker.setIcon(createIcon(activeLocation.category, true, true));
+        marker.setIcon(createIcon(activeLocation.category, true));
         activeMarkerRef.current = marker;
-        mapInstanceRef.current?.flyTo([activeLocation.lat, activeLocation.lng], 15, { duration: 0.8 });
-
-        setTimeout(() => {
-          if (activeMarkerRef.current === marker) {
-            marker.setIcon(createIcon(activeLocation.category, true, false));
-          }
-        }, 2500);
+        
+        const map = mapInstanceRef.current;
+        if (map) {
+          const targetZoom = Math.max(map.getZoom(), 15);
+          // Gracefully smooth-pan map to selected location
+          map.flyTo([activeLocation.lat, activeLocation.lng], targetZoom, {
+            duration: 0.65,
+            easeLinearity: 0.25,
+            paddingTopLeft: [0, 160],
+            paddingBottomRight: [0, 240]
+          });
+        }
       }
     } else {
       activeMarkerRef.current = null;
@@ -473,7 +524,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
     }
   }, [activeRoute]);
 
-  // Update user location marker using user-marker-crop.gif with remove-bg SVG filter
+  // Update user location marker using animated GIF marker with pure transparent background
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !userPosition) return;
@@ -483,8 +534,8 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
     const icon = L.divIcon({
       className: 'user-marker-wrapper',
       html: `
-        <div class="image-marker user-location-marker">
-          <img src="/user-marker-crop.gif" alt="Your Location" />
+        <div class="image-marker user-location-marker" title="Your Live Location">
+          <img src="/user-marker-crop.gif" class="static user-live-gif" alt="Your Live Location" />
         </div>
       `,
       iconSize: [44, 44],
@@ -493,36 +544,34 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
 
     const marker = L.marker([userPosition.lat, userPosition.lng], {
       icon,
-      zIndexOffset: 2000
+      zIndexOffset: 3000
     }).addTo(map);
 
     userMarkerRef.current = marker;
   }, [userPosition]);
 
-
-
-
-  // Update live driver markers safely without flickering
+  // Update live driver markers with luxury obsidian design and cluster merging on zoom out
   useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
+    const driverCluster = driverClusterRef.current;
+    if (!driverCluster) return;
 
     const currentMap = driverMarkersRef.current;
 
     // Remove markers for offline/removed drivers
     Object.keys(currentMap).forEach((id) => {
       if (!drivers.find(d => d.id === id)) {
-        map.removeLayer(currentMap[id].marker);
+        driverCluster.removeLayer(currentMap[id].marker);
         delete currentMap[id];
       }
     });
 
     drivers.forEach((d) => {
-      const status = d.status || 'offline';
+      const status = d.status || 'available';
       const loc = d.location;
 
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
-        const vehicleSvg = (d.vehicleType === 'Taxi' || d.vehicleType === 'Cab')
+        const isTaxi = d.vehicleType === 'Taxi' || d.vehicleType === 'Cab';
+        const vehicleSvg = isTaxi
           ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.2 1 12 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`
           : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16L8 5h8l3 11H5z"/><circle cx="7.5" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/></svg>`;
 
@@ -530,46 +579,106 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
 
         // Check if marker needs icon re-render
         if (!existing || existing.status !== status || existing.vehicleType !== d.vehicleType || existing.name !== d.name) {
-          if (existing) map.removeLayer(existing.marker);
+          if (existing) driverCluster.removeLayer(existing.marker);
 
           const icon = L.divIcon({
             className: 'driver-marker-wrapper',
-            html: `<div class="driver-map-marker">
-                     <div class="car-icon ${status}">
-                       ${vehicleSvg}
-                     </div>
-                     <div class="status-pulse ${status}"></div>
-                     <div class="driver-name-tag">${d.name}</div>
-                   </div>`,
-            iconSize: [40, 40],
-            iconAnchor: [20, 20],
-            popupAnchor: [0, -20]
+            html: `
+              <div class="modern-driver-marker">
+                <div class="driver-pod ${status} ${isTaxi ? 'is-cab' : 'is-rickshaw'}">
+                  <div class="driver-veh-icon">
+                    ${vehicleSvg}
+                  </div>
+                  <div class="driver-live-dot ${status}">
+                    <span class="driver-dot-radar"></span>
+                  </div>
+                </div>
+                <div class="driver-hover-pill">
+                  <span class="driver-pill-name">${d.name || 'Driver'}</span>
+                  <span class="driver-pill-rating">★ 4.9</span>
+                </div>
+              </div>`,
+            iconSize: [42, 42],
+            iconAnchor: [21, 21],
+            popupAnchor: [0, -22]
           });
 
           const popupContent = `
             <div class="driver-popup-card">
               <div class="dpc-header">
-                <div class="dpc-avatar">
-                  ${d.photo ? `<img src="${d.photo}" alt="${d.name}" />` : (d.name || 'D')[0].toUpperCase()}
+                <div class="dpc-avatar-wrap">
+                  <div class="dpc-avatar">
+                    ${d.photo ? `<img src="${d.photo}" alt="${d.name || 'Driver'}" />` : (d.name || 'D')[0].toUpperCase()}
+                  </div>
+                  <span class="dpc-avatar-live-indicator" title="Active Sarathi"></span>
                 </div>
                 <div class="dpc-info-col">
-                  <strong class="dpc-name">${d.name}</strong>
-                  <span class="dpc-sub">${d.vehicleType || 'E-Rickshaw'} • ${d.vehicleNo || 'UP-85'}</span>
+                  <div class="dpc-name-row">
+                    <strong class="dpc-name" title="${d.name || 'Driver'}">${d.name || 'Driver'}</strong>
+                    <span class="dpc-verified-badge" title="Verified Sarathi">
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </span>
+                  </div>
+                  <div class="dpc-meta-row">
+                    <span class="dpc-vehicle">${d.vehicleType || 'Vrinda Prime'}</span>
+                    <span class="dpc-meta-dot">•</span>
+                    <span class="dpc-plate">${d.vehicleNo || 'UP-85'}</span>
+                  </div>
+                </div>
+                <button type="button" class="dpc-close-btn" onclick="window.__vtCloseDriverPopup && window.__vtCloseDriverPopup()" aria-label="Close driver popup">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+              <div class="dpc-status-row">
+                <div class="dpc-status ${status}">
+                  <span class="dpc-status-dot"></span>
+                  <span class="dpc-status-label">${status === 'available' ? 'Available now' : 'On a ride'}</span>
+                </div>
+                <div class="dpc-eta-badge">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                  <span>2 min away</span>
                 </div>
               </div>
-              <div class="dpc-status ${status}">${status === 'available' ? 'Available now' : 'On a ride'}</div>
               <div class="dpc-actions">
-                <a href="tel:${d.phone}" class="dpc-btn-call">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                  <span>Call Driver</span>
+                <a href="tel:${d.phone || '+918000000000'}" class="dpc-btn-call">
+                  <span class="dpc-call-icon-wrap">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  </span>
+                  <span class="dpc-call-text">Call Driver</span>
+                  <span class="dpc-call-rating">★ 4.9</span>
                 </a>
               </div>
             </div>
           `;
 
-          const marker = L.marker([loc.lat, loc.lng], { icon, zIndexOffset: 500 });
-          marker.bindPopup(popupContent, { className: 'leaflet-driver-popup', maxWidth: 220 });
-          marker.addTo(map);
+          const marker = L.marker([loc.lat, loc.lng], { icon, zIndexOffset: 800 });
+          marker.bindPopup(popupContent, { 
+            className: 'leaflet-driver-popup', 
+            maxWidth: 295,
+            minWidth: 265,
+            autoPan: false,
+            offset: L.point(0, -18),
+            closeButton: false
+          });
+
+          marker.on('click', (e) => {
+            if (e) {
+              L.DomEvent.stopPropagation(e);
+            }
+            const map = mapInstanceRef.current;
+            if (map) {
+              const targetZoom = Math.max(map.getZoom(), 15);
+              // Auto-centralize map smoothly onto active driver marker with clear top & bottom viewport offsets
+              map.flyTo([loc.lat, loc.lng], targetZoom, {
+                duration: 0.7,
+                easeLinearity: 0.25,
+                paddingTopLeft: [0, 200],
+                paddingBottomRight: [0, 140]
+              });
+            }
+          });
+
+          driverCluster.addLayer(marker);
 
           currentMap[d.id] = {
             marker,
@@ -588,7 +697,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
           }
         }
       } else if (currentMap[d.id]) {
-        map.removeLayer(currentMap[d.id].marker);
+        driverCluster.removeLayer(currentMap[d.id].marker);
         delete currentMap[d.id];
       }
     });
@@ -604,5 +713,5 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
     return () => { delete window.__vtMap; };
   }, []);
 
-  return <div ref={mapRef} id="map" className={`map-style-${mapStyle}`} />;
+  return <div ref={mapRef} id="map" className={`map-style-${mapStyle} ${isDark ? 'dark-map-theme dark-theme' : 'light-map-theme'}`} />;
 }

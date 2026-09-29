@@ -137,3 +137,6 @@ Rule: telemetry-stream-segregation
 
 High-frequency GPS and IoT sensor streams must be separated from transactional business state tables to prevent high Postgres replication load.
 
+- **Minimalist Software Standard**: Keep all utility bars, consent prompts, and menu popovers strictly uncluttered (no redundant indicator dots, multi-tier nested accordions, or excessive badges unless explicitly requested).
+- **Reduced Animation Overhead**: Favor immediate, crisp CSS transitions (150ms-200ms cubic-bezier) over complex multi-bounce keyframe springs to optimize low-power mobile devices.
+

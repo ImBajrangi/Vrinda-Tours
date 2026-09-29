@@ -46,8 +46,8 @@ export default function FavoritesListSheet({
         <div className="fav-sheet-handle" />
       </div>
 
-      {/* Header Bar */}
-      <div className="fav-sheet-header">
+      {/* Header Bar - Draggable to swipe down */}
+      <div className="fav-sheet-header" {...handleProps}>
         <div className="fav-sheet-title-group">
           <div className="fav-title-icon-badge">
             <Heart size={16} fill="#e11d48" color="#e11d48" />
@@ -83,7 +83,7 @@ export default function FavoritesListSheet({
 
       {/* Content */}
       {favoriteLocations.length === 0 ? (
-        <div className="fav-empty-state">
+        <div className="fav-empty-state" {...handleProps}>
           <div className="fav-empty-icon-circle">
             <Heart size={26} className="fav-empty-heart" />
           </div>

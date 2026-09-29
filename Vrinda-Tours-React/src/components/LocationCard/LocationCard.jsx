@@ -303,23 +303,23 @@ export default function LocationCard({
 
               {/* Nearby Sacred Sites & Landmarks */}
               {nearbyAttractions.length > 0 && (
-                <div style={{ padding: '6px 10px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', margin: '2px 0' }}>
-                  <span style={{ display: 'block', fontSize: '0.68rem', fontWeight: 800, color: '#64748b', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div className="card-nearby-section">
+                  <span className="card-nearby-badge">
                     Nearby
                   </span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                  <div className="card-nearby-list">
                     {nearbyAttractions.map(item => (
                       <div 
                         key={item.name} 
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem', padding: '2px 0', cursor: 'pointer' }}
+                        className="card-nearby-item"
                         onClick={() => {
                           if (onDirections) {
                             onDirections({ name: item.name, lat: activeLoc.lat, lng: activeLoc.lng });
                           }
                         }}
                       >
-                        <span style={{ fontWeight: 600, color: '#1e293b' }}>{item.name}</span>
-                        <span style={{ color: '#2563eb', fontWeight: 700, fontSize: '0.74rem' }}>— {item.distanceText}</span>
+                        <span className="card-nearby-name">{item.name}</span>
+                        <span className="card-nearby-dist">— {item.distanceText}</span>
                       </div>
                     ))}
                   </div>

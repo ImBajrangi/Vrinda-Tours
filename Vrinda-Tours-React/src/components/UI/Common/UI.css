@@ -47,7 +47,7 @@
 
 .dynamic-island-toast:hover,
 .toast:hover {
-  transform: translateX(-50%) translateY(-2px) scale(1.03) !important;
+  transform: translateX(-50%) scale(1.02) !important;
   border-color: rgba(255, 255, 255, 0.36) !important;
   box-shadow:
     0 20px 42px -4px rgba(0, 0, 0, 0.55),

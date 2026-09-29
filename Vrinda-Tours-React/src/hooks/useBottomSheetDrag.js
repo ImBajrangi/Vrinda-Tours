@@ -92,6 +92,7 @@ export function useBottomSheetDrag(onClose, threshold = 80) {
   }, []);
 
   const handleTouchStart = useCallback((e) => {
+    if (e.target.closest && e.target.closest('button, a, input, select, textarea, [role="button"]')) return;
     if (e.touches && e.touches.length > 0) {
       startDrag(e.touches[0].clientY);
     }
@@ -109,7 +110,7 @@ export function useBottomSheetDrag(onClose, threshold = 80) {
 
   const handleMouseDown = useCallback((e) => {
     if (e.button !== 0) return;
-    e.preventDefault();
+    if (e.target.closest && e.target.closest('button, a, input, select, textarea, [role="button"]')) return;
     startDrag(e.clientY);
 
     const onMouseMove = (ev) => {

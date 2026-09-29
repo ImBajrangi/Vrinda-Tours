@@ -12,7 +12,7 @@ import {
   LogIn, LogOut, User, Lock, UserCheck, Eye, EyeOff,
   Maximize2, ZoomIn, Image as ImageIcon, ExternalLink, Tag, Gift,
   Check, Copy, UtensilsCrossed, Headphones, MessageSquare, AlertCircle, Minus,
-  Crown, BedDouble, HelpCircle, Settings, ChefHat, Landmark, Map
+  Crown, BedDouble, HelpCircle, Settings, ChefHat, Landmark, Map as MapIcon
 } from 'lucide-react';
 
 const PinterestIcon = ({ size = 14, className = "" }) => (
@@ -3624,7 +3624,7 @@ export default function PartnerLandingPage({
                     style={{ background: 'rgba(255,255,255,0.95)', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '7px 14px', fontSize: '0.8rem', fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
                     onClick={() => setIsTripPackagesOpen(true)}
                   >
-                    <Map size={15} color="#ea580c" />
+                    <MapIcon size={15} color="#ea580c" />
                     <span>Tours</span>
                   </button>
 

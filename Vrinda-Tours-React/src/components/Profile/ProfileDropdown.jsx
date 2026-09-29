@@ -1,8 +1,8 @@
 import { useRef, useEffect } from 'react';
 import { 
-  User, Heart, BedDouble, Utensils, Car, 
-  Smartphone, ShieldCheck, ChevronRight, Sparkles, ExternalLink,
-  Sun, Moon, Laptop
+  Heart, BedDouble, Car, 
+  Smartphone, ShieldCheck, ChevronRight, MessageCircle, ExternalLink,
+  Sun, Moon, Laptop, User
 } from 'lucide-react';
 import './ProfileDropdown.css';
 
@@ -21,6 +21,11 @@ export default function ProfileDropdown({
   isAdmin = false
 }) {
   const dropdownRef = useRef(null);
+
+  // Retrieve stored user name if any
+  const userName = typeof window !== 'undefined' 
+    ? (localStorage.getItem('vt_user_name') || sessionStorage.getItem('vt_user_name') || 'Braj Yatri') 
+    : 'Braj Yatri';
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -41,37 +46,112 @@ export default function ProfileDropdown({
   if (!isOpen) return null;
 
   return (
-    <div className="vt-pdd-container" ref={dropdownRef}>
-      {/* User Quick Info */}
-      <div className="vt-pdd-user-banner" onClick={() => { onClose(); onOpenFullProfile(); }}>
-        <div className="vt-pdd-avatar">
-          <User size={18} />
-          <span className="vt-pdd-online-dot" />
+    <div className="vt-pdd-container" ref={dropdownRef} role="menu" aria-label="User account menu">
+      {/* 1. Clean User Profile Header */}
+      <div 
+        className="vt-pdd-user-banner" 
+        onClick={() => { onClose(); onOpenFullProfile?.('overview'); }}
+        role="menuitem"
+        tabIndex={0}
+      >
+        <div className="vt-pdd-avatar-wrap">
+          <div className="vt-pdd-avatar-img">
+            <span>🕉️</span>
+          </div>
         </div>
         <div className="vt-pdd-user-meta">
           <div className="vt-pdd-name-row">
-            <strong>Braj Yatri</strong>
-            <span className="vt-pdd-role-tag">
-              {activeRole === 'user' ? 'Pilgrim' : activeRole === 'driver' ? 'Driver' : activeRole === 'hotel' ? 'Stay Partner' : 'Partner'}
-            </span>
+            <span className="vt-pdd-name">{userName}</span>
           </div>
-          <span className="vt-pdd-phone">View profile & settings</span>
+          <span className="vt-pdd-sub">Pilgrim • Brij Dham</span>
         </div>
-        <ChevronRight size={15} className="vt-pdd-arrow" />
+        <ChevronRight size={14} className="vt-pdd-arrow" />
       </div>
 
       <div className="vt-pdd-divider" />
 
-      {/* Theme Mode Segmented Controller */}
+      {/* 2. Essential Actions List */}
+      <div className="vt-pdd-items-list" role="group">
+        <button 
+          type="button"
+          className="vt-pdd-item" 
+          onClick={() => { onClose(); onOpenFullProfile?.('favorites'); }}
+          role="menuitem"
+        >
+          <div className="vt-pdd-item-icon">
+            <Heart size={15} />
+          </div>
+          <span className="vt-pdd-item-title">Saved Sacred Places</span>
+          {savedCount > 0 && (
+            <span className="vt-pdd-count-badge">{savedCount}</span>
+          )}
+        </button>
+
+        <button 
+          type="button"
+          className="vt-pdd-item" 
+          onClick={() => { onClose(); onOpenFullProfile?.('bookings'); }}
+          role="menuitem"
+        >
+          <div className="vt-pdd-item-icon">
+            <BedDouble size={15} />
+          </div>
+          <span className="vt-pdd-item-title">My Booking Requests</span>
+          {bookingsCount > 0 && (
+            <span className="vt-pdd-count-badge">{bookingsCount}</span>
+          )}
+        </button>
+
+        <button 
+          type="button"
+          className="vt-pdd-item" 
+          onClick={() => { onClose(); onOpenInstallApp?.(); }}
+          role="menuitem"
+        >
+          <div className="vt-pdd-item-icon">
+            <Smartphone size={15} />
+          </div>
+          <span className="vt-pdd-item-title">Install Mobile App</span>
+        </button>
+
+        <button 
+          type="button"
+          className="vt-pdd-item" 
+          onClick={() => { onClose(); onOpenDriverPortal?.(); }}
+          role="menuitem"
+        >
+          <div className="vt-pdd-item-icon">
+            <Car size={15} />
+          </div>
+          <span className="vt-pdd-item-title">Partner & Driver Desk</span>
+        </button>
+
+        {isAdmin && (
+          <button 
+            type="button"
+            className="vt-pdd-item" 
+            onClick={() => { onClose(); onOpenAdmin?.(); }}
+            role="menuitem"
+          >
+            <div className="vt-pdd-item-icon">
+              <ShieldCheck size={15} />
+            </div>
+            <span className="vt-pdd-item-title">Admin Operations</span>
+          </button>
+        )}
+      </div>
+
+      <div className="vt-pdd-divider" />
+
+      {/* 3. Theme Controller */}
       {onThemeChange && (
         <div className="vt-pdd-theme-section">
-          <span className="vt-pdd-section-lbl">Theme</span>
           <div className="vt-pdd-theme-toggle">
             <button
               type="button"
               className={`vt-pdd-theme-btn ${themePreference === 'system' ? 'active' : ''}`}
               onClick={() => onThemeChange('system')}
-              title="System Adaptive Theme"
+              title="System Theme"
             >
               <Laptop size={13} />
               <span>System</span>
@@ -100,75 +180,18 @@ export default function ProfileDropdown({
 
       <div className="vt-pdd-divider" />
 
-      {/* Primary Items List */}
-      <div className="vt-pdd-items-list">
-        <button 
-          className="vt-pdd-item" 
-          onClick={() => { onClose(); onOpenFullProfile('bookings'); }}
-        >
-          <div className="vt-pdd-item-icon blue">
-            <BedDouble size={15} />
-          </div>
-          <span className="vt-pdd-item-title">My Booking Requests</span>
-          {bookingsCount > 0 && <span className="vt-pdd-count-badge">{bookingsCount}</span>}
-        </button>
-
-        <button 
-          className="vt-pdd-item" 
-          onClick={() => { onClose(); onOpenFullProfile('favorites'); }}
-        >
-          <div className="vt-pdd-item-icon red">
-            <Heart size={15} />
-          </div>
-          <span className="vt-pdd-item-title">Saved Sacred Places</span>
-          {savedCount > 0 && <span className="vt-pdd-count-badge">{savedCount}</span>}
-        </button>
-
-        <button 
-          className="vt-pdd-item" 
-          onClick={() => { onClose(); onOpenInstallApp(); }}
-        >
-          <div className="vt-pdd-item-icon dark">
-            <Smartphone size={15} />
-          </div>
-          <span className="vt-pdd-item-title">Install Mobile App</span>
-          <span className="vt-pdd-new-badge">App</span>
-        </button>
-
-        <button 
-          className="vt-pdd-item" 
-          onClick={() => { onClose(); onOpenDriverPortal(); }}
-        >
-          <div className="vt-pdd-item-icon gold">
-            <Car size={15} />
-          </div>
-          <span className="vt-pdd-item-title">Partner & Driver Desk</span>
-        </button>
-
-        {isAdmin && (
-          <button 
-            className="vt-pdd-item" 
-            onClick={() => { onClose(); onOpenAdmin(); }}
-          >
-            <div className="vt-pdd-item-icon purple">
-              <ShieldCheck size={15} />
-            </div>
-            <span className="vt-pdd-item-title">Admin Operations Console</span>
-          </button>
-        )}
-      </div>
-
-      <div className="vt-pdd-divider" />
-
-      {/* Footer helpline */}
+      {/* 4. Direct 24x7 WhatsApp Help */}
       <div className="vt-pdd-footer">
         <a 
-          href="https://wa.me/919876543210?text=Radhe%20Radhe!"
+          href="https://wa.me/919876543210?text=Radhe%20Radhe!%20I%20need%20assistance%20with%20Vrinda%20Travels"
           target="_blank"
           rel="noopener noreferrer"
           className="vt-pdd-help-link"
         >
-          <span>24x7 Vrinda WhatsApp Helpline</span>
+          <div className="vt-pdd-help-left">
+            <MessageCircle size={14} />
+            <span>24x7 WhatsApp Help</span>
+          </div>
           <ExternalLink size={12} />
         </a>
       </div>

@@ -6,7 +6,7 @@ import {
   ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
-import { Landmark, MapPin, Compass, User, Smartphone, Navigation } from 'lucide-react';
+import { Landmark, MapPin, Compass, User, Smartphone, Navigation, ChevronDown, Check } from 'lucide-react';
 import { locations } from '../../data/locations';
 import CategoryPills from '../CategoryPills/CategoryPills';
 import { useFavorites } from '../../hooks/useFavorites';
@@ -14,6 +14,33 @@ import { searchAllPlacesAndAreas } from '../../services/geocodingService';
 import ProfileDropdown from '../Profile/ProfileDropdown';
 import { getLocalUserBookings } from '../../services/bookingService';
 import './Header.css';
+
+const SERVICE_MODES = [
+  {
+    id: 'darshan',
+    title: 'Pilgrimage & Darshan',
+    desc: 'Explore sacred temples, holy ghats & kunds',
+    label: 'Vrinda'
+  },
+  {
+    id: 'packages',
+    title: 'Curated Tour Packages',
+    desc: 'Book guided Brij 84 Kos & Mathura yatra',
+    label: 'Packages'
+  },
+  {
+    id: 'rides',
+    title: 'Instant Cabs & E-Rickshaws',
+    desc: 'Hail verified local drivers & desk',
+    label: 'Rides'
+  },
+  {
+    id: 'stays',
+    title: 'Ashrams & Stay Bookings',
+    desc: 'Reserve peaceful stays & dharamshalas',
+    label: 'Stays'
+  }
+];
 
 export default function Header({ 
   onSelectLocation, 
@@ -39,10 +66,13 @@ export default function Header({
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isModeDropdownOpen, setIsModeDropdownOpen] = useState(false);
+  const [currentMode, setCurrentMode] = useState('darshan');
   const [bookingsCount, setBookingsCount] = useState(() => getLocalUserBookings().length);
 
   const inputRef = useRef(null);
   const dropdownRef = useRef(null);
+  const modeDropdownRef = useRef(null);
   const debounceTimerRef = useRef(null);
   const { favorites, isFavorite, favoritesCount } = useFavorites();
 
@@ -54,6 +84,23 @@ export default function Header({
     window.addEventListener('vt:bookings-updated', handleUpdate);
     return () => window.removeEventListener('vt:bookings-updated', handleUpdate);
   }, []);
+
+  // Listen to mode dropdown close on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target)) {
+        setIsModeDropdownOpen(false);
+      }
+    };
+    if (isModeDropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [isModeDropdownOpen]);
 
   const activeUserRole = useMemo(() => {
     if (isAdmin) return 'admin';
@@ -159,6 +206,21 @@ export default function Header({
     inputRef.current?.blur();
   };
 
+  const handleSelectMode = (modeId) => {
+    setCurrentMode(modeId);
+    setIsModeDropdownOpen(false);
+    if (modeId === 'darshan') {
+      onFilterChange?.('all');
+      onSelectLocation?.(null);
+    } else if (modeId === 'packages') {
+      window.dispatchEvent(new CustomEvent('vt:open-packages-modal'));
+    } else if (modeId === 'rides') {
+      onOpenDrivers?.();
+    } else if (modeId === 'stays') {
+      onFilterChange?.('Hotel');
+    }
+  };
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -201,6 +263,7 @@ export default function Header({
   };
 
   const isDropdownOpen = isFocused;
+  const currentModeObj = SERVICE_MODES.find((m) => m.id === currentMode) || SERVICE_MODES[0];
 
   return (
     <>
@@ -214,21 +277,53 @@ export default function Header({
 
       <header className={`header-card ${isDropdownOpen ? 'search-active' : ''}`}>
         <div className="header-top-row">
-          {/* Brand Logo - Visible in resting mode */}
+          {/* Brand & Mode Dropdown Selector (ChatGPT / Codex Reference) */}
           {!isFocused && (
-            <div 
-              className="header-brand-logo" 
-              title="Vrinda Travels — Sacred Brij 84 Kos Pilgrimage"
-              onClick={() => onSelectLocation(null)}
-            >
-              <img 
-                src="/official-logo.svg" 
-                alt="Vrinda Travels Official Logo" 
-                className="site-brand-logo"
-                width="34"
-                height="34"
-                loading="eager"
-              />
+            <div className="header-mode-selector-wrap" ref={modeDropdownRef}>
+              <button 
+                type="button" 
+                className={`header-mode-trigger-btn ${isModeDropdownOpen ? 'active' : ''}`}
+                onClick={() => setIsModeDropdownOpen(!isModeDropdownOpen)}
+                title="Switch Portal Mode"
+                aria-expanded={isModeDropdownOpen}
+                aria-haspopup="listbox"
+              >
+                <span className="header-mode-icon-wrap">
+                  <img 
+                    src="/official-logo.svg" 
+                    alt="Vrinda" 
+                    className="site-brand-logo"
+                    width="17"
+                    height="17"
+                    loading="eager"
+                  />
+                </span>
+                <span className="header-mode-trigger-text">{currentModeObj.label}</span>
+                <ChevronDown size={13} strokeWidth={2.2} className={`header-mode-chevron ${isModeDropdownOpen ? 'open' : ''}`} />
+              </button>
+
+              {isModeDropdownOpen && (
+                <div className="header-mode-dropdown-menu" role="listbox">
+                  {SERVICE_MODES.map((mode) => {
+                    const isSelected = currentMode === mode.id;
+                    return (
+                      <div
+                        key={mode.id}
+                        className={`header-mode-item ${isSelected ? 'selected' : ''}`}
+                        onClick={() => handleSelectMode(mode.id)}
+                        role="option"
+                        aria-selected={isSelected}
+                      >
+                        <div className="header-mode-item-content">
+                          <span className="header-mode-item-title">{mode.title}</span>
+                          <span className="header-mode-item-desc">{mode.desc}</span>
+                        </div>
+                        {isSelected && <Check size={16} className="header-mode-check" />}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           )}
 
@@ -315,7 +410,6 @@ export default function Header({
                   aria-label="User Profile"
                 >
                   <User size={15} />
-                  <span className="profile-role-dot" />
                 </button>
 
                 <ProfileDropdown

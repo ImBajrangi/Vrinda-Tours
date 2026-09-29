@@ -71,8 +71,7 @@ export default function UserProfileModal({
         <div className="vt-pm-header">
           <div className="vt-pm-user-row">
             <div className="vt-pm-avatar">
-              <User size={22} />
-              <span className="vt-pm-online-dot" />
+              <User size={20} />
             </div>
             <div className="vt-pm-user-meta">
               <div className="vt-pm-name-row">
@@ -310,7 +309,7 @@ export default function UserProfileModal({
               <div className="vt-pm-driver-duty-box">
                 <div className="vt-pm-dd-text">
                   <strong>Driver Duty Status</strong>
-                  <span>{driverDuty ? '🟢 Online & Ready for Pilgrims' : '⚪ Offline'}</span>
+                  <span>{driverDuty ? 'Online & Ready for Pilgrims' : 'Offline'}</span>
                 </div>
                 <button 
                   className={`vt-pm-toggle-btn ${driverDuty ? 'active' : ''}`}

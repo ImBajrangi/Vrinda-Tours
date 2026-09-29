@@ -1802,7 +1802,6 @@
 
 .ph-comm-pay-btn:hover {
   background: #1e293b;
-  transform: translateY(-0.5px);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 
