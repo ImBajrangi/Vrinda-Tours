@@ -17,49 +17,83 @@
 }
 
 .vt-map-pin {
-    width: 36px;
+    width: 38px;
     height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), filter 0.22s ease;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
     will-change: transform;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.22));
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.22));
 }
 
+/* Category Glow Tokens */
+.cat-temple { --cat-glow: rgba(245, 158, 11, 0.65); --cat-ground: rgba(245, 158, 11, 0.45); }
+.cat-holy-site { --cat-glow: rgba(16, 185, 129, 0.65); --cat-ground: rgba(16, 185, 129, 0.45); }
+.cat-dining { --cat-glow: rgba(249, 115, 22, 0.65); --cat-ground: rgba(249, 115, 22, 0.45); }
+.cat-hotel { --cat-glow: rgba(99, 102, 241, 0.65); --cat-ground: rgba(99, 102, 241, 0.45); }
+.cat-info { --cat-glow: rgba(14, 165, 233, 0.65); --cat-ground: rgba(14, 165, 233, 0.45); }
+.cat-town { --cat-glow: rgba(148, 163, 184, 0.5); --cat-ground: rgba(148, 163, 184, 0.35); }
+
 .vt-map-pin:hover {
-    transform: scale(1.18);
+    transform: scale(1.15);
     z-index: 1000 !important;
+    filter: drop-shadow(0 3px 8px var(--cat-glow, rgba(0, 0, 0, 0.35))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
 }
 
 .vt-map-pin.is-active {
-    transform: scale(1.24);
+    transform: scale(1.22);
     z-index: 1001 !important;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 0 14px var(--cat-glow, rgba(245, 158, 11, 0.7))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
 }
 
-/* Category-specific radiant ambient hover glows */
-.vt-map-pin.cat-temple:hover {
-    filter: drop-shadow(0 3px 8px rgba(245, 158, 11, 0.5));
+/* Ground shadow / light handling */
+.pin-ground-light {
+    opacity: 0.12;
+    transition: opacity 0.3s ease;
 }
-.vt-map-pin.cat-holy-site:hover {
-    filter: drop-shadow(0 3px 8px rgba(16, 185, 129, 0.5));
+
+.pin-ground-shadow {
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
 }
-.vt-map-pin.cat-dining:hover {
-    filter: drop-shadow(0 3px 8px rgba(249, 115, 22, 0.5));
+
+/* --- Dark Map Theme Adaptations (Luminous Ambient Aura on Night Roads) --- */
+.dark-map-theme .vt-map-pin,
+.dark-theme .vt-map-pin,
+[data-theme="dark"] .vt-map-pin {
+    filter: drop-shadow(0 0 10px var(--cat-glow, rgba(249, 115, 22, 0.65))) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.85));
 }
-.vt-map-pin.cat-hotel:hover {
-    filter: drop-shadow(0 3px 8px rgba(99, 102, 241, 0.5));
+
+.dark-map-theme .vt-map-pin:hover,
+.dark-theme .vt-map-pin:hover,
+[data-theme="dark"] .vt-map-pin:hover {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 16px var(--cat-glow, rgba(249, 115, 22, 0.8))) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.95));
 }
-.vt-map-pin.cat-info:hover {
-    filter: drop-shadow(0 3px 8px rgba(14, 165, 233, 0.5));
+
+.dark-map-theme .vt-map-pin.is-active,
+.dark-theme .vt-map-pin.is-active,
+[data-theme="dark"] .vt-map-pin.is-active {
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 20px var(--cat-glow, rgba(249, 115, 22, 0.9))) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.95));
 }
-.vt-map-pin.cat-town:hover {
-    filter: drop-shadow(0 3px 8px rgba(71, 85, 105, 0.5));
+
+.dark-map-theme .pin-ground-light,
+.dark-theme .pin-ground-light,
+[data-theme="dark"] .pin-ground-light {
+    opacity: 0.65;
+    filter: blur(1.5px);
+}
+
+.dark-map-theme .pin-ground-shadow,
+.dark-theme .pin-ground-shadow,
+[data-theme="dark"] .pin-ground-shadow {
+    opacity: 0.4;
 }
 
 .vt-map-pin svg {
@@ -161,94 +195,123 @@
     -webkit-backface-visibility: hidden;
 }
 
-/* --- High-Precision Transparent User Location Beacon --- */
+/* --- Uber Precision GPS Sapphire Beacon --- */
 .user-beacon-wrapper,
 .user-marker-wrapper {
     background: none !important;
     border: none !important;
 }
 
+.uber-user-beacon,
 .user-beacon-container {
+    position: relative;
     width: 44px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
     cursor: pointer;
     background: transparent !important;
 }
 
-.user-beacon-pulse {
+.uub-pulse-wave {
     position: absolute;
-    border-radius: 50%;
-    background: rgba(37, 99, 235, 0.25);
-    border: 1.5px solid rgba(59, 130, 246, 0.6);
-    pointer-events: none;
-    box-sizing: border-box;
-}
-
-.user-beacon-pulse.ring-1 {
-    width: 36px;
-    height: 36px;
-    animation: beaconPulseWave 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
-}
-
-.user-beacon-pulse.ring-2 {
     width: 44px;
     height: 44px;
-    animation: beaconPulseWave 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite 0.8s;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.26) 0%, rgba(37, 99, 235, 0) 75%);
+    animation: uubPulseWave 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+    pointer-events: none;
 }
 
-@keyframes beaconPulseWave {
+.uub-pulse-ring {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(59, 130, 246, 0.55);
+    animation: uubPulseRing 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite 0.6s;
+    pointer-events: none;
+}
+
+@keyframes uubPulseWave {
     0% {
         transform: scale(0.35);
         opacity: 0.95;
     }
-
-    60% {
-        opacity: 0.45;
+    100% {
+        transform: scale(1.4);
+        opacity: 0;
     }
+}
 
+@keyframes uubPulseRing {
+    0% {
+        transform: scale(0.35);
+        opacity: 0.85;
+    }
     100% {
         transform: scale(1.35);
         opacity: 0;
     }
 }
 
-.user-beacon-aura {
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0) 70%);
-    pointer-events: none;
-}
-
+.uub-core-halo,
 .user-beacon-core {
-    width: 17px;
-    height: 17px;
+    position: relative;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background: #2563eb;
     border: 2.5px solid #ffffff;
-    box-shadow: 0 0 10px rgba(37, 99, 235, 0.8), 0 2px 6px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 12px rgba(37, 99, 235, 0.8), 0 2px 6px rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 2;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.uber-user-beacon:hover .uub-core-halo,
 .user-beacon-container:hover .user-beacon-core {
-    transform: scale(1.18);
+    transform: scale(1.16);
 }
 
+.uub-core-dot,
 .user-beacon-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+.uub-tag {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: rgba(15, 23, 42, 0.9);
+    color: #ffffff;
+    font-size: 0.58rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+    margin-bottom: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.uber-user-beacon:hover .uub-tag {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 .image-marker.user-location-marker {
@@ -641,31 +704,52 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
     z-index: 1500 !important;
 }
 
+.driver-ground-shadow {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0) 72%);
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.modern-driver-marker:hover .driver-ground-shadow {
+    transform: translateX(-50%) scale(1.15);
+    opacity: 0.55;
+}
+
+/* Light Map Mode (Default): Clean Apple / Uber Porcelain Token */
 .driver-pod {
     width: 36px;
     height: 36px;
-    background: #09090b;
-    color: #ffffff;
+    background: #ffffff;
+    color: #18181b;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    border: 1.5px solid #ffffff;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
     position: relative;
     transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
 }
 
 .driver-veh-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff;
+    color: #18181b;
 }
 
 .driver-veh-icon svg {
-    color: #ffffff;
-    stroke: #ffffff;
+    color: #18181b;
+    stroke: #18181b;
 }
 
 .driver-live-dot {
@@ -675,9 +759,10 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    border: 2px solid #09090b;
+    border: 2px solid #ffffff;
     pointer-events: none;
     box-sizing: border-box;
+    z-index: 3;
 }
 
 .driver-live-dot.available {
@@ -696,19 +781,19 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
 }
 
 .driver-live-dot.available .driver-dot-radar {
-    background: rgba(16, 185, 129, 0.35);
-    border: 1px solid rgba(16, 185, 129, 0.6);
-    animation: driverDotRadarWave 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+    background: rgba(16, 185, 129, 0.32);
+    border: 1px solid rgba(16, 185, 129, 0.55);
+    animation: driverDotRadarWave 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
 }
 
 @keyframes driverDotRadarWave {
     0% {
         transform: scale(0.6);
-        opacity: 1;
+        opacity: 0.9;
     }
 
     100% {
-        transform: scale(1.8);
+        transform: scale(1.6);
         opacity: 0;
     }
 }
@@ -771,13 +856,24 @@ body.dark-theme .map-style-satellite .marker-cluster:hover div span,
 }
 
 .leaflet-driver-popup .leaflet-popup-tip-container {
-    overflow: visible;
+    width: 24px;
+    height: 10px;
+    position: absolute;
+    left: 50%;
+    margin-left: -12px;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .leaflet-driver-popup .leaflet-popup-tip {
-    background: rgba(255, 255, 255, 0.95);
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    margin: -6px auto 0;
+    transform: rotate(45deg);
+    background: rgba(255, 255, 255, 0.96);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
 /* Completely suppress default leaflet close button (handled by custom header close button) */
@@ -1340,13 +1436,69 @@ body.dark-theme .leaflet-driver-popup .leaflet-popup-content-wrapper,
     box-shadow: 0 24px 54px -10px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
 }
 
+.leaflet-driver-popup .leaflet-popup-tip-container {
+    width: 24px;
+    height: 10px;
+    position: absolute;
+    left: 50%;
+    margin-left: -12px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
 [data-theme="dark"] .leaflet-driver-popup .leaflet-popup-tip,
 .dark-theme .leaflet-driver-popup .leaflet-popup-tip,
 body.dark-theme .leaflet-driver-popup .leaflet-popup-tip,
 .dark-map-theme .leaflet-driver-popup .leaflet-popup-tip {
-    background: rgba(20, 20, 24, 0.94) !important;
+    background: #141418 !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dark Map Theme: Authentic Uber Black Obsidian Token for Drivers */
+.dark-map-theme .driver-pod {
+    background: #09090b !important;
+    color: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 10px rgba(16, 185, 129, 0.2) !important;
+}
+
+.dark-map-theme .driver-veh-icon {
+    color: #ffffff !important;
+}
+
+.dark-map-theme .driver-veh-icon svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+.dark-map-theme .driver-live-dot {
+    border-color: #09090b !important;
+}
+
+.dark-map-theme .driver-ground-shadow {
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 75%) !important;
+}
+
+/* Satellite Map Theme: High-Contrast Obsidian Token */
+.map-style-satellite .driver-pod {
+    background: #09090b !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.75), 0 0 12px rgba(16, 185, 129, 0.35) !important;
+}
+
+.map-style-satellite .driver-veh-icon {
+    color: #ffffff !important;
+}
+
+.map-style-satellite .driver-veh-icon svg {
+    color: #ffffff !important;
+    stroke: #ffffff !important;
+}
+
+.map-style-satellite .driver-live-dot {
+    border-color: #09090b !important;
 }
 
 [data-theme="dark"] .leaflet-driver-popup .dpc-avatar,

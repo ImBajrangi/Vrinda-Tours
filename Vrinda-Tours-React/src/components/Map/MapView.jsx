@@ -12,31 +12,18 @@ function getCategoryPinData(category) {
     case 'Temple':
       return {
         key: 'temple',
-        gradTop: '#fde047',
-        gradMid: '#f59e0b',
+        gradTop: '#f59e0b',
+        gradMid: '#d97706',
         gradBot: '#b45309',
-        iconColor: '#b45309',
-        // Sacred Golden Kalash & Dhwaja (Flag) Finial crowning the temple pin
-        crownSvg: `
-          <path d="M18 0.3 L19.4 2.8 H16.6 Z" fill="#fde047" stroke="#b45309" stroke-width="0.5"/>
-          <line x1="18" y1="0.3" x2="21" y2="1.2" stroke="#dc2626" stroke-width="1" stroke-linecap="round"/>
-          <circle cx="18" cy="2.8" r="1" fill="#f59e0b"/>
-        `,
         // Sacred Hindu Temple Mandir with Kalash & Shikhara
-        glyph: `<path d="M12 2L13.5 5.5H10.5L12 2Z" fill="currentColor"/><path d="M12 5.5L15 9.5H9L12 5.5Z" fill="currentColor"/><rect x="7" y="9.5" width="10" height="2" rx="0.5" fill="currentColor"/><rect x="8" y="11.5" width="8" height="7.5" fill="currentColor"/><path d="M10.5 19V15C10.5 14.2 11.2 13.5 12 13.5C12.8 13.5 13.5 14.2 13.5 15V19" fill="#ffffff"/><line x1="5" y1="19" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+        glyph: `<path d="M12 2L13.5 5.5H10.5L12 2Z" fill="currentColor"/><path d="M12 5.5L15 9.5H9L12 5.5Z" fill="currentColor"/><rect x="7" y="9.5" width="10" height="2" rx="0.5" fill="currentColor"/><rect x="8" y="11.5" width="8" height="7.5" fill="currentColor"/><path d="M10.5 19V15C10.5 14.2 11.2 13.5 12 13.5C12.8 13.5 13.5 14.2 13.5 15V19" fill="#b45309"/><line x1="5" y1="19" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
       };
     case 'Holy Site':
       return {
         key: 'holy-site',
-        gradTop: '#6ee7b7',
-        gradMid: '#10b981',
+        gradTop: '#10b981',
+        gradMid: '#059669',
         gradBot: '#047857',
-        iconColor: '#047857',
-        // Sacred Lotus Petal Crown
-        crownSvg: `
-          <path d="M18 0.5 C18 0.5 16.5 2 16.5 3 C16.5 3.8 17.2 4.2 18 4.2 C18.8 4.2 19.5 3.8 19.5 3 C19.5 2 18 0.5 18 0.5 Z" fill="#6ee7b7" stroke="#047857" stroke-width="0.5"/>
-          <circle cx="18" cy="3.2" r="0.8" fill="#fde047"/>
-        `,
         // Sacred Lotus Blossom
         glyph: `<path d="M12 3C12 3 9.5 7.5 9.5 11C9.5 12.4 10.6 13.5 12 13.5C13.4 13.5 14.5 12.4 14.5 11C14.5 7.5 12 3 12 3Z" fill="currentColor"/><path d="M7.5 7C7.5 7 5.5 10.5 6 13C6.4 14.8 8 16 9.8 15.8C10.6 15.7 11.4 15.2 12 14.5C11 13 10.5 11 10.5 9C10.5 8.2 10.7 7.5 11 6.8C9.6 6.3 8.3 6.5 7.5 7Z" fill="currentColor"/><path d="M16.5 7C16.5 7 18.5 10.5 18 13C17.6 14.8 16 16 14.2 15.8C13.4 15.7 12.6 15.2 12 14.5C13 13 13.5 11 13.5 9C13.5 8.2 13.3 7.5 13 6.8C14.4 6.3 15.7 6.5 16.5 7Z" fill="currentColor"/><path d="M4 18C7 16.5 10 17.5 12 18.5C14 17.5 17 16.5 20 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
       };
@@ -44,53 +31,37 @@ function getCategoryPinData(category) {
     case 'Restaurant':
       return {
         key: 'dining',
-        gradTop: '#fdba74',
-        gradMid: '#f97316',
+        gradTop: '#f97316',
+        gradMid: '#ea580c',
         gradBot: '#c2410c',
-        iconColor: '#c2410c',
-        crownSvg: `
-          <circle cx="18" cy="2" r="1.2" fill="#fdba74" stroke="#c2410c" stroke-width="0.5"/>
-        `,
         // Culinary Fork & Spoon
-        glyph: `<path d="M18 2v6a3 3 0 0 1-3 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 2v5a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 9v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+        glyph: `<path d="M18 2v6a3 3 0 0 1-3 3v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 2v5a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M8 9v12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`,
       };
     case 'Hotel':
       return {
         key: 'hotel',
-        gradTop: '#a5b4fc',
-        gradMid: '#6366f1',
+        gradTop: '#6366f1',
+        gradMid: '#4f46e5',
         gradBot: '#3730a3',
-        iconColor: '#4338ca',
-        crownSvg: `
-          <circle cx="18" cy="2" r="1.2" fill="#a5b4fc" stroke="#3730a3" stroke-width="0.5"/>
-        `,
         // Bed / Ashram Stay
         glyph: `<path d="M2 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 9h18a2 2 0 0 1 2 2v9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2 17h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 9v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
       };
     case 'Information':
       return {
         key: 'info',
-        gradTop: '#7dd3fc',
-        gradMid: '#0ea5e9',
+        gradTop: '#0ea5e9',
+        gradMid: '#0284c7',
         gradBot: '#0369a1',
-        iconColor: '#0369a1',
-        crownSvg: `
-          <circle cx="18" cy="2" r="1.2" fill="#7dd3fc" stroke="#0369a1" stroke-width="0.5"/>
-        `,
         // Information Guide
-        glyph: `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.2" fill="currentColor"/>`,
+        glyph: `<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="16" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="1.3" fill="currentColor"/>`,
       };
     case 'Town':
     default:
       return {
         key: 'town',
-        gradTop: '#94a3b8',
+        gradTop: '#64748b',
         gradMid: '#475569',
         gradBot: '#1e293b',
-        iconColor: '#1e293b',
-        crownSvg: `
-          <circle cx="18" cy="2" r="1.2" fill="#94a3b8" stroke="#1e293b" stroke-width="0.5"/>
-        `,
         // Heritage Town Landmark
         glyph: `<path d="M12 21s-6-5.33-6-10a6 6 0 0 1 12 0c0 4.67-6 10-6 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="11" r="2.5" fill="currentColor"/>`,
       };
@@ -104,54 +75,44 @@ function createIcon(category, isActive = false) {
     className: 'marker-wrapper',
     html: `
       <div class="vt-map-pin ${isActive ? 'is-active' : ''} cat-${pin.key}">
-        <svg width="36" height="46" viewBox="0 0 36 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="38" height="46" viewBox="0 0 38 46" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="pin-grad-${pin.key}" x1="18" y1="2" x2="18" y2="42" gradientUnits="userSpaceOnUse">
+            <linearGradient id="pin-grad-${pin.key}" x1="19" y1="3" x2="19" y2="40" gradientUnits="userSpaceOnUse">
               <stop offset="0%" stop-color="${pin.gradTop}"/>
-              <stop offset="48%" stop-color="${pin.gradMid}"/>
+              <stop offset="50%" stop-color="${pin.gradMid}"/>
               <stop offset="100%" stop-color="${pin.gradBot}"/>
             </linearGradient>
-            <linearGradient id="pin-gloss-${pin.key}" x1="18" y1="4" x2="18" y2="15" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+            <linearGradient id="pin-sheen-${pin.key}" x1="19" y1="4" x2="19" y2="16" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
               <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
             </linearGradient>
           </defs>
 
-          <!-- Vector Ground Contact Shadow -->
-          <ellipse cx="18" cy="43.8" rx="6.5" ry="1.8" fill="rgba(0,0,0,0.18)"/>
+          <!-- Vector Ground Contact Shadow & Night Light Pool -->
+          <ellipse class="pin-ground-light" cx="19" cy="42.5" rx="7.5" ry="2" fill="${pin.gradMid}"/>
+          <ellipse class="pin-ground-shadow" cx="19" cy="42.5" rx="5.5" ry="1.6" fill="rgba(0,0,0,0.2)"/>
 
-          <!-- Finial Crown / Spire -->
-          ${pin.crownSvg || ''}
-
-          <!-- Sculpted Royal Jharokha Arch Crest Body -->
-          <path d="M18 1.5 C19.5 2.8 22.5 4.5 26.5 5 C31 5.5 33.5 10 33.5 16.5 C33.5 22.5 29.5 27 25 31.2 C21.2 34.6 19 38.5 18 42.5 C17 38.5 14.8 34.6 11 31.2 C6.5 27 2.5 22.5 2.5 16.5 C2.5 10 5 5.5 9.5 5 C13.5 4.5 16.5 2.8 18 1.5 Z" 
+          <!-- Apple Maps & Uber Luxury Floating POI Badge Body -->
+          <path d="M 19 3 C 27.28 3, 34 9.72, 34 18 C 34 23.6, 30.6 28.3, 25.8 30.6 L 19 40.5 L 12.2 30.6 C 7.4 28.3, 4 23.6, 4 18 C 4 9.72, 10.72 3, 19 3 Z" 
                 fill="url(#pin-grad-${pin.key})" 
                 stroke="#ffffff" 
                 stroke-width="1.8" 
                 stroke-linejoin="round"/>
 
-          <!-- Upper Architectural Arch Inlay Highlight -->
-          <path d="M18 3.5 C20 4.8 22.5 6 25 6.5 C28 7.2 31 10.2 31 15.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-linecap="round"/>
-          <path d="M18 3.5 C16 4.8 13.5 6 11 6.5 C8 7.2 5 10.2 5 15.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" stroke-linecap="round"/>
+          <!-- Specular Upper Rim Highlight -->
+          <path d="M 8 16 C 9 10 13.5 5.5 19 5.5 C 24.5 5.5 29 10 30 16 C 26 11 21 8.5 15 9.5 C 11.5 10 9 13 8 16 Z" 
+                fill="url(#pin-sheen-${pin.key})"/>
 
-          <!-- Specular Curved Gloss Sheen -->
-          <path d="M8 14C9.5 8 13.5 4.8 18 4.8C22.5 4.8 26.5 8 28 14C24 9.5 20.5 7 15.5 7.5C11.5 8 9 11 8 14Z" 
-                fill="url(#pin-gloss-${pin.key})"/>
+          <!-- Inset Medallion Bezel (Preserving circular framing) -->
+          <circle cx="19" cy="18" r="10.5" fill="rgba(0, 0, 0, 0.14)" stroke="rgba(255, 255, 255, 0.28)" stroke-width="0.8"/>
 
-          <!-- Concentric Outer Accent Ring -->
-          <circle cx="18" cy="18" r="12.2" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.8"/>
-
-          <!-- Inset Pure White Medallion (Preserved exactly as user loved!) -->
-          <circle cx="18" cy="18" r="9.5" fill="#ffffff" stroke="rgba(0,0,0,0.08)" stroke-width="0.8"/>
-          <circle cx="18" cy="18" r="8.8" fill="#ffffff" stroke="rgba(0,0,0,0.04)" stroke-width="0.5"/>
-
-          <!-- Centered Category Icon Glyph -->
-          <g transform="translate(11.5, 11.5) scale(0.54)" color="${pin.iconColor}">
+          <!-- Pure White Category Icon (Apple Maps & Google Maps Worldwide POI Standard) -->
+          <g transform="translate(12.5, 11.5) scale(0.54)" color="#ffffff">
             ${pin.glyph}
           </g>
 
           <!-- Precision Anchor Tip Dot -->
-          <circle cx="18" cy="42.5" r="1" fill="#ffffff"/>
+          <circle cx="19" cy="40.5" r="0.9" fill="#ffffff"/>
         </svg>
         ${isActive ? `
           <div class="vt-water-ripple-container">
@@ -161,8 +122,8 @@ function createIcon(category, isActive = false) {
         ` : ''}
       </div>
     `,
-    iconSize: [36, 46],
-    iconAnchor: [18, 43],
+    iconSize: [38, 46],
+    iconAnchor: [19, 41],
   });
 }
 
@@ -647,7 +608,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
     }
   }, [activeRoute]);
 
-  // Update user location marker using animated GIF marker with pure transparent background
+  // Update user location marker using Uber-grade vector GPS precision beacon
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map || !userPosition) return;
@@ -657,12 +618,17 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
     const icon = L.divIcon({
       className: 'user-marker-wrapper',
       html: `
-        <div class="image-marker user-location-marker" title="Your Live Location">
-          <img src="/user-marker-crop.gif" class="static user-live-gif" alt="Your Live Location" />
+        <div class="uber-user-beacon" title="Your Live Location">
+          <div class="uub-pulse-wave"></div>
+          <div class="uub-pulse-ring"></div>
+          <div class="uub-core-halo">
+            <div class="uub-core-dot"></div>
+          </div>
+          <div class="uub-tag">YOU</div>
         </div>
       `,
       iconSize: [44, 44],
-      iconAnchor: [22, 44]
+      iconAnchor: [22, 22]
     });
 
     const marker = L.marker([userPosition.lat, userPosition.lng], {
@@ -695,8 +661,8 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
         const isTaxi = d.vehicleType === 'Taxi' || d.vehicleType === 'Cab';
         const vehicleSvg = isTaxi
-          ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C1.4 11.2 1 12 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`
-          : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16L8 5h8l3 11H5z"/><circle cx="7.5" cy="18.5" r="2"/><circle cx="16.5" cy="18.5" r="2"/></svg>`;
+          ? `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7L7.5 3.5C7.8 2.8 8.5 2.5 9.2 2.5H14.8C15.5 2.5 16.2 2.8 16.5 3.5L18 7" fill="currentColor" fill-opacity="0.12"/><rect x="4" y="7" width="16" height="13" rx="3.5" fill="currentColor" fill-opacity="0.16"/><path d="M6 11H18M6 15H18"/><circle cx="7" cy="18" r="1.3" fill="currentColor"/><circle cx="17" cy="18" r="1.3" fill="currentColor"/><rect x="10" y="2" width="4" height="1.8" rx="0.9" fill="#10b981" stroke="#10b981"/></svg>`
+          : `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8C5 6.3 6.3 5 8 5H16C17.7 5 19 6.3 19 8V16C19 17.1 18.1 18 17 18H7C5.9 18 5 17.1 5 16V8Z" fill="currentColor" fill-opacity="0.14"/><path d="M5 10H19M8 5V18M16 5V18"/><circle cx="12" cy="3.5" r="1.5" fill="#10b981" stroke="#10b981"/><rect x="3.5" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/><rect x="19" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/></svg>`;
 
         const existing = currentMap[d.id];
 
@@ -708,6 +674,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
             className: 'driver-marker-wrapper',
             html: `
               <div class="modern-driver-marker">
+                <div class="driver-ground-shadow"></div>
                 <div class="driver-pod ${status} ${isTaxi ? 'is-cab' : 'is-rickshaw'}">
                   <div class="driver-veh-icon">
                     ${vehicleSvg}
@@ -723,7 +690,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
               </div>`,
             iconSize: [42, 42],
             iconAnchor: [21, 21],
-            popupAnchor: [0, -22]
+            popupAnchor: [0, -28]
           });
 
           const popupContent = `
@@ -765,7 +732,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
               <div class="dpc-actions">
                 <a href="tel:${d.phone || '+918000000000'}" class="dpc-btn-call">
                   <span class="dpc-call-icon-wrap">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                   </span>
                   <span class="dpc-call-text">Call Driver</span>
                   <span class="dpc-call-rating">★ 4.9</span>
@@ -780,7 +747,7 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
             maxWidth: 295,
             minWidth: 265,
             autoPan: false,
-            offset: L.point(0, -18),
+            offset: L.point(0, -6),
             closeButton: false
           });
 

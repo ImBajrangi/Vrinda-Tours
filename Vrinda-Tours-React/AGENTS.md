@@ -146,3 +146,5 @@ Never chain `drop-shadow()` with SVG matrix filters (`url(#filter)`) on nested `
 
 When overriding third-party component styles (such as Leaflet or external libraries) across theme modes, always target both container and nested leaf text nodes (e.g., div and span) with explicit text color and background pairing rules to prevent cascade collisions
 
+Always ensure Leaflet map popups maintain a minimum 10px floating air gap above active divIcon markers, and use map-theme-adaptive tokens (Porcelain for light maps, Obsidian for dark/satellite maps) with radial-gradient ground contact shadows.
+
