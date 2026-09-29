@@ -124,39 +124,19 @@ function createIcon(category, isActive = false) {
   });
 }
 
-// Butter-smooth camera glide to focus a target coordinate with zero flickering or tile jitter
-function smoothCenterOn(map, lat, lng, { targetZoom = null, offsetY = 0, duration = 0.45 } = {}) {
+// Native Leaflet smooth camera — no custom offsets, no panBy jitter
+function smoothCenterOn(map, lat, lng, { targetZoom = null } = {}) {
   if (!map || lat == null || lng == null) return;
-  map.stop(); // Cleanly abort any in-flight conflicting transitions
 
+  const targetLatLng = L.latLng(lat, lng);
   const currentZoom = map.getZoom();
   const destZoom = targetZoom ? Math.max(currentZoom, targetZoom) : currentZoom;
-  const targetLatLng = L.latLng(lat, lng);
 
-  // If zoomed far out (< 14), gracefully zoom into neighborhood first
-  if (destZoom > currentZoom + 1) {
-    map.setView(targetLatLng, destZoom, { animate: true, duration: 0.5 });
-    return;
+  if (destZoom !== currentZoom) {
+    map.flyTo(targetLatLng, destZoom, { animate: true, duration: 0.8 });
+  } else {
+    map.panTo(targetLatLng, { animate: true, duration: 0.5 });
   }
-
-  // Calculate pixel delta in current viewport
-  const pt = map.latLngToContainerPoint(targetLatLng);
-  const size = map.getSize();
-  const desiredX = size.x / 2;
-  const desiredY = Math.max(60, (size.y / 2) + offsetY);
-  const deltaX = pt.x - desiredX;
-  const deltaY = pt.y - desiredY;
-
-  // If already centered within 6 pixels, stay completely stable (prevents micro-shaking!)
-  if (Math.hypot(deltaX, deltaY) < 6) {
-    return;
-  }
-
-  map.panBy([deltaX, deltaY], {
-    animate: true,
-    duration,
-    easeLinearity: 0.25,
-  });
 }
 
 export default function MapView({ 
@@ -490,11 +470,11 @@ export default function MapView({
         // If marker is inside a cluster, use markercluster's native zoomToShowLayer to smoothly uncluster it first
         if (marker && cluster && cluster.hasLayer(marker) && cluster.getVisibleParent(marker) !== marker) {
           cluster.zoomToShowLayer(marker, () => {
-            smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15, offsetY: -70 });
+            smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15 });
           });
         } else {
           // Marker is already visible or a standalone/destination marker: Glide directly as smooth as butter!
-          smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15, offsetY: -70 });
+          smoothCenterOn(map, activeLocation.lat, activeLocation.lng, { targetZoom: 15 });
         }
       }
     } else {
@@ -666,16 +646,16 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
       className: 'user-marker-wrapper',
       html: `
         <div class="uber-user-beacon" title="Your Live Location">
-          <div class="uub-pulse-wave"></div>
-          <div class="uub-pulse-ring"></div>
-          <div class="uub-core-halo">
-            <div class="uub-core-dot"></div>
+          <div class="uub-accuracy-halo"></div>
+          <div class="uub-nav-circle">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+            </svg>
           </div>
-          <div class="uub-tag">YOU</div>
         </div>
       `,
-      iconSize: [44, 44],
-      iconAnchor: [22, 22]
+      iconSize: [48, 48],
+      iconAnchor: [24, 24]
     });
 
     const marker = L.marker([userPosition.lat, userPosition.lng], {
@@ -708,9 +688,10 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
       if ((status === 'available' || status === 'busy') && loc?.lat && loc?.lng) {
         const isTaxi = d.vehicleType === 'Taxi' || d.vehicleType === 'Cab';
         const vehicleSvg = isTaxi
-          ? `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7L7.5 3.5C7.8 2.8 8.5 2.5 9.2 2.5H14.8C15.5 2.5 16.2 2.8 16.5 3.5L18 7" fill="currentColor" fill-opacity="0.12"/><rect x="4" y="7" width="16" height="13" rx="3.5" fill="currentColor" fill-opacity="0.16"/><path d="M6 11H18M6 15H18"/><circle cx="7" cy="18" r="1.3" fill="currentColor"/><circle cx="17" cy="18" r="1.3" fill="currentColor"/><rect x="10" y="2" width="4" height="1.8" rx="0.9" fill="#10b981" stroke="#10b981"/></svg>`
-          : `<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8C5 6.3 6.3 5 8 5H16C17.7 5 19 6.3 19 8V16C19 17.1 18.1 18 17 18H7C5.9 18 5 17.1 5 16V8Z" fill="currentColor" fill-opacity="0.14"/><path d="M5 10H19M8 5V18M16 5V18"/><circle cx="12" cy="3.5" r="1.5" fill="#10b981" stroke="#10b981"/><rect x="3.5" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/><rect x="19" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/></svg>`;
+          ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7L7.5 3.5C7.8 2.8 8.5 2.5 9.2 2.5H14.8C15.5 2.5 16.2 2.8 16.5 3.5L18 7" fill="currentColor" fill-opacity="0.12"/><rect x="4" y="7" width="16" height="13" rx="3.5" fill="currentColor" fill-opacity="0.16"/><path d="M6 11H18M6 15H18"/><circle cx="7" cy="18" r="1.3" fill="currentColor"/><circle cx="17" cy="18" r="1.3" fill="currentColor"/></svg>`
+          : `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8C5 6.3 6.3 5 8 5H16C17.7 5 19 6.3 19 8V16C19 17.1 18.1 18 17 18H7C5.9 18 5 17.1 5 16V8Z" fill="currentColor" fill-opacity="0.14"/><path d="M5 10H19M8 5V18M16 5V18"/><rect x="3.5" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/><rect x="19" y="13" width="1.5" height="4" rx="0.75" fill="currentColor"/></svg>`;
 
+        const firstName = (d.name || 'Driver').split(' ')[0];
         const existing = currentMap[d.id];
 
         // Check if marker needs icon re-render
@@ -726,18 +707,12 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
                   <div class="driver-veh-icon">
                     ${vehicleSvg}
                   </div>
-                  <div class="driver-live-dot ${status}">
-                    <span class="driver-dot-radar"></span>
-                  </div>
                 </div>
-                <div class="driver-hover-pill">
-                  <span class="driver-pill-name">${d.name || 'Driver'}</span>
-                  <span class="driver-pill-rating">★ 4.9</span>
-                </div>
+                <div class="driver-hover-pill">${firstName}</div>
               </div>`,
             iconSize: [42, 42],
             iconAnchor: [21, 21],
-            popupAnchor: [0, -28]
+            popupAnchor: [0, -12]
           });
 
           const popupContent = `
@@ -788,14 +763,16 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
             </div>
           `;
 
-          const marker = L.marker([loc.lat, loc.lng], { icon, zIndexOffset: 800 });
+          const marker = L.marker([loc.lat, loc.lng], { icon, zIndexOffset: 800, bubblingMouseEvents: false });
           marker.bindPopup(popupContent, { 
             className: 'leaflet-driver-popup', 
             maxWidth: 295,
             minWidth: 265,
             autoPan: false,
             offset: L.point(0, -6),
-            closeButton: false
+            closeButton: false,
+            autoClose: true,
+            closeOnClick: true
           });
 
           marker.on('click', (e) => {
@@ -803,7 +780,18 @@ function generateParabolicArc(p0, p1, numPoints = 24, bend = 0.22) {
               L.DomEvent.stopPropagation(e.originalEvent);
             }
             L.DomEvent.stop(e);
-            smoothCenterOn(mapInstanceRef.current, loc.lat, loc.lng, { targetZoom: 15, offsetY: 70 });
+
+            const map = mapInstanceRef.current;
+            if (!map) return;
+
+            // Close any previously open popup to prevent stacking
+            map.closePopup();
+
+            // Small delay to let close finish before opening new popup + centering
+            requestAnimationFrame(() => {
+              marker.openPopup();
+              smoothCenterOn(map, loc.lat, loc.lng, { targetZoom: 15 });
+            });
           });
 
           driverCluster.addLayer(marker);
