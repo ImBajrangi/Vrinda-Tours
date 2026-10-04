@@ -3,3 +3,10 @@ dist/
 .env.local
 .env.*.local
 .env.*
+# Mobile / Build Artifacts
+*.apk
+*.aab
+*.keystore
+*.jks
+android/app/build/
+graphify-out/

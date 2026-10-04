@@ -1,0 +1,10 @@
+# Vercel Deployment Exclusions
+*.apk
+*.aab
+*.keystore
+*.jks
+android/
+ios/
+graphify-out/
+.agents/
+*.log

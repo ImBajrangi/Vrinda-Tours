@@ -21,3 +21,11 @@ firebase-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Mobile / Build Artifacts
+*.apk
+*.aab
+*.keystore
+*.jks
+android/app/build/
+graphify-out/
